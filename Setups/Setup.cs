@@ -44,7 +44,8 @@ namespace BeforeOurTime.Business.Setups
                     }",
                     Script = @"
                         (function() {
-                            log(parseInt(data.sample) + 1);
+                            var newItem = getItem('fe178ad7-0e33-4111-beaf-6dfcfd548bd5');
+                            log(newItem.UuidType);
                         })();
                     "
                 }

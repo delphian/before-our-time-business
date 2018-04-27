@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Messages;
 using BeforeOutTime.Repository.Dbs.EF;
 using Jint;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,7 @@ namespace BeforeOurTime.Business
                 .AddLogging()
                 .AddDbContext<BaseContext>(options => options.UseSqlite(connectionString))
                 .AddSingleton<IItemRepo<Item>>(new ItemRepo<Item>(db))
+                .AddSingleton<IMessageRepo>(new MessageRepo(db))
                 .BuildServiceProvider();
 
             var setup = new Setups.Setup(Configuration, ServiceProvider);
@@ -42,14 +44,38 @@ namespace BeforeOurTime.Business
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             var item = itemRepo.ReadUuid(new List<Guid>() { new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5") }).First();
 
-            var engine = new Engine()
-                .SetValue("log", new Action<object>(Console.WriteLine))
-                .SetValue("me", item)
-                .SetValue("data", JObject.Parse(item.Data));
-            engine.Execute(item.Script);
+            var message = new Message()
+            {
+                Version = ItemVersion.Alpha,
+                Type = MessageType.Tick,
+                To = itemRepo.ReadUuid(new List<Guid>() { new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5") }).First(),
+                From = itemRepo.ReadUuid(new List<Guid>() { new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5") }).First()
+            };
+            SendItemMessages(new List<Message>() { message }, ServiceProvider);
 
             Console.WriteLine("Done");
             Console.ReadLine();
+        }
+
+        public static void SendItemMessages(List<Message> messages, IServiceProvider serviceProvider)
+        {
+            var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
+            // Setup engine
+            Func<string, Item> getItem = delegate (string uuid)
+            {
+                return itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
+            };
+            var engine = new Engine()
+                .SetValue("log", new Action<object>(Console.WriteLine))
+                .SetValue("getItem", getItem);
+            // Deliver message to each recipient
+            messages.ForEach(delegate (Message message)
+            {
+                engine
+                    .SetValue("me", message.To)
+                    .SetValue("data", JObject.Parse(message.To.Data))
+                    .Execute(message.To.Script);
+            });
         }
     }
 }
