@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace BeforeOurTime.Business
 {
@@ -37,13 +38,25 @@ namespace BeforeOurTime.Business
                 .AddSingleton<IItemRepo<Item>>(new ItemRepo<Item>(db))
                 .AddSingleton<IMessageRepo>(new MessageRepo(db))
                 .BuildServiceProvider();
-
+            // Run initial setup
             var setup = new Setups.Setup(Configuration, ServiceProvider);
             setup.Install();
-
+            // Create a Timer object that knows to call our TimerCallback
+            // method once every 2000 milliseconds.
+            Timer t = new Timer(Tick, null, 0, 2000);
+            // Wait for user input
+            Console.WriteLine("Waiting - Hit enter to abort");
+            Console.ReadLine();
+        }
+        /// <summary>
+        /// Execute all item scripts that desire a regular periodic event
+        /// </summary>
+        /// <param name="o"></param>
+        public static void Tick(Object o)
+        {
+            // Display the date/time when this method got called.
+            Console.WriteLine("In TimerCallback: " + DateTime.Now);
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
-            var item = itemRepo.ReadUuid(new List<Guid>() { new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5") }).First();
-
             var message = new Message()
             {
                 Version = ItemVersion.Alpha,
@@ -51,16 +64,19 @@ namespace BeforeOurTime.Business
                 To = itemRepo.ReadUuid(new List<Guid>() { new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5") }).First(),
                 From = itemRepo.ReadUuid(new List<Guid>() { new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5") }).First()
             };
-            SendItemMessages(new List<Message>() { message }, ServiceProvider);
-
-            Console.WriteLine("Done");
-            Console.ReadLine();
+            DeliverMessages(new List<Message>() { message }, ServiceProvider);
+            // Force a garbage collection to occur for this demo.
+            GC.Collect();
         }
-
-        public static void SendItemMessages(List<Message> messages, IServiceProvider serviceProvider)
+        /// <summary>
+        /// Deliver messages to their recipient items and execute each item script
+        /// </summary>
+        /// <param name="messages"></param>
+        /// <param name="serviceProvider"></param>
+        public static void DeliverMessages(List<Message> messages, IServiceProvider serviceProvider)
         {
             var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
-            // Setup engine
+            // Box some repository functionality into safe limited javascript functions
             Func<string, Item> getItem = delegate (string uuid)
             {
                 return itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
