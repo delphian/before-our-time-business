@@ -26,6 +26,25 @@ namespace BeforeOurTime.Business.Setups
         {
             var itemRepo = (IItemRepo<Item>) ServiceProvider.GetService(typeof(IItemRepo<Item>));
             itemRepo.Delete();
+
+            var gameItem = itemRepo.Create(new List<Item>() { new Item()
+            {
+                Type = ItemType.Game,
+                Uuid = new Guid("487a7282-0cad-4081-be92-83b14671fc23"),
+                UuidType = new Guid("75f55af3-3027-404c-b9f0-7b21ead826b2"),
+                ParentId = null,
+                Children = new List<Item>(),
+                Data = @"{
+                    sample: 100
+                }",
+                Script = @"
+                    (function() {
+                        log(data.sample);
+                        data.sample = data.sample + 1;
+                    })();
+                "
+            } }).First();
+
             var interfaceType = typeof(ISetup);
             var setupItems = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())

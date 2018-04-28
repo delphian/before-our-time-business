@@ -58,14 +58,19 @@ namespace BeforeOurTime.Business
             // Display the date/time when this method got called.
             Console.Write("+");
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
-            var message = new Message()
+            var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
+            var items = itemRepo.Read();
+            items.ForEach(delegate (Item item)
             {
-                Version = ItemVersion.Alpha,
-                Type = MessageType.Tick,
-                To = itemRepo.ReadUuid(new List<Guid>() { new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5") }).First(),
-                From = itemRepo.ReadUuid(new List<Guid>() { new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5") }).First()
-            };
-            DeliverMessages(new List<Message>() { message }, ServiceProvider);
+                var message = new Message()
+                {
+                    Version = ItemVersion.Alpha,
+                    Type = MessageType.EventTick,
+                    To = item,
+                    From = gameItem
+                };
+                DeliverMessages(new List<Message>() { message }, ServiceProvider);
+            });
             // Force a garbage collection to occur for this demo.
             GC.Collect();
         }
