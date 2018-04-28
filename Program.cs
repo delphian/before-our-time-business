@@ -56,7 +56,7 @@ namespace BeforeOurTime.Business
         public static void Tick(Object o)
         {
             // Display the date/time when this method got called.
-            Console.WriteLine("In TimerCallback: " + DateTime.Now);
+            Console.Write("+");
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             var message = new Message()
             {
@@ -83,7 +83,7 @@ namespace BeforeOurTime.Business
                 return itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
             };
             var engine = new Engine()
-                .SetValue("log", new Action<object>(Console.WriteLine))
+                .SetValue("log", new Action<object>(Console.Write))
                 .SetValue("getItem", getItem);
             // Deliver message to each recipient
             messages.ForEach(delegate (Message message)
