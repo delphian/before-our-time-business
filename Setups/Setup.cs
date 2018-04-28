@@ -25,31 +25,17 @@ namespace BeforeOurTime.Business.Setups
         public Setup InstallItems()
         {
             var itemRepo = (IItemRepo<Item>) ServiceProvider.GetService(typeof(IItemRepo<Item>));
-            var items = itemRepo.ReadUuid(new List<Guid>() { new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5") }).ToList();
-            if (items != null)
-            {
-                itemRepo.Delete(items);
-            }
-            itemRepo.Create(new List<Item>()
-            {
-                new Item()
-                {
-                    Type = ItemType.Generic,
-                    Uuid = new Guid("fe178ad7-0e33-4111-beaf-6dfcfd548bd5"),
-                    UuidType = new Guid("f08045bc-86b1-4c03-bb71-3b7f95dbd7c2"),
-                    ParentId = null,
-                    Children = new List<Item>(),
-                    Data = @"{
-                        sample: 23
-                    }",
-                    Script = @"
-                        (function() {
-                            log(data.sample);
-                            data.sample = data.sample + 1;
-                        })();
-                    "
-                }
-            });
+            itemRepo.Delete();
+            var interfaceType = typeof(ISetup);
+            var setupItems = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => Activator.CreateInstance(x))
+                .ToList();
+            List<Item> items = setupItems
+                .SelectMany(x => ((ISetup)x).Items(Configuration, ServiceProvider))
+                .ToList();
+            itemRepo.Create(items);
             return this;
         }
     }
