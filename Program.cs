@@ -7,6 +7,7 @@ using Jint;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace BeforeOurTime.Business
             setup.Install();
             // Create a Timer object that knows to call our TimerCallback
             // method once every 2000 milliseconds.
-            Timer t = new Timer(Tick, null, 0, 2000);
+            Timer t = new Timer(Tick, null, 0, 8000);
             // Wait for user input
             Console.WriteLine("Waiting - Hit enter to abort");
             Console.ReadLine();
@@ -89,8 +90,11 @@ namespace BeforeOurTime.Business
             {
                 engine
                     .SetValue("me", message.To)
-                    .SetValue("data", JObject.Parse(message.To.Data))
+                    .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
+                    .Execute("var data = JSON.parse(_data);")
                     .Execute(message.To.Script);
+                message.To.Data = JsonConvert.SerializeObject(engine.GetValue("data").ToObject());
+                itemRepo.Update(new List<Item>() { message.To });
             });
         }
     }
