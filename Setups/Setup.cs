@@ -38,10 +38,10 @@ namespace BeforeOurTime.Business.Setups
                     sample: 100
                 }",
                 Script = @"
-                    (function() {
-                        log(data.sample);
+                    function onEventTick(e) {
+                        log(data.sample + ' ' + e);
                         data.sample = data.sample + 1;
-                    })();
+                    };
                 "
             } }).First();
 

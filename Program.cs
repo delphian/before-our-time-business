@@ -60,17 +60,18 @@ namespace BeforeOurTime.Business
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
             var items = itemRepo.Read();
+            var messages = new List<Message>();
             items.ForEach(delegate (Item item)
             {
-                var message = new Message()
+                messages.Add(new Message()
                 {
                     Version = ItemVersion.Alpha,
                     Type = MessageType.EventTick,
                     To = item,
                     From = gameItem
-                };
-                DeliverMessages(new List<Message>() { message }, ServiceProvider);
+                });
             });
+            DeliverMessages(messages, ServiceProvider);
             // Force a garbage collection to occur for this demo.
             GC.Collect();
         }
@@ -87,19 +88,41 @@ namespace BeforeOurTime.Business
             {
                 return itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
             };
+            // Javascript onEvent function name mapping to message type
+            var jsEvents = new Dictionary<MessageType, string>()
+            {
+                { MessageType.EventTick, "onEventTick" }
+            };
+            var parser = new Jint.Parser.JavaScriptParser();
             var engine = new Engine()
                 .SetValue("log", new Action<object>(Console.Write))
                 .SetValue("getItem", getItem);
             // Deliver message to each recipient
             messages.ForEach(delegate (Message message)
             {
-                engine
-                    .SetValue("me", message.To)
-                    .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
-                    .Execute("var data = JSON.parse(_data);")
-                    .Execute(message.To.Script);
-                message.To.Data = JsonConvert.SerializeObject(engine.GetValue("data").ToObject());
-                itemRepo.Update(new List<Item>() { message.To });
+                try
+                {
+                    var jsProgram = parser.Parse(message.To.Script.Trim());
+                    if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEvents[message.Type]))
+                    {
+                        engine
+                            .SetValue("me", message.To)
+                            .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
+                            .Execute("var data = JSON.parse(_data);")
+                            .Execute(message.To.Script)
+                            .Invoke(jsEvents[message.Type], message.Value);
+                        message.To.Data = JsonConvert.SerializeObject(engine.GetValue("data").ToObject());
+                        itemRepo.Update(new List<Item>() { message.To });
+                    }
+                    else
+                    {
+                        Console.WriteLine("\n" + message.To.Uuid + ": No matching event for: " + jsEvents[message.Type]);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("\nscript failed: " + message.To.Uuid + " " + e.Message);
+                }
             });
         }
     }
