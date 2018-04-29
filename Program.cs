@@ -89,7 +89,7 @@ namespace BeforeOurTime.Business
             var parser = new Jint.Parser.JavaScriptParser();
             var jsEngine = new Engine();
             // Javascript onEvent function name mapping to message type
-            var jsEvents = JsMapping.GetEventJsMapping();
+            var jsEvents = MapMessageHandlers.GetEventJsMapping();
             // Create script global functions
             GetJsFunctions(Configuration, serviceProvider, jsEngine);
             // Deliver message to each recipient
