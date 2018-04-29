@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Repository.Dbs.EF;
+﻿using BeforeOurTime.Business.JsFunctions;
+using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
@@ -85,17 +86,12 @@ namespace BeforeOurTime.Business
         public static void DeliverMessages(List<Message> messages, IServiceProvider serviceProvider)
         {
             var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
-            // Box some repository functionality into safe limited javascript functions
-            Func<string, Item> getItem = delegate (string uuid)
-            {
-                return itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
-            };
+            var parser = new Jint.Parser.JavaScriptParser();
+            var jsEngine = new Engine();
             // Javascript onEvent function name mapping to message type
             var jsEvents = JsMapping.GetEventJsMapping();
-            var parser = new Jint.Parser.JavaScriptParser();
-            var engine = new Engine()
-                .SetValue("log", new Action<object>(Console.Write))
-                .SetValue("getItem", getItem);
+            // Create script global functions
+            GetJsFunctions(Configuration, serviceProvider, jsEngine);
             // Deliver message to each recipient
             messages.ForEach(delegate (Message message)
             {
@@ -105,7 +101,7 @@ namespace BeforeOurTime.Business
                     if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEvents[message.Type].Function))
                     {
                         Type t = jsEvents[message.Type].Type;
-                        engine
+                        jsEngine
                             .SetValue("me", message.To)
                             .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
                             .Execute("var data = JSON.parse(_data);")
@@ -114,7 +110,8 @@ namespace BeforeOurTime.Business
                                 jsEvents[message.Type].Function,
                                 JsonConvert.DeserializeObject(JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.Value)))
                             );
-                        message.To.Data = JsonConvert.SerializeObject(engine.GetValue("data").ToObject());
+                        // Save changes to item data
+                        message.To.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
                         itemRepo.Update(new List<Item>() { message.To });
                     }
                     else
@@ -127,6 +124,23 @@ namespace BeforeOurTime.Business
                     Console.WriteLine("\nscript failed: " + message.To.Uuid + " " + e.Message);
                 }
             });
+        }
+        /// <summary>
+        /// Create all javascript functions for scripts to use
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="serviceProvider"></param>
+        /// <param name="jsEngine"></param>
+        public static void GetJsFunctions(IConfigurationRoot configuration, IServiceProvider serviceProvider, Engine jsEngine)
+        {
+            var interfaceType = typeof(IJsFunc);
+            var jsFuncClasses = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => Activator.CreateInstance(x))
+                .ToList();
+            jsFuncClasses
+                .ForEach(x => ((IJsFunc)x).AddFunctions(configuration, serviceProvider, jsEngine));
         }
     }
 }
