@@ -18,7 +18,8 @@ namespace BeforeOurTime.Repository.Models.Messages.Events.Maps
             var jsEvents = new Dictionary<MessageType, MessageHandlerAndBody>()
             {
                 { MessageType.EventTick, new MessageHandlerAndBody("onEventTick", typeof(BodyEventTick)) },
-                { MessageType.EventItemMoves, new MessageHandlerAndBody("onEventItemMoves", typeof(BodyEventItemMove)) }
+                { MessageType.EventItemMove, new MessageHandlerAndBody("onEventItemMove", typeof(BodyEventItemMove)) },
+                { MessageType.EventClientInput, new MessageHandlerAndBody("onEventClientInput", typeof(BodyEventClientInput)) }
             };
             return jsEvents;
         }

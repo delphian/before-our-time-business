@@ -29,10 +29,10 @@ namespace BeforeOurTime.Business.Apis
             {
                 Version = ItemVersion.Alpha,
                 From = Source,
-                Type = MessageType.EventItemMoves,
+                Type = MessageType.EventItemMove,
                 Value = JsonConvert.SerializeObject(new BodyEventItemMove()
                 {
-                    Type = MessageType.EventItemMoves,
+                    Type = MessageType.EventItemMove,
                     From = child.Parent,
                     To = newParent,
                     Item = child

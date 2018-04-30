@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.JsFunctions;
+using BeforeOurTime.Business.JsMessageBody;
 using BeforeOurTime.Business.Logs;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Models;
@@ -52,11 +53,25 @@ namespace BeforeOurTime.Business
             // Create a Timer object that knows to call our TimerCallback
             // method once every 2000 milliseconds.
             var api = new Api(Configuration, ServiceProvider);
-            Timer timerTick = new Timer(Tick, api, 0, 10000);
-            Timer timerDeliverMessages = new Timer(DeliverMessages, null, 0, 500);
+            Timer timerTick = new Timer(Tick, api, 100, 10000);
+            Timer timerDeliverMessages = new Timer(DeliverMessages, api, 200, 500);
             // Wait for user input
-            Console.WriteLine("Waiting - Hit enter to abort");
-            Console.ReadLine();
+
+            Console.WriteLine("Hit 'q' and enter to abort\n");
+            var clientInput = Console.ReadLine();
+            while (clientInput != "q") {
+                var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
+                var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
+                var clientMessage = new Message()
+                {
+                    Version = ItemVersion.Alpha,
+                    Type = MessageType.EventClientInput,
+                    From = gameItem,
+                    Value = JsonConvert.SerializeObject(new BodyEventClientInput() { Raw = clientInput })
+                };
+                api.SendMessage(clientMessage, itemRepo.Read());
+                clientInput = Console.ReadLine();
+            }
         }
         /// <summary>
         /// Execute all item scripts that desire a regular periodic event
@@ -87,6 +102,7 @@ namespace BeforeOurTime.Business
         public static void DeliverMessages(Object o)
         {
             Console.Write("-");
+            var api = (IApi)o;
             var logger = ServiceProvider.GetService<ILogger>();
             lock(thisLock)
             {
@@ -97,7 +113,7 @@ namespace BeforeOurTime.Business
                 // Javascript onEvent function name mapping to message type
                 var jsEvents = MapMessageHandlers.GetEventJsMapping();
                 // Create script global functions
-                GetJsFunctions(Configuration, ServiceProvider, jsEngine);
+                GetJsFunctions(Configuration, ServiceProvider, api, jsEngine);
                 // Get messages
                 List<Message> messages = messageRepo.Read();
                 messageRepo.Delete();
@@ -141,17 +157,22 @@ namespace BeforeOurTime.Business
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="serviceProvider"></param>
+        /// <param name="api"></param>
         /// <param name="jsEngine"></param>
-        public static void GetJsFunctions(IConfigurationRoot configuration, IServiceProvider serviceProvider, Engine jsEngine)
+        public static void GetJsFunctions(
+            IConfigurationRoot configuration, 
+            IServiceProvider serviceProvider,
+            IApi api,
+            Engine jsEngine)
         {
             var interfaceType = typeof(IJsFunc);
             var jsFuncClasses = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => Activator.CreateInstance(x))
+                .Select(x => Activator.CreateInstance(x, configuration, serviceProvider, api, jsEngine))
                 .ToList();
             jsFuncClasses
-                .ForEach(x => ((IJsFunc)x).AddFunctions(configuration, serviceProvider, jsEngine));
+                .ForEach(x => ((IJsFunc)x).AddFunctions());
         }
     }
 }

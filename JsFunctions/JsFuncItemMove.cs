@@ -9,9 +9,9 @@ using System.Linq;
 
 namespace BeforeOurTime.Business.JsFunctions
 {    
-    public class JsFuncLog : JsFunc, IJsFunc
+    public class JsFuncItemMove : JsFunc, IJsFunc
     {
-        public JsFuncLog(IConfigurationRoot config, IServiceProvider provider, IApi api, Engine jsEngine)
+        public JsFuncItemMove(IConfigurationRoot config, IServiceProvider provider, IApi api, Engine jsEngine)
             : base(config, provider, api, jsEngine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
@@ -20,11 +20,14 @@ namespace BeforeOurTime.Business.JsFunctions
         {
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             // Box some repository functionality into safe limited javascript functions
-            Func<string, Item> getItem = delegate (string uuid)
+            Func<string, string, bool> itemMove = delegate (string uuid, string toUuid)
             {
-                return itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
+                var item = itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
+                var toItem = itemRepo.ReadUuid(new List<Guid>() { new Guid(toUuid) }).FirstOrDefault();
+                Api.MoveItem(null, toItem, item);
+                return true;
             };
-            JsEngine.SetValue("log", new Action<object>(Console.Write));
+            JsEngine.SetValue("itemMove", itemMove);
         }
     }
 }

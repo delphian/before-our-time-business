@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Repository.Models.Items;
+﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Repository.Models.Items;
 using Jint;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,26 +9,22 @@ using System.Linq;
 
 namespace BeforeOurTime.Business.JsFunctions
 {    
-    public class JsFuncGetItem : IJsFunc
+    public class JsFuncItemGet : JsFunc, IJsFunc
     {
+        public JsFuncItemGet(IConfigurationRoot config, IServiceProvider provider, IApi api, Engine jsEngine)
+            : base(config, provider, api, jsEngine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
         /// </summary>
-        /// <param name="configuration"></param>
-        /// <param name="serviceProvider"></param>
-        /// <param name="jsEngine"></param>
-        public void AddFunctions(
-            IConfigurationRoot configuration, 
-            IServiceProvider serviceProvider, 
-            Engine jsEngine)
+        public void AddFunctions()
         {
-            var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
+            var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             // Box some repository functionality into safe limited javascript functions
-            Func<string, Item> getItem = delegate (string uuid)
+            Func<string, Item> itemGet = delegate (string uuid)
             {
                 return itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
             };
-            jsEngine.SetValue("getItem", getItem);
+            JsEngine.SetValue("itemGet", itemGet);
         }
     }
 }

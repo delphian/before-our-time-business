@@ -43,7 +43,10 @@ namespace BeforeOurTime.Business.Setups
                             if (data.sample == 110) {
                                 log('\nWe are at 110!\n');
                             }
-                        }
+                        };
+                        function onEventClientInput(e) {
+                            log('\nA client did something!\n' + e.raw);
+                        };
                     "
                 } }).First();
                 var interfaceType = typeof(ISetup);

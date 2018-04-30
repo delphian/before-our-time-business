@@ -14,5 +14,12 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="message"></param>
         /// <param name="recipients"></param>
         void SendMessage(Message message, List<Item> recipients);
+        /// <summary>
+        /// Relocate an item
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="newParent"></param>
+        /// <param name="child"></param>
+        void MoveItem(Item Source, Item newParent, Item child);
     }
 }
