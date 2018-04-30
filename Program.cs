@@ -65,19 +65,18 @@ namespace BeforeOurTime.Business
         public static void Tick(Object o)
         {
             Console.Write("+");
+            var api = (Api)o;
+            var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
+            var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
+            var tickMessage = new Message()
+            {
+                Version = ItemVersion.Alpha,
+                Type = MessageType.EventTick,
+                From = gameItem,
+                Value = "{}"
+            };
             lock (thisLock)
             {
-                var api = (Api)o;
-                // Display the date/time when this method got called.
-                var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
-                var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
-                var tickMessage = new Message()
-                {
-                    Version = ItemVersion.Alpha,
-                    Type = MessageType.EventTick,
-                    From = gameItem,
-                    Value = "{}"
-                };
                 api.SendMessage(tickMessage, itemRepo.Read());
             }
         }
@@ -103,7 +102,8 @@ namespace BeforeOurTime.Business
                 List<Message> messages = messageRepo.Read();
                 messageRepo.Delete();
                 // Deliver message to each recipient
-                messages.ForEach(delegate (Message message)
+//                messages.ForEach(delegate (Message message)
+                foreach (Message message in messages)
                 {
                     try
                     {
@@ -133,7 +133,7 @@ namespace BeforeOurTime.Business
                     {
                         logger.LogError("script failed: " + message.To.Uuid + " " + e.Message);
                     }
-                });
+                };
             }
         }
         /// <summary>

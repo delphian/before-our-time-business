@@ -39,9 +39,11 @@ namespace BeforeOurTime.Business.Setups
                     }",
                     Script = @"
                         function onEventTick(e) {
-                            log(data.sample + ' ' + e);
                             data.sample = data.sample + 1;
-                        };
+                            if (data.sample == 110) {
+                                log('\nWe are at 110!\n');
+                            }
+                        }
                     "
                 } }).First();
                 var interfaceType = typeof(ISetup);

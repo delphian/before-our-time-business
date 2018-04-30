@@ -24,13 +24,12 @@ namespace BeforeOurTime.Business.Setups
                 ParentId = gameItem.Id,
                 Children = new List<Item>(),
                 Data = @"{
-                    sample: 23
+                    sample: 25
                 }",
                 Script = @"
-                    (function() {
-                        log(data.sample);
-                        data.sample = data.sample + 1;
-                    })();
+                    function onEventTick(e) {
+                        log(data.sample = data.sample + 1);
+                    };
                 "
             });
             return items;
