@@ -35,17 +35,9 @@ namespace BeforeOurTime.Business.Setups
                     ParentId = null,
                     Children = new List<Item>(),
                     Data = @"{
-                        sample: 100
                     }",
                     Script = @"
                         function onEventTick(e) {
-                            data.sample = data.sample + 1;
-                            if (data.sample == 110) {
-                                log('\nWe are at 110!\n');
-                            }
-                        };
-                        function onEventClientInput(e) {
-                            log('\nA client did something!\n' + e.raw);
                         };
                     "
                 } }).First();

@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Timers;
 
 namespace BeforeOurTime.Business
 {
@@ -27,6 +29,7 @@ namespace BeforeOurTime.Business
     {
         public static IConfigurationRoot Configuration { set; get; }
         public static IServiceProvider ServiceProvider { set; get; }
+        public static IApi Api { set; get; }
         public static Object thisLock = new Object();
         static void Main(string[] args)
         {
@@ -47,40 +50,70 @@ namespace BeforeOurTime.Business
                 .AddSingleton<IItemRepo<Item>>(new ItemRepo<Item>(db))
                 .AddSingleton<IMessageRepo>(new MessageRepo(db))
                 .BuildServiceProvider();
+            // Setup main business Api
+            Api = new Api(Configuration, ServiceProvider);
             // Run initial setup
             var setup = new Setups.Setup(Configuration, ServiceProvider);
             setup.Install();
-            // Create a Timer object that knows to call our TimerCallback
-            // method once every 2000 milliseconds.
-            var api = new Api(Configuration, ServiceProvider);
-            Timer timerTick = new Timer(Tick, api, 100, 10000);
-            Timer timerDeliverMessages = new Timer(DeliverMessages, api, 200, 500);
+            MainLoop();
+        }
+        private static void MainLoop()
+        {
             // Wait for user input
-
             Console.WriteLine("Hit 'q' and enter to abort\n");
-            var clientInput = Console.ReadLine();
-            while (clientInput != "q") {
-                var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
-                var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
-                var clientMessage = new Message()
+            var clientInput = "";
+            var tmpInput = "";
+            long tickStart = 0;
+            long tickPassed = 0;
+            long deliverStart = 0;
+            long deliverPassed = 0;
+            while (clientInput != "q")
+            {
+                tickPassed = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - tickStart;
+                if (tickPassed > 2000)
                 {
-                    Version = ItemVersion.Alpha,
-                    Type = MessageType.EventClientInput,
-                    From = gameItem,
-                    Value = JsonConvert.SerializeObject(new BodyEventClientInput() { Raw = clientInput })
-                };
-                api.SendMessage(clientMessage, itemRepo.Read());
-                clientInput = Console.ReadLine();
+                    tickStart = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+                    Tick();
+                }
+                deliverPassed = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) - deliverStart;
+                if (deliverPassed > 200)
+                {
+                    deliverStart = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+                    DeliverMessages();
+                }
+                if (Console.KeyAvailable)
+                {
+                    char key = Console.ReadKey().KeyChar;
+                    if (key == 13)
+                    {
+                        Console.WriteLine("ok");
+                        clientInput = tmpInput;
+                        tmpInput = "";
+                        var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
+                        var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
+                        var clientMessage = new Message()
+                        {
+                            Version = ItemVersion.Alpha,
+                            Type = MessageType.EventClientInput,
+                            From = gameItem,
+                            Value = JsonConvert.SerializeObject(new BodyEventClientInput() { Raw = clientInput })
+                        };
+                        Api.SendMessage(clientMessage, itemRepo.Read());
+                    }
+                    else
+                    {
+                        tmpInput += key;
+                    }
+                }
             }
         }
         /// <summary>
         /// Execute all item scripts that desire a regular periodic event
         /// </summary>
         /// <param name="o"></param>
-        public static void Tick(Object o)
+        private static void Tick()
         {
             Console.Write("+");
-            var api = (Api)o;
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
             var tickMessage = new Message()
@@ -90,66 +123,59 @@ namespace BeforeOurTime.Business
                 From = gameItem,
                 Value = "{}"
             };
-            lock (thisLock)
-            {
-                api.SendMessage(tickMessage, itemRepo.Read());
-            }
+            Api.SendMessage(tickMessage, itemRepo.Read());
         }
         /// <summary>
         /// Deliver messages to their recipient items and execute each item script
         /// </summary>
         /// <param name="o"></param>
-        public static void DeliverMessages(Object o)
+        public static void DeliverMessages()
         {
             Console.Write("-");
-            var api = (IApi)o;
             var logger = ServiceProvider.GetService<ILogger>();
-            lock(thisLock)
-            {
-                var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
-                var messageRepo = ServiceProvider.GetService<IMessageRepo>();
-                var parser = new Jint.Parser.JavaScriptParser();
-                var jsEngine = new Engine();
-                // Javascript onEvent function name mapping to message type
-                var jsEvents = MapMessageHandlers.GetEventJsMapping();
-                // Create script global functions
-                GetJsFunctions(Configuration, ServiceProvider, api, jsEngine);
-                // Get messages
-                List<Message> messages = messageRepo.Read();
-                messageRepo.Delete();
-                // Deliver message to each recipient
+            var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
+            var messageRepo = ServiceProvider.GetService<IMessageRepo>();
+            var parser = new Jint.Parser.JavaScriptParser();
+            var jsEngine = new Engine();
+            // Javascript onEvent function name mapping to message type
+            var jsEvents = MapMessageHandlers.GetEventJsMapping();
+            // Create script global functions
+            GetJsFunctions(Configuration, ServiceProvider, Api, jsEngine);
+            // Get messages
+            List<Message> messages = messageRepo.Read();
+            messageRepo.Delete();
+            // Deliver message to each recipient
 //                messages.ForEach(delegate (Message message)
-                foreach (Message message in messages)
+            foreach (Message message in messages)
+            {
+                try
                 {
-                    try
+                    var jsProgram = parser.Parse(message.To.Script.Trim());
+                    if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEvents[message.Type].Function))
                     {
-                        var jsProgram = parser.Parse(message.To.Script.Trim());
-                        if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEvents[message.Type].Function))
-                        {
-                            Type t = jsEvents[message.Type].Type;
-                            jsEngine
-                                .SetValue("me", message.To)
-                                .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
-                                .Execute("var data = JSON.parse(_data);")
-                                .Execute(message.To.Script)
-                                .Invoke(
-                                    jsEvents[message.Type].Function,
-                                    JsonConvert.DeserializeObject(JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.Value)))
-                                );
-                            // Save changes to item data
-                            message.To.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
-                            itemRepo.Update(new List<Item>() { message.To });
-                        }
-                        else
-                        {
-                            logger.LogError(message.To.Uuid + ": No js callback for: " + jsEvents[message.Type].Function);
-                        }
+                        Type t = jsEvents[message.Type].Type;
+                        jsEngine
+                            .SetValue("me", message.To)
+                        .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
+                        .Execute("var data = JSON.parse(_data);")
+                        .Execute(message.To.Script)
+                        .Invoke(
+                            jsEvents[message.Type].Function,
+                            JsonConvert.DeserializeObject(JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.Value)))
+                        );
+                        // Save changes to item data
+                        message.To.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
+                        itemRepo.Update(new List<Item>() { message.To });
                     }
-                    catch (Exception e)
+                    else
                     {
-                        logger.LogError("script failed: " + message.To.Uuid + " " + e.Message);
+                        logger.LogError(message.To.Uuid + ": No js callback for: " + jsEvents[message.Type].Function);
                     }
-                };
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError("script failed: " + message.To.Uuid + " " + ex.Message);
+                }
             }
         }
         /// <summary>
