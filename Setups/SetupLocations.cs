@@ -26,6 +26,12 @@ namespace BeforeOurTime.Business.Setups
                 Data = @"{
                 }",
                 Script = @"
+                    function onQuery() {
+                        return {
+                            name: 'Spoon',
+                            description: 'A stupid looking spoon'
+                        };
+                    };
                 "
             });
             return items;

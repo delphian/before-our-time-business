@@ -43,7 +43,8 @@ namespace BeforeOurTime.Business.Setups
                 Script = @"
                     function onEventClientInput(e) {
                         if (e.raw == 'look') {
-                            log('Nothing to see here...\n');
+                            var stats = itemInvoke('fe178ad7-0e33-4111-beaf-6dfcfd548bd5', 'onQuery');
+                            log('Nothing to see here...\n' + stats.name);
                         }
                     };
                 "

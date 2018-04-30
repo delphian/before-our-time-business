@@ -86,7 +86,6 @@ namespace BeforeOurTime.Business
                     char key = Console.ReadKey().KeyChar;
                     if (key == 13)
                     {
-                        Console.WriteLine("ok");
                         clientInput = tmpInput;
                         tmpInput = "";
                         var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
@@ -113,7 +112,6 @@ namespace BeforeOurTime.Business
         /// <param name="o"></param>
         private static void Tick()
         {
-            Console.Write("+");
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
             var tickMessage = new Message()
@@ -131,7 +129,6 @@ namespace BeforeOurTime.Business
         /// <param name="o"></param>
         public static void DeliverMessages()
         {
-            Console.Write("-");
             var logger = ServiceProvider.GetService<ILogger>();
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             var messageRepo = ServiceProvider.GetService<IMessageRepo>();
@@ -153,7 +150,6 @@ namespace BeforeOurTime.Business
                     var jsProgram = parser.Parse(message.To.Script.Trim());
                     if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEvents[message.Type].Function))
                     {
-                        Type t = jsEvents[message.Type].Type;
                         jsEngine
                             .SetValue("me", message.To)
                         .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
