@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.JsFunctions;
+using BeforeOurTime.Business.Logs;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Items;
@@ -10,6 +11,7 @@ using Jint;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -38,6 +40,7 @@ namespace BeforeOurTime.Business
             var db = new BaseContext((new DbContextOptionsBuilder<BaseContext>()).UseSqlite(connectionString).Options);
             // Setup service provider
             ServiceProvider = new ServiceCollection()
+                .AddSingleton<ILogger>(new FileLogger())
                 .AddLogging()
                 .AddDbContext<BaseContext>(options => options.UseSqlite(connectionString))
                 .AddSingleton<IItemRepo<Item>>(new ItemRepo<Item>(db))
@@ -49,8 +52,8 @@ namespace BeforeOurTime.Business
             // Create a Timer object that knows to call our TimerCallback
             // method once every 2000 milliseconds.
             var api = new Api(Configuration, ServiceProvider);
-            Timer timerTick = new Timer(Tick, api, 0, 8000);
-            Timer timerDeliverMessages = new Timer(DeliverMessages, null, 0, 1000);
+            Timer timerTick = new Timer(Tick, api, 0, 10000);
+            Timer timerDeliverMessages = new Timer(DeliverMessages, null, 0, 500);
             // Wait for user input
             Console.WriteLine("Waiting - Hit enter to abort");
             Console.ReadLine();
@@ -61,11 +64,11 @@ namespace BeforeOurTime.Business
         /// <param name="o"></param>
         public static void Tick(Object o)
         {
-            lock(thisLock)
+            Console.Write("+");
+            lock (thisLock)
             {
                 var api = (Api)o;
                 // Display the date/time when this method got called.
-                Console.Write("+");
                 var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
                 var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
                 var tickMessage = new Message()
@@ -84,7 +87,9 @@ namespace BeforeOurTime.Business
         /// <param name="o"></param>
         public static void DeliverMessages(Object o)
         {
-            lock (thisLock)
+            Console.Write("-");
+            var logger = ServiceProvider.GetService<ILogger>();
+            lock(thisLock)
             {
                 var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
                 var messageRepo = ServiceProvider.GetService<IMessageRepo>();
@@ -121,12 +126,12 @@ namespace BeforeOurTime.Business
                         }
                         else
                         {
-                            Console.WriteLine("\n" + message.To.Uuid + ": No matching event for: " + jsEvents[message.Type].Function);
+                            logger.LogError(message.To.Uuid + ": No js callback for: " + jsEvents[message.Type].Function);
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("\nscript failed: " + message.To.Uuid + " " + e.Message);
+                        logger.LogError("script failed: " + message.To.Uuid + " " + e.Message);
                     }
                 });
             }
