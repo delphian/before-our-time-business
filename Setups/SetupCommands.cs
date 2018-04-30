@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Items;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
 namespace BeforeOurTime.Business.Setups
@@ -13,7 +14,7 @@ namespace BeforeOurTime.Business.Setups
             IConfigurationRoot configuration, 
             IServiceProvider serviceProvider) 
         {
-            var itemRepo = (IItemRepo<Item>) serviceProvider.GetService(typeof(IItemRepo<Item>));
+            var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
             var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
 
             var items = new List<Item>();

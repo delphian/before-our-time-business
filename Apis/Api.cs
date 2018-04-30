@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Repository.Models;
+using System.Linq;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -42,8 +43,9 @@ namespace BeforeOurTime.Business.Apis
             var messages = new List<Message>();
             recipients.ForEach(delegate (Item recipient)
             {
-                message.To = recipient;
-                messages.Add((Message)message.Clone());
+                var messageCopy = (Message)message.Clone();
+                messageCopy.To = recipient;
+                messages.Add(messageCopy);
             });
             MessageRepo.Create(messages);
         }
