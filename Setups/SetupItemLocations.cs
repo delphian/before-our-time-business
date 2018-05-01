@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace BeforeOurTime.Business.Setups
 {
-    public class SetupLocations : ISetup
+    public class SetupItemLocations : ISetup
     {
         public List<Item> Items(
             IConfigurationRoot configuration, 

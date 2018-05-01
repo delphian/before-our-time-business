@@ -38,9 +38,11 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Constructor
         /// </summary>
-        public Terminal()
+        /// <param name="account">Account holder in operation of terminal</param>
+        public Terminal(Account account)
         {
-
+            Id = Guid.NewGuid();
+            Account = account;
         }
         /// <summary>
         /// Send a message to the terminal
@@ -48,7 +50,10 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="message"></param>
         public void SendToTerminal(string message)
         {
-            OnMessageToTerminal(Id, message);
+            if (OnMessageToTerminal != null)
+            {
+                OnMessageToTerminal(Id, message);
+            }
         }
         /// <summary>
         /// Send a message to the server
@@ -56,7 +61,18 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="message"></param>
         public void SendToServer(string message)
         {
-            OnMessageToServer(Id, message);
+            if (OnMessageToServer != null)
+            {
+                OnMessageToServer(Id, message);
+            }
+        }
+        /// <summary>
+        /// Clone the terminal
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return this.MemberwiseClone();
         }
     }
 }

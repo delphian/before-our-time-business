@@ -2,8 +2,12 @@
 using BeforeOurTime.Business.JsFunctions;
 using BeforeOurTime.Business.JsMessageBody;
 using BeforeOurTime.Business.Logs;
+using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Models;
+using BeforeOurTime.Repository.Models.Accounts;
+using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
+using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Events.Maps;
@@ -41,13 +45,21 @@ namespace BeforeOurTime.Business
             Configuration = builder.Build();
             // Setup services
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            var dbContextService = new DbContextService(connectionString);
+            //var dbContextService = new DbContextService(connectionString);
             // Setup service provider
             ServiceProvider = new ServiceCollection()
                 .AddSingleton<ILogger>(new FileLogger())
+                .AddDbContext<BaseContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Scoped)
                 .AddLogging()
-                .AddSingleton<IItemRepo<Item>>(new ItemRepo<Item>(dbContextService))
-                .AddSingleton<IMessageRepo>(new MessageRepo(dbContextService))
+                .AddScoped<IAccountRepo, AccountRepo>()
+                .AddScoped<IItemRepo<Item>, ItemRepo<Item>>()
+                .AddScoped<IMessageRepo, MessageRepo>()
+                .AddScoped<IRepository<AuthorizationRole>, Repository<AuthorizationRole>>()
+                .AddScoped<IRepository<AuthorizationGroup>, Repository<AuthorizationGroup>>()
+                .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
+                .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
+                .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
+                .AddScoped<ITerminalManager, TerminalManager>()
                 .BuildServiceProvider();
             // Setup main business Api
             Api = new Api(Configuration, ServiceProvider);
@@ -64,7 +76,17 @@ namespace BeforeOurTime.Business
         {
             var tickTimer = new System.Threading.Timer(Tick, null, 0, 1000);
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, 500);
-            var telnetServer = new Servers.Telnet.Server();
+
+            var newServiceProvider = ServiceProvider.CreateScope().ServiceProvider;
+            var terminalManager = newServiceProvider.GetService<ITerminalManager>();
+            ((TerminalManager)terminalManager).OnTerminalCreated += delegate (Terminal terminal)
+            {
+                terminal.OnMessageToServer += delegate (Guid terminalId, string message)
+                {
+                    Console.WriteLine(message);
+                };
+            };
+            var telnetServer = new Servers.Telnet.Server(newServiceProvider);
             // Wait for user input
             Console.WriteLine("Hit 'q' and enter to abort\n");
             string clientInput = Console.ReadLine();
@@ -72,7 +94,7 @@ namespace BeforeOurTime.Business
             {
                 lock(thisLock)
                 {
-                    var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
+                    var itemRepo = newServiceProvider.GetService<IItemRepo<Item>>();
                     var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
                     var clientMessage = new Message()
                     {

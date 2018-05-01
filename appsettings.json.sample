@@ -1,5 +1,9 @@
 ﻿{
   "ConnectionStrings": {
     "DefaultConnection": "Data Source=SQLiteDatabase.db"
+  },
+  "Admin": {
+    "Email": "youremail@gmail.com",
+    "Password": "password"
   }
 }
