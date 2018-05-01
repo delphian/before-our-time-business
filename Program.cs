@@ -38,16 +38,37 @@ namespace BeforeOurTime.Business
         static void Main(string[] args)
         {
             // Setup configuration
-            var builder = new ConfigurationBuilder()
+            Configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
+                .AddEnvironmentVariables()
+                .Build();
+            IServiceCollection services = new ServiceCollection();
+            ConfigureServices(Configuration, services);
+            ServiceProvider = services.BuildServiceProvider();
+            Api = new Api(Configuration, ServiceProvider);
+            new Setups.Setup(Configuration, ServiceProvider).Install();
+            // Setup automatic message deliver and Tick counter for items
+            var tickTimer = new System.Threading.Timer(Tick, null, 0, 1000);
+            var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, 500);
+            ListenToTerminals(ServiceProvider.CreateScope().ServiceProvider);
+            // Wait for user input
+            Console.WriteLine("Hit 'q' and enter to abort\n");
+            string clientInput = Console.ReadLine();
+            while (clientInput != "q")
+            {
+                clientInput = Console.ReadLine();
+            }
+            Servers.Telnet.Server.s.stop();
+        }
+        /// <summary>
+        /// Setup services
+        /// </summary>
+        private static void ConfigureServices(IConfigurationRoot configuration, IServiceCollection services)
+        {
             // Setup services
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            //var dbContextService = new DbContextService(connectionString);
-            // Setup service provider
-            ServiceProvider = new ServiceCollection()
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            services
                 .AddSingleton<ILogger>(new FileLogger())
                 .AddDbContext<BaseContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Scoped)
                 .AddLogging()
@@ -59,55 +80,35 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
-                .AddScoped<ITerminalManager, TerminalManager>()
-                .BuildServiceProvider();
-            // Setup main business Api
-            Api = new Api(Configuration, ServiceProvider);
-            // Run initial setup
-            Setup();
-            MainLoop();
+                .AddScoped<ITerminalManager, TerminalManager>();
         }
-        private static void Setup()
+        /// <summary>
+        /// Monitor terminal connections and forward messages
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        private static void ListenToTerminals(IServiceProvider serviceProvider)
         {
-            var setup = new Setups.Setup(Configuration, ServiceProvider);
-            setup.Install();
-        }
-        private static void MainLoop()
-        {
-            var tickTimer = new System.Threading.Timer(Tick, null, 0, 1000);
-            var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, 500);
-
-            var newServiceProvider = ServiceProvider.CreateScope().ServiceProvider;
-            var terminalManager = newServiceProvider.GetService<ITerminalManager>();
+            var terminalManager = serviceProvider.GetService<ITerminalManager>();
+            var telnetServer = new Servers.Telnet.Server(serviceProvider);
             ((TerminalManager)terminalManager).OnTerminalCreated += delegate (Terminal terminal)
             {
                 terminal.OnMessageToServer += delegate (Guid terminalId, string message)
                 {
-                    Console.WriteLine(message);
+                    lock (thisLock)
+                    {
+                        var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
+                        var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
+                        var clientMessage = new Message()
+                        {
+                            Version = ItemVersion.Alpha,
+                            Type = MessageType.EventClientInput,
+                            From = gameItem,
+                            Value = JsonConvert.SerializeObject(new BodyEventClientInput() { Raw = message })
+                        };
+                        Api.SendMessage(clientMessage, itemRepo.Read());
+                    }
                 };
             };
-            var telnetServer = new Servers.Telnet.Server(newServiceProvider);
-            // Wait for user input
-            Console.WriteLine("Hit 'q' and enter to abort\n");
-            string clientInput = Console.ReadLine();
-            while (clientInput != "q")
-            {
-                lock(thisLock)
-                {
-                    var itemRepo = newServiceProvider.GetService<IItemRepo<Item>>();
-                    var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
-                    var clientMessage = new Message()
-                    {
-                        Version = ItemVersion.Alpha,
-                        Type = MessageType.EventClientInput,
-                        From = gameItem,
-                        Value = JsonConvert.SerializeObject(new BodyEventClientInput() { Raw = clientInput })
-                    };
-                    Api.SendMessage(clientMessage, itemRepo.Read());
-                }
-                clientInput = Console.ReadLine();
-            }
-            Servers.Telnet.Server.s.stop();
         }
         /// <summary>
         /// Execute all item scripts that desire a regular periodic event
