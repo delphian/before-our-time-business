@@ -17,21 +17,17 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
-        private IConfigurationRoot Configuration { set; get; }
-        private IServiceProvider ServiceProvider { set; get; }
         private IItemRepo<Item> ItemRepo { set; get; }
         private IMessageRepo MessageRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="configuration"></param>
-        /// <param name="serviceProvider"></param>
-        public Api(IConfigurationRoot configuration, IServiceProvider serviceProvider)
+        /// <param name="itemRepo"></param>
+        /// <param name="messageRepo"></param>
+        public Api(IMessageRepo messageRepo, IItemRepo<Item> itemRepo)
         {
-            Configuration = configuration;
-            ServiceProvider = serviceProvider;
-            ItemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
-            MessageRepo = ServiceProvider.GetService<IMessageRepo>();
+            MessageRepo = messageRepo;
+            ItemRepo = itemRepo;
         }
         /// <summary>
         /// Send a message to multiple recipient items

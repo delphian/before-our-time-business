@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis;
 using Jint;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,15 +20,13 @@ namespace BeforeOurTime.Business.JsFunctions
         /// <param name="configuration"></param>
         /// <param name="serviceProvider"></param>
         /// <param name="api"></aparam>
-        /// <param name="jsEngine"></param>
         public JsFunctionManager(
             IConfigurationRoot configuration,
-            IServiceProvider serviceProvider,
-            IApi api)
+            IServiceProvider serviceProvider)
         {
             Configuration = configuration;
             ServiceProvider = serviceProvider;
-            Api = api;
+            Api = ServiceProvider.GetService<IApi>();
         }
         public void AddJsFunctions(Engine jsEngine)
         {

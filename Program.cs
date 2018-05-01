@@ -33,7 +33,6 @@ namespace BeforeOurTime.Business
     {
         public static IConfigurationRoot Configuration { set; get; }
         public static IServiceProvider ServiceProvider { set; get; }
-        public static IApi Api { set; get; }
         public static Object thisLock = new Object();
         static void Main(string[] args)
         {
@@ -46,7 +45,6 @@ namespace BeforeOurTime.Business
             IServiceCollection services = new ServiceCollection();
             ConfigureServices(Configuration, services);
             ServiceProvider = services.BuildServiceProvider();
-            Api = new Api(Configuration, ServiceProvider);
             new Setups.Setup(Configuration, ServiceProvider.CreateScope().ServiceProvider).Install();
             // Setup automatic message deliver and Tick counter for items
             var tickTimer = new System.Threading.Timer(Tick, null, 0, 1000);
@@ -80,6 +78,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
+                .AddScoped<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }
         /// <summary>
@@ -97,6 +96,7 @@ namespace BeforeOurTime.Business
                     lock (thisLock)
                     {
                         var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
+                        var api = serviceProvider.GetService<IApi>();
                         var gameItem = itemRepo.ReadUuid(new List<Guid>() { terminal.ItemUuid }).First();
                         var clientMessage = new Message()
                         {
@@ -105,7 +105,7 @@ namespace BeforeOurTime.Business
                             From = gameItem,
                             Value = JsonConvert.SerializeObject(new BodyEventClientInput() { Raw = message })
                         };
-                        Api.SendMessage(clientMessage, itemRepo.Read());
+                        api.SendMessage(clientMessage, itemRepo.Read());
                     }
                 };
             };
@@ -119,6 +119,7 @@ namespace BeforeOurTime.Business
             lock(thisLock)
             {
                 var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
+                var api = ServiceProvider.GetService<IApi>();
                 var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
                 var tickMessage = new Message()
                 {
@@ -127,7 +128,7 @@ namespace BeforeOurTime.Business
                     From = gameItem,
                     Value = "{}"
                 };
-                Api.SendMessage(tickMessage, itemRepo.Read());
+                api.SendMessage(tickMessage, itemRepo.Read());
             }
         }
         /// <summary>
@@ -146,7 +147,7 @@ namespace BeforeOurTime.Business
                 // Javascript onEvent function name mapping to message type
                 var jsEvents = MapMessageHandlers.GetEventJsMapping();
                 // Create script global functions
-                var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider, Api);
+                var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
                 jsFunctionManager.AddJsFunctions(jsEngine);
                 // Get messages
                 List<Message> messages = messageRepo.Read();
