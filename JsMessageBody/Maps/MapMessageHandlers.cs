@@ -19,7 +19,7 @@ namespace BeforeOurTime.Repository.Models.Messages.Events.Maps
             {
                 { MessageType.EventTick, new MessageHandlerAndBody("onEventTick", typeof(BodyEventTick)) },
                 { MessageType.EventItemMove, new MessageHandlerAndBody("onEventItemMove", typeof(BodyEventItemMove)) },
-                { MessageType.EventClientInput, new MessageHandlerAndBody("onEventClientInput", typeof(BodyEventClientInput)) }
+                { MessageType.EventTerminalInput, new MessageHandlerAndBody("onEventTerminalInput", typeof(BodyEventTerminalInput)) }
             };
             return jsEvents;
         }

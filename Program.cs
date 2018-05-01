@@ -101,9 +101,12 @@ namespace BeforeOurTime.Business
                         var clientMessage = new Message()
                         {
                             Version = ItemVersion.Alpha,
-                            Type = MessageType.EventClientInput,
+                            Type = MessageType.EventTerminalInput,
                             From = gameItem,
-                            Value = JsonConvert.SerializeObject(new BodyEventClientInput() { Raw = message })
+                            Value = JsonConvert.SerializeObject(new BodyEventTerminalInput() {
+                                Terminal = terminal,
+                                Raw = message
+                            })
                         };
                         api.SendMessage(clientMessage, itemRepo.Read());
                     }
