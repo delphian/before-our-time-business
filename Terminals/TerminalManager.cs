@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Accounts.Authentication;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BeforeOurTime.Business.Terminals
 {
@@ -41,9 +42,9 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Constructor
         /// </summary>
-        public TerminalManager(IAccountRepo accountRepo)
+        public TerminalManager(IServiceProvider serviceProvider)
         {
-            AccountRepo = accountRepo;
+            AccountRepo = serviceProvider.CreateScope().ServiceProvider.GetService<IAccountRepo>();
         }
         /// <summary>
         /// Request the creation of a terminal by first authenticating a username and password

@@ -47,11 +47,11 @@ namespace BeforeOurTime.Business
             ConfigureServices(Configuration, services);
             ServiceProvider = services.BuildServiceProvider();
             Api = new Api(Configuration, ServiceProvider);
-            new Setups.Setup(Configuration, ServiceProvider).Install();
+            new Setups.Setup(Configuration, ServiceProvider.CreateScope().ServiceProvider).Install();
             // Setup automatic message deliver and Tick counter for items
             var tickTimer = new System.Threading.Timer(Tick, null, 0, 1000);
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, 500);
-            ListenToTerminals(ServiceProvider);
+            ListenToTerminals(ServiceProvider.CreateScope().ServiceProvider);
             // Wait for user input
             Console.WriteLine("Hit 'q' and enter to abort\n");
             string clientInput = Console.ReadLine();
@@ -146,7 +146,8 @@ namespace BeforeOurTime.Business
                 // Javascript onEvent function name mapping to message type
                 var jsEvents = MapMessageHandlers.GetEventJsMapping();
                 // Create script global functions
-                GetJsFunctions(Configuration, ServiceProvider, Api, jsEngine);
+                var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider, Api);
+                jsFunctionManager.AddJsFunctions(jsEngine);
                 // Get messages
                 List<Message> messages = messageRepo.Read();
                 messageRepo.Delete();
@@ -189,28 +190,6 @@ namespace BeforeOurTime.Business
                     }
                 }
             }
-        }
-        /// <summary>
-        /// Create all javascript functions for scripts to use
-        /// </summary>
-        /// <param name="configuration"></param>
-        /// <param name="serviceProvider"></param>
-        /// <param name="api"></param>
-        /// <param name="jsEngine"></param>
-        public static void GetJsFunctions(
-            IConfigurationRoot configuration, 
-            IServiceProvider serviceProvider,
-            IApi api,
-            Engine jsEngine)
-        {
-            var interfaceType = typeof(IJsFunc);
-            var jsFuncClasses = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(x => x.GetTypes())
-                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => Activator.CreateInstance(x, configuration, serviceProvider, api, jsEngine))
-                .ToList();
-            jsFuncClasses
-                .ForEach(x => ((IJsFunc)x).AddFunctions());
         }
     }
 }
