@@ -64,6 +64,7 @@ namespace BeforeOurTime.Business
         {
             var tickTimer = new System.Threading.Timer(Tick, null, 0, 1000);
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, 500);
+            var telnetServer = new Servers.Telnet.Server();
             // Wait for user input
             Console.WriteLine("Hit 'q' and enter to abort\n");
             string clientInput = Console.ReadLine();
@@ -84,6 +85,7 @@ namespace BeforeOurTime.Business
                 }
                 clientInput = Console.ReadLine();
             }
+            Servers.Telnet.Server.s.stop();
         }
         /// <summary>
         /// Execute all item scripts that desire a regular periodic event
