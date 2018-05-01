@@ -29,7 +29,8 @@ namespace BeforeOurTime.Business.Setups
                     function onEventTerminalInput(e) {
                         if (e.raw == 'help') {
                             log('Available commands are : \'help\', \'look\', \'q\'\n');
-                            log('Received help command from: ' + e.terminal.id + '\n');
+                            log('Received help command from: ' + e.terminal.itemUuid + '\n');
+                            itemMessage(me.uuid.ToString(), e.terminal.itemUuid.toString(), { 'text': 'hello!' });
                         }
                     };
                 "
