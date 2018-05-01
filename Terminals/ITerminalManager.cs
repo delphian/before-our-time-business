@@ -19,5 +19,10 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminalId">Unique terminal identifier</param>
         /// <param name="message">Raw message</param>
         void SendToTerminalId(Guid terminalId, string message);
+        /// <summary>
+        /// Get list of all active terminals
+        /// </summary>
+        /// <returns></returns>
+        List<Terminal> GetTerminals();
     }
 }

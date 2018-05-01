@@ -51,7 +51,7 @@ namespace BeforeOurTime.Business
             // Setup automatic message deliver and Tick counter for items
             var tickTimer = new System.Threading.Timer(Tick, null, 0, 1000);
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, 500);
-            ListenToTerminals(ServiceProvider.CreateScope().ServiceProvider);
+            ListenToTerminals(ServiceProvider);
             // Wait for user input
             Console.WriteLine("Hit 'q' and enter to abort\n");
             string clientInput = Console.ReadLine();
@@ -80,7 +80,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
-                .AddScoped<ITerminalManager, TerminalManager>();
+                .AddSingleton<ITerminalManager, TerminalManager>();
         }
         /// <summary>
         /// Monitor terminal connections and forward messages
@@ -97,7 +97,7 @@ namespace BeforeOurTime.Business
                     lock (thisLock)
                     {
                         var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
-                        var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
+                        var gameItem = itemRepo.ReadUuid(new List<Guid>() { terminal.ItemUuid }).First();
                         var clientMessage = new Message()
                         {
                             Version = ItemVersion.Alpha,
@@ -151,7 +151,6 @@ namespace BeforeOurTime.Business
                 List<Message> messages = messageRepo.Read();
                 messageRepo.Delete();
                 // Deliver message to each recipient
-                //                messages.ForEach(delegate (Message message)
                 foreach (Message message in messages)
                 {
                     try
@@ -171,6 +170,13 @@ namespace BeforeOurTime.Business
                             // Save changes to item data
                             message.To.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
                             itemRepo.Update(new List<Item>() { message.To });
+                            // Forward message to terminal
+                            var terminalManager = ServiceProvider.GetService<ITerminalManager>();
+                            var terminal = terminalManager.GetTerminals().Where(x => x.ItemUuid == message.To.Uuid).FirstOrDefault();
+                            if (terminal != null)
+                            {
+                                terminal.SendToTerminal(message.Value);
+                            }
                         }
                         else
                         {

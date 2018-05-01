@@ -19,7 +19,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// List of all active terminals
         /// </summary>
-        protected List<Terminal> Terminals { set; get; }
+        protected List<Terminal> Terminals = new List<Terminal>();
         /// <summary>
         /// Callback definition of function subscribed to OnTerminalCreated
         /// </summary>
@@ -59,18 +59,21 @@ namespace BeforeOurTime.Business.Terminals
                 .FirstOrDefault();
             if (account != null)
             {
-                return CreateTerminal(account);
+                // Atach to game object (temporary)
+                return CreateTerminal(account.Id, new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
             }
             return null;
         }
         /// <summary>
         /// Create a new terminal and notify subscribers
         /// </summary>
-        /// <param name="account">Account holder in operation of terminal</param>
+        /// <param name="accountId">Account holder in operation of terminal</param>
+        /// <param name="itemUuid">Item currently attached to as terminal's avatar (in system representation)</param>
         /// <returns></returns>
-        public Terminal CreateTerminal(Account account)
+        public Terminal CreateTerminal(int accountId, Guid itemUuid)
         {
-            var terminal = new Terminal(account);
+            var terminal = new Terminal(accountId, itemUuid);
+            Terminals.Add(terminal);
             if (OnTerminalCreated != null)
             {
                 OnTerminalCreated(terminal);
@@ -95,6 +98,14 @@ namespace BeforeOurTime.Business.Terminals
         public void SendToTerminalId(Guid terminalId, string message)
         {
             Terminals.FirstOrDefault(x => x.Id == terminalId).SendToTerminal(message);
+        }
+        /// <summary>
+        /// Get list of all active terminals
+        /// </summary>
+        /// <returns></returns>
+        public List<Terminal> GetTerminals()
+        {
+            return Terminals;
         }
     }
 }

@@ -20,7 +20,11 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Account holder in operation of terminal
         /// </summary>
-        public Account Account { set; get; }
+        public int AccountId { set; get; }
+        /// <summary>
+        /// Item currently attached to as terminal's avatar (in system representation)
+        /// </summary>
+        public Guid ItemUuid { set; get; }
         /// <summary>
         /// Define delgate that terminal and server can use to exchange messages
         /// </summary>
@@ -38,11 +42,13 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="account">Account holder in operation of terminal</param>
-        public Terminal(Account account)
+        /// <param name="accountId">Account holder in operation of terminal</param>
+        /// <param name="itemUuid">Item currently attached to as terminal's avatar (in system representation)</param>
+        public Terminal(int accountId, Guid itemUuid)
         {
             Id = Guid.NewGuid();
-            Account = account;
+            AccountId = accountId;
+            ItemUuid = itemUuid;
         }
         /// <summary>
         /// Send a message to the terminal
