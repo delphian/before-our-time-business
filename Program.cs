@@ -77,6 +77,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
+                .AddScoped<IJsEventManager, JsEventManager>()
                 .AddScoped<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }
@@ -144,12 +145,12 @@ namespace BeforeOurTime.Business
                 var logger = ServiceProvider.GetService<ILogger>();
                 var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
                 var messageRepo = ServiceProvider.GetService<IMessageRepo>();
+                var jsEventManager = ServiceProvider.GetService<IJsEventManager>();
                 var parser = new Jint.Parser.JavaScriptParser();
                 var jsEngine = new Engine();
-                // Javascript onEvent function name mapping to message type
-                var jsEvents = JsEventManager.GetEventJsMapping();
                 // Create script global functions
                 var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
+                var jsEvents = jsEventManager.GetMessageToJsEventMapping();
                 jsFunctionManager.AddJsFunctions(jsEngine);
                 // Get messages
                 List<Message> messages = messageRepo.Read();

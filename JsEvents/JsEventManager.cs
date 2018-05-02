@@ -6,14 +6,21 @@ using System.Text;
 namespace BeforeOurTime.Business.JsEvents
 {
     /// <summary>
-    /// Javascript onEvent function name mapping to message type
+    /// Message type mapping to js onEvent function callback and argument type
     /// </summary>
-    public static class JsEventManager
+    public class JsEventManager : IJsEventManager
     {
         /// <summary>
-        /// Javascript onEvent function name mapping to message type
+        /// Constructor
         /// </summary>
-        public static Dictionary<MessageType, JsEventHandler> GetEventJsMapping()
+        public JsEventManager()
+        {
+
+        }
+        /// <summary>
+        /// Message type mapping to js onEvent function and argument
+        /// </summary>
+        public Dictionary<MessageType, JsEventHandler> GetMessageToJsEventMapping()
         {
             var jsEvents = new Dictionary<MessageType, JsEventHandler>()
             {
