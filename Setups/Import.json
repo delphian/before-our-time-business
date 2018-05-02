@@ -1,11 +1,118 @@
 ﻿{
-  "Roles": {
+    "Roles": [
+        {
+            "Id": "b9082ca0-22e0-4c50-95de-dfa027730195",
+            "NameUnique": "AccountCreate",
+            "Name": "Create Account"
+        },
+        {
+            "Id": "092b6810-24b2-40a4-be32-70e9c72f58db",
+            "NameUnique": "AccountRead",
+            "Name": "Read Account"
+        },
+        {
+            "Id": "0cc0bae3-92e1-47a2-b6ff-393a022e2328",
+            "NameUnique": "AccountUpdate",
+            "Name": "Update Account"
+        },
+        {
+            "Id": "412dec3f-9b5f-4972-8daf-deccf1c65c60",
+            "NameUnique": "AccountDelete",
+            "Name": "Delete Account"
+        },
+        {
+            "Id": "025ffb06-76b4-4f41-b621-2c54b70d2fbc",
+            "NameUnique": "ItemCreate",
+            "Name": "Create Item"
+        },
+        {
+            "Id": "c09c8ca1-7914-46af-9c20-fe7fd02ab030",
+            "NameUnique": "ItemRead",
+            "Name": "Read Item"
+        },
+        {
+            "Id": "c076e5c1-d874-4f10-b22b-eda845952b18",
+            "NameUnique": "ItemUpdate",
+            "Name": "Update Item"
+        },
+        {
+            "Id": "f20a4726-754e-4896-91e7-61ecbe38f8c4",
+            "NameUnique": "ItemDelete",
+            "Name": "Delete Item"
+        }
+    ],
+    "Groups": [
+        {
+            "Id": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb",
+            "Name": "Sysop"
+        }
+    ],
+    "GroupRoles": [
+        {
+            "Id": "bd135c93-9bd6-47aa-8b0e-6584599fa57b",
+            "GroupId": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb",
+            "RoleId": "b9082ca0-22e0-4c50-95de-dfa027730195"
+        },
+        {
+            "Id": "3ce84da7-7ef0-423a-9dbf-7587469efd7f",
+            "GroupId": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb",
+            "RoleId": "092b6810-24b2-40a4-be32-70e9c72f58db"
+        },
+        {
+            "Id": "31e9079a-f490-46b7-b4aa-acd88553d98e",
+            "GroupId": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb",
+            "RoleId": "0cc0bae3-92e1-47a2-b6ff-393a022e2328"
+        },
+        {
+            "Id": "ca1a0ec0-3d93-4849-a114-8cad945969a7",
+            "GroupId": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb",
+            "RoleId": "412dec3f-9b5f-4972-8daf-deccf1c65c60"
+        },
+        {
+            "Id": "b2e9658d-3fd3-491e-adff-aa08df4afdb3",
+            "GroupId": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb",
+            "RoleId": "025ffb06-76b4-4f41-b621-2c54b70d2fbc"
+        },
+        {
+            "Id": "da655301-f5f5-4995-8276-b6435c4f582a",
+            "GroupId": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb",
+            "RoleId": "c09c8ca1-7914-46af-9c20-fe7fd02ab030"
+        },
+        {
+            "Id": "0a7ccc3f-4eb1-4fb5-9a4e-1500cf84a693",
+            "GroupId": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb",
+            "RoleId": "c076e5c1-d874-4f10-b22b-eda845952b18"
+        },
+        {
+            "Id": "8ce19679-605c-47f1-adf5-3a78256c33cd",
+            "GroupId": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb",
+            "RoleId": "f20a4726-754e-4896-91e7-61ecbe38f8c4"
+        }
+    ],
+    "Accounts": [
+        {
+            "Id": "c51fb773-6c41-4840-8f20-7f249e61b2b8",
+            "Name": "First Born"
+        }
+    ],
+    "AccountGroups": [
+        {
+            "Id": "f3f3dc33-6e37-44f2-850b-f47542381026",
+            "AccountId": "c51fb773-6c41-4840-8f20-7f249e61b2b8",
+            "GroupId": "4fa7d5a4-a6d1-4516-84c3-43ca8c2fe1bb"
+        }
+    ],
+    "Authentication": {
+        "BotMeta": [
+            {
+                "Id": "c5f9ce41-bbf3-44f5-a917-8c276d78449d",
+                "Email": "admin@localhost",
+                "Password": "password",
+                "AccountId": "c51fb773-6c41-4840-8f20-7f249e61b2b8"
+            }
+        ]
+    },
+    "Items": {
 
-  },
-  "Accounts": {
-
-  },
-  "Items": {
-
-  }
+    }
 }

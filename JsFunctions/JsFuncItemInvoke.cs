@@ -22,7 +22,7 @@ namespace BeforeOurTime.Business.JsFunctions
             // Box some repository functionality into safe limited javascript functions
             Func<string, string, object> itemInvoke = delegate (string uuid, string method)
             {
-                var item = itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
+                var item = itemRepo.Read(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
                 object result = new Engine().Execute(item.Script.Trim()).Invoke(method, "{}");
                 return result;
             };

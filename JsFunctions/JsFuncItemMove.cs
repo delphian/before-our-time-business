@@ -22,8 +22,8 @@ namespace BeforeOurTime.Business.JsFunctions
             // Box some repository functionality into safe limited javascript functions
             Func<string, string, bool> itemMove = delegate (string uuid, string toUuid)
             {
-                var item = itemRepo.ReadUuid(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
-                var toItem = itemRepo.ReadUuid(new List<Guid>() { new Guid(toUuid) }).FirstOrDefault();
+                var item = itemRepo.Read(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
+                var toItem = itemRepo.Read(new List<Guid>() { new Guid(toUuid) }).FirstOrDefault();
                 Api.MoveItem(null, toItem, item);
                 return true;
             };

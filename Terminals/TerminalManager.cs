@@ -71,7 +71,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="accountId">Account holder in operation of terminal</param>
         /// <param name="itemUuid">Item currently attached to as terminal's avatar (in system representation)</param>
         /// <returns></returns>
-        public Terminal CreateTerminal(int accountId, Guid itemUuid)
+        public Terminal CreateTerminal(Guid accountId, Guid itemUuid)
         {
             var terminal = new Terminal(accountId, itemUuid);
             Terminals.Add(terminal);

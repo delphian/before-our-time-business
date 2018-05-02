@@ -97,7 +97,7 @@ namespace BeforeOurTime.Business
                     {
                         var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
                         var api = serviceProvider.GetService<IApi>();
-                        var gameItem = itemRepo.ReadUuid(new List<Guid>() { terminal.ItemUuid }).First();
+                        var gameItem = itemRepo.Read(new List<Guid>() { terminal.ItemUuid }).First();
                         var clientMessage = new Message()
                         {
                             Version = ItemVersion.Alpha,
@@ -123,7 +123,7 @@ namespace BeforeOurTime.Business
             {
                 var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
                 var api = ServiceProvider.GetService<IApi>();
-                var gameItem = itemRepo.ReadUuid(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
+                var gameItem = itemRepo.Read(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
                 var tickMessage = new Message()
                 {
                     Version = ItemVersion.Alpha,
@@ -177,7 +177,7 @@ namespace BeforeOurTime.Business
                             itemRepo.Update(new List<Item>() { message.To });
                             // Forward message to terminal
                             var terminalManager = ServiceProvider.GetService<ITerminalManager>();
-                            var terminal = terminalManager.GetTerminals().Where(x => x.ItemUuid == message.To.Uuid).FirstOrDefault();
+                            var terminal = terminalManager.GetTerminals().Where(x => x.ItemUuid == message.To.Id).FirstOrDefault();
                             if (terminal != null)
                             {
                                 terminal.SendToTerminal(message.Value);
@@ -185,12 +185,12 @@ namespace BeforeOurTime.Business
                         }
                         else
                         {
-                            logger.LogError(message.To.Uuid + ": No js callback for: " + jsEvents[message.Type].Function);
+                            logger.LogError(message.To.Id + ": No js callback for: " + jsEvents[message.Type].Function);
                         }
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError("script failed: " + message.To.Uuid + " " + ex.Message);
+                        logger.LogError("script failed: " + message.To.Id + " " + ex.Message);
                     }
                 }
             }

@@ -29,8 +29,8 @@ namespace BeforeOurTime.Business.JsFunctions
                 object msgBody)
             {
                 Enum.TryParse(type, out MessageType msgType);
-                var itemFrom = itemRepo.ReadUuid(new List<Guid>() { new Guid(uuidFrom) }).FirstOrDefault();
-                var itemTo = itemRepo.ReadUuid(new List<Guid>() { new Guid(uuidTo) }).FirstOrDefault();
+                var itemFrom = itemRepo.Read(new List<Guid>() { new Guid(uuidFrom) }).FirstOrDefault();
+                var itemTo = itemRepo.Read(new List<Guid>() { new Guid(uuidTo) }).FirstOrDefault();
                 var message = new Message()
                 {
                     From = itemFrom,

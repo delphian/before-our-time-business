@@ -5,8 +5,11 @@ using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Items;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -38,60 +41,18 @@ namespace BeforeOurTime.Business.Setups
             var authenBotMetaRepo = ServiceProvider.GetService<IRepository<AuthenticationBotMeta>>();
             if (!accountRepo.Read(0, 1).Any())
             {
-                var roles = new List<AuthorizationRole>();
-                // Account Roles
-                var accountRoles = new List<AuthorizationRole>()
-                    {
-                        new AuthorizationRole { NameUnique = "AccountCreate", Name = "Create Account" },
-                        new AuthorizationRole { NameUnique = "AccountRead", Name = "Read Account" },
-                        new AuthorizationRole { NameUnique = "AccountUpdate", Name = "Update Account" },
-                        new AuthorizationRole { NameUnique = "AccountDelete", Name = "Delete Account" }
-                    };
-                authorRoleRepo.Create(accountRoles);
-                roles.AddRange(accountRoles);
-                // Item Roles
-                var itemRoles = new List<AuthorizationRole>()
-                    {
-                        new AuthorizationRole { NameUnique = "ItemCreate", Name = "Create Item" },
-                        new AuthorizationRole { NameUnique = "ItemRead", Name = "Read Item" },
-                        new AuthorizationRole { NameUnique = "ItemUpdate", Name = "Update Item" },
-                        new AuthorizationRole { NameUnique = "ItemDelete", Name = "Delete Item" }
-                    };
-                authorRoleRepo.Create(itemRoles);
-                roles.AddRange(itemRoles);
-                // Sysop Group
-                var groupSysop = authorGroupRepo.Create(new List<AuthorizationGroup>()
-                    {
-                        new AuthorizationGroup { Name = "Sysop" }
-                    }).First();
-                var groupRoles = authorGroupRoleRepo.Create(new List<AuthorizationGroupRole>() {
-                        new AuthorizationGroupRole { Role = roles.Where(x => x.NameUnique == "AccountCreate").First(), Group = groupSysop },
-                        new AuthorizationGroupRole { Role = roles.Where(x => x.NameUnique == "AccountRead").First(), Group = groupSysop },
-                        new AuthorizationGroupRole { Role = roles.Where(x => x.NameUnique == "AccountUpdate").First(), Group = groupSysop },
-                        new AuthorizationGroupRole { Role = roles.Where(x => x.NameUnique == "AccountDelete").First(), Group = groupSysop },
-                        new AuthorizationGroupRole { Role = roles.Where(x => x.NameUnique == "ItemCreate").First(), Group = groupSysop },
-                        new AuthorizationGroupRole { Role = roles.Where(x => x.NameUnique == "ItemRead").First(), Group = groupSysop },
-                        new AuthorizationGroupRole { Role = roles.Where(x => x.NameUnique == "ItemUpdate").First(), Group = groupSysop },
-                        new AuthorizationGroupRole { Role = roles.Where(x => x.NameUnique == "ItemDelete").First(), Group = groupSysop }
-                    });
-                // Accounts
-                var account = accountRepo.Create(new List<Account>() {
-                        new Account { Name = "First Born" }
-                    }).First();
-                // Account credentials
-                var authenBotMeta = authenBotMetaRepo.Create(new List<AuthenticationBotMeta>()
-                    {
-                        new AuthenticationBotMeta {
-                            Email = Configuration.GetSection("Admin").GetSection("Email").Value,
-                            Password = Configuration.GetSection("Admin").GetSection("Password").Value,
-                            Account = account
-                        }
-                    }).First();
-                // Assign groups to accounts
-                var accountGroup = authorAccountGroupRepo.Create(new List<AuthorizationAccountGroup>()
-                    {
-                        new AuthorizationAccountGroup { Account = account, Group = groupSysop }
-                    }).First();
+                string json = "";
+                using (StreamReader r = new StreamReader("Setups\\Import.json"))
+                {
+                    json = r.ReadToEnd();
+                }
+                var jObj = JObject.Parse(json);
+                authorRoleRepo.Create(JsonConvert.DeserializeObject<List<AuthorizationRole>>(jObj["Roles"].ToString()));
+                authorGroupRepo.Create(JsonConvert.DeserializeObject<List<AuthorizationGroup>>(jObj["Groups"].ToString()));
+                authorGroupRoleRepo.Create(JsonConvert.DeserializeObject<List<AuthorizationGroupRole>>(jObj["GroupRoles"].ToString()));
+                accountRepo.Create(JsonConvert.DeserializeObject<List<Account>>(jObj["Accounts"].ToString()));
+                authenBotMetaRepo.Create(JsonConvert.DeserializeObject<List<AuthenticationBotMeta>>(jObj["Authentication"]["BotMeta"].ToString()));
+                authorAccountGroupRepo.Create(JsonConvert.DeserializeObject<List<AuthorizationAccountGroup>>(jObj["AccountGroups"].ToString()));
             }
             return this;
         }
@@ -103,7 +64,7 @@ namespace BeforeOurTime.Business.Setups
                 var gameItem = itemRepo.Create(new List<Item>() { new Item()
                 {
                     Type = ItemType.Game,
-                    Uuid = new Guid("487a7282-0cad-4081-be92-83b14671fc23"),
+                    Id = new Guid("487a7282-0cad-4081-be92-83b14671fc23"),
                     UuidType = new Guid("75f55af3-3027-404c-b9f0-7b21ead826b2"),
                     ParentId = null,
                     Children = new List<Item>(),

@@ -23,7 +23,7 @@ namespace BeforeOurTime.Business.Terminals
         /// Account holder in operation of terminal
         /// </summary>
         [JsonProperty(PropertyName = "accountId")]
-        public int AccountId { set; get; }
+        public Guid AccountId { set; get; }
         /// <summary>
         /// Item currently attached to as terminal's avatar (in system representation)
         /// </summary>
@@ -48,7 +48,7 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="accountId">Account holder in operation of terminal</param>
         /// <param name="itemUuid">Item currently attached to as terminal's avatar (in system representation)</param>
-        public Terminal(int accountId, Guid itemUuid)
+        public Terminal(Guid accountId, Guid itemUuid)
         {
             Id = Guid.NewGuid();
             AccountId = accountId;
