@@ -27,13 +27,8 @@ namespace BeforeOurTime.Business.Setups
         }
         public Setup Install()
         {
-            InstallItems();
-            InstallAccounts();
-            return this;
-        }
-        public Setup InstallAccounts()
-        {
             var accountRepo = ServiceProvider.GetService<IAccountRepo>();
+            var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             var authorRoleRepo = ServiceProvider.GetService<IRepository<AuthorizationRole>>();
             var authorGroupRepo = ServiceProvider.GetService<IRepository<AuthorizationGroup>>();
             var authorGroupRoleRepo = ServiceProvider.GetService<IRepository<AuthorizationGroupRole>>();
@@ -53,37 +48,7 @@ namespace BeforeOurTime.Business.Setups
                 accountRepo.Create(JsonConvert.DeserializeObject<List<Account>>(jObj["Accounts"].ToString()));
                 authenBotMetaRepo.Create(JsonConvert.DeserializeObject<List<AuthenticationBotMeta>>(jObj["Authentication"]["BotMeta"].ToString()));
                 authorAccountGroupRepo.Create(JsonConvert.DeserializeObject<List<AuthorizationAccountGroup>>(jObj["AccountGroups"].ToString()));
-            }
-            return this;
-        }
-        public Setup InstallItems()
-        {
-            var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
-            if (!itemRepo.Read(0, 1).Any())
-            {
-                var gameItem = itemRepo.Create(new List<Item>() { new Item()
-                {
-                    Type = ItemType.Game,
-                    Id = new Guid("487a7282-0cad-4081-be92-83b14671fc23"),
-                    UuidType = new Guid("75f55af3-3027-404c-b9f0-7b21ead826b2"),
-                    ParentId = null,
-                    Children = new List<Item>(),
-                    Data = @"{
-                    }",
-                    Script = @"
-                        function onTick(e) {
-                        };
-                    "
-                } }).First();
-                var interfaceType = typeof(ISetup);
-                var setupItems = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(x => x.GetTypes())
-                    .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                    .Select(x => Activator.CreateInstance(x))
-                    .ToList();
-                List<Item> items = setupItems
-                    .SelectMany(x => ((ISetup)x).Items(Configuration, ServiceProvider))
-                    .ToList();
+                var items = JsonConvert.DeserializeObject<List<Item>>(jObj["Items"].ToString());
                 itemRepo.Create(items);
             }
             return this;

@@ -112,7 +112,57 @@
             }
         ]
     },
-    "Items": {
-
-    }
+    "Items": [
+        {
+            "Id": "487a7282-0cad-4081-be92-83b14671fc23",
+            "Type": 10,
+            "UuidType": "75f55af3-3027-404c-b9f0-7b21ead826b2",
+            "ParentId": null,
+            "Data": "{}",
+            "Script": "function onTick(e) {};"
+        },
+        {
+            "Id": "998b0dd6-4a6e-4930-8245-60effa37279a",
+            "Type": 200,
+            "UuidType": "ed187c11-1afe-4750-985a-546ec6198f5f",
+            "ParentId": "487a7282-0cad-4081-be92-83b14671fc23",
+            "Data": "{}",
+            "Script": "
+                function onTerminalInput(e) {
+                    if (e.raw == 'help') {
+                        log('Available commands are : \'help\', \'look\', \'q\'\n');
+                        log('Received help command from: ' + e.terminal.itemUuid + '\n');
+                        itemMessage(me.uuid.ToString(), e.terminal.itemUuid.toString(), 'EventTick', { });
+                    }
+                };"
+        },
+        {
+            "Id": "9428d020-b5bd-425d-8b07-91e94ac680f5",
+            "Type": 200,
+            "UuidType": "8a3ba31e-df39-4be1-a177-d83daaec8716",
+            "ParentId": "487a7282-0cad-4081-be92-83b14671fc23",
+            "Data": "{}",
+            "Script": "                    
+                function onTerminalInput(e) {
+                    if (e.raw == 'look') {
+                        var stats = itemInvoke('fe178ad7-0e33-4111-beaf-6dfcfd548bd5', 'onQuery');
+                        log('Nothing to see here...\n' + stats.name);
+                    }
+                };"
+        },
+        {
+            "Id": "fe178ad7-0e33-4111-beaf-6dfcfd548bd5",
+            "Type": 100,
+            "UuidType": "f08045bc-86b1-4c03-bb71-3b7f95dbd7c2",
+            "ParentId": "487a7282-0cad-4081-be92-83b14671fc23",
+            "Data": "{}",
+            "Script": "
+                function onQuery() {
+                    return {
+                        name: 'Spoon',
+                        description: 'A stupid looking spoon'
+                    };
+                };"
+        }
+    ]
 }
