@@ -22,19 +22,21 @@ namespace BeforeOurTime.Business.JsFunctions
         {
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             // Box some repository functionality into safe limited javascript functions
-            Func<string, string, object, bool> itemMessage = delegate (
+            Func<string, string, string, object, bool> itemMessage = delegate (
                 string uuidFrom, 
                 string uuidTo,
-                object messageBody)
+                string type,
+                object msgBody)
             {
+                Enum.TryParse(type, out MessageType msgType);
                 var itemFrom = itemRepo.ReadUuid(new List<Guid>() { new Guid(uuidFrom) }).FirstOrDefault();
                 var itemTo = itemRepo.ReadUuid(new List<Guid>() { new Guid(uuidTo) }).FirstOrDefault();
                 var message = new Message()
                 {
                     From = itemFrom,
                     Version = ItemVersion.Alpha,
-                    Type = MessageType.EventTick,
-                    Value = JsonConvert.SerializeObject(messageBody)
+                    Type = msgType,
+                    Value = JsonConvert.SerializeObject(msgBody)
                 };
                 Api.SendMessage(message, new List<Item>() { itemTo });
                 return true;

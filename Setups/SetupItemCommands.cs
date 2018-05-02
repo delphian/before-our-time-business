@@ -30,7 +30,7 @@ namespace BeforeOurTime.Business.Setups
                         if (e.raw == 'help') {
                             log('Available commands are : \'help\', \'look\', \'q\'\n');
                             log('Received help command from: ' + e.terminal.itemUuid + '\n');
-                            itemMessage(me.uuid.ToString(), e.terminal.itemUuid.toString(), { 'text': 'hello!' });
+                            itemMessage(me.uuid.ToString(), e.terminal.itemUuid.toString(), 'EventTick', { });
                         }
                     };
                 "
