@@ -22,18 +22,17 @@ namespace BeforeOurTime.Business.JsFunctions
         {
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             // Box some repository functionality into safe limited javascript functions
-            Func<string, string, string, object, bool> itemMessage = delegate (
-                string uuidFrom, 
-                string uuidTo,
+            Func<Item, string, string, object, bool> itemMessage = delegate (
+                Item from,
+                string toId,
                 string type,
                 object msgBody)
             {
                 Enum.TryParse(type, out MessageType msgType);
-                var itemFrom = itemRepo.Read(new List<Guid>() { new Guid(uuidFrom) }).FirstOrDefault();
-                var itemTo = itemRepo.Read(new List<Guid>() { new Guid(uuidTo) }).FirstOrDefault();
+                var itemTo = itemRepo.Read(new List<Guid>() { new Guid(toId) }).FirstOrDefault();
                 var message = new Message()
                 {
-                    From = itemFrom,
+                    From = from,
                     Version = ItemVersion.Alpha,
                     Type = msgType,
                     Value = JsonConvert.SerializeObject(msgBody)
@@ -41,7 +40,8 @@ namespace BeforeOurTime.Business.JsFunctions
                 Api.SendMessage(message, new List<Item>() { itemTo });
                 return true;
             };
-            JsEngine.SetValue("itemMessage", itemMessage);
+            JsEngine.SetValue("_itemMessage", itemMessage);
+            JsEngine.SetValue("itemMessage", "function(toId, type, msgBody){ return _itemMessage(me, toId, type, msgBody) };");
         }
     }
 }
