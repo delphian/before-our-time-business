@@ -1,6 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.JsEvents;
 using BeforeOurTime.Business.JsFunctions;
-using BeforeOurTime.Business.JsMessageBody;
 using BeforeOurTime.Business.Logs;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Dbs.EF;
@@ -10,7 +10,6 @@ using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
 using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Events.Maps;
 using BeforeOutTime.Repository.Dbs.EF;
 using Jint;
 using Microsoft.EntityFrameworkCore;
@@ -103,7 +102,7 @@ namespace BeforeOurTime.Business
                             Version = ItemVersion.Alpha,
                             Type = MessageType.EventTerminalInput,
                             From = gameItem,
-                            Value = JsonConvert.SerializeObject(new BodyEventTerminalInput() {
+                            Value = JsonConvert.SerializeObject(new BodyTerminalInput() {
                                 Terminal = terminal,
                                 Raw = message
                             })
@@ -148,7 +147,7 @@ namespace BeforeOurTime.Business
                 var parser = new Jint.Parser.JavaScriptParser();
                 var jsEngine = new Engine();
                 // Javascript onEvent function name mapping to message type
-                var jsEvents = MapMessageHandlers.GetEventJsMapping();
+                var jsEvents = JsEventManager.GetEventJsMapping();
                 // Create script global functions
                 var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
                 jsFunctionManager.AddJsFunctions(jsEngine);

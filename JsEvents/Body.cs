@@ -4,15 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.JsMessageBody
+namespace BeforeOurTime.Business.JsEvents
 {
     /// <summary>
-    /// An event that items may subscribe to receive messages on
+    /// Content of event message. Passed as argument to javascript event listener function
     /// </summary>
     public class Body
     {
         /// <summary>
-        /// Specific event type. Determines the properties of the event itself
+        /// Message type that invoked this event
         /// </summary>
         [JsonProperty(PropertyName = "type")]
         public MessageType Type { set; get; }

@@ -110,7 +110,7 @@ namespace BeforeOurTime.Business.Setups
                     Data = @"{
                     }",
                     Script = @"
-                        function onEventTick(e) {
+                        function onTick(e) {
                         };
                     "
                 } }).First();

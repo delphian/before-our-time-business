@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.JsMessageBody
+namespace BeforeOurTime.Business.JsEvents
 {
     /// <summary>
-    /// An event that items may subscribe to receive messages on
+    /// Content of event message. Passed as argument to javascript event listener function
     /// </summary>
-    public class BodyEventItemMove : Body, IBody
+    public class BodyItemMove : Body, IBody
     {
         /// <summary>
         /// Where the item has departd from

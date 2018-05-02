@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.JsMessageBody
+namespace BeforeOurTime.Business.JsEvents
 {
     /// <summary>
-    /// An event that items may subscribe to receive messages on
+    /// Content of event message. Passed as argument to javascript event listener function
     /// </summary>
-    public class BodyEventTerminalInput : Body, IBody
+    public class BodyTerminalInput : Body, IBody
     {
         /// <summary>
         /// A single remote connection. Source of the message

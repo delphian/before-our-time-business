@@ -1,5 +1,4 @@
-﻿using BeforeOurTime.Business.JsMessageBody;
-using BeforeOurTime.Repository.Models.Items;
+﻿using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -8,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Repository.Models;
+using BeforeOurTime.Business.JsEvents;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -30,7 +30,7 @@ namespace BeforeOurTime.Business.Apis
                 Version = ItemVersion.Alpha,
                 From = Source,
                 Type = MessageType.EventItemMove,
-                Value = JsonConvert.SerializeObject(new BodyEventItemMove()
+                Value = JsonConvert.SerializeObject(new BodyItemMove()
                 {
                     Type = MessageType.EventItemMove,
                     From = child.Parent,

@@ -26,7 +26,7 @@ namespace BeforeOurTime.Business.Setups
                 Children = new List<Item>(),
                 Data = @"{}",
                 Script = @"
-                    function onEventTerminalInput(e) {
+                    function onTerminalInput(e) {
                         if (e.raw == 'help') {
                             log('Available commands are : \'help\', \'look\', \'q\'\n');
                             log('Received help command from: ' + e.terminal.itemUuid + '\n');
@@ -44,7 +44,7 @@ namespace BeforeOurTime.Business.Setups
                 Children = new List<Item>(),
                 Data = @"{}",
                 Script = @"
-                    function onEventTerminalInput(e) {
+                    function onTerminalInput(e) {
                         if (e.raw == 'look') {
                             var stats = itemInvoke('fe178ad7-0e33-4111-beaf-6dfcfd548bd5', 'onQuery');
                             log('Nothing to see here...\n' + stats.name);
