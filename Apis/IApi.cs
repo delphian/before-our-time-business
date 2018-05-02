@@ -24,6 +24,10 @@ namespace BeforeOurTime.Business.Apis
         /// <summary>
         /// Truncate all tables in database
         /// </summary>
-        void DataReset();
+        IApi DataReset();
+        /// <summary>
+        /// Install initial accounts and database objects
+        /// </summary>
+        IApi DataInstall();
     }
 }

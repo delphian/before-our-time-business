@@ -19,7 +19,7 @@ namespace BeforeOurTime.Business.Apis
         /// <summa+y>
         /// Truncate all tables in database
         /// </summary>
-        public void DataReset()
+        public IApi DataReset()
         {
             AccountRepo.Delete();
             AuthorRoleRepo.Delete();
@@ -29,6 +29,7 @@ namespace BeforeOurTime.Business.Apis
             AuthenBotMetaRepo.Delete();
             MessageRepo.Delete();
             ItemRepo.Delete();
+            return this;
         }
     }
 }
