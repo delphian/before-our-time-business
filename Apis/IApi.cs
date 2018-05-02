@@ -21,5 +21,9 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="newParent"></param>
         /// <param name="child"></param>
         void MoveItem(Item Source, Item newParent, Item child);
+        /// <summary>
+        /// Truncate all tables in database
+        /// </summary>
+        void DataReset();
     }
 }

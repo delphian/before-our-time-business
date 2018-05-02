@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Repository.Models;
 using System.Linq;
+using BeforeOurTime.Repository.Models.Accounts;
+using BeforeOurTime.Repository.Models.Accounts.Authorization;
+using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -16,17 +19,37 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
-        private IItemRepo<Item> ItemRepo { set; get; }
+        private IAccountRepo AccountRepo { set; get; }
+        private IRepository<AuthorizationRole> AuthorRoleRepo { set; get; }
+        private IRepository<AuthorizationGroup> AuthorGroupRepo { set; get; }
+        private IRepository<AuthorizationGroupRole> AuthorGroupRoleRepo { set; get; }
+        private IRepository<AuthorizationAccountGroup> AuthorAccountGroupRepo { set; get; }
+        private IRepository<AuthenticationBotMeta> AuthenBotMetaRepo { set; get; }
         private IMessageRepo MessageRepo { set; get; }
+        private IItemRepo<Item> ItemRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="itemRepo"></param>
         /// <param name="messageRepo"></param>
-        public Api(IMessageRepo messageRepo, IItemRepo<Item> itemRepo)
+        public Api(
+            IAccountRepo accountRepo,
+            IRepository<AuthorizationRole> authorRoleRepo,
+            IRepository<AuthorizationGroup> authorGroupRepo,
+            IRepository<AuthorizationGroupRole> authorGroupRoleRepo,
+            IRepository<AuthorizationAccountGroup> authorAccountGroupRepo,
+            IRepository<AuthenticationBotMeta> authenBotMetaRepo,
+            IMessageRepo messageRepo, 
+            IItemRepo<Item> itemRepo)
         {
-            MessageRepo = messageRepo;
+            AccountRepo = accountRepo;
+            AuthorRoleRepo = authorRoleRepo;
+            AuthorGroupRepo = authorGroupRepo;
+            AuthorGroupRoleRepo = authorGroupRoleRepo;
+            AuthorAccountGroupRepo = authorAccountGroupRepo;
+            AuthenBotMetaRepo = authenBotMetaRepo;
             ItemRepo = itemRepo;
+            MessageRepo = messageRepo;
         }
         /// <summary>
         /// Send a message to multiple recipient items
