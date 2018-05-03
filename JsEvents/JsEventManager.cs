@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Repository.Models.Messages;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeforeOurTime.Business.JsEvents
@@ -10,26 +11,30 @@ namespace BeforeOurTime.Business.JsEvents
     /// </summary>
     public class JsEventManager : IJsEventManager
     {
+        protected List<JsEventRegistration> JsEventRegistrations = new List<JsEventRegistration>();
         /// <summary>
         /// Constructor
         /// </summary>
         public JsEventManager()
         {
-
         }
         /// <summary>
         /// Message type mapping to js onEvent function and argument
         /// </summary>
-        public Dictionary<MessageType, JsEventHandler> GetMessageToJsEventMapping()
+        public List<JsEventRegistration> GetJsEventRegistrations()
         {
-            var jsEvents = new Dictionary<MessageType, JsEventHandler>()
+            if (JsEventRegistrations.Count == 0)
             {
-                { MessageType.EventTick, new JsEventHandler("onTick", typeof(BodyTick)) },
-                { MessageType.EventItemMove, new JsEventHandler("onItemMove", typeof(BodyItemMove)) },
-                { MessageType.EventTerminalInput, new JsEventHandler("onTerminalInput", typeof(BodyTerminalInput)) },
-                { MessageType.EventTerminalOutput, new JsEventHandler("onTerminalOutput", typeof(BodyTerminalOutput)) }
-            };
-            return jsEvents;
+                var interfaceType = typeof(IJsHandler);
+                var jsEventClasses = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(x => x.GetTypes())
+                    .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                    .Select(x => Activator.CreateInstance(x))
+                    .ToList();
+                jsEventClasses
+                    .ForEach(x => JsEventRegistrations.Add(((IJsHandler)x).Register()));
+            }
+            return JsEventRegistrations;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace BeforeOurTime.Business.JsEvents
     /// <summary>
     /// Content of event message. Passed as argument to javascript event listener function
     /// </summary>
-    public class BodyTerminalInput : Body, IBody
+    public class OnTerminalInput : JsHandler, IJsHandler
     {
         /// <summary>
         /// A single remote connection. Source of the message
@@ -22,5 +23,13 @@ namespace BeforeOurTime.Business.JsEvents
         /// </summary>
         [JsonProperty(PropertyName = "raw")]
         public string Raw { set; get; }
+        /// <summary>
+        /// Register javascript event handler
+        /// </summary>
+        /// <returns></returns>
+        public JsEventRegistration Register()
+        {
+            return new JsEventRegistration(MessageType.EventTerminalInput, "onTerminalInput", typeof(OnTerminalInput));
+        }
     }
 }

@@ -104,7 +104,7 @@ namespace BeforeOurTime.Business
                             Version = ItemVersion.Alpha,
                             Type = MessageType.EventTerminalInput,
                             From = gameItem,
-                            Value = JsonConvert.SerializeObject(new BodyTerminalInput() {
+                            Value = JsonConvert.SerializeObject(new OnTerminalInput() {
                                 Terminal = terminal,
                                 Raw = message
                             })
@@ -151,7 +151,7 @@ namespace BeforeOurTime.Business
                 var jsEngine = new Engine();
                 // Create script global functions
                 var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
-                var jsEvents = jsEventManager.GetMessageToJsEventMapping();
+                var jsEvents = jsEventManager.GetJsEventRegistrations();
                 // Get messages
                 List<Message> messages = messageRepo.Read();
                 messageRepo.Delete();
@@ -161,7 +161,7 @@ namespace BeforeOurTime.Business
                     try
                     {
                         var jsProgram = parser.Parse(message.To.Script.Trim());
-                        if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEvents[message.Type].Function))
+                        if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEvents.Where(y => y.MessageType == message.Type).Select(y => y.JsFunction).FirstOrDefault()))
                         {
                             jsFunctionManager.AddJsFunctions(jsEngine);
                             jsEngine
@@ -170,7 +170,7 @@ namespace BeforeOurTime.Business
                                 .Execute("var data = JSON.parse(_data);")
                                 .Execute(message.To.Script)
                                 .Invoke(
-                                    jsEvents[message.Type].Function,
+                                    jsEvents.Where(x => x.MessageType == message.Type).Select(x => x.JsFunction).FirstOrDefault(),
                                     JsonConvert.DeserializeObject(
                                         JsonConvert.SerializeObject(
                                             JsonConvert.DeserializeObject(message.Value)))

@@ -1,0 +1,17 @@
+﻿{
+    "Items": [
+        {
+            "Id": "20c4b5fc-5cfe-4382-aea8-84c1d80f71f0",
+            "Type": 300,
+            "UuidType": "84dd5b2e-a02d-410a-99c7-056624d15b35",
+            "ParentId": "487a7282-0cad-4081-be92-83b14671fc23",
+            "Data": "{}",
+            "Script": "
+                function onTick(e) {};
+                function onTerminalOutput(e) {
+                    terminalMessage(e.terminal.id, e.raw);         
+                };
+            "
+        }
+    ]
+}

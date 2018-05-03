@@ -10,6 +10,6 @@ namespace BeforeOurTime.Business.JsEvents
         /// <summary>
         /// Message type mapping to js onEvent function and argument
         /// </summary>
-        Dictionary<MessageType, JsEventHandler> GetMessageToJsEventMapping();
+        List<JsEventRegistration> GetJsEventRegistrations();
     }
 }

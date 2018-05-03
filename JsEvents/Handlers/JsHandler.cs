@@ -1,5 +1,4 @@
-﻿using BeforeOurTime.Business.Terminals;
-using BeforeOurTime.Repository.Models.Items;
+﻿using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,12 +9,12 @@ namespace BeforeOurTime.Business.JsEvents
     /// <summary>
     /// Content of event message. Passed as argument to javascript event listener function
     /// </summary>
-    public class BodyTerminalOutput : Body, IBody
+    public class JsHandler
     {
         /// <summary>
-        /// Raw unstructured string for terminal consumption
+        /// Message type that invoked this event
         /// </summary>
-        [JsonProperty(PropertyName = "raw")]
-        public string Raw { set; get; }
+        [JsonProperty(PropertyName = "type")]
+        public MessageType Type { set; get; }
     }
 }

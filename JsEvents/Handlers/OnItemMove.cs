@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace BeforeOurTime.Business.JsEvents
     /// <summary>
     /// Content of event message. Passed as argument to javascript event listener function
     /// </summary>
-    public class BodyItemMove : Body, IBody
+    public class OnItemMove : JsHandler, IJsHandler
     {
         /// <summary>
         /// Where the item has departd from
@@ -26,5 +27,14 @@ namespace BeforeOurTime.Business.JsEvents
         /// </summary>
         [JsonProperty(PropertyName = "item")]
         public Item Item { set; get; }
+        /// <summary>
+        /// Register javascript event handler
+        /// </summary>
+        /// <returns></returns>
+        public JsEventRegistration Register()
+        {
+            return new JsEventRegistration(MessageType.EventItemMove, "onItemMove", typeof(OnItemMove));
+        }
     }
+
 }

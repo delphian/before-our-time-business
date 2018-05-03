@@ -30,7 +30,7 @@ namespace BeforeOurTime.Business.Apis
                 Version = ItemVersion.Alpha,
                 From = Source,
                 Type = MessageType.EventItemMove,
-                Value = JsonConvert.SerializeObject(new BodyItemMove()
+                Value = JsonConvert.SerializeObject(new OnItemMove()
                 {
                     Type = MessageType.EventItemMove,
                     From = child.Parent,
