@@ -19,9 +19,9 @@ namespace BeforeOurTime.Business.Apis
         /// <summary>
         /// Relocate an item
         /// </summary>
-        /// <param name="Source"></param>
-        /// <param name="newParent"></param>
-        /// <param name="child"></param>
+        /// <param name="Source">Item responsible for doing the moving</param>
+        /// <param name="newParent">Item which will become the parent</param>
+        /// <param name="child">Item which will become a new child</param>
         public void ItemMove(Item Source, Item newParent, Item child)
         {
             // Construct the message

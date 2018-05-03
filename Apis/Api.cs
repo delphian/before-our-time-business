@@ -11,6 +11,7 @@ using System.Linq;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
+using BeforeOurTime.Business.JsEvents;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -27,6 +28,7 @@ namespace BeforeOurTime.Business.Apis
         private IRepository<AuthenticationBotMeta> AuthenBotMetaRepo { set; get; }
         private IMessageRepo MessageRepo { set; get; }
         private IItemRepo<Item> ItemRepo { set; get; }
+        protected IJsEventManager JsEventManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -40,7 +42,8 @@ namespace BeforeOurTime.Business.Apis
             IRepository<AuthorizationAccountGroup> authorAccountGroupRepo,
             IRepository<AuthenticationBotMeta> authenBotMetaRepo,
             IMessageRepo messageRepo, 
-            IItemRepo<Item> itemRepo)
+            IItemRepo<Item> itemRepo,
+            IJsEventManager jsEventManager)
         {
             AccountRepo = accountRepo;
             AuthorRoleRepo = authorRoleRepo;
@@ -50,6 +53,7 @@ namespace BeforeOurTime.Business.Apis
             AuthenBotMetaRepo = authenBotMetaRepo;
             ItemRepo = itemRepo;
             MessageRepo = messageRepo;
+            JsEventManager = jsEventManager;
         }
         /// <summary>
         /// Send a message to multiple recipient items
