@@ -119,7 +119,7 @@
             "UuidType": "75f55af3-3027-404c-b9f0-7b21ead826b2",
             "ParentId": null,
             "Data": "{}",
-            "Script": "function onTick(e) {};"
+            "Script": "function onTick(e) {};function onTerminalOutput(e) { }"
         },
         {
             "Id": "998b0dd6-4a6e-4930-8245-60effa37279a",
@@ -130,9 +130,8 @@
             "Script": "
                 function onTerminalInput(e) {
                     if (e.raw == 'help') {
-                        log('Available commands are : \\'help\\', \\'look\\', \\'q\\'\\n');
-                        log('Received help command from: ' + e.terminal.itemUuid + '\\n');
-                        itemMessage(e.terminal.itemUuid, 'EventTick', { \"value\":  \"hi\" });
+                        var helps = 'Available commands are: help, look, q\\n';
+                        itemMessage(e.terminal.itemUuid, 'EventTerminalOutput', { \"raw\": helps });
                     }
                 };"
         },

@@ -146,6 +146,7 @@ namespace BeforeOurTime.Business
                 var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
                 var messageRepo = ServiceProvider.GetService<IMessageRepo>();
                 var jsEventManager = ServiceProvider.GetService<IJsEventManager>();
+                var terminalManager = ServiceProvider.GetService<ITerminalManager>();
                 var parser = new Jint.Parser.JavaScriptParser();
                 var jsEngine = new Engine();
                 // Create script global functions
@@ -178,7 +179,6 @@ namespace BeforeOurTime.Business
                             message.To.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
                             itemRepo.Update(new List<Item>() { message.To });
                             // Forward message to terminal
-                            var terminalManager = ServiceProvider.GetService<ITerminalManager>();
                             var terminal = terminalManager.GetTerminals().Where(x => x.ItemUuid == message.To.Id).FirstOrDefault();
                             if (terminal != null)
                             {

@@ -26,7 +26,8 @@ namespace BeforeOurTime.Business.JsEvents
             {
                 { MessageType.EventTick, new JsEventHandler("onTick", typeof(BodyTick)) },
                 { MessageType.EventItemMove, new JsEventHandler("onItemMove", typeof(BodyItemMove)) },
-                { MessageType.EventTerminalInput, new JsEventHandler("onTerminalInput", typeof(BodyTerminalInput)) }
+                { MessageType.EventTerminalInput, new JsEventHandler("onTerminalInput", typeof(BodyTerminalInput)) },
+                { MessageType.EventTerminalOutput, new JsEventHandler("onTerminalOutput", typeof(BodyTerminalOutput)) }
             };
             return jsEvents;
         }
