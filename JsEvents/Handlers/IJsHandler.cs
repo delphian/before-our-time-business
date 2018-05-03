@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BeforeOurTime.Repository.Models.Items;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,5 +15,10 @@ namespace BeforeOurTime.Business.JsEvents
         /// </summary>
         /// <returns></returns>
         JsEventRegistration Register();
+        /// <summary>
+        /// Require this JS event handler on any item of TYPE
+        /// </summary>
+        /// <returns></returns>
+        List<ItemType> RequiredOn();
     }
 }

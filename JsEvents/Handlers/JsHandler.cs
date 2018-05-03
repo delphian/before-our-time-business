@@ -7,7 +7,7 @@ using System.Text;
 namespace BeforeOurTime.Business.JsEvents
 {
     /// <summary>
-    /// Content of event message. Passed as argument to javascript event listener function
+    /// Defines a JS event handler. Javascript function to be called when a message of TYPE is received
     /// </summary>
     public class JsHandler
     {

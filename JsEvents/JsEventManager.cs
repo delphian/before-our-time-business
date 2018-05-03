@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Repository.Models.Messages;
+﻿using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,10 @@ namespace BeforeOurTime.Business.JsEvents
     public class JsEventManager : IJsEventManager
     {
         protected List<JsEventRegistration> JsEventRegistrations = new List<JsEventRegistration>();
+        /// <summary>
+        /// Required Js Event handlers an item of TYPE must implement
+        /// </summary>
+        protected Dictionary<ItemType, List<JsEventRegistration>> RequiredJsHandlers = new Dictionary<ItemType, List<JsEventRegistration>>();
         /// <summary>
         /// Constructor
         /// </summary>
@@ -35,6 +40,18 @@ namespace BeforeOurTime.Business.JsEvents
                     .ForEach(x => JsEventRegistrations.Add(((IJsHandler)x).Register()));
             }
             return JsEventRegistrations;
+        }
+        /// <summary>
+        /// Required Js Event handlers an item of TYPE must implement
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<ItemType, List<JsEventRegistration>> GetRequiredJsHandlers()
+        {
+            if (RequiredJsHandlers.Count == 0)
+            {
+
+            }
+            return RequiredJsHandlers;
         }
     }
 }

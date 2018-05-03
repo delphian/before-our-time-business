@@ -9,7 +9,7 @@ using System.Text;
 namespace BeforeOurTime.Business.JsEvents
 {
     /// <summary>
-    /// Content of event message. Passed as argument to javascript event listener function
+    /// Defines a JS event handler. Javascript function to be called when a message of TYPE is received
     /// </summary>
     public class OnTerminalInput : JsHandler, IJsHandler
     {
@@ -30,6 +30,16 @@ namespace BeforeOurTime.Business.JsEvents
         public JsEventRegistration Register()
         {
             return new JsEventRegistration(MessageType.EventTerminalInput, "onTerminalInput", typeof(OnTerminalInput));
+        }
+        /// <summary>
+        /// Require this JS event handler on any item of TYPE
+        /// </summary>
+        /// <returns></returns>
+        public List<ItemType> RequiredOn()
+        {
+            return new List<ItemType>()
+            {
+            };
         }
     }
 }
