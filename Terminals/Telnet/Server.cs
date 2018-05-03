@@ -12,6 +12,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         public static TelnetServer s { set; get; }
         public static IServiceProvider ServiceProvider { set; get; }
         public static Dictionary<uint, Terminal> Terminals = new Dictionary<uint, Terminal>();
+        public static Dictionary<uint, string> UserName = new Dictionary<uint, string>();
         public static Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
 
         public Server(IServiceProvider serviceProvider)
@@ -55,16 +56,14 @@ namespace BeforeOurTime.Business.Servers.Telnet
             EClientStatus status = c.getCurrentStatus();
             if (status == EClientStatus.Guest)
             {
-                if (message == "bryan.hazelbaker@gmail.com")
-                {
-                    s.sendMessageToClient(c, "\r\nPassword: ");
-                    c.setStatus(EClientStatus.Authenticating);
-                }
+                UserName[c.getClientID()] = message;
+                s.sendMessageToClient(c, "\r\nPassword: ");
+                c.setStatus(EClientStatus.Authenticating);
             }
             else if (status == EClientStatus.Authenticating)
             {
                 var terminalManager = ServiceProvider.GetService<ITerminalManager>();
-                var terminal = terminalManager.RequestTerminal("bryan.hazelbaker@gmail.com", message);
+                var terminal = terminalManager.RequestTerminal(UserName[c.getClientID()], message);
                 if (terminal != null)
                 {
                     Terminals[c.getClientID()] = terminal;

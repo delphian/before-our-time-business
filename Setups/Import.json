@@ -130,9 +130,9 @@
             "Script": "
                 function onTerminalInput(e) {
                     if (e.raw == 'help') {
-                        log('Available commands are : \'help\', \'look\', \'q\'\n');
-                        log('Received help command from: ' + e.terminal.itemUuid + '\n');
-                        itemMessage(me.uuid.ToString(), e.terminal.itemUuid.toString(), 'EventTick', { });
+                        log('Available commands are : \\'help\\', \\'look\\', \\'q\\'\\n');
+                        log('Received help command from: ' + e.terminal.itemUuid + '\\n');
+                        itemMessage(e.terminal.itemUuid.toString(), 'EventTick', { });
                     }
                 };"
         },
@@ -146,7 +146,7 @@
                 function onTerminalInput(e) {
                     if (e.raw == 'look') {
                         var stats = itemInvoke('fe178ad7-0e33-4111-beaf-6dfcfd548bd5', 'onQuery');
-                        log('Nothing to see here...\n' + stats.name);
+                        log('Nothing to see here...\\n' + stats.name);
                     }
                 };"
         },
