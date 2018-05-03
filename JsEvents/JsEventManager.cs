@@ -30,7 +30,7 @@ namespace BeforeOurTime.Business.JsEvents
         {
             if (JsEventRegistrations.Count == 0)
             {
-                var interfaceType = typeof(IJsHandler);
+                var interfaceType = typeof(IJsEventHandler);
                 var jsEventClasses = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(x => x.GetTypes())
                     .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
@@ -39,9 +39,9 @@ namespace BeforeOurTime.Business.JsEvents
                 jsEventClasses
                     .ForEach(delegate (object jsEventClass)
                     {
-                        var eventRegistration = ((IJsHandler)jsEventClass).Register();
+                        var eventRegistration = ((IJsEventHandler)jsEventClass).Register();
                         JsEventRegistrations.Add(eventRegistration);
-                        ((IJsHandler)jsEventClass).RequiredOn().ForEach(delegate (ItemType itemType)
+                        ((IJsEventHandler)jsEventClass).RequiredOn().ForEach(delegate (ItemType itemType)
                         {
                             if (!RequiredJsHandlers.ContainsKey(itemType))
                             {

@@ -9,7 +9,7 @@ namespace BeforeOurTime.Business.JsEvents
     /// <summary>
     /// Defines a JS event handler. Javascript function to be called when a message of TYPE is received
     /// </summary>
-    public class JsHandler
+    public class JsEventHandler
     {
         /// <summary>
         /// Message type that invoked this event

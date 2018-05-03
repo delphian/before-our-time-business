@@ -11,7 +11,7 @@ namespace BeforeOurTime.Business.JsEvents
     /// <summary>
     /// Defines a JS event handler. Javascript function to be called when a message of TYPE is received
     /// </summary>
-    public class OnTerminalInput : JsHandler, IJsHandler
+    public class OnTerminalInput : JsEventHandler, IJsEventHandler
     {
         /// <summary>
         /// A single remote connection. Source of the message

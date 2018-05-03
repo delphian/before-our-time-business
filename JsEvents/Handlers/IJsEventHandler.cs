@@ -8,7 +8,7 @@ namespace BeforeOurTime.Business.JsEvents
     /// <summary>
     /// Content of event message. Passed as argument to javascript event listener function
     /// </summary>
-    public interface IJsHandler
+    public interface IJsEventHandler
     {
         /// <summary>
         /// Register javascript event handler

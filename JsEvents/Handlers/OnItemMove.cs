@@ -10,7 +10,7 @@ namespace BeforeOurTime.Business.JsEvents
     /// <summary>
     /// Defines a JS event handler. Javascript function to be called when a message of TYPE is received
     /// </summary>
-    public class OnItemMove : JsHandler, IJsHandler
+    public class OnItemMove : JsEventHandler, IJsEventHandler
     {
         /// <summary>
         /// Where the item has departd from

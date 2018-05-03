@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="JsEvents\Handlers\JsHandler.cs" />
+    <None Include="JsEvents\Handlers\JsEventHandler.cs" />
   </ItemGroup>
 
   <ItemGroup>
