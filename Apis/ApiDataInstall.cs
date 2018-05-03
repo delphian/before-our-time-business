@@ -25,22 +25,74 @@ namespace BeforeOurTime.Business.Apis
         /// <summary>
         /// Install initial accounts and database objects
         /// </summary>
-        public IApi DataInstall()
+        /// <param name="path">The relative or absolute path to the directory</param>
+        public IApi DataInstall(string path)
         {
             if (!AccountRepo.Read(0, 1).Any())
             {
-                string json = "";
-                using (StreamReader r = new StreamReader("Setups\\Import.json"))
+                DataInstallDirectory(path);
+            }
+            return this;
+        }
+        /// <summary>
+        /// Install all JSON install files located in a single directory
+        /// </summary>
+        /// <param name="path">The relative or absolute path to the directory</param>
+        /// <returns></returns>
+        public IApi DataInstallDirectory(string path)
+        {
+            Directory.GetFiles(path, "*.json").ToList().ForEach(delegate (string filePath)
+            {
+                DataInstallFile(filePath);
+            });
+            if (Directory.GetDirectories(path).ToList().Any())
+            {
+                Directory.GetDirectories(path).ToList().ForEach(delegate (string dirPath)
                 {
-                    json = r.ReadToEnd();
-                }
-                var jObj = JObject.Parse(json);
+                    DataInstallDirectory(dirPath);
+                });
+            }
+            return this;
+        }
+        /// <summary>
+        /// Parse a single JSON install file to create accounts and items
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public IApi DataInstallFile(string path)
+        {
+            string json = "";
+            using (StreamReader r = new StreamReader(path))
+            {
+                json = r.ReadToEnd();
+            }
+            var jObj = JObject.Parse(json);
+            if (jObj["Roles"] != null)
+            {
                 AuthorRoleRepo.Create(JsonConvert.DeserializeObject<List<AuthorizationRole>>(jObj["Roles"].ToString()));
+            }
+            if (jObj["Groups"] != null)
+            {
                 AuthorGroupRepo.Create(JsonConvert.DeserializeObject<List<AuthorizationGroup>>(jObj["Groups"].ToString()));
+            }
+            if (jObj["GroupRoles"] != null)
+            {
                 AuthorGroupRoleRepo.Create(JsonConvert.DeserializeObject<List<AuthorizationGroupRole>>(jObj["GroupRoles"].ToString()));
+            }
+            if (jObj["Accounts"] != null)
+            {
                 AccountRepo.Create(JsonConvert.DeserializeObject<List<Account>>(jObj["Accounts"].ToString()));
+            }
+            if (jObj["Authentication"] != null && jObj["Authentication"]["BotMeta"] != null)
+            {
                 AuthenBotMetaRepo.Create(JsonConvert.DeserializeObject<List<AuthenticationBotMeta>>(jObj["Authentication"]["BotMeta"].ToString()));
+            }
+            if (jObj["AccountGroups"] != null)
+            {
                 AuthorAccountGroupRepo.Create(JsonConvert.DeserializeObject<List<AuthorizationAccountGroup>>(jObj["AccountGroups"].ToString()));
+            }
+            if (jObj["Items"] != null)
+            {
                 ItemRepo.Create(JsonConvert.DeserializeObject<List<Item>>(jObj["Items"].ToString()));
             }
             return this;

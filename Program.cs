@@ -44,7 +44,8 @@ namespace BeforeOurTime.Business
             IServiceCollection services = new ServiceCollection();
             ConfigureServices(Configuration, services);
             ServiceProvider = services.BuildServiceProvider();
-            ServiceProvider.CreateScope().ServiceProvider.GetService<IApi>().DataReset().DataInstall();
+            ServiceProvider.CreateScope().ServiceProvider.GetService<IApi>().DataReset().DataInstall(
+                Configuration["Setup"]);
             // Setup automatic message deliver and Tick counter for items
             var tickTimer = new System.Threading.Timer(Tick, null, 0, 1000);
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, 500);

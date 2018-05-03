@@ -20,7 +20,7 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="Source"></param>
         /// <param name="newParent"></param>
         /// <param name="child"></param>
-        void MoveItem(Item Source, Item newParent, Item child);
+        void ItemMove(Item Source, Item newParent, Item child);
         /// <summary>
         /// Truncate all tables in database
         /// </summary>
@@ -28,6 +28,16 @@ namespace BeforeOurTime.Business.Apis
         /// <summary>
         /// Install initial accounts and database objects
         /// </summary>
-        IApi DataInstall();
+        /// <param name="path">The relative or absolute path to the directory</param>
+        IApi DataInstall(string path);
+        /// <summary>
+        /// Permenantly delete an item and remove from data store
+        /// </summary>
+        /// <remarks>
+        /// All children will be re-homed to the item parent unless otherwise specified
+        /// </remarks>
+        /// <param name="item">Item to delete</param>
+        /// <param name="deleteChildren">Also delete all children</param>
+        void ItemDelete(Item item, bool? deleteChildren = false);
     }
 }

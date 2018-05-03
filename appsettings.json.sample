@@ -1,9 +1,10 @@
 ﻿{
-  "ConnectionStrings": {
-    "DefaultConnection": "Data Source=SQLiteDatabase.db"
-  },
-  "Admin": {
-    "Email": "youremail@gmail.com",
-    "Password": "password"
-  }
+    "ConnectionStrings": {
+        "DefaultConnection": "Data Source=SQLiteDatabase.db"
+    },
+    "Admin": {
+        "Email": "youremail@gmail.com",
+        "Password": "password"
+    },
+    "Setup": "Setups"
 }

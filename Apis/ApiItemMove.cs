@@ -22,7 +22,7 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="Source"></param>
         /// <param name="newParent"></param>
         /// <param name="child"></param>
-        public void MoveItem(Item Source, Item newParent, Item child)
+        public void ItemMove(Item Source, Item newParent, Item child)
         {
             // Construct the message
             var message = new Message()

@@ -24,7 +24,7 @@ namespace BeforeOurTime.Business.JsFunctions
             {
                 var item = itemRepo.Read(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
                 var toItem = itemRepo.Read(new List<Guid>() { new Guid(toUuid) }).FirstOrDefault();
-                Api.MoveItem(null, toItem, item);
+                Api.ItemMove(null, toItem, item);
                 return true;
             };
             JsEngine.SetValue("itemMove", itemMove);
