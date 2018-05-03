@@ -37,7 +37,19 @@ namespace BeforeOurTime.Business.JsEvents
                     .Select(x => Activator.CreateInstance(x))
                     .ToList();
                 jsEventClasses
-                    .ForEach(x => JsEventRegistrations.Add(((IJsHandler)x).Register()));
+                    .ForEach(delegate (object jsEventClass)
+                    {
+                        var eventRegistration = ((IJsHandler)jsEventClass).Register();
+                        JsEventRegistrations.Add(eventRegistration);
+                        ((IJsHandler)jsEventClass).RequiredOn().ForEach(delegate (ItemType itemType)
+                        {
+                            if (!RequiredJsHandlers.ContainsKey(itemType))
+                            {
+                                RequiredJsHandlers[itemType] = new List<JsEventRegistration>();
+                            }
+                            RequiredJsHandlers[itemType].Add(eventRegistration);
+                        });
+                    });
             }
             return JsEventRegistrations;
         }
@@ -49,7 +61,7 @@ namespace BeforeOurTime.Business.JsEvents
         {
             if (RequiredJsHandlers.Count == 0)
             {
-
+                GetJsEventRegistrations();
             }
             return RequiredJsHandlers;
         }
