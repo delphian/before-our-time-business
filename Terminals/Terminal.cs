@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Repository.Models.Accounts;
+﻿using BeforeOurTime.Repository.Json;
+using BeforeOurTime.Repository.Models.Accounts;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,16 +19,19 @@ namespace BeforeOurTime.Business.Terminals
         /// Automatically generated during instantiation
         /// </remarks>
         [JsonProperty(PropertyName = "id")]
+        [JsonConverter(typeof(GuidJsonConverter))]
         public Guid Id { set; get; }
         /// <summary>
         /// Account holder in operation of terminal
         /// </summary>
         [JsonProperty(PropertyName = "accountId")]
+        [JsonConverter(typeof(GuidJsonConverter))]
         public Guid AccountId { set; get; }
         /// <summary>
         /// Item currently attached to as terminal's avatar (in system representation)
         /// </summary>
         [JsonProperty(PropertyName = "itemUuid")]
+        [JsonConverter(typeof(GuidJsonConverter))]
         public Guid ItemUuid { set; get; }
         /// <summary>
         /// Define delgate that terminal and server can use to exchange messages

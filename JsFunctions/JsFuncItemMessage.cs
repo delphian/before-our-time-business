@@ -41,7 +41,7 @@ namespace BeforeOurTime.Business.JsFunctions
                 return true;
             };
             JsEngine.SetValue("_itemMessage", itemMessage);
-            JsEngine.SetValue("itemMessage", "function(toId, type, msgBody){ return _itemMessage(me, toId, type, msgBody) };");
+            JsEngine.Execute("var itemMessage = function(toId, type, msgBody){ return _itemMessage(me, toId.ToString(), type, msgBody) };");
         }
     }
 }

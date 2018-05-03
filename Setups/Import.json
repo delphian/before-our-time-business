@@ -132,7 +132,7 @@
                     if (e.raw == 'help') {
                         log('Available commands are : \\'help\\', \\'look\\', \\'q\\'\\n');
                         log('Received help command from: ' + e.terminal.itemUuid + '\\n');
-                        itemMessage(e.terminal.itemUuid.toString(), 'EventTick', { });
+                        itemMessage(e.terminal.itemUuid, 'EventTick', { \"value\":  \"hi\" });
                     }
                 };"
         },

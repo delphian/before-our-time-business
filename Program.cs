@@ -151,7 +151,6 @@ namespace BeforeOurTime.Business
                 // Create script global functions
                 var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
                 var jsEvents = jsEventManager.GetMessageToJsEventMapping();
-                jsFunctionManager.AddJsFunctions(jsEngine);
                 // Get messages
                 List<Message> messages = messageRepo.Read();
                 messageRepo.Delete();
@@ -163,15 +162,18 @@ namespace BeforeOurTime.Business
                         var jsProgram = parser.Parse(message.To.Script.Trim());
                         if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEvents[message.Type].Function))
                         {
+                            jsFunctionManager.AddJsFunctions(jsEngine);
                             jsEngine
                                 .SetValue("me", message.To)
-                            .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
-                            .Execute("var data = JSON.parse(_data);")
-                            .Execute(message.To.Script)
-                            .Invoke(
-                                jsEvents[message.Type].Function,
-                                JsonConvert.DeserializeObject(JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.Value)))
-                            );
+                                .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
+                                .Execute("var data = JSON.parse(_data);")
+                                .Execute(message.To.Script)
+                                .Invoke(
+                                    jsEvents[message.Type].Function,
+                                    JsonConvert.DeserializeObject(
+                                        JsonConvert.SerializeObject(
+                                            JsonConvert.DeserializeObject(message.Value)))
+                                );
                             // Save changes to item data
                             message.To.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
                             itemRepo.Update(new List<Item>() { message.To });
