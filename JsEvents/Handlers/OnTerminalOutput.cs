@@ -14,6 +14,11 @@ namespace BeforeOurTime.Business.JsEvents
     public class OnTerminalOutput : JsHandler, IJsHandler
     {
         /// <summary>
+        /// A single remote connection. Source of the message
+        /// </summary>
+        [JsonProperty(PropertyName = "terminal")]
+        public Terminal Terminal { set; get; }
+        /// <summary>
         /// Raw unstructured string for terminal consumption
         /// </summary>
         [JsonProperty(PropertyName = "raw")]

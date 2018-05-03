@@ -161,7 +161,9 @@ namespace BeforeOurTime.Business
                     try
                     {
                         var jsProgram = parser.Parse(message.To.Script.Trim());
-                        if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEvents.Where(y => y.MessageType == message.Type).Select(y => y.JsFunction).FirstOrDefault()))
+                        var jsEventHandler = jsEvents.Where(x => x.MessageType == message.Type).Select(x => x.JsFunction).FirstOrDefault();
+                        var jsArgumentType = jsEvents.Where(x => x.MessageType == message.Type).Select(x => x.JsArgument).FirstOrDefault();
+                        if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEventHandler))
                         {
                             jsFunctionManager.AddJsFunctions(jsEngine);
                             jsEngine
@@ -170,10 +172,8 @@ namespace BeforeOurTime.Business
                                 .Execute("var data = JSON.parse(_data);")
                                 .Execute(message.To.Script)
                                 .Invoke(
-                                    jsEvents.Where(x => x.MessageType == message.Type).Select(x => x.JsFunction).FirstOrDefault(),
-                                    JsonConvert.DeserializeObject(
-                                        JsonConvert.SerializeObject(
-                                            JsonConvert.DeserializeObject(message.Value)))
+                                    jsEventHandler,
+                                    JsonConvert.DeserializeObject(message.Value, jsArgumentType)
                                 );
                             // Save changes to item data
                             message.To.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
