@@ -40,7 +40,9 @@
                         name: 'Spoon',
                         description: 'A stupid looking spoon'
                     };
-                };"
+                };
+                function onItemMove(e) {};
+            "
         }
     ]
 }
