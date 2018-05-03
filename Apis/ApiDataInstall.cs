@@ -93,7 +93,15 @@ namespace BeforeOurTime.Business.Apis
             }
             if (jObj["Items"] != null)
             {
-                ItemRepo.Create(JsonConvert.DeserializeObject<List<Item>>(jObj["Items"].ToString()));
+                var items = JsonConvert.DeserializeObject<List<Item>>(jObj["Items"].ToString());
+                items.ForEach(delegate (Item item)
+                {
+                    Item parent = null;
+                    if (item.ParentId != null) {
+                        parent = ItemRepo.Read(new List<Guid>() { item.ParentId.Value }).First();
+                    }
+                    ItemCreate(null, parent, item);
+                });
             }
             return this;
         }

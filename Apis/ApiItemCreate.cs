@@ -28,11 +28,21 @@ namespace BeforeOurTime.Business.Apis
             List<JsEventRegistration> missingHandlers = JsEventManager.MissingEvent(child);
             if (missingHandlers.Count == 0)
             {
-                ItemMove(source, parent, child);
+                ItemRepo.Create(new List<Item>() { child });
+                if (parent != null)
+                {
+                    ItemMove(source, parent, child);
+                }
                 created = true;
             } else
             {
-                Console.WriteLine(child.Id + " is missing event handlers for : " + missingHandlers.ToString());
+                var handlersStr = "";
+                missingHandlers.ForEach(delegate (JsEventRegistration jsEventReg)
+                {
+                    handlersStr += (handlersStr.Length == 0) ? jsEventReg.JsFunction :
+                                                               ", " + jsEventReg.JsFunction;
+                });
+                Console.WriteLine(child.Id + " is missing event handlers for : " + handlersStr);
             }
             return created;
         }
