@@ -17,5 +17,11 @@ namespace BeforeOurTime.Business.JsEvents
         /// </summary>
         /// <returns></returns>
         Dictionary<ItemType, List<JsEventRegistration>> GetRequiredJsHandlers();
+        /// <summary>
+        /// Search an item for missing event handlers based on item's type
+        /// </summary>
+        /// <param name="item">Item on which Script property will be searched</param>
+        /// <returns></returns>
+        List<JsEventRegistration> MissingEvent(Item item);
     }
 }

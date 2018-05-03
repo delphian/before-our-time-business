@@ -65,5 +65,29 @@ namespace BeforeOurTime.Business.JsEvents
             }
             return RequiredJsHandlers;
         }
+        /// <summary>
+        /// Search an item for missing event handlers based on item's type
+        /// </summary>
+        /// <param name="item">Item on which Script property will be searched</param>
+        /// <returns></returns>
+        public List<JsEventRegistration> MissingEvent(Item item)
+        {
+            var MissingEvents = new List<JsEventRegistration>();
+            var allRequiredHandlers = GetRequiredJsHandlers();
+            if (allRequiredHandlers.ContainsKey(item.Type))
+            {
+                var requiredHandlers = allRequiredHandlers[item.Type];
+                var parser = new Jint.Parser.JavaScriptParser();
+                var jsProgram = parser.Parse(item.Script);
+                requiredHandlers.ForEach(delegate (JsEventRegistration registration)
+                {
+                    if (!jsProgram.FunctionDeclarations.Any(x => x.Id.Name == registration.JsFunction))
+                    {
+                        MissingEvents.Add(registration);
+                    }
+                });
+            }
+            return MissingEvents;
+        }
     }
 }
