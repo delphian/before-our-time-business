@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Setups\Game.json~RF1a07ab4a.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="JsEvents\Handlers\JsEventHandler.cs" />
   </ItemGroup>
 
@@ -32,7 +36,13 @@
     <None Update="Setups\Characters\Characters.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Setups\Import.json">
+    <None Update="Setups\Commands\Commands.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Setups\Game.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Setups\Authorization.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Setups\Locations\Locations.json">

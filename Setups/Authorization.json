@@ -111,20 +111,5 @@
                 "AccountId": "c51fb773-6c41-4840-8f20-7f249e61b2b8"
             }
         ]
-    },
-    "Items": [
-        {
-            "Id": "487a7282-0cad-4081-be92-83b14671fc23",
-            "Type": 10,
-            "UuidType": "75f55af3-3027-404c-b9f0-7b21ead826b2",
-            "ParentId": null,
-            "Data": "{}",
-            "Script": "
-                function onTick(e) {};
-                function onTerminalOutput(e) {
-                    terminalMessage(e.terminal.id, e.raw);         
-                };
-            "
-        }
-    ]
+    }
 }
