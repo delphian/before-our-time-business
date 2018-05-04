@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BeforeOurTime.Repository.Models.Accounts;
+using BeforeOurTime.Repository.Models.Items;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,14 +20,14 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="name">User name</param>
         /// <param name="password">User password</param>
         /// <returns></returns>
-        TerminalManager AuthenticateTerminal(Terminal terminal, string name, string password);
+        Account AuthenticateTerminal(Terminal terminal, string name, string password);
         /// <summary>
         /// Attach a terminal to an environment item as it's avatar
         /// </summary>
         /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        TerminalManager AttachTerminal(Terminal terminal, Guid itemId);
+        Item AttachTerminal(Terminal terminal, Guid itemId);
         /// <summary>
         /// Send a message to a specific terminal
         /// </summary>

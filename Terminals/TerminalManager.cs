@@ -7,6 +7,7 @@ using BeforeOurTime.Repository.Models.Accounts.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using BeforeOurTime.Business.Terminals.Middleware;
 using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Repository.Models.Items;
 
 namespace BeforeOurTime.Business.Terminals
 {
@@ -19,6 +20,10 @@ namespace BeforeOurTime.Business.Terminals
         /// Account repository
         /// </summary>
         protected IAccountRepo AccountRepo { set; get; }
+        /// <summary>
+        /// Item repository
+        /// </summary>
+        protected IItemRepo<Item> ItemRepo { set; get; }
         /// <summary>
         /// Interface to the core environment
         /// </summary>
@@ -55,6 +60,7 @@ namespace BeforeOurTime.Business.Terminals
         public TerminalManager(IServiceProvider serviceProvider)
         {
             AccountRepo = serviceProvider.CreateScope().ServiceProvider.GetService<IAccountRepo>();
+            
             Api = serviceProvider.GetService<IApi>();
             // Register terminal middleware
             var interfaceType = typeof(ITerminalMiddleware);
@@ -86,18 +92,13 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="name">User name</param>
         /// <param name="password">User password</param>
         /// <returns></returns>
-        public TerminalManager AuthenticateTerminal(Terminal terminal, string name, string password)
+        public Account AuthenticateTerminal(Terminal terminal, string name, string password)
         {
             var account = AccountRepo
                 .Read(
                     new AuthenticationRequest() { PrincipalName = name, PrincipalPassword = password })
                 .FirstOrDefault();
-            if (account != null)
-            {
-                terminal.AccountId = account.Id;
-                terminal.Status = TerminalStatus.Authenticated;
-            }
-            return this;
+            return account;
         }
         /// <summary>
         /// Attach a terminal to an environment item as it's avatar
@@ -105,11 +106,10 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        public TerminalManager AttachTerminal(Terminal terminal, Guid itemId)
+        public Item AttachTerminal(Terminal terminal, Guid itemId)
         {
-            terminal.ItemUuid = itemId;
-            terminal.Status = TerminalStatus.Attached;
-            return this;
+            var item = ItemRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
+            return item;
         }
         /// <summary>
         /// Destroy a terminal and notify subscribers

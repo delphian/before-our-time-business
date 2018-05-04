@@ -58,21 +58,21 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
         private static void messageReceived(TelnetClient c, string message)
         {
-            Console.WriteLine(Terminals[c.getClientID()].Id + ": " + message);
+            Terminal terminal = (Terminals.ContainsKey(c.getClientID())) ? Terminals[c.getClientID()] : null;
+            Console.WriteLine(terminal.Id + ": " + message);
             EClientStatus status = c.getCurrentStatus();
-            if (Terminals[c.getClientID()].Status == TerminalStatus.Guest && UserName[c.getClientID()] == "")
+            if (terminal.Status == TerminalStatus.Guest && UserName[c.getClientID()] == "")
             {
                 UserName[c.getClientID()] = message;
                 s.sendMessageToClient(c, "\r\nPassword: ");
                 c.setStatus(EClientStatus.Authenticating);
             }
-            else if (Terminals[c.getClientID()].Status == TerminalStatus.Guest && UserName[c.getClientID()] != "")
+            else if (terminal.Status == TerminalStatus.Guest && UserName[c.getClientID()] != "")
             {
-                TerminalManager.AuthenticateTerminal(Terminals[c.getClientID()], UserName[c.getClientID()], message);
-                if (Terminals[c.getClientID()].Status == TerminalStatus.Authenticated)
+                if (terminal.Authenticate(UserName[c.getClientID()], message))
                 {
-                    Terminals[c.getClientID()].OnMessageToTerminal += MessageFromServer;
-                    Clients[Terminals[c.getClientID()].Id] = c;
+                    terminal.OnMessageToTerminal += MessageFromServer;
+                    Clients[terminal.Id] = c;
                     s.clearClientScreen(c);
                     s.sendMessageToClient(c, "Terminal authenticated on account " + Terminals[c.getClientID()].AccountId + ".\r\n > ");
                     s.sendMessageToClient(c, "\r\nCharacter: ");
@@ -83,11 +83,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     c.setStatus(EClientStatus.Guest);
                 }
             }
-            else if (Terminals[c.getClientID()].Status == TerminalStatus.Authenticated)
+            else if (terminal.Status == TerminalStatus.Authenticated)
             {
                 s.sendMessageToClient(c, "\r\nCharacter: ");
             }
-            else if (Terminals[c.getClientID()].Status == TerminalStatus.Attached)
+            else if (terminal.Status == TerminalStatus.Attached)
             {
                 Terminals[c.getClientID()].SendToApi(message);
                 s.sendMessageToClient(c, "\r\n > ");

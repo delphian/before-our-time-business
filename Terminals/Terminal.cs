@@ -66,6 +66,38 @@ namespace BeforeOurTime.Business.Terminals
             Id = Guid.NewGuid();
         }
         /// <summary>
+        /// Authenticate to use an account
+        /// </summary>
+        /// <param name="name">User name</param>
+        /// <param name="password">User password</param>
+        /// <returns></returns>
+        public bool Authenticate(string name, string password)
+        {
+            var account = TerminalManager.AuthenticateTerminal(this, name, password);
+            if (account != null)
+            {
+                AccountId = account.Id;
+                Status = TerminalStatus.Authenticated;
+            }
+            return (account != null);
+        }
+        /// <summary>
+        /// Attach to environment item as avatar
+        /// </summary>
+        /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
+        /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
+        /// <returns></returns>
+        bool AttachTerminal(Terminal terminal, Guid itemId)
+        {
+            var item = TerminalManager.AttachTerminal(this, itemId);
+            if (item != null)
+            {
+                ItemUuid = item.Id;
+                Status = TerminalStatus.Attached;
+            }
+            return (item != null);
+        }
+        /// <summary>
         /// Send a message to the terminal
         /// </summary>
         /// <param name="message"></param>
@@ -110,6 +142,14 @@ namespace BeforeOurTime.Business.Terminals
             {
                 OnMessageToServer(Id, message);
             }
+        }
+        /// <summary>
+        /// Get the terminal status
+        /// </summary>
+        /// <returns></returns>
+        public TerminalStatus GetTerminalStatus()
+        {
+            return Status;
         }
         /// <summary>
         /// Clone the terminal
