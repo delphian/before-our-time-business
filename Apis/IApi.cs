@@ -39,5 +39,15 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="item">Item to delete</param>
         /// <param name="deleteChildren">Also delete all children</param>
         void ItemDelete(Item item, bool? deleteChildren = false);
+        /// <summary>
+        /// Create a new item
+        /// </summary>
+        /// <remarks>
+        /// Any item, or model derived from an item, may be created
+        /// </remarks>
+        /// <param name="Source">Item responsible for doing the creating</param>
+        /// <param name="newParent">Item which will become the parent</param>
+        /// <param name="child">Item which is the new child being created</param>
+        bool ItemCreate<T>(Item source, Item parent, T child) where T : Item;
     }
 }

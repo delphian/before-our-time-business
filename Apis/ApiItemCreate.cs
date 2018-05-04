@@ -19,16 +19,19 @@ namespace BeforeOurTime.Business.Apis
         /// <summary>
         /// Create a new item
         /// </summary>
+        /// <remarks>
+        /// Any item, or model derived from an item, may be created
+        /// </remarks>
         /// <param name="Source">Item responsible for doing the creating</param>
         /// <param name="newParent">Item which will become the parent</param>
         /// <param name="child">Item which is the new child being created</param>
-        public bool ItemCreate(Item source, Item parent, Item child)
+        public bool ItemCreate<T>(Item source, Item parent, T child) where T : Item
         {
             var created = false;
             List<JsEventRegistration> missingHandlers = JsEventManager.MissingEvent(child);
             if (missingHandlers.Count == 0)
             {
-                ItemRepo.Create(new List<Item>() { child });
+                ItemRepo.Create<T>(new List<T>() { child });
                 if (parent != null)
                 {
                     ItemMove(source, parent, child);

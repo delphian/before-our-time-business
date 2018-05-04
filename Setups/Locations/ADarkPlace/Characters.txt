@@ -1,10 +1,10 @@
 ﻿{
-    "Items": [
+    "Characters": [
         {
             "Id": "20c4b5fc-5cfe-4382-aea8-84c1d80f71f0",
             "Type": 300,
             "UuidType": "84dd5b2e-a02d-410a-99c7-056624d15b35",
-            "ParentId": "487a7282-0cad-4081-be92-83b14671fc23",
+            "ParentId": "e74713f3-9ea8-45e5-9715-3b019222af90",
             "Data": "{}",
             "Script": "
                 function onTick(e) {};

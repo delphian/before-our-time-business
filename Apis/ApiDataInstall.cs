@@ -41,7 +41,10 @@ namespace BeforeOurTime.Business.Apis
         /// <returns></returns>
         public IApi DataInstallDirectory(string path)
         {
-            Directory.GetFiles(path, "*.json").ToList().ForEach(delegate (string filePath)
+            Directory.GetFiles(path, "*.*")
+                .Where(x => x.EndsWith(".json") || x.EndsWith(".txt"))
+                .ToList()
+                .ForEach(delegate (string filePath)
             {
                 DataInstallFile(filePath);
             });
@@ -100,7 +103,20 @@ namespace BeforeOurTime.Business.Apis
                     if (item.ParentId != null) {
                         parent = ItemRepo.Read(new List<Guid>() { item.ParentId.Value }).First();
                     }
-                    ItemCreate(null, parent, item);
+                    ItemCreate<Item>(null, parent, item);
+                });
+            }
+            if (jObj["Characters"] != null)
+            {
+                var items = JsonConvert.DeserializeObject<List<Character>>(jObj["Characters"].ToString());
+                items.ForEach(delegate (Character item)
+                {
+                    Item parent = null;
+                    if (item.ParentId != null)
+                    {
+                        parent = ItemRepo.Read(new List<Guid>() { item.ParentId.Value }).First();
+                    }
+                    ItemCreate<Character>(null, parent, item);
                 });
             }
             return this;
