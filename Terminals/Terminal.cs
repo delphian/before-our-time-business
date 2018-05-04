@@ -87,15 +87,15 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        bool AttachTerminal(Terminal terminal, Guid itemId)
+        public bool Attach(Terminal terminal, Guid itemId)
         {
-            var item = TerminalManager.AttachTerminal(this, itemId);
-            if (item != null)
+            var character = TerminalManager.AttachTerminal(this, itemId);
+            if (character != null)
             {
-                ItemUuid = item.Id;
+                ItemUuid = character.Id;
                 Status = TerminalStatus.Attached;
             }
-            return (item != null);
+            return (character != null);
         }
         /// <summary>
         /// Send a message to the terminal

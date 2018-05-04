@@ -27,7 +27,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        Item AttachTerminal(Terminal terminal, Guid itemId);
+        Character AttachTerminal(Terminal terminal, Guid itemId);
         /// <summary>
         /// Send a message to a specific terminal
         /// </summary>

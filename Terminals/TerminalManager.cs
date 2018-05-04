@@ -23,7 +23,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Item repository
         /// </summary>
-        protected IItemRepo<Item> ItemRepo { set; get; }
+        protected IItemRepo<Character> CharacterRepo { set; get; }
         /// <summary>
         /// Interface to the core environment
         /// </summary>
@@ -106,10 +106,15 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        public Item AttachTerminal(Terminal terminal, Guid itemId)
+        public Character AttachTerminal(Terminal terminal, Guid itemId)
         {
-            var item = ItemRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
-            return item;
+            Character avatar = null;
+            var character = CharacterRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
+            if (terminal.AccountId == character.AccountId)
+            {
+                avatar = character;
+            }
+            return avatar;
         }
         /// <summary>
         /// Destroy a terminal and notify subscribers
