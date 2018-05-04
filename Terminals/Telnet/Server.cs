@@ -9,8 +9,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
 {
     public class Server
     {
-        public static TelnetServer s { set; get; }
         public static IServiceProvider ServiceProvider { set; get; }
+        public static ITerminalManager TerminalManager { set; get; }
+        public static TelnetServer s { set; get; }
         public static Dictionary<uint, Terminal> Terminals = new Dictionary<uint, Terminal>();
         public static Dictionary<uint, string> UserName = new Dictionary<uint, string>();
         public static Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
@@ -18,6 +19,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         public Server(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
+            TerminalManager = ServiceProvider.GetService<ITerminalManager>();
             s = new TelnetServer(IPAddress.Any);
             s.ClientConnected += clientConnected;
             s.ClientDisconnected += clientDisconnected;
@@ -35,14 +37,18 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
         private static void clientConnected(TelnetClient c)
         {
-            Console.WriteLine("CONNECTED: " + c);
-
-            s.sendMessageToClient(c, "Telnet Server\r\nLogin: ");
+            var terminal = TerminalManager.RequestTerminal();
+            Terminals[c.getClientID()] = terminal;
+            UserName[c.getClientID()] = "";
+            Console.WriteLine("Terminal granted " + terminal.Id + "\r\n");
+            s.sendMessageToClient(c, "Terminal granted " + terminal.Id + "\r\nLogin: ");
         }
 
         private static void clientDisconnected(TelnetClient c)
         {
-            Console.WriteLine("DISCONNECTED: " + c);
+            Console.WriteLine("Terminal disconnected " + Terminals[c.getClientID()].Id + "\r\n");
+            TerminalManager.DestroyTerminal(Terminals[c.getClientID()]);
+            Terminals[c.getClientID()] = null;
         }
 
         private static void connectionBlocked(IPEndPoint ep)
@@ -52,25 +58,24 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
         private static void messageReceived(TelnetClient c, string message)
         {
-            Console.WriteLine("MESSAGE: " + message);
+            Console.WriteLine(Terminals[c.getClientID()].Id + ": " + message);
             EClientStatus status = c.getCurrentStatus();
-            if (status == EClientStatus.Guest)
+            if (Terminals[c.getClientID()].Status == TerminalStatus.Guest && UserName[c.getClientID()] == "")
             {
                 UserName[c.getClientID()] = message;
                 s.sendMessageToClient(c, "\r\nPassword: ");
                 c.setStatus(EClientStatus.Authenticating);
             }
-            else if (status == EClientStatus.Authenticating)
+            else if (Terminals[c.getClientID()].Status == TerminalStatus.Guest && UserName[c.getClientID()] != "")
             {
-                var terminalManager = ServiceProvider.GetService<ITerminalManager>();
-                var terminal = terminalManager.RequestTerminal(UserName[c.getClientID()], message);
-                if (terminal != null)
+                TerminalManager.AuthenticateTerminal(Terminals[c.getClientID()], UserName[c.getClientID()], message);
+                if (Terminals[c.getClientID()].Status == TerminalStatus.Authenticated)
                 {
-                    Terminals[c.getClientID()] = terminal;
                     Terminals[c.getClientID()].OnMessageToTerminal += MessageFromServer;
-                    Clients[terminal.Id] = c;
+                    Clients[Terminals[c.getClientID()].Id] = c;
                     s.clearClientScreen(c);
-                    s.sendMessageToClient(c, "Terminal granted " + terminal.Id + ".\r\n > ");
+                    s.sendMessageToClient(c, "Terminal authenticated on account " + Terminals[c.getClientID()].AccountId + ".\r\n > ");
+                    s.sendMessageToClient(c, "\r\nCharacter: ");
                     c.setStatus(EClientStatus.LoggedIn);
                 } else
                 {
@@ -78,7 +83,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     c.setStatus(EClientStatus.Guest);
                 }
             }
-            else
+            else if (Terminals[c.getClientID()].Status == TerminalStatus.Authenticated)
+            {
+                s.sendMessageToClient(c, "\r\nCharacter: ");
+            }
+            else if (Terminals[c.getClientID()].Status == TerminalStatus.Attached)
             {
                 Terminals[c.getClientID()].SendToApi(message);
                 s.sendMessageToClient(c, "\r\n > ");

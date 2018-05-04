@@ -65,33 +65,13 @@ namespace BeforeOurTime.Business.Terminals
                 .ToList();
         }
         /// <summary>
-        /// Request the creation of a terminal by first authenticating a username and password
+        /// Create a new terminal
         /// </summary>
-        /// <param name="name">User name</param>
-        /// <param name="password">User password</param>
         /// <returns></returns>
-        public Terminal RequestTerminal(string name, string password)
+        public Terminal RequestTerminal()
         {
-            var account = AccountRepo
-                .Read(
-                    new AuthenticationRequest() { PrincipalName = name, PrincipalPassword = password })
-                .FirstOrDefault();
-            if (account != null)
-            {
-                // Atach to game object (temporary)
-                return CreateTerminal(account.Id, new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
-            }
-            return null;
-        }
-        /// <summary>
-        /// Create a new terminal and notify subscribers
-        /// </summary>
-        /// <param name="accountId">Account holder in operation of terminal</param>
-        /// <param name="itemUuid">Item currently attached to as terminal's avatar (in system representation)</param>
-        /// <returns></returns>
-        public Terminal CreateTerminal(Guid accountId, Guid itemUuid)
-        {
-            var terminal = new Terminal(this, accountId, itemUuid);
+            var terminal = new Terminal(this);
+            terminal.Status = TerminalStatus.Guest;
             Terminals.Add(terminal);
             if (OnTerminalCreated != null)
             {
@@ -100,14 +80,47 @@ namespace BeforeOurTime.Business.Terminals
             return terminal;
         }
         /// <summary>
+        /// Authenticate a terminal to use an account
+        /// </summary>
+        /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
+        /// <param name="name">User name</param>
+        /// <param name="password">User password</param>
+        /// <returns></returns>
+        public TerminalManager AuthenticateTerminal(Terminal terminal, string name, string password)
+        {
+            var account = AccountRepo
+                .Read(
+                    new AuthenticationRequest() { PrincipalName = name, PrincipalPassword = password })
+                .FirstOrDefault();
+            if (account != null)
+            {
+                terminal.AccountId = account.Id;
+                terminal.Status = TerminalStatus.Authenticated;
+            }
+            return this;
+        }
+        /// <summary>
+        /// Attach a terminal to an environment item as it's avatar
+        /// </summary>
+        /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
+        /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
+        /// <returns></returns>
+        public TerminalManager AttachTerminal(Terminal terminal, Guid itemId)
+        {
+            terminal.ItemUuid = itemId;
+            terminal.Status = TerminalStatus.Attached;
+            return this;
+        }
+        /// <summary>
         /// Destroy a terminal and notify subscribers
         /// </summary>
         /// <param name="terminal">A single remote connection</param>
-        public void DestroyTerminal(Terminal terminal)
+        public TerminalManager DestroyTerminal(Terminal terminal)
         {
             Terminals.Remove(terminal);
             OnTerminalDestroyed((Terminal) terminal.Clone());
             terminal = null;
+            return this;
         }
         /// <summary>
         /// Send a message to a specific terminal

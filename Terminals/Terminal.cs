@@ -27,6 +27,10 @@ namespace BeforeOurTime.Business.Terminals
         [JsonConverter(typeof(GuidJsonConverter))]
         public Guid Id { set; get; }
         /// <summary>
+        /// Connection status of terminal
+        /// </summary>
+        public TerminalStatus Status { set; get; }
+        /// <summary>
         /// Account holder in operation of terminal
         /// </summary>
         [JsonProperty(PropertyName = "accountId")]
@@ -56,14 +60,10 @@ namespace BeforeOurTime.Business.Terminals
         /// Constructor
         /// </summary>
         /// <param name="terminalManager">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
-        /// <param name="accountId">Account holder in operation of terminal</param>
-        /// <param name="itemUuid">Item currently attached to as terminal's avatar (in system representation)</param>
-        public Terminal(TerminalManager terminalManager, Guid accountId, Guid itemUuid)
+        public Terminal(TerminalManager terminalManager)
         {
             TerminalManager = terminalManager;
             Id = Guid.NewGuid();
-            AccountId = accountId;
-            ItemUuid = itemUuid;
         }
         /// <summary>
         /// Send a message to the terminal
