@@ -25,7 +25,6 @@ namespace BeforeOurTime.Business.Terminals.Middleware.Telnet
         /// <returns></returns>
         public string ToClient(string message, Func<string, string> next)
         {
-            message += "...";
             return (next != null) ? next(message) : message;
         }
     }
