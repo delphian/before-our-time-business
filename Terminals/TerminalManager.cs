@@ -5,6 +5,8 @@ using System.Text;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Accounts.Authentication;
 using Microsoft.Extensions.DependencyInjection;
+using BeforeOurTime.Business.Terminals.Middleware;
+using BeforeOurTime.Business.Apis;
 
 namespace BeforeOurTime.Business.Terminals
 {
@@ -17,6 +19,10 @@ namespace BeforeOurTime.Business.Terminals
         /// Account repository
         /// </summary>
         protected IAccountRepo AccountRepo { set; get; }
+        /// <summary>
+        /// Interface to the core environment
+        /// </summary>
+        protected IApi Api { set; get; }
         /// <summary>
         /// List of all active terminals
         /// </summary>
@@ -40,11 +46,23 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         public event TerminalDestroyed OnTerminalDestroyed;
         /// <summary>
+        /// Features that may insert themselves between terminal and api or terminal and server
+        /// </summary>
+        public List<ITerminalMiddleware> TerminalMiddlewares = new List<ITerminalMiddleware>();
+        /// <summary>
         /// Constructor
         /// </summary>
         public TerminalManager(IServiceProvider serviceProvider)
         {
             AccountRepo = serviceProvider.CreateScope().ServiceProvider.GetService<IAccountRepo>();
+            Api = serviceProvider.GetService<IApi>();
+            // Register terminal middleware
+            var interfaceType = typeof(ITerminalMiddleware);
+            TerminalMiddlewares = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => (ITerminalMiddleware) Activator.CreateInstance(x, Api))
+                .ToList();
         }
         /// <summary>
         /// Request the creation of a terminal by first authenticating a username and password
@@ -73,7 +91,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public Terminal CreateTerminal(Guid accountId, Guid itemUuid)
         {
-            var terminal = new Terminal(accountId, itemUuid);
+            var terminal = new Terminal(this, accountId, itemUuid);
             Terminals.Add(terminal);
             if (OnTerminalCreated != null)
             {
@@ -98,7 +116,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="message">Raw message</param>
         public void SendToTerminalId(Guid terminalId, string message)
         {
-            Terminals.FirstOrDefault(x => x.Id == terminalId).SendToTerminal(message);
+            Terminals.FirstOrDefault(x => x.Id == terminalId).SendToClient(message);
         }
         /// <summary>
         /// Get list of all active terminals
@@ -107,6 +125,14 @@ namespace BeforeOurTime.Business.Terminals
         public List<Terminal> GetTerminals()
         {
             return Terminals;
+        }
+        /// <summary>
+        /// Get list of all terminal middleware
+        /// </summary>
+        /// <returns></returns>
+        public List<ITerminalMiddleware> GetTerminalMiddleware()
+        {
+            return TerminalMiddlewares;
         }
     }
 }

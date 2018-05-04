@@ -23,7 +23,7 @@
             "Script": "                    
                 function onTerminalInput(e) {
                     if (e.raw == 'look') {
-                        var looks = itemInvoke('fe178ad7-0e33-4111-beaf-6dfcfd548bd5', 'onQuery') + '\\r\\n';
+                        var looks = itemInvoke('fe178ad7-0e33-4111-beaf-6dfcfd548bd5', 'onQueryPhysical') + '\\r\\n';
                         itemMessage(e.terminal.itemUuid, 'EventTerminalOutput', { \"terminal\": e.terminal, \"raw\": looks });
                     }
                 };"

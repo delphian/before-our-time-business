@@ -80,7 +80,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
             else
             {
-                Terminals[c.getClientID()].SendToServer(message);
+                Terminals[c.getClientID()].SendToApi(message);
                 s.sendMessageToClient(c, "\r\n > ");
             }
             // s.kickClient(c);

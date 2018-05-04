@@ -5,6 +5,7 @@
             "Type": 300,
             "UuidType": "84dd5b2e-a02d-410a-99c7-056624d15b35",
             "ParentId": "e74713f3-9ea8-45e5-9715-3b019222af90",
+			"AccountId": "c51fb773-6c41-4840-8f20-7f249e61b2b8",
             "Data": "{}",
             "Script": "
                 function onTick(e) {};

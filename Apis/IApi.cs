@@ -6,6 +6,9 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis
 {
+    /// <summary>
+    /// Interface to the core environment
+    /// </summary>
     public interface IApi
     {
         /// <summary>

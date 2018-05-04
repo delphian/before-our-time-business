@@ -3,6 +3,7 @@ using BeforeOurTime.Repository.Models.Accounts;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeforeOurTime.Business.Terminals
@@ -12,6 +13,10 @@ namespace BeforeOurTime.Business.Terminals
     /// </summary>
     public class Terminal
     {
+        /// <summary>
+        /// Central manager of all client connections regardless of protocol (telnet, websocket, etc)
+        /// </summary>
+        protected TerminalManager TerminalManager { set; get; }
         /// <summary>
         /// Unique terminal identifier
         /// </summary>
@@ -50,10 +55,12 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="terminalManager">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         /// <param name="accountId">Account holder in operation of terminal</param>
         /// <param name="itemUuid">Item currently attached to as terminal's avatar (in system representation)</param>
-        public Terminal(Guid accountId, Guid itemUuid)
+        public Terminal(TerminalManager terminalManager, Guid accountId, Guid itemUuid)
         {
+            TerminalManager = terminalManager;
             Id = Guid.NewGuid();
             AccountId = accountId;
             ItemUuid = itemUuid;
@@ -62,8 +69,20 @@ namespace BeforeOurTime.Business.Terminals
         /// Send a message to the terminal
         /// </summary>
         /// <param name="message"></param>
-        public void SendToTerminal(string message)
+        public void SendToClient(string message)
         {
+            var allMiddleware = TerminalManager.GetTerminalMiddleware().Select(x => x).ToList();
+            string Next(string msg)
+            {
+                var middleware = allMiddleware.FirstOrDefault();
+                if (middleware != null)
+                {
+                    allMiddleware.Remove(middleware);
+                    return middleware.ToClient(msg, Next);
+                }
+                return msg;
+            }
+            message = Next(message);
             if (OnMessageToTerminal != null)
             {
                 OnMessageToTerminal(Id, message);
@@ -73,8 +92,20 @@ namespace BeforeOurTime.Business.Terminals
         /// Send a message to the server
         /// </summary>
         /// <param name="message"></param>
-        public void SendToServer(string message)
+        public void SendToApi(string message)
         {
+            var allMiddleware = TerminalManager.GetTerminalMiddleware().Select(x => x).ToList();
+            string Next(string msg)
+            {
+                var middleware = allMiddleware.FirstOrDefault();
+                if (middleware != null)
+                {
+                    allMiddleware.Remove(middleware);
+                    return middleware.ToApi(msg, Next);
+                }
+                return msg;
+            }
+            message = Next(message);
             if (OnMessageToServer != null)
             {
                 OnMessageToServer(Id, message);

@@ -29,7 +29,7 @@ namespace BeforeOurTime.Business.JsFunctions
                 object msgBody)
             {
                 var terminal = terminalManager.GetTerminals().Where(x => x.Id.ToString() == terminalId).FirstOrDefault();
-                terminal.SendToTerminal(msgBody.ToString());
+                terminal.SendToClient(msgBody.ToString());
                 return true;
             };
             JsEngine.SetValue("_terminalMessage", terminalMessage);

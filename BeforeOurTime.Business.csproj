@@ -33,13 +33,13 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Setups\Commands\Commands.json">
+    <None Update="Setups\Commands\Commands.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Setups\Game.json">
+    <None Update="Setups\Game.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Setups\Authorization.json">
+    <None Update="Setups\Authorization.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Setups\Locations\ADarkPlace\Characters.txt">

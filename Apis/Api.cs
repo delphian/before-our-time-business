@@ -16,7 +16,7 @@ using BeforeOurTime.Business.JsEvents;
 namespace BeforeOurTime.Business.Apis
 {
     /// <summary>
-    /// Interface into the game
+    /// Interface to the core environment
     /// </summary>
     public partial class Api : IApi
     {
