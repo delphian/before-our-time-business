@@ -85,7 +85,16 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
             else if (terminal.Status == TerminalStatus.Authenticated)
             {
-                s.sendMessageToClient(c, "\r\nCharacter: ");
+                Guid characterId;
+                Guid.TryParse(message, out characterId);
+                if (terminal.Attach(characterId))
+                {
+                    s.sendMessageToClient(c, "Terminal attached to avatar " + terminal.ItemUuid + ".\r\n > ");
+
+                } else
+                {
+                    s.sendMessageToClient(c, "\r\nNo such avatar\r\nCharacter: ");
+                }
             }
             else if (terminal.Status == TerminalStatus.Attached)
             {

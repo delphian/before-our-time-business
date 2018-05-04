@@ -84,10 +84,9 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Attach to environment item as avatar
         /// </summary>
-        /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        public bool Attach(Terminal terminal, Guid itemId)
+        public bool Attach(Guid itemId)
         {
             var character = TerminalManager.AttachTerminal(this, itemId);
             if (character != null)

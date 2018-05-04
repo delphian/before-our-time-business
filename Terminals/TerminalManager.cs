@@ -23,7 +23,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Item repository
         /// </summary>
-        protected IItemRepo<Character> CharacterRepo { set; get; }
+        protected IItemRepo<Item> ItemRepo { set; get; }
         /// <summary>
         /// Interface to the core environment
         /// </summary>
@@ -59,8 +59,9 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         public TerminalManager(IServiceProvider serviceProvider)
         {
-            AccountRepo = serviceProvider.CreateScope().ServiceProvider.GetService<IAccountRepo>();
-            
+            var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
+            AccountRepo = scopedProvider.GetService<IAccountRepo>();
+            ItemRepo = scopedProvider.GetService<IItemRepo<Item>>();
             Api = serviceProvider.GetService<IApi>();
             // Register terminal middleware
             var interfaceType = typeof(ITerminalMiddleware);
@@ -109,8 +110,8 @@ namespace BeforeOurTime.Business.Terminals
         public Character AttachTerminal(Terminal terminal, Guid itemId)
         {
             Character avatar = null;
-            var character = CharacterRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
-            if (terminal.AccountId == character.AccountId)
+            var character = ItemRepo.Read<Character>(new List<Guid>() { itemId }).FirstOrDefault();
+            if (character != null && terminal.AccountId == character.AccountId)
             {
                 avatar = character;
             }
