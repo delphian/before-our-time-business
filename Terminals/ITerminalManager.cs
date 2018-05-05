@@ -44,5 +44,11 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <returns></returns>
         List<Terminal> GetTerminals();
+        /// <summary>
+        /// Get all possible characters that a terminal may attach to
+        /// </summary>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
+        /// <returns></returns>
+        List<Character> GetAttachableAvatars(Terminal terminal);
     }
 }

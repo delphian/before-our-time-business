@@ -72,6 +72,7 @@ namespace BeforeOurTime.Business
                 .AddLogging()
                 .AddScoped<IAccountRepo, AccountRepo>()
                 .AddScoped<IItemRepo<Item>, ItemRepo<Item>>()
+                .AddScoped<ICharacterRepo, CharacterRepo>()
                 .AddScoped<IMessageRepo, MessageRepo>()
                 .AddScoped<IRepository<AuthorizationRole>, Repository<AuthorizationRole>>()
                 .AddScoped<IRepository<AuthorizationGroup>, Repository<AuthorizationGroup>>()

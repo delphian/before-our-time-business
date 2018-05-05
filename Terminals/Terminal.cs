@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Repository.Json;
 using BeforeOurTime.Repository.Models.Accounts;
+using BeforeOurTime.Repository.Models.Items;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -100,6 +101,14 @@ namespace BeforeOurTime.Business.Terminals
                 Status = TerminalStatus.Attached;
             }
             return (character != null);
+        }
+        /// <summary>
+        /// Get available characters for terminal attachment
+        /// </summary>
+        /// <returns></returns>
+        public List<Character> GetAttachable()
+        {
+            return TerminalManager.GetAttachableAvatars(this);
         }
         /// <summary>
         /// Send a message to the terminal

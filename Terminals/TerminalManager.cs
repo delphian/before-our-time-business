@@ -25,6 +25,10 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         protected IItemRepo<Item> ItemRepo { set; get; }
         /// <summary>
+        /// Central data repository for all character items
+        /// </summary>
+        protected ICharacterRepo CharacterRepo { set; get; }
+        /// <summary>
         /// Interface to the core environment
         /// </summary>
         protected IApi Api { set; get; }
@@ -62,6 +66,7 @@ namespace BeforeOurTime.Business.Terminals
             var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
             AccountRepo = scopedProvider.GetService<IAccountRepo>();
             ItemRepo = scopedProvider.GetService<IItemRepo<Item>>();
+            CharacterRepo = scopedProvider.GetService<ICharacterRepo>();
             Api = serviceProvider.GetService<IApi>();
             // Register terminal middleware
             var interfaceType = typeof(ITerminalMiddleware);
@@ -95,8 +100,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public Account AuthenticateTerminal(Terminal terminal, string name, string password)
         {
-            var account = AccountRepo
-                .Read(
+            var account = AccountRepo.Read(
                     new AuthenticationRequest() { PrincipalName = name, PrincipalPassword = password })
                 .FirstOrDefault();
             return account;
@@ -110,7 +114,7 @@ namespace BeforeOurTime.Business.Terminals
         public Character AttachTerminal(Terminal terminal, Guid itemId)
         {
             Character avatar = null;
-            var character = ItemRepo.Read<Character>(new List<Guid>() { itemId }).FirstOrDefault();
+            var character = CharacterRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
             if (character != null && terminal.AccountId == character.AccountId)
             {
                 avatar = character;
@@ -152,6 +156,20 @@ namespace BeforeOurTime.Business.Terminals
         public List<ITerminalMiddleware> GetTerminalMiddleware()
         {
             return TerminalMiddlewares;
+        }
+        /// <summary>
+        /// Get all possible characters that a terminal may attach to
+        /// </summary>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
+        /// <returns></returns>
+        public List<Character> GetAttachableAvatars(Terminal terminal)
+        {
+            var avatars = new List<Character>();
+            if (terminal.AccountId != null)
+            {
+                avatars = CharacterRepo.ReadAvatars(terminal.AccountId);
+            }
+            return avatars;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Text;
+using BeforeOurTime.Repository.Models.Items;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -39,8 +40,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
             c.SetTerminal(TerminalManager.RequestTerminal());
             c.GetTerminal().DataBag["step"] = "connected";
             s.clearClientScreen(c);
-            s.sendMessageToClient(c, "Terminal granted " + c.GetTerminal().Id + "\r\n");
-            s.sendMessageToClient(c, "Welcome to Before Our Time\r\n");
+            s.sendMessageToClient(c, "Terminal granted " + c.GetTerminal().Id + ".\r\n");
+            s.sendMessageToClient(c, "Welcome to Before Our Time. For help type \"help\".\r\n");
             s.sendMessageToClient(c, "> ");
         }
 
@@ -64,11 +65,12 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     {
                         case "help":
                             s.sendMessageToClient(c, "\r\n");
-                            s.sendMessageToClient(c, "  \"new\"   - Create a new account\r\n");
-                            s.sendMessageToClient(c, "  \"login\" - Login to an existing account\r\n");
-                            s.sendMessageToClient(c, "  \"bye\"   - KThnxBye\r\n\r\n");
+                            s.sendMessageToClient(c, "  new    - Create a new account\r\n");
+                            s.sendMessageToClient(c, "  login  - Login to an existing account\r\n");
+                            s.sendMessageToClient(c, "  bye    - KThnxBye\r\n");
                             s.sendMessageToClient(c, "> ");
                             break;
+                        case "q":
                         case "bye":
                             s.sendMessageToClient(c, "Cya...\r\n");
                             s.kickClient(c);
@@ -111,11 +113,25 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     {
                         case "help":
                             s.sendMessageToClient(c, "\r\n");
-                            s.sendMessageToClient(c, "  \"new\"       - Create a new character\r\n");
-                            s.sendMessageToClient(c, "  \"list\"      - List existing characters\r\n");
-                            s.sendMessageToClient(c, "  \"play {id}\" - Play an existing character\r\n");
-                            s.sendMessageToClient(c, "  \"bye\"       - KThnxBye\r\n\r\n");
+                            s.sendMessageToClient(c, "  new        - Create a new character\r\n");
+                            s.sendMessageToClient(c, "  list       - List existing characters\r\n");
+                            s.sendMessageToClient(c, "  play {id}  - Play an existing character\r\n");
+                            s.sendMessageToClient(c, "  bye        - KThnxBye\r\n");
                             s.sendMessageToClient(c, "> ");
+                            break;
+                        case "list":
+                            s.sendMessageToClient(c, "\r\n");
+                            var characters = c.GetTerminal().GetAttachable();
+                            characters.ForEach(delegate (Character character)
+                            {
+                                s.sendMessageToClient(c, "  " + character.Id + "\r\n");
+                            });
+                            s.sendMessageToClient(c, "> ");
+                            break;
+                        case "q":
+                        case "bye":
+                            s.sendMessageToClient(c, "Cya...\r\n");
+                            s.kickClient(c);
                             break;
                         case "play":
                             Guid characterId;
