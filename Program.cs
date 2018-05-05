@@ -132,7 +132,7 @@ namespace BeforeOurTime.Business
                     From = gameItem,
                     Value = "{}"
                 };
-                // api.SendMessage(tickMessage, itemRepo.Read());
+                api.SendMessage(tickMessage, itemRepo.Read());
             }
         }
         /// <summary>

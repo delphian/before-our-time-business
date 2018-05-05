@@ -123,11 +123,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         case "?":
                         case "help":
                             s.sendMessageToClient(c, "\r\n\r\n");
-                            s.sendMessageToClient(c, "  new        - Create a new character\r\n");
-                            s.sendMessageToClient(c, "  list       - List existing characters\r\n");
-                            s.sendMessageToClient(c, "  play {id}  - Play an existing character\r\n");
-                            s.sendMessageToClient(c, "  back       - Return to previous screen\r\n");
-                            s.sendMessageToClient(c, "  bye        - Disconnect\r\n\r\n");
+                            s.sendMessageToClient(c, "  new         - Create a new character\r\n");
+                            s.sendMessageToClient(c, "  list        - List existing characters\r\n");
+                            s.sendMessageToClient(c, "  play {name} - Play an existing character\r\n");
+                            s.sendMessageToClient(c, "  back        - Return to previous screen\r\n");
+                            s.sendMessageToClient(c, "  bye         - Disconnect\r\n\r\n");
                             s.sendMessageToClient(c, "Account> ");
                             break;
                         case "back":
@@ -136,11 +136,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             s.sendMessageToClient(c, "\r\nWelcome> ");
                             break;
                         case "list":
-                            s.sendMessageToClient(c, "\r\n");
+                            s.sendMessageToClient(c, "\r\n\r\n");
                             var characters = c.GetTerminal().GetAttachable();
                             characters.ForEach(delegate (Character character)
                             {
-                                s.sendMessageToClient(c, "  " + character.Id + "\r\n");
+                                s.sendMessageToClient(c, "  " + character.Name + " (" + character.Id + ")\r\n");
                             });
                             s.sendMessageToClient(c, "\r\n");
                             s.sendMessageToClient(c, "Account> ");
@@ -151,14 +151,24 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             s.kickClient(c);
                             break;
                         case "play":
-                            Guid characterId;
-                            Guid.TryParse(message.Split(' ').Last(), out characterId);
-                            if (c.GetTerminal().Attach(characterId))
+                            var name = message.Split(' ').Last().ToLower();
+                            c.GetTerminal().GetAttachable().ForEach(delegate (Character character)
                             {
-                                c.GetTerminal().DataBag["step"] = "attached";
-                                s.sendMessageToClient(c, "\r\n");
-                                s.sendMessageToClient(c, "Terminal attached to avatar. Play!\r\n\r\n");
-                                s.sendMessageToClient(c, "> ");
+                                if (character.Name.ToLower() == name)
+                                {
+                                    if (c.GetTerminal().Attach(character.Id))
+                                    {
+                                        c.GetTerminal().DataBag["step"] = "attached";
+                                        s.sendMessageToClient(c, "\r\n");
+                                        s.sendMessageToClient(c, "Terminal attached to avatar. Play!\r\n\r\n");
+                                        s.sendMessageToClient(c, "> ");
+                                    }
+                                }
+                            });
+                            if (c.GetTerminal().Status != TerminalStatus.Attached)
+                            {
+                                s.sendMessageToClient(c, "\r\nUnknown character \"" + name + "\"\r\n");
+                                s.sendMessageToClient(c, "Account> ");
                             }
                             break;
                         default:
