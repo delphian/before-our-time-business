@@ -33,7 +33,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
         private static void MessageFromServer(Terminal terminal, string messageFromServer)
         {
+            s.sendMessageToClient(Clients[terminal.Id], "\r\n");
             s.sendMessageToClient(Clients[terminal.Id], messageFromServer);
+            s.sendMessageToClient(Clients[terminal.Id], "\r\n> ");
         }
 
         private static void clientConnected(TelnetClient c)
@@ -180,8 +182,19 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
             else if (c.GetTerminal().Status == TerminalStatus.Attached)
             {
-                c.GetTerminal().SendToApi(message);
-                s.sendMessageToClient(c, "\r\n> ");
+                switch (message)
+                {
+                    case "bye":
+                    case "q":
+                    case "exit":
+                        s.sendMessageToClient(c, "\r\nCya...\r\n");
+                        s.kickClient(c);
+                        break;
+                    default:
+                        c.GetTerminal().SendToApi(message);
+                        s.sendMessageToClient(c, "\r\n> ");
+                        break;
+                }
             }
         }
     }
