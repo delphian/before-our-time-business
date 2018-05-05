@@ -39,9 +39,14 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Item currently attached to as terminal's avatar (in system representation)
         /// </summary>
-        [JsonProperty(PropertyName = "itemUuid")]
+        [JsonProperty(PropertyName = "avatarId")]
         [JsonConverter(typeof(GuidJsonConverter))]
-        public Guid ItemUuid { set; get; }
+        public Guid AvatarId { set; get; }
+        /// <summary>
+        /// General purpose databag at the disposal of the client server
+        /// </summary>
+        [JsonProperty(PropertyName = "dataBag")]
+        public Dictionary<string, string> DataBag = new Dictionary<string, string>();
         /// <summary>
         /// Define delgate that terminal and server can use to exchange messages
         /// </summary>
@@ -91,7 +96,7 @@ namespace BeforeOurTime.Business.Terminals
             var character = TerminalManager.AttachTerminal(this, itemId);
             if (character != null)
             {
-                ItemUuid = character.Id;
+                AvatarId = character.Id;
                 Status = TerminalStatus.Attached;
             }
             return (character != null);

@@ -98,7 +98,7 @@ namespace BeforeOurTime.Business
                     {
                         var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
                         var api = serviceProvider.GetService<IApi>();
-                        var gameItem = itemRepo.Read(new List<Guid>() { terminal.ItemUuid }).First();
+                        var gameItem = itemRepo.Read(new List<Guid>() { terminal.AvatarId }).First();
                         var clientMessage = new Message()
                         {
                             Version = ItemVersion.Alpha,
