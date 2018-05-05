@@ -68,7 +68,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             s.sendMessageToClient(c, "  new    - Create a new account\r\n");
                             s.sendMessageToClient(c, "  login  - Login to an existing account\r\n");
                             s.sendMessageToClient(c, "  bye    - KThnxBye\r\n");
-                            s.sendMessageToClient(c, "> ");
+                            s.sendMessageToClient(c, " > ");
                             break;
                         case "q":
                         case "bye":
@@ -81,7 +81,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             c.GetTerminal().DataBag["step"] = "login_name";
                             break;
                         default:
-                            s.sendMessageToClient(c, "\r\n> ");
+                            s.sendMessageToClient(c, "\r\n > ");
                             break;
                     }
                 }
@@ -101,7 +101,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         c.GetTerminal().DataBag["step"] = "authenticated";
                         s.sendMessageToClient(c, "\r\n");
                         s.sendMessageToClient(c, "Hello " + c.GetTerminal().DataBag["login_name"] + "\r\n");
-                        s.sendMessageToClient(c, "> ");
+                        s.sendMessageToClient(c, " > ");
                     }
                 }
             }
@@ -116,8 +116,14 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             s.sendMessageToClient(c, "  new        - Create a new character\r\n");
                             s.sendMessageToClient(c, "  list       - List existing characters\r\n");
                             s.sendMessageToClient(c, "  play {id}  - Play an existing character\r\n");
+                            s.sendMessageToClient(c, "  back       - Return to previous screen\r\n");
                             s.sendMessageToClient(c, "  bye        - KThnxBye\r\n");
-                            s.sendMessageToClient(c, "> ");
+                            s.sendMessageToClient(c, " > ");
+                            break;
+                        case "back":
+                            c.GetTerminal().Status = TerminalStatus.Guest;
+                            c.GetTerminal().DataBag["step"] = "connected";
+                            s.sendMessageToClient(c, "\r\n > ");
                             break;
                         case "list":
                             s.sendMessageToClient(c, "\r\n");
@@ -126,7 +132,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             {
                                 s.sendMessageToClient(c, "  " + character.Id + "\r\n");
                             });
-                            s.sendMessageToClient(c, "> ");
+                            s.sendMessageToClient(c, " > ");
                             break;
                         case "q":
                         case "bye":
@@ -141,11 +147,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                                 c.GetTerminal().DataBag["step"] = "attached";
                                 s.sendMessageToClient(c, "\r\n");
                                 s.sendMessageToClient(c, "Terminal attached to avatar. Play!\r\n\r\n");
-                                s.sendMessageToClient(c, "> ");
+                                s.sendMessageToClient(c, " > ");
                             }
                             break;
                         default:
-                            s.sendMessageToClient(c, "\r\n> ");
+                            s.sendMessageToClient(c, "\r\n > ");
                             break;
                     }
                 }
