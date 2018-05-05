@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Repository.Models.Items;
+﻿using BeforeOurTime.Repository.Models.Accounts;
+using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
 using System;
 using System.Collections.Generic;
@@ -52,5 +53,12 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="newParent">Item which will become the parent</param>
         /// <param name="child">Item which is the new child being created</param>
         bool ItemCreate<T>(Item source, Item parent, T child) where T : Item;
+        /// <summary>
+        /// Create a new account and local authentication credentials
+        /// </summary>
+        /// <param name="name">Friendly account name</param>
+        /// <param name="email">Login email address for account</param>
+        /// <param name="password">Password for account</param>
+        Account AccountCreate(string name, string email, string password);
     }
 }

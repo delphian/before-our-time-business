@@ -111,6 +111,23 @@ namespace BeforeOurTime.Business.Terminals
             return TerminalManager.GetAttachableAvatars(this);
         }
         /// <summary>
+        /// Create a new account and local authentication credentials. Authenticate on new account
+        /// </summary>
+        /// <param name="name">Friendly account name</param>
+        /// <param name="email">Login email address for account</param>
+        /// <param name="password">Password for account</param>
+        /// <returns></returns>
+        public bool CreateAccount(string name, string email, string password)
+        {
+            var account = TerminalManager.CreateAccount(this, name, email, password);
+            if (account != null)
+            {
+                AccountId = account.Id;
+                Status = TerminalStatus.Authenticated;
+            }
+            return (account != null);
+        }
+        /// <summary>
         /// Send a message to the terminal
         /// </summary>
         /// <param name="message"></param>
