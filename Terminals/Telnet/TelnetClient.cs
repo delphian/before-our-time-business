@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BeforeOurTime.Business.Terminals;
+using System;
 using System.Net;
 
 namespace BeforeOurTime.Business.Servers.Telnet
@@ -42,6 +43,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// The last received data from the client.
         /// </summary>
         private string receivedData;
+        /// <summary>
+        /// Single generic connection used by the environment to communicate with clients
+        /// </summary>
+        private Terminal Terminal { set; get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TelnetClient"/> class.
@@ -101,7 +106,16 @@ namespace BeforeOurTime.Business.Servers.Telnet
         {
             return receivedData;
         }
-
+        
+        /// <summary>
+        /// Get the client's associated environment terminal
+        /// </summary>
+        /// <returns></returns>
+        public Terminal GetTerminal()
+        {
+            return Terminal;
+        }
+   
         /// <summary>
         /// Sets the client's current status.
         /// </summary>
@@ -120,6 +134,14 @@ namespace BeforeOurTime.Business.Servers.Telnet
             this.receivedData = newReceivedData;
         }
 
+        /// <summary>
+        /// Sets the client's associated environment terminal
+        /// </summary>
+        /// <param name="terminal"></param>
+        public void SetTerminal(Terminal terminal)
+        {
+            Terminal = terminal;
+        }
         /// <summary>
         /// Appends a string to the client's last
         /// received data.

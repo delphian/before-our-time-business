@@ -12,7 +12,6 @@ namespace BeforeOurTime.Business.Servers.Telnet
         public static IServiceProvider ServiceProvider { set; get; }
         public static ITerminalManager TerminalManager { set; get; }
         public static TelnetServer s { set; get; }
-        public static Dictionary<uint, Terminal> Terminals = new Dictionary<uint, Terminal>();
         public static Dictionary<uint, string> UserName = new Dictionary<uint, string>();
         public static Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
 
@@ -37,18 +36,17 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
         private static void clientConnected(TelnetClient c)
         {
-            var terminal = TerminalManager.RequestTerminal();
-            Terminals[c.getClientID()] = terminal;
+            c.SetTerminal(TerminalManager.RequestTerminal());
             UserName[c.getClientID()] = "";
-            Console.WriteLine("Terminal granted " + terminal.Id + "\r\n");
-            s.sendMessageToClient(c, "Terminal granted " + terminal.Id + "\r\nLogin: ");
+            Console.WriteLine("Terminal granted " + c.GetTerminal().Id + "\r\n");
+            s.sendMessageToClient(c, "Terminal granted " + c.GetTerminal().Id + "\r\nLogin: ");
         }
 
         private static void clientDisconnected(TelnetClient c)
         {
-            Console.WriteLine("Terminal disconnected " + Terminals[c.getClientID()].Id + "\r\n");
-            TerminalManager.DestroyTerminal(Terminals[c.getClientID()]);
-            Terminals[c.getClientID()] = null;
+            Console.WriteLine("Terminal disconnected " + c.GetTerminal().Id + "\r\n");
+            TerminalManager.DestroyTerminal(c.GetTerminal());
+            c.SetTerminal(null);
         }
 
         private static void connectionBlocked(IPEndPoint ep)
@@ -58,7 +56,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
         private static void messageReceived(TelnetClient c, string message)
         {
-            Terminal terminal = (Terminals.ContainsKey(c.getClientID())) ? Terminals[c.getClientID()] : null;
+            Terminal terminal = c.GetTerminal();
             Console.WriteLine(terminal.Id + ": " + message);
             EClientStatus status = c.getCurrentStatus();
             if (terminal.Status == TerminalStatus.Guest && UserName[c.getClientID()] == "")
@@ -74,7 +72,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     terminal.OnMessageToTerminal += MessageFromServer;
                     Clients[terminal.Id] = c;
                     s.clearClientScreen(c);
-                    s.sendMessageToClient(c, "Terminal authenticated on account " + Terminals[c.getClientID()].AccountId + ".\r\n > ");
+                    s.sendMessageToClient(c, "Terminal authenticated on account " + c.GetTerminal().AccountId + ".\r\n");
                     s.sendMessageToClient(c, "\r\nCharacter: ");
                     c.setStatus(EClientStatus.LoggedIn);
                 } else
@@ -98,7 +96,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
             else if (terminal.Status == TerminalStatus.Attached)
             {
-                Terminals[c.getClientID()].SendToApi(message);
+                c.GetTerminal().SendToApi(message);
                 s.sendMessageToClient(c, "\r\n > ");
             }
             // s.kickClient(c);

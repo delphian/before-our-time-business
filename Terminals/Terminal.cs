@@ -9,7 +9,7 @@ using System.Text;
 namespace BeforeOurTime.Business.Terminals
 {
     /// <summary>
-    /// A single remote connection
+    /// Single generic connection used by the environment to communicate with clients
     /// </summary>
     public class Terminal
     {

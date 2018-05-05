@@ -35,7 +35,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Callback definition of function subscribed to OnTerminalCreated
         /// </summary>
-        /// <param name="terminal">A single remote connection</param>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         public delegate void TerminalCreated(Terminal terminal);
         /// <summary>
         /// Subscribe to notification after a new terminal has been created
@@ -44,7 +44,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Callback definition of function subscribed to OnTerminalDestroyed 
         /// </summary>
-        /// <param name="terminal">A single remote connection</param>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         public delegate void TerminalDestroyed(Terminal terminal);
         /// <summary>
         /// Subscribe to notification before a terminal is destroyed
@@ -89,7 +89,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Authenticate a terminal to use an account
         /// </summary>
-        /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="name">User name</param>
         /// <param name="password">User password</param>
         /// <returns></returns>
@@ -104,7 +104,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Attach a terminal to an environment item as it's avatar
         /// </summary>
-        /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
         public Character AttachTerminal(Terminal terminal, Guid itemId)
@@ -120,7 +120,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Destroy a terminal and notify subscribers
         /// </summary>
-        /// <param name="terminal">A single remote connection</param>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         public TerminalManager DestroyTerminal(Terminal terminal)
         {
             Terminals.Remove(terminal);
