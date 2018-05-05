@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Text;
 using BeforeOurTime.Repository.Models.Items;
+using System.Linq;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -40,9 +41,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
             c.SetTerminal(TerminalManager.RequestTerminal());
             c.GetTerminal().DataBag["step"] = "connected";
             s.clearClientScreen(c);
-            s.sendMessageToClient(c, "Terminal granted " + c.GetTerminal().Id + ".\r\n");
-            s.sendMessageToClient(c, "Welcome to Before Our Time. For help type \"help\".\r\n");
-            s.sendMessageToClient(c, "> ");
+            s.sendMessageToClient(c, "Terminal granted " + c.GetTerminal().Id + ".\r\n\r\n");
+            s.sendMessageToClient(c, "Welcome to Before Our Time. For help type \"help\".\r\n\r\n");
+            s.sendMessageToClient(c, "Welcome> ");
         }
 
         private static void clientDisconnected(TelnetClient c)
@@ -63,12 +64,13 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 {
                     switch (message.ToLower())
                     {
+                        case "?":
                         case "help":
-                            s.sendMessageToClient(c, "\r\n");
+                            s.sendMessageToClient(c, "\r\n\r\n");
                             s.sendMessageToClient(c, "  new    - Create a new account\r\n");
                             s.sendMessageToClient(c, "  login  - Login to an existing account\r\n");
-                            s.sendMessageToClient(c, "  bye    - KThnxBye\r\n");
-                            s.sendMessageToClient(c, " > ");
+                            s.sendMessageToClient(c, "  bye    - Disconnect\r\n\r\n");
+                            s.sendMessageToClient(c, "Welcome> ");
                             break;
                         case "q":
                         case "bye":
@@ -81,7 +83,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             c.GetTerminal().DataBag["step"] = "login_name";
                             break;
                         default:
-                            s.sendMessageToClient(c, "\r\n > ");
+                            s.sendMessageToClient(c, "\r\nUnknown welcome command \"" + message + "\".\r\n\r\n");
+                            s.sendMessageToClient(c, "Welcome> ");
                             break;
                     }
                 }
@@ -100,30 +103,37 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         Clients[c.GetTerminal().Id] = c;
                         c.GetTerminal().DataBag["step"] = "authenticated";
                         s.sendMessageToClient(c, "\r\n");
-                        s.sendMessageToClient(c, "Hello " + c.GetTerminal().DataBag["login_name"] + "\r\n");
-                        s.sendMessageToClient(c, " > ");
+                        s.sendMessageToClient(c, "Hello " + c.GetTerminal().DataBag["login_name"] + "\r\n\r\n");
+                        s.sendMessageToClient(c, "Account> ");
+                    }
+                    else
+                    {
+                        s.sendMessageToClient(c, "\r\n");
+                        s.sendMessageToClient(c, "Bad username or password.\r\n\r\n");
+                        s.sendMessageToClient(c, "Welcome> ");
                     }
                 }
             }
-            if (c.GetTerminal().Status == TerminalStatus.Authenticated)
+            else if (c.GetTerminal().Status == TerminalStatus.Authenticated)
             {
                 if (c.GetTerminal().DataBag["step"] == "authenticated")
                 {
-                    switch (message.ToLower())
+                    switch (message.Split(' ').First().ToLower())
                     {
+                        case "?":
                         case "help":
-                            s.sendMessageToClient(c, "\r\n");
+                            s.sendMessageToClient(c, "\r\n\r\n");
                             s.sendMessageToClient(c, "  new        - Create a new character\r\n");
                             s.sendMessageToClient(c, "  list       - List existing characters\r\n");
                             s.sendMessageToClient(c, "  play {id}  - Play an existing character\r\n");
                             s.sendMessageToClient(c, "  back       - Return to previous screen\r\n");
-                            s.sendMessageToClient(c, "  bye        - KThnxBye\r\n");
-                            s.sendMessageToClient(c, " > ");
+                            s.sendMessageToClient(c, "  bye        - Disconnect\r\n\r\n");
+                            s.sendMessageToClient(c, "Account> ");
                             break;
                         case "back":
                             c.GetTerminal().Status = TerminalStatus.Guest;
                             c.GetTerminal().DataBag["step"] = "connected";
-                            s.sendMessageToClient(c, "\r\n > ");
+                            s.sendMessageToClient(c, "\r\nWelcome> ");
                             break;
                         case "list":
                             s.sendMessageToClient(c, "\r\n");
@@ -132,7 +142,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             {
                                 s.sendMessageToClient(c, "  " + character.Id + "\r\n");
                             });
-                            s.sendMessageToClient(c, " > ");
+                            s.sendMessageToClient(c, "\r\n");
+                            s.sendMessageToClient(c, "Account> ");
                             break;
                         case "q":
                         case "bye":
@@ -141,17 +152,18 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             break;
                         case "play":
                             Guid characterId;
-                            Guid.TryParse(message, out characterId);
+                            Guid.TryParse(message.Split(' ').Last(), out characterId);
                             if (c.GetTerminal().Attach(characterId))
                             {
                                 c.GetTerminal().DataBag["step"] = "attached";
                                 s.sendMessageToClient(c, "\r\n");
                                 s.sendMessageToClient(c, "Terminal attached to avatar. Play!\r\n\r\n");
-                                s.sendMessageToClient(c, " > ");
+                                s.sendMessageToClient(c, "> ");
                             }
                             break;
                         default:
-                            s.sendMessageToClient(c, "\r\n > ");
+                            s.sendMessageToClient(c, "\r\nUnknown account command \"" + message + "\".\r\n\r\n");
+                            s.sendMessageToClient(c, "Account> ");
                             break;
                     }
                 }
