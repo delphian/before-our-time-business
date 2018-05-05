@@ -62,123 +62,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
         {
             if (c.GetTerminal().Status == TerminalStatus.Guest)
             {
-                if (c.GetTerminal().DataBag["step"] == "connected")
-                {
-                    switch (message.ToLower())
-                    {
-                        case "?":
-                        case "help":
-                            s.sendMessageToClient(c, "\r\n\r\n");
-                            s.sendMessageToClient(c, "  new    - Create a new account\r\n");
-                            s.sendMessageToClient(c, "  login  - Login to an existing account\r\n");
-                            s.sendMessageToClient(c, "  bye    - Disconnect\r\n\r\n");
-                            s.sendMessageToClient(c, "Welcome> ");
-                            break;
-                        case "q":
-                        case "bye":
-                            s.sendMessageToClient(c, "Cya...\r\n");
-                            s.kickClient(c);
-                            break;
-                        case "login":
-                            s.sendMessageToClient(c, "\r\n");
-                            s.sendMessageToClient(c, "Name: ");
-                            c.GetTerminal().DataBag["step"] = "login_name";
-                            break;
-                        default:
-                            s.sendMessageToClient(c, "\r\nUnknown welcome command \"" + message + "\".\r\n\r\n");
-                            s.sendMessageToClient(c, "Welcome> ");
-                            break;
-                    }
-                }
-                else if (c.GetTerminal().DataBag["step"] == "login_name")
-                {
-                    c.GetTerminal().DataBag["login_name"] = message;
-                    c.GetTerminal().DataBag["step"] = "login_password";
-                    s.sendMessageToClient(c, "\r\n");
-                    s.sendMessageToClient(c, "Password: ");
-                }
-                else if (c.GetTerminal().DataBag["step"] == "login_password")
-                {
-                    if (c.GetTerminal().Authenticate(c.GetTerminal().DataBag["login_name"], message))
-                    {
-                        c.GetTerminal().OnMessageToTerminal += MessageFromServer;
-                        Clients[c.GetTerminal().Id] = c;
-                        c.GetTerminal().DataBag["step"] = "authenticated";
-                        s.sendMessageToClient(c, "\r\n");
-                        s.sendMessageToClient(c, "Hello " + c.GetTerminal().DataBag["login_name"] + "\r\n\r\n");
-                        s.sendMessageToClient(c, "Account> ");
-                    }
-                    else
-                    {
-                        s.sendMessageToClient(c, "\r\n");
-                        s.sendMessageToClient(c, "Bad username or password.\r\n\r\n");
-                        s.sendMessageToClient(c, "Welcome> ");
-                    }
-                }
+                HandleMessageFromGuest(c, message);
             }
             else if (c.GetTerminal().Status == TerminalStatus.Authenticated)
             {
-                if (c.GetTerminal().DataBag["step"] == "authenticated")
-                {
-                    switch (message.Split(' ').First().ToLower())
-                    {
-                        case "?":
-                        case "help":
-                            s.sendMessageToClient(c, "\r\n\r\n");
-                            s.sendMessageToClient(c, "  new         - Create a new character\r\n");
-                            s.sendMessageToClient(c, "  list        - List existing characters\r\n");
-                            s.sendMessageToClient(c, "  play {name} - Play an existing character\r\n");
-                            s.sendMessageToClient(c, "  back        - Return to previous screen\r\n");
-                            s.sendMessageToClient(c, "  bye         - Disconnect\r\n\r\n");
-                            s.sendMessageToClient(c, "Account> ");
-                            break;
-                        case "back":
-                            c.GetTerminal().Status = TerminalStatus.Guest;
-                            c.GetTerminal().DataBag["step"] = "connected";
-                            s.sendMessageToClient(c, "\r\nWelcome> ");
-                            break;
-                        case "list":
-                            s.sendMessageToClient(c, "\r\n\r\n");
-                            var characters = c.GetTerminal().GetAttachable();
-                            characters.ForEach(delegate (Character character)
-                            {
-                                s.sendMessageToClient(c, "  " + character.Name + " (" + character.Id + ")\r\n");
-                            });
-                            s.sendMessageToClient(c, "\r\n");
-                            s.sendMessageToClient(c, "Account> ");
-                            break;
-                        case "q":
-                        case "bye":
-                            s.sendMessageToClient(c, "Cya...\r\n");
-                            s.kickClient(c);
-                            break;
-                        case "play":
-                            var name = message.Split(' ').Last().ToLower();
-                            c.GetTerminal().GetAttachable().ForEach(delegate (Character character)
-                            {
-                                if (character.Name.ToLower() == name)
-                                {
-                                    if (c.GetTerminal().Attach(character.Id))
-                                    {
-                                        c.GetTerminal().DataBag["step"] = "attached";
-                                        s.sendMessageToClient(c, "\r\n");
-                                        s.sendMessageToClient(c, "Terminal attached to avatar. Play!\r\n\r\n");
-                                        s.sendMessageToClient(c, "> ");
-                                    }
-                                }
-                            });
-                            if (c.GetTerminal().Status != TerminalStatus.Attached)
-                            {
-                                s.sendMessageToClient(c, "\r\nUnknown character \"" + name + "\"\r\n");
-                                s.sendMessageToClient(c, "Account> ");
-                            }
-                            break;
-                        default:
-                            s.sendMessageToClient(c, "\r\nUnknown account command \"" + message + "\".\r\n\r\n");
-                            s.sendMessageToClient(c, "Account> ");
-                            break;
-                    }
-                }
+                HandleMessageFromAuthenticated(c, message);
             }
             else if (c.GetTerminal().Status == TerminalStatus.Attached)
             {
@@ -193,6 +81,176 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     default:
                         c.GetTerminal().SendToApi(message);
                         s.sendMessageToClient(c, "\r\n> ");
+                        break;
+                }
+            }
+        }
+        /// <summary>
+        /// Handle all client messages from terminal with Guest status
+        /// </summary>
+        /// <param name="c">Telnet client</param>
+        /// <param name="message">message from client</param>
+        private static void HandleMessageFromGuest(TelnetClient c, string message)
+        {
+            if (c.GetTerminal().DataBag["step"] == "connected")
+            {
+                switch (message.ToLower())
+                {
+                    case "?":
+                    case "help":
+                        s.sendMessageToClient(c, "\r\n\r\n");
+                        s.sendMessageToClient(c, "  new    - Create a new account\r\n");
+                        s.sendMessageToClient(c, "  login  - Login to an existing account\r\n");
+                        s.sendMessageToClient(c, "  bye    - Disconnect\r\n\r\n");
+                        s.sendMessageToClient(c, "Welcome> ");
+                        break;
+                    case "q":
+                    case "bye":
+                        s.sendMessageToClient(c, "Cya...\r\n");
+                        s.kickClient(c);
+                        break;
+                    case "new":
+                        s.sendMessageToClient(c, "\r\n");
+                        s.sendMessageToClient(c, "Name: ");
+                        c.GetTerminal().DataBag["step"] = "create_name";
+                        break;
+                    case "login":
+                        s.sendMessageToClient(c, "\r\n");
+                        s.sendMessageToClient(c, "Name: ");
+                        c.GetTerminal().DataBag["step"] = "login_name";
+                        break;
+                    default:
+                        s.sendMessageToClient(c, "\r\nUnknown welcome command \"" + message + "\".\r\n\r\n");
+                        s.sendMessageToClient(c, "Welcome> ");
+                        break;
+                }
+            }
+            else if (c.GetTerminal().DataBag["step"] == "login_name")
+            {
+                c.GetTerminal().DataBag["login_name"] = message;
+                c.GetTerminal().DataBag["step"] = "login_password";
+                s.sendMessageToClient(c, "\r\n");
+                s.sendMessageToClient(c, "Password: ");
+            }
+            else if (c.GetTerminal().DataBag["step"] == "login_password")
+            {
+                if (c.GetTerminal().Authenticate(c.GetTerminal().DataBag["login_name"], message))
+                {
+                    c.GetTerminal().OnMessageToTerminal += MessageFromServer;
+                    Clients[c.GetTerminal().Id] = c;
+                    c.GetTerminal().DataBag["step"] = "authenticated";
+                    s.sendMessageToClient(c, "\r\n");
+                    s.sendMessageToClient(c, "Hello " + c.GetTerminal().DataBag["login_name"] + "\r\n\r\n");
+                    s.sendMessageToClient(c, "Account> ");
+                }
+                else
+                {
+                    s.sendMessageToClient(c, "\r\n");
+                    s.sendMessageToClient(c, "Bad username or password.\r\n\r\n");
+                    s.sendMessageToClient(c, "Welcome> ");
+                }
+            }
+            else if (c.GetTerminal().DataBag["step"] == "create_name")
+            {
+                c.GetTerminal().DataBag["create_name"] = message;
+                c.GetTerminal().DataBag["step"] = "create_email";
+                s.sendMessageToClient(c, "\r\n");
+                s.sendMessageToClient(c, "Email: ");
+            }
+            else if (c.GetTerminal().DataBag["step"] == "create_email")
+            {
+                c.GetTerminal().DataBag["create_email"] = message;
+                c.GetTerminal().DataBag["step"] = "create_password";
+                s.sendMessageToClient(c, "\r\n");
+                s.sendMessageToClient(c, "Password: ");
+            }
+            else if (c.GetTerminal().DataBag["step"] == "create_password")
+            {
+                if (c.GetTerminal().CreateAccount(
+                    c.GetTerminal().DataBag["create_name"],
+                    c.GetTerminal().DataBag["create_email"],
+                    message))
+                {
+                    c.GetTerminal().OnMessageToTerminal += MessageFromServer;
+                    Clients[c.GetTerminal().Id] = c;
+                    c.GetTerminal().DataBag["step"] = "authenticated";
+                    s.sendMessageToClient(c, "\r\n");
+                    s.sendMessageToClient(c, "Hello " + c.GetTerminal().DataBag["create_name"] + "\r\n\r\n");
+                    s.sendMessageToClient(c, "Account> ");
+                }
+                else
+                {
+                    s.sendMessageToClient(c, "\r\n");
+                    s.sendMessageToClient(c, "Unable to create account.\r\n\r\n");
+                    s.sendMessageToClient(c, "Welcome> ");
+                }
+            }
+        }
+        /// <summary>
+        /// Handle all client messages from terminal with Guest status
+        /// </summary>
+        /// <param name="c">Telnet client</param>
+        /// <param name="message">message from client</param>
+        private static void HandleMessageFromAuthenticated(TelnetClient c, string message)
+        {
+            if (c.GetTerminal().DataBag["step"] == "authenticated")
+            {
+                switch (message.Split(' ').First().ToLower())
+                {
+                    case "?":
+                    case "help":
+                        s.sendMessageToClient(c, "\r\n\r\n");
+                        s.sendMessageToClient(c, "  new         - Create a new character\r\n");
+                        s.sendMessageToClient(c, "  list        - List existing characters\r\n");
+                        s.sendMessageToClient(c, "  play {name} - Play an existing character\r\n");
+                        s.sendMessageToClient(c, "  back        - Return to previous screen\r\n");
+                        s.sendMessageToClient(c, "  bye         - Disconnect\r\n\r\n");
+                        s.sendMessageToClient(c, "Account> ");
+                        break;
+                    case "back":
+                        c.GetTerminal().Status = TerminalStatus.Guest;
+                        c.GetTerminal().DataBag["step"] = "connected";
+                        s.sendMessageToClient(c, "\r\nWelcome> ");
+                        break;
+                    case "list":
+                        s.sendMessageToClient(c, "\r\n\r\n");
+                        var characters = c.GetTerminal().GetAttachable();
+                        characters.ForEach(delegate (Character character)
+                        {
+                            s.sendMessageToClient(c, "  " + character.Name + " (" + character.Id + ")\r\n");
+                        });
+                        s.sendMessageToClient(c, "\r\n");
+                        s.sendMessageToClient(c, "Account> ");
+                        break;
+                    case "q":
+                    case "bye":
+                        s.sendMessageToClient(c, "Cya...\r\n");
+                        s.kickClient(c);
+                        break;
+                    case "play":
+                        var name = message.Split(' ').Last().ToLower();
+                        c.GetTerminal().GetAttachable().ForEach(delegate (Character character)
+                        {
+                            if (character.Name.ToLower() == name)
+                            {
+                                if (c.GetTerminal().Attach(character.Id))
+                                {
+                                    c.GetTerminal().DataBag["step"] = "attached";
+                                    s.sendMessageToClient(c, "\r\n");
+                                    s.sendMessageToClient(c, "Terminal attached to avatar. Play!\r\n\r\n");
+                                    s.sendMessageToClient(c, "> ");
+                                }
+                            }
+                        });
+                        if (c.GetTerminal().Status != TerminalStatus.Attached)
+                        {
+                            s.sendMessageToClient(c, "\r\nUnknown character \"" + name + "\"\r\n");
+                            s.sendMessageToClient(c, "Account> ");
+                        }
+                        break;
+                    default:
+                        s.sendMessageToClient(c, "\r\nUnknown account command \"" + message + "\".\r\n\r\n");
+                        s.sendMessageToClient(c, "Account> ");
                         break;
                 }
             }
