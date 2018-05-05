@@ -51,9 +51,9 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Define delgate that terminal and server can use to exchange messages
         /// </summary>
-        /// <param name="terminalId"></param>
+        /// <param name="terminal"></param>
         /// <param name="message"></param>
-        public delegate void messageOnTerminal(Guid terminalId, string message);
+        public delegate void messageOnTerminal(Terminal terminal, string message);
         /// <summary>
         /// Terminals may attach to this event to receive messages from server
         /// </summary>
@@ -130,7 +130,7 @@ namespace BeforeOurTime.Business.Terminals
             message = Next(message);
             if (OnMessageToTerminal != null)
             {
-                OnMessageToTerminal(Id, message);
+                OnMessageToTerminal(this, message);
             }
         }
         /// <summary>
@@ -153,7 +153,7 @@ namespace BeforeOurTime.Business.Terminals
             message = Next(message);
             if (OnMessageToServer != null)
             {
-                OnMessageToServer(Id, message);
+                OnMessageToServer(this, message);
             }
         }
         /// <summary>

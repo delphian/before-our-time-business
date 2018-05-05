@@ -31,9 +31,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
             Console.WriteLine("SERVER STARTED: " + DateTime.Now);
         }
 
-        private static void MessageFromServer(Guid terminalId, string messageFromServer)
+        private static void MessageFromServer(Terminal terminal, string messageFromServer)
         {
-            s.sendMessageToClient(Clients[terminalId], messageFromServer);
+            s.sendMessageToClient(Clients[terminal.Id], messageFromServer);
         }
 
         private static void clientConnected(TelnetClient c)

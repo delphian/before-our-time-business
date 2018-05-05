@@ -93,18 +93,17 @@ namespace BeforeOurTime.Business
             var telnetServer = new Servers.Telnet.Server(serviceProvider);
             ((TerminalManager)terminalManager).OnTerminalCreated += delegate (Terminal terminal)
             {
-                terminal.OnMessageToServer += delegate (Guid terminalId, string message)
+                terminal.OnMessageToServer += delegate (Terminal xterminal, string message)
                 {
                     lock (thisLock)
                     {
                         var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
                         var api = serviceProvider.GetService<IApi>();
-                        var gameItem = itemRepo.Read(new List<Guid>() { terminal.AvatarId }).First();
                         var clientMessage = new Message()
                         {
                             Version = ItemVersion.Alpha,
                             Type = MessageType.EventTerminalInput,
-                            From = gameItem,
+                            From = itemRepo.Read(new List<Guid>() { terminal.AvatarId }).First(),
                             Value = JsonConvert.SerializeObject(new OnTerminalInput() {
                                 Terminal = terminal,
                                 Raw = message
@@ -133,7 +132,7 @@ namespace BeforeOurTime.Business
                     From = gameItem,
                     Value = "{}"
                 };
-                api.SendMessage(tickMessage, itemRepo.Read());
+                // api.SendMessage(tickMessage, itemRepo.Read());
             }
         }
         /// <summary>
@@ -161,24 +160,25 @@ namespace BeforeOurTime.Business
                 {
                     try
                     {
-                        var jsProgram = parser.Parse(message.To.Script.Trim());
+                        var me = itemRepo.Read(new List<Guid>() { message.ToId }).First();
+                        var jsProgram = parser.Parse(me.Script.Trim());
                         var jsEventHandler = jsEvents.Where(x => x.MessageType == message.Type).Select(x => x.JsFunction).FirstOrDefault();
                         var jsArgumentType = jsEvents.Where(x => x.MessageType == message.Type).Select(x => x.JsArgument).FirstOrDefault();
                         if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEventHandler))
                         {
                             jsFunctionManager.AddJsFunctions(jsEngine);
                             jsEngine
-                                .SetValue("me", message.To)
-                                .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(message.To.Data)))
+                                .SetValue("me", me)
+                                .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(me.Data)))
                                 .Execute("var data = JSON.parse(_data);")
-                                .Execute(message.To.Script)
+                                .Execute(me.Script)
                                 .Invoke(
                                     jsEventHandler,
                                     JsonConvert.DeserializeObject(message.Value, jsArgumentType)
                                 );
                             // Save changes to item data
-                            message.To.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
-                            itemRepo.Update(new List<Item>() { message.To });
+                            me.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
+                            itemRepo.Update(new List<Item>() { me });
                         }
                         else
                         {
@@ -187,7 +187,7 @@ namespace BeforeOurTime.Business
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError("script failed: " + message.To.Id + " " + ex.Message);
+                        logger.LogError("script failed: " + message.ToId + " " + ex.Message);
                     }
                 }
             }

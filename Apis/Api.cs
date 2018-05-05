@@ -62,14 +62,20 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="recipients"></param>
         public void SendMessage(Message message, List<Item> recipients)
         {
-            var messages = new List<Message>();
-            recipients.ForEach(delegate (Item recipient)
+            if (message.From != null)
             {
-                var messageCopy = (Message)message.Clone();
-                messageCopy.To = recipient;
-                messages.Add(messageCopy);
-            });
-            MessageRepo.Create(messages);
+                var messages = new List<Message>();
+                recipients.ForEach(delegate (Item recipient)
+                {
+                    var messageCopy = (Message)message.Clone();
+                    messageCopy.ToId = recipient.Id;
+                    messages.Add(messageCopy);
+                });
+                MessageRepo.Create(messages);
+            } else
+            {
+                Console.WriteLine("Refusing to send anonymous item message " + message.Type.ToString());
+            }
         }
     }
 }

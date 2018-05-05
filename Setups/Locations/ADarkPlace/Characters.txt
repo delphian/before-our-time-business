@@ -10,6 +10,7 @@
             "Script": "
                 function onTick(e) {};
                 function onTerminalOutput(e) {
+					log(e);
                     terminalMessage(e.terminal.id, e.raw);         
                 };
                 function onItemMove(e) { };
