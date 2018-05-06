@@ -128,6 +128,21 @@ namespace BeforeOurTime.Business.Terminals
             return (account != null);
         }
         /// <summary>
+        /// Create a new character and attach
+        /// </summary>
+        /// <param name="name">Friendly name of character</param>
+        /// <returns></returns>
+        public bool CreateCharacter(string name)
+        {
+            var character = TerminalManager.CreateCharacter(this, name);
+            if (character != null)
+            {
+                AvatarId = character.Id;
+                Status = TerminalStatus.Attached;
+            }
+            return (character != null);
+        }
+        /// <summary>
         /// Send a message to the terminal
         /// </summary>
         /// <param name="message"></param>

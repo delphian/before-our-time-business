@@ -60,5 +60,15 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="email">Login email address for account</param>
         /// <param name="password">Password for account</param>
         Account AccountCreate(string name, string email, string password);
+        /// <summary>
+        /// Create a new character
+        /// </summary>
+        /// <param name="name">Public name of the character</param>
+        /// <param name="accountId">Account to which this character belongs</param>
+        /// <param name="parentId">Location of new item</param>
+        Character ItemCreateCharacter(
+            string name,
+            Guid accountId,
+            Guid parentId);
     }
 }

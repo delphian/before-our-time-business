@@ -25,7 +25,7 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="name">Public name of the character</param>
         /// <param name="accountId">Account to which this character belongs</param>
         /// <param name="parentId">Location of new item</param>
-        public Character AccountCreateCharacter(
+        public Character ItemCreateCharacter(
             string name, 
             Guid accountId,
             Guid parentId)

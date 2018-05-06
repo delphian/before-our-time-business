@@ -59,5 +59,12 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="password">Password for account</param>
         /// <returns></returns>
         Account CreateAccount(Terminal terminal, string name, string email, string password);
+        /// <summary>
+        /// Create character owned by account owner of terminal
+        /// </summary>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
+        /// <param name="name">Friendly name of character</param>
+        /// <returns></returns>
+        Character CreateCharacter(Terminal terminal, string name);
     }
 }

@@ -73,7 +73,7 @@ namespace BeforeOurTime.Business.Terminals
             TerminalMiddlewares = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (ITerminalMiddleware) Activator.CreateInstance(x, Api))
+                .Select(x => (ITerminalMiddleware)Activator.CreateInstance(x, Api))
                 .ToList();
         }
         /// <summary>
@@ -128,7 +128,7 @@ namespace BeforeOurTime.Business.Terminals
         public TerminalManager DestroyTerminal(Terminal terminal)
         {
             Terminals.Remove(terminal);
-            OnTerminalDestroyed((Terminal) terminal.Clone());
+            OnTerminalDestroyed((Terminal)terminal.Clone());
             terminal = null;
             return this;
         }
@@ -182,6 +182,20 @@ namespace BeforeOurTime.Business.Terminals
         public Account CreateAccount(Terminal terminal, string name, string email, string password)
         {
             return Api.AccountCreate(name, email, password);
+        }
+        /// <summary>
+        /// Create character owned by account owner of terminal
+        /// </summary>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
+        /// <param name="name">Friendly name of character</param>
+        /// <returns></returns>
+        public Character CreateCharacter(Terminal terminal, string name)
+        {
+            Character character = Api.ItemCreateCharacter(
+                name, 
+                terminal.AccountId, 
+                new Guid("e74713f3-9ea8-45e5-9715-3b019222af90"));
+            return character;
         }
     }
 }

@@ -193,7 +193,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="message">message from client</param>
         private static void HandleMessageFromAuthenticated(TelnetClient c, string message)
         {
-            if (c.GetTerminal().DataBag["step"] == "authenticated")
+            if (c.GetTerminal().DataBag["step"] == "create_character")
+            {
+                MessageStepCreateCharacter(c, message);
+            }
+            else if (c.GetTerminal().DataBag["step"] == "authenticated")
             {
                 switch (message.Split(' ').First().ToLower())
                 {
@@ -211,6 +215,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         c.GetTerminal().Status = TerminalStatus.Guest;
                         c.GetTerminal().DataBag["step"] = "connected";
                         s.sendMessageToClient(c, "\r\nWelcome> ");
+                        break;
+                    case "new":
+                        c.GetTerminal().DataBag["step"] = "create_character";
+                        MessageStepCreateCharacter(c, message);
                         break;
                     case "list":
                         s.sendMessageToClient(c, "\r\n\r\n");
@@ -255,5 +263,45 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 }
             }
         }
+        /// <summary>
+        /// Create new character during login process
+        /// </summary>
+        /// <remarks>
+        /// Handles all messages when DataBag step is "create_character"
+        /// </remarks>
+        /// <param name="c">Telnet client</param>
+        /// <param name="message">message from client</param>
+        private static void MessageStepCreateCharacter(TelnetClient c, string message)
+        {
+            if (!c.GetTerminal().DataBag.ContainsKey("create_character_step"))
+            {
+                c.GetTerminal().DataBag["create_character_step"] = "create";
+            }
+            switch (c.GetTerminal().DataBag["create_character_step"])
+            {
+                case "create":
+                    s.sendMessageToClient(c, "\r\nOk, let's create a new character.\r\n\r\n");
+                    s.sendMessageToClient(c, "\r\n Name: ");
+                    c.GetTerminal().DataBag["create_character_step"] = "save_name";
+                    break;
+                case "save_name":
+                    c.GetTerminal().DataBag["create_character_name"] = message;
+                    if (c.GetTerminal().CreateCharacter(c.GetTerminal().DataBag["create_character_name"]))
+                    {
+                        c.GetTerminal().DataBag["step"] = "attached";
+                        s.sendMessageToClient(c, "\r\nTerminal attached to avatar. Play!\r\n\r\n");
+                        s.sendMessageToClient(c, "> ");
+                    } else
+                    {
+                        c.GetTerminal().DataBag["step"] = "attached";
+                        c.GetTerminal().DataBag.Remove("create_character_name");
+                        c.GetTerminal().DataBag.Remove("create_character_step");
+                        s.sendMessageToClient(c, "\r\nSomething went wrong. Character not created.\r\n\r\n");
+                        s.sendMessageToClient(c, "Account> ");
+                    }
+                    break;
+            }
+        }
+
     }
 }
