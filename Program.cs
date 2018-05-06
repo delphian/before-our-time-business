@@ -99,11 +99,13 @@ namespace BeforeOurTime.Business
                     {
                         var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
                         var api = serviceProvider.GetService<IApi>();
+                        var from = itemRepo.Read(new List<Guid>() { terminal.AvatarId }).First();
                         var clientMessage = new Message()
                         {
                             Version = ItemVersion.Alpha,
                             Type = MessageType.EventTerminalInput,
-                            From = itemRepo.Read(new List<Guid>() { terminal.AvatarId }).First(),
+                            From = from,
+                            FromId = from.Id,
                             Value = JsonConvert.SerializeObject(new OnTerminalInput() {
                                 Terminal = terminal,
                                 Raw = message
@@ -132,7 +134,7 @@ namespace BeforeOurTime.Business
                     From = gameItem,
                     Value = "{}"
                 };
-                api.SendMessage(tickMessage, itemRepo.Read());
+                //api.SendMessage(tickMessage, itemRepo.Read());
             }
         }
         /// <summary>

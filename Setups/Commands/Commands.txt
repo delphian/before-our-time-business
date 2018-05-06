@@ -8,7 +8,6 @@
             "Data": "{}",
             "Script": "
                 function onTerminalInput(e) {
-					log(e);
                     if (e.raw == 'help') {
                         var helps = 'Available commands are: help, look, q\\r\\n';
                         itemMessage(e.terminal.avatarId, 'EventTerminalOutput', { \"terminal\": e.terminal, \"raw\": helps });
@@ -24,10 +23,15 @@
             "Script": "                    
                 function onTerminalInput(e) {
                     if (e.raw == 'look') {
-                        var looks = itemInvoke('fe178ad7-0e33-4111-beaf-6dfcfd548bd5', 'onQueryPhysical') + '\\r\\n';
-                        itemMessage(e.terminal.avatarId, 'EventTerminalOutput', { \"terminal\": e.terminal, \"raw\": looks });
+						var character = itemGet(e.terminal.avatarId);
+                        var look = itemInvoke(character.parentId, 'onQueryPhysical');
+						var name = look.name;
+						var description = look.description;
+						var results = name + '\\r\\n' + description + '\\r\\n';
+                        itemMessage(e.terminal.avatarId, 'EventTerminalOutput', { \"terminal\": e.terminal, \"raw\": results });
                     }
-                };"
+                };
+			"
         }
     ]
 }
