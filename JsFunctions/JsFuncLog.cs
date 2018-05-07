@@ -20,11 +20,13 @@ namespace BeforeOurTime.Business.JsFunctions
         {
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             // Box some repository functionality into safe limited javascript functions
-            Func<string, Item> getItem = delegate (string uuid)
+            Func<Item, string, bool> Log = delegate (Item me, string message)
             {
-                return itemRepo.Read(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
+                Console.WriteLine(message);
+                return true;
             };
-            JsEngine.SetValue("log", new Action<object>(Console.Write));
+            JsEngine.SetValue("_log", Log);
+            JsEngine.Execute("var log = function(message){ return _log(me, message) };");
         }
     }
 }

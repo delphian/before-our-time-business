@@ -1,4 +1,6 @@
-﻿using BeforeOurTime.Business.Apis;
+﻿#define DEBUG
+
+using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.JsEvents;
 using BeforeOurTime.Business.JsFunctions;
 using BeforeOurTime.Business.Logs;
@@ -47,8 +49,8 @@ namespace BeforeOurTime.Business
             ServiceProvider.CreateScope().ServiceProvider.GetService<IApi>().DataReset().DataInstall(
                 Configuration["Setup"]);
             // Setup automatic message deliver and Tick counter for items
-            var tickTimer = new System.Threading.Timer(Tick, null, 0, 1000);
-            var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, 500);
+            var tickTimer = new System.Threading.Timer(Tick, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Tick"]));
+            var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Delivery"]));
             ListenToTerminals(ServiceProvider.CreateScope().ServiceProvider);
             // Wait for user input
             Console.WriteLine("Hit 'q' and enter to abort\n");
@@ -160,8 +162,10 @@ namespace BeforeOurTime.Business
                 // Deliver message to each recipient
                 foreach (Message message in messages)
                 {
+#if !DEBUG
                     try
                     {
+#endif
                         var me = itemRepo.Read(new List<Guid>() { message.ToId }).First();
                         var jsProgram = parser.Parse(me.Script.Trim());
                         var jsEventHandler = jsEvents.Where(x => x.MessageType == message.Type).Select(x => x.JsFunction).FirstOrDefault();
@@ -182,16 +186,14 @@ namespace BeforeOurTime.Business
                             me.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
                             itemRepo.Update(new List<Item>() { me });
                         }
-                        else
-                        {
-                            // logger.LogError(message.To.Id + ": No js callback for: " + jsEvents[message.Type].Function);
-                        }
                     }
-                    catch (Exception ex)
+#if !DEBUG
+                catch (Exception ex)
                     {
                         logger.LogError("script failed: " + message.ToId + " " + ex.Message);
                     }
                 }
+#endif
             }
         }
     }

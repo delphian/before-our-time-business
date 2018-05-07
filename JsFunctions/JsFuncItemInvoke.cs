@@ -20,13 +20,14 @@ namespace BeforeOurTime.Business.JsFunctions
         {
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             // Box some repository functionality into safe limited javascript functions
-            Func<string, string, object> itemInvoke = delegate (string uuid, string method)
+            Func<Item, string, string, object> itemInvoke = delegate (Item me, string uuid, string method)
             {
                 var item = itemRepo.Read(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
                 object result = new Engine().Execute(item.Script.Trim()).Invoke(method, "{}");
                 return result;
             };
-            JsEngine.SetValue("itemInvoke", itemInvoke);
+            JsEngine.SetValue("_itemInvoke", itemInvoke);
+            JsEngine.Execute("var itemInvoke = function(toGuidId, funcName){ return _itemInvoke(me, toGuidId.ToString(), funcName) };");
         }
     }
 }

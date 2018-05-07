@@ -20,14 +20,15 @@ namespace BeforeOurTime.Business.JsFunctions
         {
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             // Box some repository functionality into safe limited javascript functions
-            Func<string, string, bool> itemMove = delegate (string uuid, string toUuid)
+            Func<Item, string, string, bool> itemMove = delegate (Item me, string uuid, string toUuid)
             {
                 var item = itemRepo.Read(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
                 var toItem = itemRepo.Read(new List<Guid>() { new Guid(toUuid) }).FirstOrDefault();
                 Api.ItemMove(null, toItem, item);
                 return true;
             };
-            JsEngine.SetValue("itemMove", itemMove);
+            JsEngine.SetValue("_itemMove", itemMove);
+            JsEngine.Execute("var itemMove = function(uuid, toUuid){ return _itemMove(me, uuid.ToString(), toUuid.ToString()) };");
         }
     }
 }
