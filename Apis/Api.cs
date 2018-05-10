@@ -21,12 +21,12 @@ namespace BeforeOurTime.Business.Apis
     public partial class Api : IApi
     {
         private IAccountRepo AccountRepo { set; get; }
+        private IAuthorGroupRepo AuthorGroupRepo { set; get; }
+        private IMessageRepo MessageRepo { set; get; }
         private IRepository<AuthorizationRole> AuthorRoleRepo { set; get; }
-        private IRepository<AuthorizationGroup> AuthorGroupRepo { set; get; }
         private IRepository<AuthorizationGroupRole> AuthorGroupRoleRepo { set; get; }
         private IRepository<AuthorizationAccountGroup> AuthorAccountGroupRepo { set; get; }
         private IRepository<AuthenticationBotMeta> AuthenBotMetaRepo { set; get; }
-        private IMessageRepo MessageRepo { set; get; }
         private IItemRepo<Item> ItemRepo { set; get; }
         protected IJsEventManager JsEventManager { set; get; }
         /// <summary>
@@ -37,7 +37,7 @@ namespace BeforeOurTime.Business.Apis
         public Api(
             IAccountRepo accountRepo,
             IRepository<AuthorizationRole> authorRoleRepo,
-            IRepository<AuthorizationGroup> authorGroupRepo,
+            IAuthorGroupRepo authorGroupRepo,
             IRepository<AuthorizationGroupRole> authorGroupRoleRepo,
             IRepository<AuthorizationAccountGroup> authorAccountGroupRepo,
             IRepository<AuthenticationBotMeta> authenBotMetaRepo,
