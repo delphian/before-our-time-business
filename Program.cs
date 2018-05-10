@@ -77,7 +77,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<ICharacterRepo, CharacterRepo>()
                 .AddScoped<IMessageRepo, MessageRepo>()
                 .AddScoped<IRepository<AuthorizationRole>, Repository<AuthorizationRole>>()
-                .AddScoped<IRepository<AuthorizationGroup>, Repository<AuthorizationGroup>>()
+                .AddScoped<IAuthorGroupRepo, AuthorGroupRepo>()
                 .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
