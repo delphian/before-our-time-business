@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Repository.Models.Accounts;
+﻿using BeforeOurTime.Business.Apis.Accounts;
+using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
 using System;
@@ -70,5 +71,6 @@ namespace BeforeOurTime.Business.Apis
             string name,
             Guid accountId,
             Guid parentId);
+        IAccountManager GetAccountManager();
     }
 }

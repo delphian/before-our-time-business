@@ -1,6 +1,7 @@
 ﻿#define DEBUG
 
 using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.JsEvents;
 using BeforeOurTime.Business.JsFunctions;
 using BeforeOurTime.Business.Logs;
@@ -82,6 +83,8 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
                 .AddScoped<IJsEventManager, JsEventManager>()
+                // Main environment interface
+                .AddScoped<IAccountManager, AccountManager>()
                 .AddScoped<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }

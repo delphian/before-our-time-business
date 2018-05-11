@@ -100,10 +100,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public Account AuthenticateTerminal(Terminal terminal, string name, string password)
         {
-            var account = AccountRepo.Read(
-                    new AuthenticationRequest() { PrincipalName = name, PrincipalPassword = password })
-                .FirstOrDefault();
-            return account;
+            return Api.GetAccountManager().Authenticate(name, password);
         }
         /// <summary>
         /// Attach a terminal to an environment item as it's avatar
@@ -181,7 +178,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public Account CreateAccount(Terminal terminal, string name, string email, string password)
         {
-            return Api.AccountCreate(name, email, password);
+            return Api.GetAccountManager().Create(name, email, password);
         }
         /// <summary>
         /// Create character owned by account owner of terminal
