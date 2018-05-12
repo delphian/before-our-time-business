@@ -23,6 +23,7 @@ namespace BeforeOurTime.Business.Apis.Items
             IScriptManager scriptManager,
             IItemRepo<Item> itemRepo)
         {
+            ScriptManager = scriptManager;
             ItemRepo = itemRepo;
         }
         /// <summary>

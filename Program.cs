@@ -4,6 +4,7 @@ using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Scripts;
+using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.JsFunctions;
 using BeforeOurTime.Business.Logs;
 using BeforeOurTime.Business.Models.ScriptCallbacks.Arguments;
@@ -15,6 +16,7 @@ using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
 using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Scripts.Callbacks;
 using BeforeOutTime.Repository.Dbs.EF;
 using Jint;
 using Microsoft.EntityFrameworkCore;
@@ -84,8 +86,10 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
+                .AddScoped<IScriptCallbackRepo, ScriptCallbackRepo>()
                 // Main environment interface api
                 .AddScoped<IAccountManager, AccountManager>()
+                .AddScoped<IScriptEngine, JsScriptEngine>()
                 .AddScoped<IScriptManager, ScriptManager>()
                 .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IApi, Api>()

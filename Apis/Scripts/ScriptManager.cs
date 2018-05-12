@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Scripts.Callbacks;
 using Jint.Parser;
@@ -13,7 +14,7 @@ namespace BeforeOurTime.Business.Apis.Scripts
     {
         protected IItemRepo<Item> ItemRepo { set; get; }
         protected IScriptCallbackRepo ScriptCallbackRepo { set; get; }
-        protected JavaScriptParser Parser { set; get; }
+        protected IScriptEngine ScriptEngine { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -21,11 +22,11 @@ namespace BeforeOurTime.Business.Apis.Scripts
         public ScriptManager(
             IItemRepo<Item> itemRepo,
             IScriptCallbackRepo scriptCallbackRepo,
-            JavaScriptParser parser)
+            IScriptEngine scriptEngine)
         {
             ItemRepo = itemRepo;
             ScriptCallbackRepo = scriptCallbackRepo;
-            Parser = parser;
+            ScriptEngine = scriptEngine;
         }
         /// <summary>
         /// Get all callback function names declared by script
@@ -34,8 +35,7 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// <returns></returns>
         public List<string> GetCallbackDeclarations(string script)
         {
-            var jsProgram = Parser.Parse(script.Trim());
-            return jsProgram.FunctionDeclarations.Select(x => x.Id.Name).ToList();
+            return ScriptEngine.GetFunctionDeclarations(script.Trim());
         }
         /// <summary>
         /// Get all properly formated callbacks declared by script
