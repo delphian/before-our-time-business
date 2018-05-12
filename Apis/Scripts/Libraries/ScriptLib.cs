@@ -7,9 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.JsFunctions
+namespace BeforeOurTime.Business.Apis.Scripts.Libraries
 {
-    public class JsFunc
+    public class ScriptLib
     {
         protected IConfigurationRoot Configuration { set; get; }
         protected IServiceProvider ServiceProvider { set; get; }
@@ -22,7 +22,7 @@ namespace BeforeOurTime.Business.JsFunctions
         /// <param name="serviceProvider"></param>
         /// <aparam name="iApi"></aparam>
         /// <param name="jsEngine"></param>
-        public JsFunc(
+        public ScriptLib(
             IConfigurationRoot configuration,
             IServiceProvider serviceProvider,
             IApi api,

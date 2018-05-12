@@ -8,11 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BeforeOurTime.Business.JsFunctions
+namespace BeforeOurTime.Business.Apis.Scripts.Libraries
 {    
-    public class JsFuncItemGet : JsFunc, IJsFunc
+    public class ScriptLibItemGet : ScriptLib, IScriptLib
     {
-        public JsFuncItemGet(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
+        public ScriptLibItemGet(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
             : base(config, provider, api, engine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call

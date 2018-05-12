@@ -8,11 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BeforeOurTime.Business.JsFunctions
+namespace BeforeOurTime.Business.Apis.Scripts.Libraries
 {    
-    public class JsFuncItemMove : JsFunc, IJsFunc
+    public class ScriptLibItemInvoke : ScriptLib, IScriptLib
     {
-        public JsFuncItemMove(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
+        public ScriptLibItemInvoke(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
             : base(config, provider, api, engine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
@@ -21,16 +21,15 @@ namespace BeforeOurTime.Business.JsFunctions
         {
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             // Box some repository functionality into safe limited javascript functions
-            Func<Item, string, string, bool> itemMove = delegate (Item me, string uuid, string toUuid)
+            Func<Item, string, string, object> itemInvoke = delegate (Item me, string uuid, string method)
             {
                 var item = itemRepo.Read(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
-                var toItem = itemRepo.Read(new List<Guid>() { new Guid(toUuid) }).FirstOrDefault();
-                Api.ItemMove(null, toItem, item);
-                return true;
+                object result = new Engine().Execute(item.Script.Trim()).Invoke(method, "{}");
+                return result;
             };
             Engine
-                .SetValue("_itemMove", itemMove)
-                .Execute("var itemMove = function(uuid, toUuid){ return _itemMove(me, uuid.ToString(), toUuid.ToString()) };");
+                .SetValue("_itemInvoke", itemInvoke)
+                .Execute("var itemInvoke = function(toGuidId, funcName){ return _itemInvoke(me, toGuidId.ToString(), funcName) };");
         }
     }
 }

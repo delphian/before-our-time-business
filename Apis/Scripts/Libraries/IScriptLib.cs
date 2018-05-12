@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.JsFunctions
+namespace BeforeOurTime.Business.Apis.Scripts.Libraries
 {
-    public interface IJsFunc
+    public interface IScriptLib
     {
         void AddFunctions();
     }

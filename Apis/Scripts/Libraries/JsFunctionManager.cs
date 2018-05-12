@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.JsFunctions
+namespace BeforeOurTime.Business.Apis.Scripts.Libraries
 {
     class JsFunctionManager
     {
@@ -31,14 +31,14 @@ namespace BeforeOurTime.Business.JsFunctions
         }
         public void AddJsFunctions(IScriptEngine engine)
         {
-            var interfaceType = typeof(IJsFunc);
+            var interfaceType = typeof(IScriptLib);
             var jsFuncClasses = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
                 .Select(x => Activator.CreateInstance(x, Configuration, ServiceProvider, Api, engine))
                 .ToList();
             jsFuncClasses
-                .ForEach(x => ((IJsFunc)x).AddFunctions());
+                .ForEach(x => ((IScriptLib)x).AddFunctions());
         }
     }
 }

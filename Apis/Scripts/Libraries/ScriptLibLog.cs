@@ -8,11 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BeforeOurTime.Business.JsFunctions
+namespace BeforeOurTime.Business.Apis.Scripts.Libraries
 {    
-    public class JsFuncItemInvoke : JsFunc, IJsFunc
+    public class ScriptLibLog : ScriptLib, IScriptLib
     {
-        public JsFuncItemInvoke(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
+        public ScriptLibLog(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
             : base(config, provider, api, engine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
@@ -21,15 +21,14 @@ namespace BeforeOurTime.Business.JsFunctions
         {
             var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
             // Box some repository functionality into safe limited javascript functions
-            Func<Item, string, string, object> itemInvoke = delegate (Item me, string uuid, string method)
+            Func<Item, string, bool> Log = delegate (Item me, string message)
             {
-                var item = itemRepo.Read(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
-                object result = new Engine().Execute(item.Script.Trim()).Invoke(method, "{}");
-                return result;
+                Console.WriteLine(message);
+                return true;
             };
             Engine
-                .SetValue("_itemInvoke", itemInvoke)
-                .Execute("var itemInvoke = function(toGuidId, funcName){ return _itemInvoke(me, toGuidId.ToString(), funcName) };");
+                .SetValue("_log", Log)
+                .Execute("var log = function(message){ return _log(me, message) };");
         }
     }
 }

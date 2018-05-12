@@ -10,11 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BeforeOurTime.Business.JsFunctions
+namespace BeforeOurTime.Business.Apis.Scripts.Libraries
 {    
-    public class JsFuncItemMessage : JsFunc, IJsFunc
+    public class ScriptLibItemMessage : ScriptLib, IScriptLib
     {
-        public JsFuncItemMessage(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
+        public ScriptLibItemMessage(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
             : base(config, provider, api, engine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
