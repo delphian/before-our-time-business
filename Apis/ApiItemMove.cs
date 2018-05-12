@@ -7,14 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Repository.Models;
-using BeforeOurTime.Business.JsEvents;
 
 namespace BeforeOurTime.Business.Apis
 {
     /// <summary>
     /// Interface into the game
     /// </summary>
-    public partial class Api
+    public partial class Api : IApi
     {
         /// <summary>
         /// Relocate an item
@@ -27,16 +26,16 @@ namespace BeforeOurTime.Business.Apis
             // Construct the message
             var message = new Message()
             {
-                Version = ItemVersion.Alpha,
-                From = Source,
-                Type = MessageType.EventItemMove,
-                Value = JsonConvert.SerializeObject(new OnItemMove()
-                {
-                    Type = MessageType.EventItemMove,
-                    From = child.Parent,
-                    To = newParent,
-                    Item = child
-                })
+                Sender = Source,
+                Callback = GetScriptManager().GetCallbackDefinition("onItemMove"),
+                Package = "",
+                //JsonConvert.SerializeObject(new OnItemMove()
+                //{
+                //    Type = MessageType.EventItemMove,
+                //    From = child.Parent,
+                //    To = newParent,
+                //    Item = child
+                //})
             };
             // Move the item
             var oldParent = child.Parent;

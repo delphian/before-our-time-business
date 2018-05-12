@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Repository.Models;
-using BeforeOurTime.Business.JsEvents;
 using BeforeOurTime.Repository.Models.Accounts;
 using System.Linq;
 using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
@@ -17,7 +16,7 @@ namespace BeforeOurTime.Business.Apis
     /// <summary>
     /// Interface into the game
     /// </summary>
-    public partial class Api
+    public partial class Api : IApi
     {
         /// <summary>
         /// Create a new character
@@ -43,7 +42,7 @@ namespace BeforeOurTime.Business.Apis
                 Data = "{}",
                 Script = "{ function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { }; }"
             };
-            ItemCreate<Character>(game, parent, character);
+            GetItemManager().Create<Character>(game, character);
             return character;
         }
     }

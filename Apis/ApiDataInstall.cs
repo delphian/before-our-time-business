@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Repository.Models;
-using BeforeOurTime.Business.JsEvents;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json.Linq;
@@ -20,7 +19,7 @@ namespace BeforeOurTime.Business.Apis
     /// <summary>
     /// Interface into the game
     /// </summary>
-    public partial class Api
+    public partial class Api : IApi
     {
         /// <summary>
         /// Install initial accounts and database objects
@@ -99,11 +98,7 @@ namespace BeforeOurTime.Business.Apis
                 var items = JsonConvert.DeserializeObject<List<Item>>(jObj["Items"].ToString());
                 items.ForEach(delegate (Item item)
                 {
-                    Item parent = null;
-                    if (item.ParentId != null) {
-                        parent = ItemRepo.Read(new List<Guid>() { item.ParentId.Value }).First();
-                    }
-                    ItemCreate<Item>(null, parent, item);
+                    GetItemManager().Create<Item>(null, item);
                 });
             }
             if (jObj["Characters"] != null)
@@ -111,12 +106,7 @@ namespace BeforeOurTime.Business.Apis
                 var items = JsonConvert.DeserializeObject<List<Character>>(jObj["Characters"].ToString());
                 items.ForEach(delegate (Character item)
                 {
-                    Item parent = null;
-                    if (item.ParentId != null)
-                    {
-                        parent = ItemRepo.Read(new List<Guid>() { item.ParentId.Value }).First();
-                    }
-                    ItemCreate<Character>(null, parent, item);
+                    GetItemManager().Create<Character>(null, item);
                 });
             }
             return this;

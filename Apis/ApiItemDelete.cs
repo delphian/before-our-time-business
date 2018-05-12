@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Repository.Models;
-using BeforeOurTime.Business.JsEvents;
 
 namespace BeforeOurTime.Business.Apis
 {

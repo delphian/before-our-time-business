@@ -28,14 +28,13 @@ namespace BeforeOurTime.Business.JsFunctions
                 string type,
                 object msgBody)
             {
-                Enum.TryParse(type, out MessageType msgType);
+                var callback = Api.GetScriptManager().GetCallbackDefinition(type);
                 var itemTo = itemRepo.Read(new List<Guid>() { new Guid(toId) }).FirstOrDefault();
                 var message = new Message()
                 {
-                    From = from,
-                    Version = ItemVersion.Alpha,
-                    Type = msgType,
-                    Value = JsonConvert.SerializeObject(msgBody)
+                    Sender = from,
+                    Callback = callback,
+                    Package = JsonConvert.SerializeObject(msgBody)
                 };
                 Api.SendMessage(message, new List<Item>() { itemTo });
                 return true;

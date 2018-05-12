@@ -2,9 +2,11 @@
 
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
-using BeforeOurTime.Business.JsEvents;
+using BeforeOurTime.Business.Apis.Items;
+using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.JsFunctions;
 using BeforeOurTime.Business.Logs;
+using BeforeOurTime.Business.Models.ScriptCallbacks.Arguments;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Models;
@@ -82,9 +84,10 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
-                .AddScoped<IJsEventManager, JsEventManager>()
-                // Main environment interface
+                // Main environment interface api
                 .AddScoped<IAccountManager, AccountManager>()
+                .AddScoped<IScriptManager, ScriptManager>()
+                .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }
@@ -105,13 +108,12 @@ namespace BeforeOurTime.Business
                         var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
                         var api = serviceProvider.GetService<IApi>();
                         var from = itemRepo.Read(new List<Guid>() { terminal.AvatarId }).First();
+                        var callback = api.GetScriptManager().GetCallbackDefinition("onTerminalInput");
                         var clientMessage = new Message()
                         {
-                            Version = ItemVersion.Alpha,
-                            Type = MessageType.EventTerminalInput,
-                            From = from,
-                            FromId = from.Id,
-                            Value = JsonConvert.SerializeObject(new OnTerminalInput() {
+                            Callback = callback,
+                            Sender = from,
+                            Package = JsonConvert.SerializeObject(new ArgTerminalInput() {
                                 Terminal = terminal,
                                 Raw = message
                             })
@@ -134,10 +136,9 @@ namespace BeforeOurTime.Business
                 var gameItem = itemRepo.Read(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
                 var tickMessage = new Message()
                 {
-                    Version = ItemVersion.Alpha,
-                    Type = MessageType.EventTick,
-                    From = gameItem,
-                    Value = "{}"
+                    Callback = api.GetScriptManager().GetCallbackDefinition("onTick"),
+                    Sender = gameItem,
+                    Package = "{}"
                 };
                 //api.SendMessage(tickMessage, itemRepo.Read());
             }
@@ -153,12 +154,10 @@ namespace BeforeOurTime.Business
                 var logger = ServiceProvider.GetService<ILogger>();
                 var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
                 var messageRepo = ServiceProvider.GetService<IMessageRepo>();
-                var jsEventManager = ServiceProvider.GetService<IJsEventManager>();
                 var parser = new Jint.Parser.JavaScriptParser();
                 var jsEngine = new Engine();
                 // Create script global functions
                 var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
-                var jsEvents = jsEventManager.GetJsEventRegistrations();
                 // Get messages
                 List<Message> messages = messageRepo.Read();
                 messageRepo.Delete();
@@ -169,11 +168,9 @@ namespace BeforeOurTime.Business
                     try
                     {
 #endif
-                        var me = itemRepo.Read(new List<Guid>() { message.ToId }).First();
+                        var me = itemRepo.Read(new List<Guid>() { message.RecipientId }).First();
                         var jsProgram = parser.Parse(me.Script.Trim());
-                        var jsEventHandler = jsEvents.Where(x => x.MessageType == message.Type).Select(x => x.JsFunction).FirstOrDefault();
-                        var jsArgumentType = jsEvents.Where(x => x.MessageType == message.Type).Select(x => x.JsArgument).FirstOrDefault();
-                        if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == jsEventHandler))
+                        if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == message.Callback.FunctionName))
                         {
                             jsFunctionManager.AddJsFunctions(jsEngine);
                             jsEngine
@@ -182,8 +179,8 @@ namespace BeforeOurTime.Business
                                 .Execute("var data = JSON.parse(_data);")
                                 .Execute(me.Script)
                                 .Invoke(
-                                    jsEventHandler,
-                                    JsonConvert.DeserializeObject(message.Value, jsArgumentType)
+                                    message.Callback.FunctionName,
+                                    JsonConvert.DeserializeObject(message.Package, Type.GetType(message.Callback.ArgumentType))
                                 );
                             // Save changes to item data
                             me.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
@@ -191,7 +188,7 @@ namespace BeforeOurTime.Business
                         }
                     }
 #if !DEBUG
-                catch (Exception ex)
+                    catch (Exception ex)
                     {
                         logger.LogError("script failed: " + message.ToId + " " + ex.Message);
                     }

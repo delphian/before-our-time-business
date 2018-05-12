@@ -1,4 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Accounts;
+using BeforeOurTime.Business.Apis.Items;
+using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
@@ -45,23 +47,6 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="deleteChildren">Also delete all children</param>
         void ItemDelete(Item item, bool? deleteChildren = false);
         /// <summary>
-        /// Create a new item
-        /// </summary>
-        /// <remarks>
-        /// Any item, or model derived from an item, may be created
-        /// </remarks>
-        /// <param name="Source">Item responsible for doing the creating</param>
-        /// <param name="newParent">Item which will become the parent</param>
-        /// <param name="child">Item which is the new child being created</param>
-        bool ItemCreate<T>(Item source, Item parent, T child) where T : Item;
-        /// <summary>
-        /// Create a new account and local authentication credentials
-        /// </summary>
-        /// <param name="name">Friendly account name</param>
-        /// <param name="email">Login email address for account</param>
-        /// <param name="password">Password for account</param>
-        Account AccountCreate(string name, string email, string password);
-        /// <summary>
         /// Create a new character
         /// </summary>
         /// <param name="name">Public name of the character</param>
@@ -72,5 +57,7 @@ namespace BeforeOurTime.Business.Apis
             Guid accountId,
             Guid parentId);
         IAccountManager GetAccountManager();
+        IScriptManager GetScriptManager();
+        IItemManager GetItemManager();
     }
 }

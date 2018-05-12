@@ -11,8 +11,9 @@ using System.Linq;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
-using BeforeOurTime.Business.JsEvents;
 using BeforeOurTime.Business.Apis.Accounts;
+using BeforeOurTime.Business.Apis.Scripts;
+using BeforeOurTime.Business.Apis.Items;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -29,8 +30,9 @@ namespace BeforeOurTime.Business.Apis
         private IRepository<AuthorizationAccountGroup> AuthorAccountGroupRepo { set; get; }
         private IRepository<AuthenticationBotMeta> AuthenBotMetaRepo { set; get; }
         private IItemRepo<Item> ItemRepo { set; get; }
-        protected IJsEventManager JsEventManager { set; get; }
         protected IAccountManager AccountManager { set; get; }
+        protected IScriptManager ScriptManager { set; get; }
+        protected IItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -45,8 +47,9 @@ namespace BeforeOurTime.Business.Apis
             IRepository<AuthenticationBotMeta> authenBotMetaRepo,
             IMessageRepo messageRepo, 
             IItemRepo<Item> itemRepo,
-            IJsEventManager jsEventManager,
-            IAccountManager accountManager)
+            IAccountManager accountManager,
+            IScriptManager scriptManager,
+            IItemManager itemManager)
         {
             AccountRepo = accountRepo;
             AuthorRoleRepo = authorRoleRepo;
@@ -56,8 +59,9 @@ namespace BeforeOurTime.Business.Apis
             AuthenBotMetaRepo = authenBotMetaRepo;
             ItemRepo = itemRepo;
             MessageRepo = messageRepo;
-            JsEventManager = jsEventManager;
             AccountManager = accountManager;
+            ScriptManager = scriptManager;
+            ItemManager = itemManager;
         }
         /// <summary>
         /// Send a message to multiple recipient items
@@ -66,24 +70,32 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="recipients"></param>
         public void SendMessage(Message message, List<Item> recipients)
         {
-            if (message.From != null)
+            if (message.SenderId != null)
             {
                 var messages = new List<Message>();
                 recipients.ForEach(delegate (Item recipient)
                 {
                     var messageCopy = (Message)message.Clone();
-                    messageCopy.ToId = recipient.Id;
+                    messageCopy.RecipientId = recipient.Id;
                     messages.Add(messageCopy);
                 });
                 MessageRepo.Create(messages);
             } else
             {
-                Console.WriteLine("Refusing to send anonymous item message " + message.Type.ToString());
+                Console.WriteLine("Refusing to send anonymous message");
             }
         }
         public IAccountManager GetAccountManager()
         {
             return AccountManager;
+        }
+        public IScriptManager GetScriptManager()
+        {
+            return ScriptManager;
+        }
+        public IItemManager GetItemManager()
+        {
+            return ItemManager;
         }
     }
 }
