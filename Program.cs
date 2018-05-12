@@ -158,8 +158,7 @@ namespace BeforeOurTime.Business
                 var logger = ServiceProvider.GetService<ILogger>();
                 var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
                 var messageRepo = ServiceProvider.GetService<IMessageRepo>();
-                var parser = new Jint.Parser.JavaScriptParser();
-                var jsEngine = new Engine();
+                var ScriptEngine = ServiceProvider.GetService<IScriptEngine>();
                 // Create script global functions
                 var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
                 // Get messages
@@ -173,11 +172,10 @@ namespace BeforeOurTime.Business
                     {
 #endif
                         var me = itemRepo.Read(new List<Guid>() { message.RecipientId }).First();
-                        var jsProgram = parser.Parse(me.Script.Trim());
-                        if (jsProgram.FunctionDeclarations.Any(x => x.Id.Name == message.Callback.FunctionName))
+                        if (ScriptEngine.GetFunctionDeclarations(me.Script.Trim()).Contains(message.Callback.FunctionName))
                         {
-                            jsFunctionManager.AddJsFunctions(jsEngine);
-                            jsEngine
+                            jsFunctionManager.AddJsFunctions(ScriptEngine);
+                            ScriptEngine
                                 .SetValue("me", me)
                                 .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(me.Data)))
                                 .Execute("var data = JSON.parse(_data);")
@@ -187,7 +185,7 @@ namespace BeforeOurTime.Business
                                     JsonConvert.DeserializeObject(message.Package, Type.GetType(message.Callback.ArgumentType))
                                 );
                             // Save changes to item data
-                            me.Data = JsonConvert.SerializeObject(jsEngine.GetValue("data").ToObject());
+                            me.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
                             itemRepo.Update(new List<Item>() { me });
                         }
                     }

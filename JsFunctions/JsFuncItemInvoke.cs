@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Repository.Models.Items;
 using Jint;
 using Microsoft.Extensions.Configuration;
@@ -11,8 +12,8 @@ namespace BeforeOurTime.Business.JsFunctions
 {    
     public class JsFuncItemInvoke : JsFunc, IJsFunc
     {
-        public JsFuncItemInvoke(IConfigurationRoot config, IServiceProvider provider, IApi api, Engine jsEngine)
-            : base(config, provider, api, jsEngine) { }
+        public JsFuncItemInvoke(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
+            : base(config, provider, api, engine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
         /// </summary>
@@ -26,8 +27,9 @@ namespace BeforeOurTime.Business.JsFunctions
                 object result = new Engine().Execute(item.Script.Trim()).Invoke(method, "{}");
                 return result;
             };
-            JsEngine.SetValue("_itemInvoke", itemInvoke);
-            JsEngine.Execute("var itemInvoke = function(toGuidId, funcName){ return _itemInvoke(me, toGuidId.ToString(), funcName) };");
+            Engine
+                .SetValue("_itemInvoke", itemInvoke)
+                .Execute("var itemInvoke = function(toGuidId, funcName){ return _itemInvoke(me, toGuidId.ToString(), funcName) };");
         }
     }
 }

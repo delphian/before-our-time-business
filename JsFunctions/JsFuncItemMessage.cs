@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
 using Jint;
@@ -13,8 +14,8 @@ namespace BeforeOurTime.Business.JsFunctions
 {    
     public class JsFuncItemMessage : JsFunc, IJsFunc
     {
-        public JsFuncItemMessage(IConfigurationRoot config, IServiceProvider provider, IApi api, Engine jsEngine)
-            : base(config, provider, api, jsEngine) { }
+        public JsFuncItemMessage(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
+            : base(config, provider, api, engine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
         /// </summary>
@@ -39,8 +40,9 @@ namespace BeforeOurTime.Business.JsFunctions
                 Api.SendMessage(message, new List<Item>() { itemTo });
                 return true;
             };
-            JsEngine.SetValue("_itemMessage", itemMessage);
-            JsEngine.Execute("var itemMessage = function(toGuidId, type, msgBody){ return _itemMessage(me, toGuidId.ToString(), type, msgBody) };");
+            Engine
+                .SetValue("_itemMessage", itemMessage)
+                .Execute("var itemMessage = function(toGuidId, type, msgBody){ return _itemMessage(me, toGuidId.ToString(), type, msgBody) };");
         }
     }
 }

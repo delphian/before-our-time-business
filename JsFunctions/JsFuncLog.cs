@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Repository.Models.Items;
 using Jint;
 using Microsoft.Extensions.Configuration;
@@ -11,8 +12,8 @@ namespace BeforeOurTime.Business.JsFunctions
 {    
     public class JsFuncLog : JsFunc, IJsFunc
     {
-        public JsFuncLog(IConfigurationRoot config, IServiceProvider provider, IApi api, Engine jsEngine)
-            : base(config, provider, api, jsEngine) { }
+        public JsFuncLog(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
+            : base(config, provider, api, engine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
         /// </summary>
@@ -25,8 +26,9 @@ namespace BeforeOurTime.Business.JsFunctions
                 Console.WriteLine(message);
                 return true;
             };
-            JsEngine.SetValue("_log", Log);
-            JsEngine.Execute("var log = function(message){ return _log(me, message) };");
+            Engine
+                .SetValue("_log", Log)
+                .Execute("var log = function(message){ return _log(me, message) };");
         }
     }
 }

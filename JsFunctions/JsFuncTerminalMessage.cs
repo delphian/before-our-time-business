@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
@@ -14,8 +15,8 @@ namespace BeforeOurTime.Business.JsFunctions
 {    
     public class JsFuncTerminalMessage : JsFunc, IJsFunc
     {
-        public JsFuncTerminalMessage(IConfigurationRoot config, IServiceProvider provider, IApi api, Engine jsEngine)
-            : base(config, provider, api, jsEngine) { }
+        public JsFuncTerminalMessage(IConfigurationRoot config, IServiceProvider provider, IApi api, IScriptEngine engine)
+            : base(config, provider, api, engine) { }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
         /// </summary>
@@ -32,8 +33,9 @@ namespace BeforeOurTime.Business.JsFunctions
                 terminal.SendToClient(msgBody.ToString());
                 return true;
             };
-            JsEngine.SetValue("_terminalMessage", terminalMessage);
-            JsEngine.Execute("var terminalMessage = function(terminalId, msgBody){ return _terminalMessage(me, terminalId.ToString(), msgBody) };");
+            Engine
+                .SetValue("_terminalMessage", terminalMessage)
+                .Execute("var terminalMessage = function(terminalId, msgBody){ return _terminalMessage(me, terminalId.ToString(), msgBody) };");
         }
     }
 }

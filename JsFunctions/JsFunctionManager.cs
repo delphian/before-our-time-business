@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Scripts.Engines;
 using Jint;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,13 +29,13 @@ namespace BeforeOurTime.Business.JsFunctions
             ServiceProvider = serviceProvider;
             Api = ServiceProvider.GetService<IApi>();
         }
-        public void AddJsFunctions(Engine jsEngine)
+        public void AddJsFunctions(IScriptEngine engine)
         {
             var interfaceType = typeof(IJsFunc);
             var jsFuncClasses = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => Activator.CreateInstance(x, Configuration, ServiceProvider, Api, jsEngine))
+                .Select(x => Activator.CreateInstance(x, Configuration, ServiceProvider, Api, engine))
                 .ToList();
             jsFuncClasses
                 .ForEach(x => ((IJsFunc)x).AddFunctions());

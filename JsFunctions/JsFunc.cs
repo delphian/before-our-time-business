@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Scripts.Engines;
 using Jint;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,7 @@ namespace BeforeOurTime.Business.JsFunctions
         protected IConfigurationRoot Configuration { set; get; }
         protected IServiceProvider ServiceProvider { set; get; }
         protected IApi Api { set; get; }
-        protected Engine JsEngine { set; get; }
+        protected IScriptEngine Engine { set; get; }
         /// <summary>
         /// Add a javascript function to the engine for scripts to call
         /// </summary>
@@ -25,12 +26,12 @@ namespace BeforeOurTime.Business.JsFunctions
             IConfigurationRoot configuration,
             IServiceProvider serviceProvider,
             IApi api,
-            Engine jsEngine)
+            IScriptEngine engine)
         {
             Configuration = configuration;
             ServiceProvider = serviceProvider;
             Api = api;
-            JsEngine = jsEngine;
+            Engine = engine;
         }
     }
 }
