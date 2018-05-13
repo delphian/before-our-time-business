@@ -4,6 +4,7 @@ using BeforeOurTime.Repository.Models.Accounts;
 using System.Linq;
 using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
 using BeforeOurTime.Repository.Models.Accounts.Authentication;
+using System;
 
 namespace BeforeOurTime.Business.Apis.Accounts
 {
@@ -71,6 +72,26 @@ namespace BeforeOurTime.Business.Apis.Accounts
                 })
                 .FirstOrDefault();
             return account;
+        }
+        /// <summary>
+        /// Read a local authentication credential
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
+        public AuthenticationBotMeta ReadCredential(Guid accountId)
+        {
+            return AuthenBotMetaRepo.Read().Where(x => x.AccountId == accountId).FirstOrDefault();
+        }
+        /// <summary>
+        /// Update a credential's password
+        /// </summary>
+        /// <param name="credential">Local authentication credential</param>
+        /// <param name="password">New password</param>
+        /// <returns></returns>
+        public AuthenticationBotMeta UpdateCredentialPassword(AuthenticationBotMeta credential, string password)
+        {
+            credential.Password = BCrypt.Net.BCrypt.HashPassword(password);
+            return AuthenBotMetaRepo.Update(new List<AuthenticationBotMeta>() { credential }).FirstOrDefault();
         }
     }
 }

@@ -17,6 +17,7 @@ using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+using BeforeOurTime.Repository.Models.Scripts.Interfaces;
 using BeforeOutTime.Repository.Dbs.EF;
 using Jint;
 using Microsoft.EntityFrameworkCore;
@@ -87,6 +88,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
                 .AddScoped<IScriptCallbackRepo, ScriptCallbackRepo>()
+                .AddScoped<IScriptInterfaceRepo, ScriptInterfaceRepo>()
                 // Main environment interface api
                 .AddScoped<IAccountManager, AccountManager>()
                 .AddScoped<IScriptEngine, JsScriptEngine>()
