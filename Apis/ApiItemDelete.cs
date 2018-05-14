@@ -29,7 +29,7 @@ namespace BeforeOurTime.Business.Apis
             var oldParent = item.Parent;
             item.Children.ForEach(delegate (Item child)
             {
-                ItemMove(item, item.Parent, child);
+                GetItemManager().Move(child, oldParent, item);
             });
             ItemRepo.Delete(new List<Item>() { item });
         }

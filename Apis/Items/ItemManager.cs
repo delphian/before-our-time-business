@@ -8,24 +8,29 @@ using System.Text;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Repository.Models.Scripts.Callbacks;
 using System.Linq;
+using BeforeOurTime.Repository.Models.Messages;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
     public class ItemManager : IItemManager
     {
-        protected IScriptManager ScriptManager { set; get; }
-        protected IItemRepo<Item> ItemRepo { set; get; }
+        private IItemRepo<Item> ItemRepo { set; get; }
+        private IScriptManager ScriptManager { set; get; }
+        private IApi Api { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="scriptManager"></param>
         /// <param name="itemRepo"></param>
+        /// <param name="api"></param>
         public ItemManager(
             IScriptManager scriptManager,
-            IItemRepo<Item> itemRepo)
+            IItemRepo<Item> itemRepo,
+            IApi api)
         {
             ScriptManager = scriptManager;
             ItemRepo = itemRepo;
+            Api = api;
         }
         /// <summary>
         /// Create a new item
@@ -115,6 +120,48 @@ namespace BeforeOurTime.Business.Apis.Items
                 });
             });
            return callbackLinks;
+        }
+        /// <summary>
+        /// Relocate an item
+        /// </summary>
+        /// <param name="item">Item to move</param>
+        /// <param name="newParent">Item which will become the parent</param>
+        /// <param name="source">Item responsible for doing the moving</param>
+        public Item Move(Item item, Item newParent, Item source = null)
+        {
+            // Construct the message
+            var message = new Message()
+            {
+                Sender = source,
+                Callback = ScriptManager.GetCallbackDefinition("onItemMove"),
+                Package = "",
+                //JsonConvert.SerializeObject(new OnItemMove()
+                //{
+                //    Type = MessageType.EventItemMove,
+                //    From = child.Parent,
+                //    To = newParent,
+                //    Item = child
+                //})
+            };
+            // Move the item
+            var oldParent = item.Parent;
+            oldParent?.Children.Remove(item);
+            newParent.Children.Add(item);
+            item.Parent = newParent;
+            var updateItems = new List<Item>() { newParent, item };
+            if (oldParent != null)
+            {
+                updateItems.Add(oldParent);
+            }
+            ItemRepo.Update(updateItems);
+            // Distribute message
+            var recipients = new List<Item>() { item, newParent };
+            if (oldParent != null)
+            {
+                recipients.Add(oldParent);
+            }
+            Api.SendMessage(message, recipients);
+            return item;
         }
     }
 }

@@ -49,5 +49,12 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="item">Item to be updated</param>
         /// <returns></returns>
         Item Update<T>(T item) where T : Item;
+        /// <summary>
+        /// Relocate an item
+        /// </summary>
+        /// <param name="item">Item to move</param>
+        /// <param name="newParent">Item which will become the parent</param>
+        /// <param name="source">Item responsible for doing the moving</param>
+        Item Move(Item item, Item newParent, Item source = null);
     }
 }

@@ -22,13 +22,6 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="recipients"></param>
         void SendMessage(Message message, List<Item> recipients);
         /// <summary>
-        /// Relocate an item
-        /// </summary>
-        /// <param name="Source"></param>
-        /// <param name="newParent"></param>
-        /// <param name="child"></param>
-        void ItemMove(Item Source, Item newParent, Item child);
-        /// <summary>
         /// Truncate all tables in database
         /// </summary>
         IApi DataReset();

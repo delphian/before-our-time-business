@@ -25,7 +25,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
             {
                 var item = itemRepo.Read(new List<Guid>() { new Guid(uuid) }).FirstOrDefault();
                 var toItem = itemRepo.Read(new List<Guid>() { new Guid(toUuid) }).FirstOrDefault();
-                Api.ItemMove(null, toItem, item);
+                Api.GetItemManager().Move(item, toItem, null);
                 return true;
             };
             Engine
