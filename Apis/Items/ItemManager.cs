@@ -16,6 +16,7 @@ namespace BeforeOurTime.Business.Apis.Items
     public class ItemManager : IItemManager
     {
         private IItemRepo<Item> ItemRepo { set; get; }
+        private IItemLocationRepo ItemLocationRepo { set; get; }
         private IMessageManager MessageManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
         /// <summary>
