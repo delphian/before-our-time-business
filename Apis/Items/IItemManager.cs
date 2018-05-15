@@ -15,7 +15,7 @@ namespace BeforeOurTime.Business.Apis.Items
         /// </remarks>
         /// <param name="source">Item responsible for doing the creating</param>
         /// <param name="item">Item which is new and being created</param>
-        bool Create<T>(Item source, T item) where T : Item;
+        T Create<T>(Item source, T item) where T : Item;
         /// <summary>
         /// Create a new character
         /// </summary>

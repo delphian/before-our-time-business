@@ -41,11 +41,11 @@ namespace BeforeOurTime.Business.Apis.Items
         /// </remarks>
         /// <param name="source">Item responsible for doing the creating</param>
         /// <param name="item">Item which is new and being created</param>
-        public bool Create<T>(Item source, T item) where T : Item
+        public T Create<T>(Item source, T item) where T : Item
         {
             item.FunctionLinks = UpdateScriptCallbackLinks(item);
             ItemRepo.Create<T>(new List<T>() { item });
-            return true;
+            return item;
         }
         /// <summary>
         /// Create a new character
