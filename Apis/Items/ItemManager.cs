@@ -65,7 +65,6 @@ namespace BeforeOurTime.Business.Apis.Items
                 Name = name,
                 AccountId = accountId,
                 Type = ItemType.Character,
-                Version = ItemVersion.Alpha,
                 UuidType = Guid.NewGuid(),
                 ParentId = parentId,
                 Data = "{}",
