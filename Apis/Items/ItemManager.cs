@@ -114,7 +114,7 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <typeparam name="TDerived">Type derived from item</typeparam>
         /// <param name="item">Item to be updated</param>
         /// <returns></returns>
-        public Item Update<T>(T item) where T : Item
+        public T Update<T>(T item) where T : Item
         {
             item.FunctionLinks = UpdateScriptCallbackLinks(item);
             return ItemRepo.Update<T>(new List<T>() { item }).FirstOrDefault();

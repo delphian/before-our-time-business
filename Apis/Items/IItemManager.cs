@@ -55,7 +55,7 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <typeparam name="T">Type derived from item</typeparam>
         /// <param name="item">Item to be updated</param>
         /// <returns></returns>
-        Item Update<T>(T item) where T : Item;
+        T Update<T>(T item) where T : Item;
         /// <summary>
         /// Permenantly delete an item and remove from data store
         /// </summary>
