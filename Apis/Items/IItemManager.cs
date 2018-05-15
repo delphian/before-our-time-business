@@ -17,6 +17,13 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="item">Item which is new and being created</param>
         bool Create<T>(Item source, T item) where T : Item;
         /// <summary>
+        /// Create a new character
+        /// </summary>
+        /// <param name="name">Public name of the character</param>
+        /// <param name="accountId">Account to which this character belongs</param>
+        /// <param name="parentId">Location of new item</param>
+        Character CreateCharacter(string name, Guid accountId, Guid parentId);
+        /// <summary>
         /// Read single model of a type derived from Item
         /// </summary>
         /// <typeparam name="T">Subtype of item</typeparam>
@@ -49,6 +56,15 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="item">Item to be updated</param>
         /// <returns></returns>
         Item Update<T>(T item) where T : Item;
+        /// <summary>
+        /// Permenantly delete an item and remove from data store
+        /// </summary>
+        /// <remarks>
+        /// All children will be re-homed to the item parent unless otherwise specified
+        /// </remarks>
+        /// <param name="item">Item to delete</param>
+        /// <param name="deleteChildren">Also delete all children</param>
+        void ItemDelete(Item item, bool? deleteChildren = false);
         /// <summary>
         /// Relocate an item
         /// </summary>

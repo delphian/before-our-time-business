@@ -188,7 +188,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public Character CreateCharacter(Terminal terminal, string name)
         {
-            Character character = Api.ItemCreateCharacter(
+            Character character = Api.GetItemManager().CreateCharacter(
                 name, 
                 terminal.AccountId, 
                 new Guid("e74713f3-9ea8-45e5-9715-3b019222af90"));

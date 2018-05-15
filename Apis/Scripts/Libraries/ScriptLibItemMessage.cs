@@ -37,7 +37,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
                     Callback = callback,
                     Package = JsonConvert.SerializeObject(msgBody)
                 };
-                Api.SendMessage(message, new List<Item>() { itemTo });
+                Api.GetMessageManager().SendMessage(message, new List<Item>() { itemTo });
                 return true;
             };
             Engine

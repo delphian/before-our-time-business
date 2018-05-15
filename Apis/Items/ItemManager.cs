@@ -9,14 +9,15 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Repository.Models.Scripts.Callbacks;
 using System.Linq;
 using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Business.Apis.Messages;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
     public class ItemManager : IItemManager
     {
         private IItemRepo<Item> ItemRepo { set; get; }
+        private IMessageManager MessageManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
-        private IApi Api { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -24,13 +25,13 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="itemRepo"></param>
         /// <param name="api"></param>
         public ItemManager(
-            IScriptManager scriptManager,
             IItemRepo<Item> itemRepo,
-            IApi api)
+            IMessageManager messageManager,
+            IScriptManager scriptManager)
         {
-            ScriptManager = scriptManager;
             ItemRepo = itemRepo;
-            Api = api;
+            MessageManager = messageManager;
+            ScriptManager = scriptManager;
         }
         /// <summary>
         /// Create a new item
@@ -45,6 +46,33 @@ namespace BeforeOurTime.Business.Apis.Items
             item.FunctionLinks = UpdateScriptCallbackLinks(item);
             ItemRepo.Create<T>(new List<T>() { item });
             return true;
+        }
+        /// <summary>
+        /// Create a new character
+        /// </summary>
+        /// <param name="name">Public name of the character</param>
+        /// <param name="accountId">Account to which this character belongs</param>
+        /// <param name="parentId">Location of new item</param>
+        public Character CreateCharacter(
+            string name,
+            Guid accountId,
+            Guid parentId)
+        {
+            var parent = Read<Item>(parentId);
+            var game = Read<Item>(new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
+            var character = new Character()
+            {
+                Name = name,
+                AccountId = accountId,
+                Type = ItemType.Character,
+                Version = ItemVersion.Alpha,
+                UuidType = Guid.NewGuid(),
+                ParentId = parentId,
+                Data = "{}",
+                Script = "{ function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { }; }"
+            };
+            Create<Character>(game, character);
+            return character;
         }
         /// <summary>
         /// Read single model of a type derived from Item
@@ -91,6 +119,24 @@ namespace BeforeOurTime.Business.Apis.Items
         {
             item.FunctionLinks = UpdateScriptCallbackLinks(item);
             return ItemRepo.Update<T>(new List<T>() { item }).FirstOrDefault();
+        }
+        /// <summary>
+        /// Permenantly delete an item and remove from data store
+        /// </summary>
+        /// <remarks>
+        /// All children will be re-homed to the item parent unless otherwise specified
+        /// </remarks>
+        /// <param name="item">Item to delete</param>
+        /// <param name="deleteChildren">Also delete all children</param>
+        public void ItemDelete(Item item, bool? deleteChildren = false)
+        {
+            // Move the item
+            var oldParent = item.Parent;
+            item.Children.ForEach(delegate (Item child)
+            {
+                Move(child, oldParent, item);
+            });
+            ItemRepo.Delete(new List<Item>() { item });
         }
         /// <summary>
         /// Generate callback links by parsing an item's script callback function definitions
@@ -160,7 +206,7 @@ namespace BeforeOurTime.Business.Apis.Items
             {
                 recipients.Add(oldParent);
             }
-            Api.SendMessage(message, recipients);
+            MessageManager.SendMessage(message, recipients);
             return item;
         }
     }

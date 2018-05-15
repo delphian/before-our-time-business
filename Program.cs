@@ -3,6 +3,7 @@
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Items;
+using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
@@ -52,8 +53,6 @@ namespace BeforeOurTime.Business
             IServiceCollection services = new ServiceCollection();
             ConfigureServices(Configuration, services);
             ServiceProvider = services.BuildServiceProvider();
-            ServiceProvider.CreateScope().ServiceProvider.GetService<IApi>().DataReset().DataInstall(
-                Configuration["Setup"]);
             // Setup automatic message deliver and Tick counter for items
             var tickTimer = new System.Threading.Timer(Tick, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Tick"]));
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Delivery"]));
@@ -89,10 +88,11 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
                 .AddScoped<IScriptCallbackRepo, ScriptCallbackRepo>()
                 .AddScoped<IScriptInterfaceRepo, ScriptInterfaceRepo>()
-                // Main environment interface api
-                .AddScoped<IAccountManager, AccountManager>()
+                // Main environment interface API
                 .AddScoped<IScriptEngine, JsScriptEngine>()
+                .AddScoped<IAccountManager, AccountManager>()
                 .AddScoped<IScriptManager, ScriptManager>()
+                .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
@@ -124,7 +124,7 @@ namespace BeforeOurTime.Business
                                 Raw = message
                             })
                         };
-                        api.SendMessage(clientMessage, itemRepo.Read());
+                        api.GetMessageManager().SendMessage(clientMessage, itemRepo.Read());
                     }
                 };
             };
