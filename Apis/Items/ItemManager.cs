@@ -23,14 +23,17 @@ namespace BeforeOurTime.Business.Apis.Items
         /// Constructor
         /// </summary>
         /// <param name="scriptManager"></param>
+        /// <param name="itemLocationRepo"></param>
         /// <param name="itemRepo"></param>
         /// <param name="api"></param>
         public ItemManager(
             IItemRepo<Item> itemRepo,
+            IItemLocationRepo itemLocationRepo,
             IMessageManager messageManager,
             IScriptManager scriptManager)
         {
             ItemRepo = itemRepo;
+            ItemLocationRepo = itemLocationRepo;
             MessageManager = messageManager;
             ScriptManager = scriptManager;
         }
