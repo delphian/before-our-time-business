@@ -49,32 +49,6 @@ namespace BeforeOurTime.Business.Apis.Items
             return item;
         }
         /// <summary>
-        /// Create a new character
-        /// </summary>
-        /// <param name="name">Public name of the character</param>
-        /// <param name="accountId">Account to which this character belongs</param>
-        /// <param name="parentId">Location of new item</param>
-        public ItemCharacter CreateCharacter(
-            string name,
-            Guid accountId,
-            Guid parentId)
-        {
-            var parent = Read<Item>(parentId);
-            var game = Read<Item>(new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
-            var character = new ItemCharacter()
-            {
-                Name = name,
-                AccountId = accountId,
-                Type = ItemType.Character,
-                UuidType = Guid.NewGuid(),
-                ParentId = parentId,
-                Data = "{}",
-                Script = "{ function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { }; }"
-            };
-            Create<ItemCharacter>(game, character);
-            return character;
-        }
-        /// <summary>
         /// Read single model of a type derived from Item
         /// </summary>
         /// <typeparam name="T">Subtype of item</typeparam>

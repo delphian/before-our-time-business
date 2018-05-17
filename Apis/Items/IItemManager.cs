@@ -17,13 +17,6 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="item">Item which is new and being created</param>
         T Create<T>(Item source, T item) where T : Item;
         /// <summary>
-        /// Create a new character
-        /// </summary>
-        /// <param name="name">Public name of the character</param>
-        /// <param name="accountId">Account to which this character belongs</param>
-        /// <param name="parentId">Location of new item</param>
-        ItemCharacter CreateCharacter(string name, Guid accountId, Guid parentId);
-        /// <summary>
         /// Read single model of a type derived from Item
         /// </summary>
         /// <typeparam name="T">Subtype of item</typeparam>

@@ -22,6 +22,7 @@ namespace BeforeOurTime.Business.Apis
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         private IItemGameManager ItemGameManager { set; get; }
+        private IItemCharacterManager ItemCharacterManager { set; get; }
         private Dictionary<Type, IItemManager> ItemManagerList { set; get; }
         /// <summary>
         /// Constructor
@@ -33,13 +34,15 @@ namespace BeforeOurTime.Business.Apis
             IAccountManager accountManager,
             IScriptManager scriptManager,
             IItemManager itemManager,
-            IItemGameManager itemGameManager)
+            IItemGameManager itemGameManager,
+            IItemCharacterManager itemCharacterManager)
         {
             MessageManager = messageManager;
             AccountManager = accountManager;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
             ItemManagerList.Add(typeof(IItemGameManager), itemGameManager);
+            ItemManagerList.Add(typeof(IItemCharacterManager), itemCharacterManager);
         }
         public IMessageManager GetMessageManager()
         {

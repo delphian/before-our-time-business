@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using BeforeOurTime.Business.Terminals.Middleware;
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Business.Apis.Items.Games;
 
 namespace BeforeOurTime.Business.Terminals
 {
@@ -188,7 +189,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public ItemCharacter CreateCharacter(Terminal terminal, string name)
         {
-            ItemCharacter character = Api.GetItemManager().CreateCharacter(
+            ItemCharacter character = Api.GetItemManager<IItemCharacterManager>().Create(
                 name, 
                 terminal.AccountId, 
                 new Guid("e74713f3-9ea8-45e5-9715-3b019222af90"));
