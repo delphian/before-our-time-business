@@ -22,18 +22,15 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="scriptManager"></param>
-        /// <param name="itemLocationRepo"></param>
         /// <param name="itemRepo"></param>
-        /// <param name="api"></param>
+        /// <param name="scriptManager"></param>
+        /// <param name="messageManager"></param>
         public ItemManager(
             IItemRepo<Item> itemRepo,
-            IItemLocationRepo itemLocationRepo,
             IMessageManager messageManager,
             IScriptManager scriptManager)
         {
             ItemRepo = itemRepo;
-            ItemLocationRepo = itemLocationRepo;
             MessageManager = messageManager;
             ScriptManager = scriptManager;
         }
@@ -57,14 +54,14 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="name">Public name of the character</param>
         /// <param name="accountId">Account to which this character belongs</param>
         /// <param name="parentId">Location of new item</param>
-        public Character CreateCharacter(
+        public ItemCharacter CreateCharacter(
             string name,
             Guid accountId,
             Guid parentId)
         {
             var parent = Read<Item>(parentId);
             var game = Read<Item>(new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
-            var character = new Character()
+            var character = new ItemCharacter()
             {
                 Name = name,
                 AccountId = accountId,
@@ -74,7 +71,7 @@ namespace BeforeOurTime.Business.Apis.Items
                 Data = "{}",
                 Script = "{ function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { }; }"
             };
-            Create<Character>(game, character);
+            Create<ItemCharacter>(game, character);
             return character;
         }
         /// <summary>

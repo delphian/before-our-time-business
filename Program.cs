@@ -3,6 +3,7 @@
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Items;
+using BeforeOurTime.Business.Apis.Items.Games;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
@@ -79,7 +80,7 @@ namespace BeforeOurTime.Business
                 .AddLogging()
                 .AddScoped<IAccountRepo, AccountRepo>()
                 .AddScoped<IItemRepo<Item>, ItemRepo<Item>>()
-                .AddScoped<ICharacterRepo, CharacterRepo>()
+                .AddScoped<IItemCharacterRepo, CharacterRepo>()
                 .AddScoped<IMessageRepo, MessageRepo>()
                 .AddScoped<IRepository<AuthorizationRole>, Repository<AuthorizationRole>>()
                 .AddScoped<IAuthorGroupRepo, AuthorGroupRepo>()
@@ -94,6 +95,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IScriptManager, ScriptManager>()
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<IItemManager, ItemManager>()
+                .AddScoped<IItemGameManager, ItemGameManager>()
                 .AddScoped<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }

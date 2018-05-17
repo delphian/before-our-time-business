@@ -27,7 +27,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        Character AttachTerminal(Terminal terminal, Guid itemId);
+        ItemCharacter AttachTerminal(Terminal terminal, Guid itemId);
         /// <summary>
         /// Send a message to a specific terminal
         /// </summary>
@@ -49,7 +49,7 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <returns></returns>
-        List<Character> GetAttachableAvatars(Terminal terminal);
+        List<ItemCharacter> GetAttachableAvatars(Terminal terminal);
         /// <summary>
         /// Create a new account and local authentication credentials
         /// </summary>
@@ -65,6 +65,6 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="name">Friendly name of character</param>
         /// <returns></returns>
-        Character CreateCharacter(Terminal terminal, string name);
+        ItemCharacter CreateCharacter(Terminal terminal, string name);
     }
 }

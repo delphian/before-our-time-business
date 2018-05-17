@@ -106,7 +106,7 @@ namespace BeforeOurTime.Business.Terminals
         /// Get available characters for terminal attachment
         /// </summary>
         /// <returns></returns>
-        public List<Character> GetAttachable()
+        public List<ItemCharacter> GetAttachable()
         {
             return TerminalManager.GetAttachableAvatars(this);
         }

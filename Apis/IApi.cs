@@ -20,5 +20,6 @@ namespace BeforeOurTime.Business.Apis
         IAccountManager GetAccountManager();
         IScriptManager GetScriptManager();
         IItemManager GetItemManager();
+        T GetItemManager<T>() where T : IItemManager;
     }
 }

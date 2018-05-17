@@ -8,6 +8,7 @@ using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
+using BeforeOurTime.Business.Apis.Items.Games;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -20,6 +21,8 @@ namespace BeforeOurTime.Business.Apis
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
+        private IItemGameManager ItemGameManager { set; get; }
+        private Dictionary<Type, IItemManager> ItemManagerList { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -29,12 +32,14 @@ namespace BeforeOurTime.Business.Apis
             IMessageManager messageManager,
             IAccountManager accountManager,
             IScriptManager scriptManager,
-            IItemManager itemManager)
+            IItemManager itemManager,
+            IItemGameManager itemGameManager)
         {
             MessageManager = messageManager;
             AccountManager = accountManager;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
+            ItemManagerList.Add(typeof(IItemGameManager), itemGameManager);
         }
         public IMessageManager GetMessageManager()
         {
@@ -51,6 +56,10 @@ namespace BeforeOurTime.Business.Apis
         public IItemManager GetItemManager()
         {
             return ItemManager;
+        }
+        public T GetItemManager<T>() where T : IItemManager
+        {
+            return (T)ItemManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
         }
     }
 }

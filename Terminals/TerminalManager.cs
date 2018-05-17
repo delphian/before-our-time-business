@@ -27,7 +27,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Central data repository for all character items
         /// </summary>
-        protected ICharacterRepo CharacterRepo { set; get; }
+        protected IItemCharacterRepo CharacterRepo { set; get; }
         /// <summary>
         /// Interface to the core environment
         /// </summary>
@@ -66,7 +66,7 @@ namespace BeforeOurTime.Business.Terminals
             var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
             AccountRepo = scopedProvider.GetService<IAccountRepo>();
             ItemRepo = scopedProvider.GetService<IItemRepo<Item>>();
-            CharacterRepo = scopedProvider.GetService<ICharacterRepo>();
+            CharacterRepo = scopedProvider.GetService<IItemCharacterRepo>();
             Api = serviceProvider.GetService<IApi>();
             // Register terminal middleware
             var interfaceType = typeof(ITerminalMiddleware);
@@ -108,9 +108,9 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        public Character AttachTerminal(Terminal terminal, Guid itemId)
+        public ItemCharacter AttachTerminal(Terminal terminal, Guid itemId)
         {
-            Character avatar = null;
+            ItemCharacter avatar = null;
             var character = CharacterRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
             if (character != null && terminal.AccountId == character.AccountId)
             {
@@ -159,9 +159,9 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <returns></returns>
-        public List<Character> GetAttachableAvatars(Terminal terminal)
+        public List<ItemCharacter> GetAttachableAvatars(Terminal terminal)
         {
-            var avatars = new List<Character>();
+            var avatars = new List<ItemCharacter>();
             if (terminal.AccountId != null)
             {
                 avatars = CharacterRepo.ReadAvatars(terminal.AccountId);
@@ -186,9 +186,9 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="name">Friendly name of character</param>
         /// <returns></returns>
-        public Character CreateCharacter(Terminal terminal, string name)
+        public ItemCharacter CreateCharacter(Terminal terminal, string name)
         {
-            Character character = Api.GetItemManager().CreateCharacter(
+            ItemCharacter character = Api.GetItemManager().CreateCharacter(
                 name, 
                 terminal.AccountId, 
                 new Guid("e74713f3-9ea8-45e5-9715-3b019222af90"));
