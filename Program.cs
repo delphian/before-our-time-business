@@ -3,7 +3,9 @@
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Items;
+using BeforeOurTime.Business.Apis.Items.Characters;
 using BeforeOurTime.Business.Apis.Items.Games;
+using BeforeOurTime.Business.Apis.Items.Locations;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;

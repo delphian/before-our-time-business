@@ -9,6 +9,7 @@ using BeforeOurTime.Business.Terminals.Middleware;
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Business.Apis.Items.Games;
+using BeforeOurTime.Business.Apis.Items.Characters;
 
 namespace BeforeOurTime.Business.Terminals
 {
