@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Games
+namespace BeforeOurTime.Business.Apis.Items.Characters
 {
     public interface IItemCharacterManager : IItemManager
     {

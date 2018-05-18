@@ -96,6 +96,8 @@ namespace BeforeOurTime.Business
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IItemGameManager, ItemGameManager>()
+                .AddScoped<IItemLocationManager, ItemLocationManager>()
+                .AddScoped<IItemCharacterManager, ItemCharacterManager>()
                 .AddScoped<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }

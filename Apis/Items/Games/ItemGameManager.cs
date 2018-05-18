@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Games
 {
-    class ItemGameManager : ItemManager, IItemGameManager
+    public class ItemGameManager : ItemManager, IItemGameManager
     {
         /// <summary>
         /// Constructor
