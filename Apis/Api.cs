@@ -19,6 +19,7 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
+        private Dictionary<Type, IItemManager> ItemManagerList = new Dictionary<Type, IItemManager>();
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
@@ -26,7 +27,6 @@ namespace BeforeOurTime.Business.Apis
         private IItemGameManager ItemGameManager { set; get; }
         private IItemCharacterManager ItemCharacterManager { set; get; }
         private IItemLocationManager ItemLocationManager { set; get; }
-        private Dictionary<Type, IItemManager> ItemManagerList { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
