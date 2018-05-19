@@ -1,5 +1,7 @@
-﻿using BeforeOurTime.Business.Apis.Messages;
+﻿using BeforeOurTime.Business.Apis.Items.Games;
+using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
+using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Items;
 using System;
 using System.Collections.Generic;
@@ -7,19 +9,23 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Characters
 {
-    public class ItemCharacterManager : ItemManager, IItemCharacterManager
+    public class ItemCharacterManager : IItemCharacterManager
     {
+        private IItemRepo<Item> ItemRepo { set; get; }
+        private IItemGameRepo ItemGameRepo { set; get; }
+//        private ItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="itemRepo"></param>
-        /// <param name="messageManager"></param>
-        /// <param name="scriptManager"></param>
         public ItemCharacterManager(
             IItemRepo<Item> itemRepo,
-            IMessageManager messageManager,
-            IScriptManager scriptManager) : base(itemRepo, messageManager, scriptManager)
+            IItemGameRepo itemGameRepo
+//            ItemManager itemManager
+            )
         {
+            ItemRepo = itemRepo;
+            ItemGameRepo = itemGameRepo;
+//            ItemManager = itemManager;
         }
         /// <summary>
         /// Create a new character
@@ -32,8 +38,8 @@ namespace BeforeOurTime.Business.Apis.Items.Characters
             Guid accountId,
             Guid parentId)
         {
-            var parent = Read<Item>(parentId);
-            var game = Read<Item>(new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
+            var parent = ItemRepo.Read(parentId);
+            var game = ItemGameRepo.Read(new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
             var character = new ItemCharacter()
             {
                 Name = name,
@@ -44,7 +50,7 @@ namespace BeforeOurTime.Business.Apis.Items.Characters
                 Data = "{}",
                 Script = "{ function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { }; }"
             };
-            Create<ItemCharacter>(game, character);
+//            ItemManager.Create(game, character);
             return character;
         }
     }

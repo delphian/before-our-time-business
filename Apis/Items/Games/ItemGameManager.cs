@@ -7,19 +7,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Games
 {
-    public class ItemGameManager : ItemManager, IItemGameManager
+    public class ItemGameManager : IItemGameManager
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="itemRepo"></param>
-        /// <param name="messageManager"></param>
-        /// <param name="scriptManager"></param>
-        public ItemGameManager(
-            IItemRepo<Item> itemRepo,
-            IMessageManager messageManager,
-            IScriptManager scriptManager) : base(itemRepo, messageManager, scriptManager)
-        {
-        }
     }
 }

@@ -14,6 +14,7 @@ using BeforeOurTime.Business.Logs;
 using BeforeOurTime.Business.Models.ScriptCallbacks.Arguments;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Dbs.EF;
+using BeforeOurTime.Repository.Dbs.EF.Items;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
@@ -82,7 +83,9 @@ namespace BeforeOurTime.Business
                 .AddLogging()
                 .AddScoped<IAccountRepo, AccountRepo>()
                 .AddScoped<IItemRepo<Item>, ItemRepo<Item>>()
-                .AddScoped<IItemCharacterRepo, CharacterRepo>()
+                .AddScoped<IItemCharacterRepo, ItemCharacterRepo>()
+                .AddScoped<IItemGameRepo, ItemGameRepo>()
+                .AddScoped<IItemLocationRepo, ItemLocationRepo>()
                 .AddScoped<IMessageRepo, MessageRepo>()
                 .AddScoped<IRepository<AuthorizationRole>, Repository<AuthorizationRole>>()
                 .AddScoped<IAuthorGroupRepo, AuthorGroupRepo>()

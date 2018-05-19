@@ -7,19 +7,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Locations
 {
-    public class ItemLocationManager : ItemManager, IItemLocationManager
+    public class ItemLocationManager : IItemLocationManager
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="itemRepo"></param>
-        /// <param name="messageManager"></param>
-        /// <param name="scriptManager"></param>
-        public ItemLocationManager(
-            IItemRepo<Item> itemRepo,
-            IMessageManager messageManager,
-            IScriptManager scriptManager) : base(itemRepo, messageManager, scriptManager)
-        {
-        }
     }
 }

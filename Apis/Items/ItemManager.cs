@@ -16,7 +16,6 @@ namespace BeforeOurTime.Business.Apis.Items
     public class ItemManager : IItemManager
     {
         private IItemRepo<Item> ItemRepo { set; get; }
-        private IItemLocationRepo ItemLocationRepo { set; get; }
         private IMessageManager MessageManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
         /// <summary>
@@ -42,57 +41,49 @@ namespace BeforeOurTime.Business.Apis.Items
         /// </remarks>
         /// <param name="source">Item responsible for doing the creating</param>
         /// <param name="item">Item which is new and being created</param>
-        public T Create<T>(Item source, T item) where T : Item
+        public Item Create(Item source, Item item)
         {
             item.FunctionLinks = UpdateScriptCallbackLinks(item);
-            ItemRepo.Create<T>(new List<T>() { item });
+            ItemRepo.Create(new List<Item>() { item });
             return item;
         }
         /// <summary>
         /// Read single model of a type derived from Item
         /// </summary>
-        /// <typeparam name="T">Subtype of item</typeparam>
         /// <param name="itemIds">Unique item identifier</param>
         /// <returns></returns>
-        public T Read<T>(Guid itemId) where T : Item
+        public Item Read(Guid itemId)
         {
-            return Read<T>(new List<Guid>() { itemId }).FirstOrDefault();
+            return Read(new List<Guid>() { itemId }).FirstOrDefault();
         }
         /// <summary>
-        /// Read multiple items
+        /// Read multiple models derived from Item
         /// </summary>
-        /// <typeparam name="T">Subtype of item</typeparam>
         /// <param name="itemIds">List of unique item identifiers</param>
         /// <returns></returns>
-        public List<T> Read<T>(List <Guid> itemIds) where T : Item
+        public List<Item> Read(List <Guid> itemIds)
         {
-            return ItemRepo.Read<T>(itemIds);
+            return ItemRepo.Read(itemIds);
         }
         /// <summary>
-        /// Read all models of a type derived from Item, or specify an offset and limit
+        /// Read all models derived from Item, or specify an offset and limit
         /// </summary>
-        /// <remarks>
-        /// If repository was instanted with type Item (T) then this method may be used to 
-        /// read any model (TDerived) that is derived from type T (Item)
-        /// </remarks>
-        /// <typeparam name="T">Subtype of item</typeparam>
         /// <param name="offset">Number of model records to skip</param>
         /// <param name="limit">Maximum number of model records to return</param>
         /// <returns></returns>
-        public List<T> Read<T>(int? offset = null, int? limit = null) where T : Item
+        public List<Item> Read(int? offset = null, int? limit = null)
         {
-            return ItemRepo.Read<T>(offset, limit);
+            return ItemRepo.Read(offset, limit);
         }
         /// <summary>
-        /// Update any model that is derived from type Item
+        /// Update any model that is derived from Item
         /// </summary>
-        /// <typeparam name="TDerived">Type derived from item</typeparam>
         /// <param name="item">Item to be updated</param>
         /// <returns></returns>
-        public T Update<T>(T item) where T : Item
+        public Item Update(Item item)
         {
             item.FunctionLinks = UpdateScriptCallbackLinks(item);
-            return ItemRepo.Update<T>(new List<T>() { item }).FirstOrDefault();
+            return ItemRepo.Update(new List<Item>() { item }).FirstOrDefault();
         }
         /// <summary>
         /// Permenantly delete an item and remove from data store
@@ -102,7 +93,7 @@ namespace BeforeOurTime.Business.Apis.Items
         /// </remarks>
         /// <param name="item">Item to delete</param>
         /// <param name="deleteChildren">Also delete all children</param>
-        public void ItemDelete(Item item, bool? deleteChildren = false)
+        public void Delete(Item item, bool? deleteChildren = false)
         {
             // Move the item
             var oldParent = item.Parent;

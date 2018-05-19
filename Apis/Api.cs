@@ -11,6 +11,7 @@ using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Items.Games;
 using BeforeOurTime.Business.Apis.Items.Characters;
 using BeforeOurTime.Business.Apis.Items.Locations;
+using BeforeOurTime.Repository.Models.Items;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -19,7 +20,7 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
-        private Dictionary<Type, IItemManager> ItemManagerList = new Dictionary<Type, IItemManager>();
+        private Dictionary<Type, IItemSubManager> ItemManagerList = new Dictionary<Type, IItemSubManager>();
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
@@ -65,7 +66,7 @@ namespace BeforeOurTime.Business.Apis
         {
             return ItemManager;
         }
-        public T GetItemManager<T>() where T : IItemManager
+        public T GetItemManager<T>() where T : IItemSubManager
         {
             return (T)ItemManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
         }

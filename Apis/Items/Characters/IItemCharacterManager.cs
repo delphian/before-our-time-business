@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Characters
 {
-    public interface IItemCharacterManager : IItemManager
+    public interface IItemCharacterManager : IItemSubManager
     {
         /// <summary>
         /// Create a new character
