@@ -12,14 +12,14 @@ namespace BeforeOurTime.Business.Apis.Items.Details
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailCharacterRepo DetailCharacterRepo { set; get; }
-        private ItemManager ItemManager { set; get; }
+        private IItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         public DetailCharacterManager(
             IItemRepo itemRepo,
             IDetailCharacterRepo detailCharacterRepo,
-            ItemManager itemManager)
+            IItemManager itemManager)
         {
             ItemRepo = itemRepo;
             DetailCharacterRepo = detailCharacterRepo;
