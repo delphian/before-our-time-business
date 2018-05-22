@@ -13,6 +13,9 @@ using BeforeOurTime.Business.Apis.Messages;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
+    /// <summary>
+    /// Manages security, environment messages, CRUD, and run time considerations for items
+    /// </summary>
     public class ItemManager : IItemManager
     {
         private IItemRepo ItemRepo { set; get; }
@@ -36,12 +39,8 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <summary>
         /// Create a new item
         /// </summary>
-        /// <remarks>
-        /// Any item, or model derived from an item, may be created
-        /// </remarks>
-        /// <param name="source">Item responsible for doing the creating</param>
         /// <param name="item">Item which is new and being created</param>
-        public Item Create(Item source, Item item)
+        public Item Create(Item item)
         {
             item.FunctionLinks = UpdateScriptCallbackLinks(item);
             ItemRepo.Create(new List<Item>() { item });

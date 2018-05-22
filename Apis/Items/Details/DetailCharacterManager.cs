@@ -36,14 +36,14 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             Guid accountId,
             Guid parentId)
         {
-            var characterItem = ItemRepo.Create(new List<Item>() { new Item()
+            var characterItem = ItemManager.Create(new Item()
             {
                 Type = ItemType.Character,
                 UuidType = Guid.NewGuid(),
                 ParentId = parentId,
                 Data = "{}",
-                Script = "{ function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { }; }"
-            } }).FirstOrDefault();
+                Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
+            });
             var character = DetailCharacterRepo.Create(new List<DetailCharacter>() { new DetailCharacter()
             {
                 Item = characterItem,

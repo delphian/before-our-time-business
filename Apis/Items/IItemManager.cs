@@ -5,17 +5,16 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
+    /// <summary>
+    /// Manages security, environment messages, CRUD, and run time considerations for items
+    /// </summary>
     public interface IItemManager
     {
         /// <summary>
         /// Create a new item
         /// </summary>
-        /// <remarks>
-        /// Any item, or model derived from an item, may be created
-        /// </remarks>
-        /// <param name="source">Item responsible for doing the creating</param>
         /// <param name="item">Item which is new and being created</param>
-        Item Create(Item source, Item item);
+        Item Create(Item item);
         /// <summary>
         /// Read single model of a type derived from Item
         /// </summary>
