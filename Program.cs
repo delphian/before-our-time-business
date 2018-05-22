@@ -3,9 +3,7 @@
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Items;
-using BeforeOurTime.Business.Apis.Items.Characters;
-using BeforeOurTime.Business.Apis.Items.Games;
-using BeforeOurTime.Business.Apis.Items.Locations;
+using BeforeOurTime.Business.Apis.Items.Details;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
@@ -15,11 +13,13 @@ using BeforeOurTime.Business.Models.ScriptCallbacks.Arguments;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Dbs.EF.Items;
+using BeforeOurTime.Repository.Dbs.EF.Items.Details;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
 using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Details.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Scripts.Callbacks;
 using BeforeOurTime.Repository.Models.Scripts.Interfaces;
@@ -81,11 +81,8 @@ namespace BeforeOurTime.Business
                 .AddSingleton<ILogger>(new FileLogger())
                 .AddDbContext<BaseContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Scoped)
                 .AddLogging()
+                // Repositories
                 .AddScoped<IAccountRepo, AccountRepo>()
-                .AddScoped<IItemRepo<Item>, ItemRepo<Item>>()
-                .AddScoped<IItemCharacterRepo, ItemCharacterRepo>()
-                .AddScoped<IItemGameRepo, ItemGameRepo>()
-                .AddScoped<IItemLocationRepo, ItemLocationRepo>()
                 .AddScoped<IMessageRepo, MessageRepo>()
                 .AddScoped<IRepository<AuthorizationRole>, Repository<AuthorizationRole>>()
                 .AddScoped<IAuthorGroupRepo, AuthorGroupRepo>()
@@ -94,15 +91,20 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
                 .AddScoped<IScriptCallbackRepo, ScriptCallbackRepo>()
                 .AddScoped<IScriptInterfaceRepo, ScriptInterfaceRepo>()
+                // Repositories (Items)
+                .AddScoped<IItemRepo, ItemRepo>()
+                .AddScoped<IDetailCharacterRepo, DetailCharacterRepo>()
+                .AddScoped<IDetailGameRepo, DetailGameRepo>()
+                .AddScoped<IDetailLocationRepo, DetailLocationRepo>()
                 // Main environment interface API
                 .AddScoped<IScriptEngine, JsScriptEngine>()
                 .AddScoped<IAccountManager, AccountManager>()
                 .AddScoped<IScriptManager, ScriptManager>()
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<IItemManager, ItemManager>()
-                .AddScoped<IItemGameManager, ItemGameManager>()
-                .AddScoped<IItemLocationManager, ItemLocationManager>()
-                .AddScoped<IItemCharacterManager, ItemCharacterManager>()
+                .AddScoped<IDetailGameManager, DetailGameManager>()
+                .AddScoped<IDetailLocationManager, DetailLocationManager>()
+                .AddScoped<IDetailCharacterManager, DetailCharacterManager>()
                 .AddScoped<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }
@@ -120,7 +122,7 @@ namespace BeforeOurTime.Business
                 {
                     lock (thisLock)
                     {
-                        var itemRepo = serviceProvider.GetService<IItemRepo<Item>>();
+                        var itemRepo = serviceProvider.GetService<IItemRepo>();
                         var api = serviceProvider.GetService<IApi>();
                         var from = itemRepo.Read(new List<Guid>() { terminal.AvatarId }).First();
                         var callback = api.GetScriptManager().GetCallbackDefinition("onTerminalInput");
@@ -146,7 +148,7 @@ namespace BeforeOurTime.Business
         {
             lock(thisLock)
             {
-                var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
+                var itemRepo = ServiceProvider.GetService<IItemRepo>();
                 var api = ServiceProvider.GetService<IApi>();
                 var gameItem = itemRepo.Read(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
                 var tickMessage = new Message()
@@ -167,7 +169,7 @@ namespace BeforeOurTime.Business
             lock(thisLock)
             {
                 var logger = ServiceProvider.GetService<ILogger>();
-                var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
+                var itemRepo = ServiceProvider.GetService<IItemRepo>();
                 var messageRepo = ServiceProvider.GetService<IMessageRepo>();
                 var ScriptEngine = ServiceProvider.GetService<IScriptEngine>();
                 // Create script global functions

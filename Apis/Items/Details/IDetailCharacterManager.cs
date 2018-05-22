@@ -1,11 +1,12 @@
 ﻿using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Details;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Characters
+namespace BeforeOurTime.Business.Apis.Items.Details
 {
-    public interface IItemCharacterManager : IItemSubManager
+    public interface IDetailCharacterManager : IDetailManager
     {
         /// <summary>
         /// Create a new character
@@ -13,6 +14,6 @@ namespace BeforeOurTime.Business.Apis.Items.Characters
         /// <param name="name">Public name of the character</param>
         /// <param name="accountId">Account to which this character belongs</param>
         /// <param name="parentId">Location of new item</param>
-        ItemCharacter Create(string name, Guid accountId, Guid parentId);
+        DetailCharacter Create(string name, Guid accountId, Guid parentId);
     }
 }

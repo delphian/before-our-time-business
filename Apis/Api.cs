@@ -8,10 +8,7 @@ using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Items.Games;
-using BeforeOurTime.Business.Apis.Items.Characters;
-using BeforeOurTime.Business.Apis.Items.Locations;
-using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Business.Apis.Items.Details;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -20,14 +17,14 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
-        private Dictionary<Type, IItemSubManager> ItemManagerList = new Dictionary<Type, IItemSubManager>();
+        private Dictionary<Type, IDetailManager> DetailManagerList = new Dictionary<Type, IDetailManager>();
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
-        private IItemGameManager ItemGameManager { set; get; }
-        private IItemCharacterManager ItemCharacterManager { set; get; }
-        private IItemLocationManager ItemLocationManager { set; get; }
+        private IDetailGameManager DetailGameManager { set; get; }
+        private IDetailCharacterManager DetailCharacterManager { set; get; }
+        private IDetailLocationManager DetailLocationManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -38,17 +35,17 @@ namespace BeforeOurTime.Business.Apis
             IAccountManager accountManager,
             IScriptManager scriptManager,
             IItemManager itemManager,
-            IItemGameManager itemGameManager,
-            IItemCharacterManager itemCharacterManager,
-            IItemLocationManager itemLocationManager)
+            IDetailGameManager detailGameManager,
+            IDetailCharacterManager detailCharacterManager,
+            IDetailLocationManager detailLocationManager)
         {
             MessageManager = messageManager;
             AccountManager = accountManager;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
-            ItemManagerList.Add(typeof(IItemGameManager), itemGameManager);
-            ItemManagerList.Add(typeof(IItemCharacterManager), itemCharacterManager);
-            ItemManagerList.Add(typeof(IItemLocationManager), itemLocationManager);
+            DetailManagerList.Add(typeof(IDetailGameManager), detailGameManager);
+            DetailManagerList.Add(typeof(IDetailCharacterManager), detailCharacterManager);
+            DetailManagerList.Add(typeof(IDetailLocationManager), detailLocationManager);
         }
         public IMessageManager GetMessageManager()
         {
@@ -66,9 +63,9 @@ namespace BeforeOurTime.Business.Apis
         {
             return ItemManager;
         }
-        public T GetItemManager<T>() where T : IItemSubManager
+        public T GetDetailManager<T>() where T : IDetailManager
         {
-            return (T)ItemManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
+            return (T)DetailManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
         }
     }
 }

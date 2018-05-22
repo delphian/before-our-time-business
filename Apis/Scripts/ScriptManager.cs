@@ -12,7 +12,7 @@ namespace BeforeOurTime.Business.Apis.Scripts
     /// </summary>
     public class ScriptManager : IScriptManager
     {
-        protected IItemRepo<Item> ItemRepo { set; get; }
+        protected IItemRepo ItemRepo { set; get; }
         protected IScriptCallbackRepo ScriptCallbackRepo { set; get; }
         protected IScriptEngine ScriptEngine { set; get; }
         /// <summary>
@@ -20,7 +20,7 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// </summary>
         /// <param name="ItemRepo"></param>
         public ScriptManager(
-            IItemRepo<Item> itemRepo,
+            IItemRepo itemRepo,
             IScriptCallbackRepo scriptCallbackRepo,
             IScriptEngine scriptEngine)
         {

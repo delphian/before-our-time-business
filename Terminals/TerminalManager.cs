@@ -8,8 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using BeforeOurTime.Business.Terminals.Middleware;
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Business.Apis.Items.Games;
-using BeforeOurTime.Business.Apis.Items.Characters;
+using BeforeOurTime.Repository.Models.Items.Details;
+using BeforeOurTime.Business.Apis.Items.Details;
+using BeforeOurTime.Repository.Models.Items.Details.Repos;
 
 namespace BeforeOurTime.Business.Terminals
 {
@@ -25,11 +26,11 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Item repository
         /// </summary>
-        protected IItemRepo<Item> ItemRepo { set; get; }
+        protected IItemRepo ItemRepo { set; get; }
         /// <summary>
         /// Central data repository for all character items
         /// </summary>
-        protected IItemCharacterRepo CharacterRepo { set; get; }
+        protected IDetailCharacterRepo DetailCharacterRepo { set; get; }
         /// <summary>
         /// Interface to the core environment
         /// </summary>
@@ -67,8 +68,8 @@ namespace BeforeOurTime.Business.Terminals
         {
             var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
             AccountRepo = scopedProvider.GetService<IAccountRepo>();
-            ItemRepo = scopedProvider.GetService<IItemRepo<Item>>();
-            CharacterRepo = scopedProvider.GetService<IItemCharacterRepo>();
+            ItemRepo = scopedProvider.GetService<IItemRepo>();
+            DetailCharacterRepo = scopedProvider.GetService<IDetailCharacterRepo>();
             Api = serviceProvider.GetService<IApi>();
             // Register terminal middleware
             var interfaceType = typeof(ITerminalMiddleware);
@@ -110,10 +111,10 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        public ItemCharacter AttachTerminal(Terminal terminal, Guid itemId)
+        public DetailCharacter AttachTerminal(Terminal terminal, Guid itemId)
         {
-            ItemCharacter avatar = null;
-            var character = CharacterRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
+            DetailCharacter avatar = null;
+            var character = DetailCharacterRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
             if (character != null && terminal.AccountId == character.AccountId)
             {
                 avatar = character;
@@ -161,12 +162,12 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <returns></returns>
-        public List<ItemCharacter> GetAttachableAvatars(Terminal terminal)
+        public List<DetailCharacter> GetAttachableAvatars(Terminal terminal)
         {
-            var avatars = new List<ItemCharacter>();
+            var avatars = new List<DetailCharacter>();
             if (terminal.AccountId != null)
             {
-                avatars = CharacterRepo.ReadAvatars(terminal.AccountId);
+                avatars = DetailCharacterRepo.ReadCharacters(terminal.AccountId);
             }
             return avatars;
         }
@@ -188,9 +189,9 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="name">Friendly name of character</param>
         /// <returns></returns>
-        public ItemCharacter CreateCharacter(Terminal terminal, string name)
+        public DetailCharacter CreateCharacter(Terminal terminal, string name)
         {
-            ItemCharacter character = Api.GetItemManager<IItemCharacterManager>().Create(
+            DetailCharacter character = Api.GetDetailManager<IDetailCharacterManager>().Create(
                 name, 
                 terminal.AccountId, 
                 new Guid("e74713f3-9ea8-45e5-9715-3b019222af90"));

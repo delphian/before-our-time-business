@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Repository.Json;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Details;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -106,7 +107,7 @@ namespace BeforeOurTime.Business.Terminals
         /// Get available characters for terminal attachment
         /// </summary>
         /// <returns></returns>
-        public List<ItemCharacter> GetAttachable()
+        public List<DetailCharacter> GetAttachable()
         {
             return TerminalManager.GetAttachableAvatars(this);
         }

@@ -19,7 +19,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
         /// </summary>
         public void AddFunctions()
         {
-            var itemRepo = ServiceProvider.GetService<IItemRepo<Item>>();
+            var itemRepo = ServiceProvider.GetService<IItemRepo>();
             // Box some repository functionality into safe limited javascript functions
             Func<Item, string, string, bool> itemMove = delegate (Item me, string uuid, string toUuid)
             {

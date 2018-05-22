@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Details;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,7 +28,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        ItemCharacter AttachTerminal(Terminal terminal, Guid itemId);
+        DetailCharacter AttachTerminal(Terminal terminal, Guid itemId);
         /// <summary>
         /// Send a message to a specific terminal
         /// </summary>
@@ -49,7 +50,7 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <returns></returns>
-        List<ItemCharacter> GetAttachableAvatars(Terminal terminal);
+        List<DetailCharacter> GetAttachableAvatars(Terminal terminal);
         /// <summary>
         /// Create a new account and local authentication credentials
         /// </summary>
@@ -65,6 +66,6 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="name">Friendly name of character</param>
         /// <returns></returns>
-        ItemCharacter CreateCharacter(Terminal terminal, string name);
+        DetailCharacter CreateCharacter(Terminal terminal, string name);
     }
 }

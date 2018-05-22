@@ -15,7 +15,7 @@ namespace BeforeOurTime.Business.Apis.Items
 {
     public class ItemManager : IItemManager
     {
-        private IItemRepo<Item> ItemRepo { set; get; }
+        private IItemRepo ItemRepo { set; get; }
         private IMessageManager MessageManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
         /// <summary>
@@ -25,7 +25,7 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="scriptManager"></param>
         /// <param name="messageManager"></param>
         public ItemManager(
-            IItemRepo<Item> itemRepo,
+            IItemRepo itemRepo,
             IMessageManager messageManager,
             IScriptManager scriptManager)
         {

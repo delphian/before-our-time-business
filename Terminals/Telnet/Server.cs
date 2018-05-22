@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using BeforeOurTime.Repository.Models.Items;
 using System.Linq;
+using BeforeOurTime.Repository.Models.Items.Details;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -223,7 +224,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     case "list":
                         s.sendMessageToClient(c, "\r\n\r\n");
                         var characters = c.GetTerminal().GetAttachable();
-                        characters.ForEach(delegate (ItemCharacter character)
+                        characters.ForEach(delegate (DetailCharacter character)
                         {
                             s.sendMessageToClient(c, "  " + character.Name + " (" + character.Id + ")\r\n");
                         });
@@ -237,7 +238,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         break;
                     case "play":
                         var name = message.Split(' ').Last().ToLower();
-                        c.GetTerminal().GetAttachable().ForEach(delegate (ItemCharacter character)
+                        c.GetTerminal().GetAttachable().ForEach(delegate (DetailCharacter character)
                         {
                             if (character.Name.ToLower() == name)
                             {

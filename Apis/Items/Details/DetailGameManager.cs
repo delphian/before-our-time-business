@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Games
+namespace BeforeOurTime.Business.Apis.Items.Details
 {
-    public class ItemGameManager : IItemGameManager
+    public class DetailGameManager : IDetailGameManager
     {
     }
 }
