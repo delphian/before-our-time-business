@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+﻿using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Delegates.onRawText
     /// delegate. Generally the text is simply dumped to the client's
     /// default text output, or discarded entirely.
     /// </remarks>
-    public class OnRawTextArgument : ICallbackArgument
+    public class OnRawTextArgument : IDelegateArgument
     {
         [JsonProperty(PropertyName = "text", Order = 10)]
         public string Text { set; get; }

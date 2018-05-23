@@ -21,7 +21,7 @@ using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Details.Repos;
 using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using BeforeOurTime.Repository.Models.Scripts.Interfaces;
 using BeforeOutTime.Repository.Dbs.EF;
 using Jint;

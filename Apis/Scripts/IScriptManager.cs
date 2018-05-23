@@ -1,5 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.Scripts.Delegates;
-using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,24 +22,24 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// </summary>
         /// <param name="script">Script that provides custom properties and their management</param>
         /// <returns>List of valid delegate declarations</returns>
-        List<ICallback> GetScriptValidDelegates(string script);
+        List<IDelegate> GetScriptValidDelegates(string script);
         /// <summary>
         /// Get all delegates declared in script but improperly implemented
         /// </summary>
         /// <param name="script">Script that provides custom properties and their management</param>
         /// <returns>List of invalid delegate declarations, or empty list if script is valid</returns>
-        List<ICallback> GetScriptInvalidDelegates(string script);
+        List<IDelegate> GetScriptInvalidDelegates(string script);
         /// <summary>
         /// Get script delegate definition based on name
         /// </summary>
         /// <param name="name">Script delegate definition function name</param>
         /// <returns></returns>
-        ICallback GetDelegateDefinition(string name);
+        IDelegate GetDelegateDefinition(string name);
         /// <summary>
         /// Get script delegate definition based on unique identifier
         /// </summary>
         /// <param name="uuid">Script delegate definition unique identiifer</param>
         /// <returns></returns>
-        ICallback GetDelegateDefinition(Guid uuid);
+        IDelegate GetDelegateDefinition(Guid uuid);
     }
 }

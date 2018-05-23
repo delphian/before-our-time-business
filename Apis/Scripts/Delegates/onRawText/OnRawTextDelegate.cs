@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+﻿using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Delegates.onRawText
     /// <summary>
     /// Unformatted raw information provided in a string
     /// </summary>
-    public class OnRawTextDelegate : ICallback
+    public class OnRawTextDelegate : IDelegate
     {
         /// <summary>
         /// Constructor

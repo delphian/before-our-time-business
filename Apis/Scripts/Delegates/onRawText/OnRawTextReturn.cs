@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+﻿using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Delegates.onRawText
     /// <remarks>
     /// This object will be returned from the onRawText script delegate
     /// </remarks>
-    public class OnRawTextReturn : ICallbackReturn
+    public class OnRawTextReturn : IDelegateReturn
     {
     }
 }

@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+﻿using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Delegates.onTick
     /// <summary>
     /// Periodic poke from the server indicating passage of time
     /// </summary>
-    public class OnTickDelegate : ICallback
+    public class OnTickDelegate : IDelegate
     {
         /// <summary>
         /// Constructor

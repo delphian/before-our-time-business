@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Business.Apis.Scripts;
-using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System.Linq;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Business.Apis.Messages;
@@ -114,14 +114,14 @@ namespace BeforeOurTime.Business.Apis.Items
             if (invalidCallbacks.Count > 0)
             {
                 var callbackStrs = "";
-                invalidCallbacks.ForEach(delegate (ICallback invalidCallback)
+                invalidCallbacks.ForEach(delegate (IDelegate invalidCallback)
                 {
                     callbackStrs += (callbackStrs.Length == 0) ? invalidCallback.GetFunctionName() :
                                                                ", " + invalidCallback.GetFunctionName();
                 });
                 throw new Exception("Improperly declared script callback functions: " + callbackStrs);
             }
-            ScriptManager.GetScriptValidDelegates(item.Script).ForEach(delegate (ICallback callback)
+            ScriptManager.GetScriptValidDelegates(item.Script).ForEach(delegate (IDelegate callback)
             {
                 callbackLinks.Add(new ScriptCallbackItemLink()
                 {

@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+﻿using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Delegates.onTick
     /// <remarks>
     /// This object will be recieved as the argument to the onTick script delegate
     /// </remarks>
-    public class OnTickArgument : ICallbackArgument
+    public class OnTickArgument : IDelegateArgument
     {
     }
 }

@@ -5,7 +5,7 @@ using System.Reflection;
 using BeforeOurTime.Business.Apis.Scripts.Delegates;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Scripts.Callbacks;
+using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using Jint.Parser;
 
 namespace BeforeOurTime.Business.Apis.Scripts
@@ -19,7 +19,7 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// <summary>
         /// List of available delegate definitions a script may declare
         /// </summary>
-        private List<ICallback> DelegateDefinitions { set; get; }
+        private List<IDelegate> DelegateDefinitions { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -44,9 +44,9 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// </summary>
         /// <param name="script">Script that provides custom properties and their management</param>
         /// <returns>List of valid delegate declarations</returns>
-        public List<ICallback> GetScriptValidDelegates(string script)
+        public List<IDelegate> GetScriptValidDelegates(string script)
         {
-            var scriptValidDelegates = new List<ICallback>();
+            var scriptValidDelegates = new List<IDelegate>();
             var scriptFunctionDeclarations = GetScriptFunctionDeclarations(script);
             scriptFunctionDeclarations.ForEach(delegate (string functionName)
             {
@@ -62,9 +62,9 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// </summary>
         /// <param name="script">Script that provides custom properties and their management</param>
         /// <returns>List of invalid delegate declarations, or empty list if script is valid</returns>
-        public List<ICallback> GetScriptInvalidDelegates(string script)
+        public List<IDelegate> GetScriptInvalidDelegates(string script)
         {
-            var scriptInvalidDelegates = new List<ICallback>();
+            var scriptInvalidDelegates = new List<IDelegate>();
             return scriptInvalidDelegates;
         }
         /// <summary>
@@ -72,7 +72,7 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// </summary>
         /// <param name="name">Script delegate definition function name</param>
         /// <returns></returns>
-        public ICallback GetDelegateDefinition(string name)
+        public IDelegate GetDelegateDefinition(string name)
         {
             return DelegateDefinitions.Where(x => x.GetFunctionName() == name).FirstOrDefault();
         }
@@ -81,7 +81,7 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// </summary>
         /// <param name="uuid">Script delegate definition unique identiifer</param>
         /// <returns></returns>
-        public ICallback GetDelegateDefinition(Guid uuid)
+        public IDelegate GetDelegateDefinition(Guid uuid)
         {
             return DelegateDefinitions.Where(x => x.GetId() == uuid).FirstOrDefault();
         }
@@ -92,14 +92,14 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// Delegate definitions are created by classes that implement IScriptDelegate
         /// </remarks>
         /// <returns></returns>
-        private List<ICallback> BuildDelegateDefinitions()
+        private List<IDelegate> BuildDelegateDefinitions()
         {
-            var scriptDelegates = new List<ICallback>();
-            var interfaceType = typeof(ICallback);
+            var scriptDelegates = new List<IDelegate>();
+            var interfaceType = typeof(IDelegate);
             scriptDelegates = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (ICallback) Activator.CreateInstance(x))
+                .Select(x => (IDelegate) Activator.CreateInstance(x))
                 .ToList();
             return scriptDelegates;
         }
