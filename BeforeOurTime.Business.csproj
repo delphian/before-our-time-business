@@ -6,6 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\ScriptCallbacks\Returns\**" />
+    <Compile Remove="Models\Scripts\**" />
+    <EmbeddedResource Remove="Models\ScriptCallbacks\Returns\**" />
+    <EmbeddedResource Remove="Models\Scripts\**" />
+    <None Remove="Models\ScriptCallbacks\Returns\**" />
+    <None Remove="Models\Scripts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Setups\Game.json~RF1a07ab4a.TMP" />
   </ItemGroup>
 
@@ -49,11 +58,6 @@
 
   <ItemGroup>
     <PackageReference Update="Microsoft.NETCore.App" Version="2.0.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\ScriptCallbacks\Returns\" />
-    <Folder Include="Models\Scripts\" />
   </ItemGroup>
 
 </Project>

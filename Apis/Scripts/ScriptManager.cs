@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using BeforeOurTime.Business.Apis.Scripts.Callbacks;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Scripts.Callbacks;
@@ -13,27 +16,29 @@ namespace BeforeOurTime.Business.Apis.Scripts
     public class ScriptManager : IScriptManager
     {
         protected IItemRepo ItemRepo { set; get; }
-        protected IScriptCallbackRepo ScriptCallbackRepo { set; get; }
         protected IScriptEngine ScriptEngine { set; get; }
+        /// <summary>
+        /// List of definitions for all script callback functions
+        /// </summary>
+        private List<ICallback> CallbackDefinitions { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="ItemRepo"></param>
         public ScriptManager(
             IItemRepo itemRepo,
-            IScriptCallbackRepo scriptCallbackRepo,
             IScriptEngine scriptEngine)
         {
             ItemRepo = itemRepo;
-            ScriptCallbackRepo = scriptCallbackRepo;
             ScriptEngine = scriptEngine;
+            CallbackDefinitions = BuildCallbackDefinitions();
         }
         /// <summary>
         /// Get all callback function names declared by script
         /// </summary>
         /// <param name="script">Javascript that provides custom properties and their management</param>
         /// <returns></returns>
-        public List<string> GetCallbackDeclarations(string script)
+        public List<string> GetScriptCallbackDeclarations(string script)
         {
             return ScriptEngine.GetFunctionDeclarations(script.Trim());
         }
@@ -42,28 +47,27 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// </summary>
         /// <param name="script">Javascript that provides custom properties and their management</param>
         /// <returns>Javascript that provides custom properties and their management</returns>
-        public List<ScriptCallback> GetCallbacks(string script)
+        public List<ICallback> GetScriptCallbackDefinitions(string script)
         {
-            var scriptCallbacks = new List<ScriptCallback>();
-            var callbackNames = GetCallbackDeclarations(script);
-            callbackNames.ForEach(delegate (string callbackName)
+            var callbacks = new List<ICallback>();
+            var callbackDeclarations = GetScriptCallbackDeclarations(script);
+            callbackDeclarations.ForEach(delegate (string functionName)
             {
-                var callback = ScriptCallbackRepo.Read(callbackName);
-                if (callback != null)
+                if (CallbackDefinitions.Any(x => x.GetFunctionName() == functionName))
                 {
-                    scriptCallbacks.Add(callback);
+                    callbacks.Add(CallbackDefinitions.Where(x => x.GetFunctionName() == functionName).First());
                 }
             });
-            return scriptCallbacks;
+            return callbacks;
         }
         /// <summary>
         /// Get all script callback functions declared by script but improperly implemented
         /// </summary>
         /// <param name="script">Javascript that provides custom properties and their management</param>
         /// <returns>List of invalid callback function declarations, or empty list of script is valid</returns>
-        public List<ScriptCallback> GetInvalidCallbacks(string script)
+        public List<ICallback> GetScriptInvalidCallbackDeclarations(string script)
         {
-            var invalidCallbacks = new List<ScriptCallback>();
+            var invalidCallbacks = new List<ICallback>();
             return invalidCallbacks;
         }
         /// <summary>
@@ -71,9 +75,24 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// </summary>
         /// <param name="name">Name of the script callback definition</param>
         /// <returns></returns>
-        public ScriptCallback GetCallbackDefinition(string name)
+        public ICallback GetCallbackDefinition(string name)
         {
-            return ScriptCallbackRepo.Read(name);
+            return CallbackDefinitions.Where(x => x.GetFunctionName() == name).FirstOrDefault();
+        }
+        /// <summary>
+        /// Build a list of script function callback definitions
+        /// </summary>
+        /// <returns></returns>
+        private List<ICallback> BuildCallbackDefinitions()
+        {
+            var callbacks = new List<ICallback>();
+            var interfaceType = typeof(ICallback);
+            callbacks = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => (ICallback) Activator.CreateInstance(x))
+                .ToList();
+            return callbacks;
         }
     }
 }
