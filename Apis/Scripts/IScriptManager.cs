@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Business.Apis.Scripts.Callbacks;
+﻿using BeforeOurTime.Business.Apis.Scripts.Delegates;
 using BeforeOurTime.Repository.Models.Scripts.Callbacks;
 using System;
 using System.Collections.Generic;
@@ -12,34 +12,34 @@ namespace BeforeOurTime.Business.Apis.Scripts
     public interface IScriptManager
     {
         /// <summary>
-        /// Get all callback function names declared by script
+        /// Get all functions declared in script
         /// </summary>
-        /// <param name="script">Javascript that provides custom properties and their management</param>
+        /// <param name="script">Script that provides custom properties and their management</param>
         /// <returns></returns>
-        List<string> GetScriptCallbackDeclarations(string script);
+        List<string> GetScriptFunctionDeclarations(string script);
         /// <summary>
-        /// Get all properly formated callbacks declared by script
+        /// Get all delegates declared in script and properly implemented
         /// </summary>
-        /// <param name="script">Javascript that provides custom properties and their management</param>
-        /// <returns>Javascript that provides custom properties and their management</returns>
-        List<ICallback> GetScriptCallbackDefinitions(string script);
+        /// <param name="script">Script that provides custom properties and their management</param>
+        /// <returns>List of valid delegate declarations</returns>
+        List<ICallback> GetScriptValidDelegates(string script);
         /// <summary>
-        /// Get all script callback functions declared by script but improperly implemented
+        /// Get all delegates declared in script but improperly implemented
         /// </summary>
-        /// <param name="script">Javascript that provides custom properties and their management</param>
-        /// <returns>List of invalid callback function declarations, or empty list of script is valid</returns>
-        List<ICallback> GetScriptInvalidCallbackDeclarations(string script);
+        /// <param name="script">Script that provides custom properties and their management</param>
+        /// <returns>List of invalid delegate declarations, or empty list if script is valid</returns>
+        List<ICallback> GetScriptInvalidDelegates(string script);
         /// <summary>
-        /// Get script callback function definition based on name
+        /// Get script delegate definition based on name
         /// </summary>
-        /// <param name="name">Name of the script callback definition</param>
+        /// <param name="name">Script delegate definition function name</param>
         /// <returns></returns>
-        ICallback GetCallbackDefinition(string name);
+        ICallback GetDelegateDefinition(string name);
         /// <summary>
-        /// Get script callback function definition based on unique identifier
+        /// Get script delegate definition based on unique identifier
         /// </summary>
-        /// <param name="uuid">script function definition unique identiifer</param>
+        /// <param name="uuid">Script delegate definition unique identiifer</param>
         /// <returns></returns>
-        ICallback GetCallbackDefinition(Guid uuid);
+        ICallback GetDelegateDefinition(Guid uuid);
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using BeforeOurTime.Business.Apis.Scripts.Callbacks;
+using BeforeOurTime.Business.Apis.Scripts.Delegates;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Scripts.Callbacks;
@@ -15,93 +15,93 @@ namespace BeforeOurTime.Business.Apis.Scripts
     /// </summary>
     public class ScriptManager : IScriptManager
     {
-        protected IItemRepo ItemRepo { set; get; }
         protected IScriptEngine ScriptEngine { set; get; }
         /// <summary>
-        /// List of definitions for all script callback functions
+        /// List of available delegate definitions a script may declare
         /// </summary>
-        private List<ICallback> CallbackDefinitions { set; get; }
+        private List<ICallback> DelegateDefinitions { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ItemRepo"></param>
+        /// <param name="scriptEngine"></param>
         public ScriptManager(
-            IItemRepo itemRepo,
             IScriptEngine scriptEngine)
         {
-            ItemRepo = itemRepo;
             ScriptEngine = scriptEngine;
-            CallbackDefinitions = BuildCallbackDefinitions();
+            DelegateDefinitions = BuildDelegateDefinitions();
         }
         /// <summary>
-        /// Get all callback function names declared by script
+        /// Get all functions declared in script
         /// </summary>
-        /// <param name="script">Javascript that provides custom properties and their management</param>
+        /// <param name="script">Script that provides custom properties and their management</param>
         /// <returns></returns>
-        public List<string> GetScriptCallbackDeclarations(string script)
+        public List<string> GetScriptFunctionDeclarations(string script)
         {
             return ScriptEngine.GetFunctionDeclarations(script.Trim());
         }
         /// <summary>
-        /// Get all properly formated callbacks declared by script
+        /// Get all delegates declared in script and properly implemented
         /// </summary>
-        /// <param name="script">Javascript that provides custom properties and their management</param>
-        /// <returns>Javascript that provides custom properties and their management</returns>
-        public List<ICallback> GetScriptCallbackDefinitions(string script)
+        /// <param name="script">Script that provides custom properties and their management</param>
+        /// <returns>List of valid delegate declarations</returns>
+        public List<ICallback> GetScriptValidDelegates(string script)
         {
-            var callbacks = new List<ICallback>();
-            var callbackDeclarations = GetScriptCallbackDeclarations(script);
-            callbackDeclarations.ForEach(delegate (string functionName)
+            var scriptValidDelegates = new List<ICallback>();
+            var scriptFunctionDeclarations = GetScriptFunctionDeclarations(script);
+            scriptFunctionDeclarations.ForEach(delegate (string functionName)
             {
-                if (CallbackDefinitions.Any(x => x.GetFunctionName() == functionName))
+                if (DelegateDefinitions.Any(x => x.GetFunctionName() == functionName))
                 {
-                    callbacks.Add(CallbackDefinitions.Where(x => x.GetFunctionName() == functionName).First());
+                    scriptValidDelegates.Add(DelegateDefinitions.Where(x => x.GetFunctionName() == functionName).First());
                 }
             });
-            return callbacks;
+            return scriptValidDelegates;
         }
         /// <summary>
-        /// Get all script callback functions declared by script but improperly implemented
+        /// Get all delegates declared in script but improperly implemented
         /// </summary>
-        /// <param name="script">Javascript that provides custom properties and their management</param>
-        /// <returns>List of invalid callback function declarations, or empty list of script is valid</returns>
-        public List<ICallback> GetScriptInvalidCallbackDeclarations(string script)
+        /// <param name="script">Script that provides custom properties and their management</param>
+        /// <returns>List of invalid delegate declarations, or empty list if script is valid</returns>
+        public List<ICallback> GetScriptInvalidDelegates(string script)
         {
-            var invalidCallbacks = new List<ICallback>();
-            return invalidCallbacks;
+            var scriptInvalidDelegates = new List<ICallback>();
+            return scriptInvalidDelegates;
         }
         /// <summary>
-        /// Get script callback function definition based on name
+        /// Get script delegate definition based on name
         /// </summary>
-        /// <param name="name">Name of the script callback definition</param>
+        /// <param name="name">Script delegate definition function name</param>
         /// <returns></returns>
-        public ICallback GetCallbackDefinition(string name)
+        public ICallback GetDelegateDefinition(string name)
         {
-            return CallbackDefinitions.Where(x => x.GetFunctionName() == name).FirstOrDefault();
+            return DelegateDefinitions.Where(x => x.GetFunctionName() == name).FirstOrDefault();
         }
         /// <summary>
-        /// Get script callback function definition based on unique identifier
+        /// Get script delegate definition based on unique identifier
         /// </summary>
-        /// <param name="uuid">script function definition unique identiifer</param>
+        /// <param name="uuid">Script delegate definition unique identiifer</param>
         /// <returns></returns>
-        public ICallback GetCallbackDefinition(Guid uuid)
+        public ICallback GetDelegateDefinition(Guid uuid)
         {
-            return CallbackDefinitions.Where(x => x.GetId() == uuid).FirstOrDefault();
+            return DelegateDefinitions.Where(x => x.GetId() == uuid).FirstOrDefault();
         }
         /// <summary>
-        /// Build a list of script function callback definitions
+        /// Build list of available delegate definitions
         /// </summary>
+        /// <remarks>
+        /// Delegate definitions are created by classes that implement IScriptDelegate
+        /// </remarks>
         /// <returns></returns>
-        private List<ICallback> BuildCallbackDefinitions()
+        private List<ICallback> BuildDelegateDefinitions()
         {
-            var callbacks = new List<ICallback>();
+            var scriptDelegates = new List<ICallback>();
             var interfaceType = typeof(ICallback);
-            callbacks = AppDomain.CurrentDomain.GetAssemblies()
+            scriptDelegates = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
                 .Select(x => (ICallback) Activator.CreateInstance(x))
                 .ToList();
-            return callbacks;
+            return scriptDelegates;
         }
     }
 }

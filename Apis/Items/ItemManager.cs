@@ -110,7 +110,7 @@ namespace BeforeOurTime.Business.Apis.Items
         protected List<ScriptCallbackItemLink> UpdateScriptCallbackLinks(Item item)
         {
             var callbackLinks = new List<ScriptCallbackItemLink>();
-            var invalidCallbacks = ScriptManager.GetScriptInvalidCallbackDeclarations(item.Script);
+            var invalidCallbacks = ScriptManager.GetScriptInvalidDelegates(item.Script);
             if (invalidCallbacks.Count > 0)
             {
                 var callbackStrs = "";
@@ -121,7 +121,7 @@ namespace BeforeOurTime.Business.Apis.Items
                 });
                 throw new Exception("Improperly declared script callback functions: " + callbackStrs);
             }
-            ScriptManager.GetScriptCallbackDefinitions(item.Script).ForEach(delegate (ICallback callback)
+            ScriptManager.GetScriptValidDelegates(item.Script).ForEach(delegate (ICallback callback)
             {
                 callbackLinks.Add(new ScriptCallbackItemLink()
                 {
@@ -143,7 +143,7 @@ namespace BeforeOurTime.Business.Apis.Items
             var message = new Message()
             {
                 Sender = source,
-                CallbackId = ScriptManager.GetCallbackDefinition("onItemMove").GetId(),
+                CallbackId = ScriptManager.GetDelegateDefinition("onItemMove").GetId(),
                 Package = "",
                 //JsonConvert.SerializeObject(new OnItemMove()
                 //{

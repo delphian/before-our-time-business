@@ -4,13 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Scripts.Callbacks.onTick
+namespace BeforeOurTime.Business.Apis.Scripts.Delegates.onTick
 {
     /// <summary>
     /// A void, or empty, return value
     /// </summary>
     /// <remarks>
-    /// This object will be return from the onTick script function callback
+    /// This object will be return from the onTick script delegate
     /// </remarks>
     public class OnTickReturn : ICallbackReturn
     {

@@ -3,34 +3,34 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Scripts.Callbacks.onTick
+namespace BeforeOurTime.Business.Apis.Scripts.Delegates.onRawText
 {
     /// <summary>
-    /// Periodic poke from the server indicating passage of time
+    /// Unformatted raw information provided in a string
     /// </summary>
-    public class OnTickCallback : ICallback
+    public class OnRawTextDelegate : ICallback
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        public OnTickCallback()
+        public OnRawTextDelegate()
         {
         }
         public string GetFunctionName()
         {
-            return "onTick";
+            return "onRawText";
         }
         public Type GetArgumentType()
         {
-            return typeof(OnTickArgument);
+            return typeof(OnRawTextArgument);
         }
         public Type GetReturnType()
         {
-            return typeof(OnTickReturn);
+            return typeof(OnRawTextReturn);
         }
         public Guid GetId()
         {
-            return new Guid("a20ef1ab-0e3f-40df-aca9-a70e18e51f32");
+            return new Guid("f0a2281e-82df-49d1-91da-40712d70f28f");
         }
     }
 }

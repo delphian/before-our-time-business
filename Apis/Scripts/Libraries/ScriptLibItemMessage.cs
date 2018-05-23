@@ -29,7 +29,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
                 string type,
                 object msgBody)
             {
-                var callback = Api.GetScriptManager().GetCallbackDefinition(type);
+                var callback = Api.GetScriptManager().GetDelegateDefinition(type);
                 var itemTo = itemRepo.Read(new List<Guid>() { new Guid(toId) }).FirstOrDefault();
                 var message = new Message()
                 {
