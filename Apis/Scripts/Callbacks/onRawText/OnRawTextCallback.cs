@@ -28,5 +28,9 @@ namespace BeforeOurTime.Business.Apis.Scripts.Callbacks.onRawText
         {
             return typeof(OnRawTextReturn);
         }
+        public Guid GetId()
+        {
+            return new Guid("f0a2281e-82df-49d1-91da-40712d70f28f");
+        }
     }
 }

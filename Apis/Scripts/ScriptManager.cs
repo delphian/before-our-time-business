@@ -80,6 +80,15 @@ namespace BeforeOurTime.Business.Apis.Scripts
             return CallbackDefinitions.Where(x => x.GetFunctionName() == name).FirstOrDefault();
         }
         /// <summary>
+        /// Get script callback function definition based on unique identifier
+        /// </summary>
+        /// <param name="uuid">script function definition unique identiifer</param>
+        /// <returns></returns>
+        public ICallback GetCallbackDefinition(Guid uuid)
+        {
+            return CallbackDefinitions.Where(x => x.GetId() == uuid).FirstOrDefault();
+        }
+        /// <summary>
         /// Build a list of script function callback definitions
         /// </summary>
         /// <returns></returns>

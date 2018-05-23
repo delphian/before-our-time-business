@@ -35,5 +35,11 @@ namespace BeforeOurTime.Business.Apis.Scripts
         /// <param name="name">Name of the script callback definition</param>
         /// <returns></returns>
         ICallback GetCallbackDefinition(string name);
+        /// <summary>
+        /// Get script callback function definition based on unique identifier
+        /// </summary>
+        /// <param name="uuid">script function definition unique identiifer</param>
+        /// <returns></returns>
+        ICallback GetCallbackDefinition(Guid uuid);
     }
 }

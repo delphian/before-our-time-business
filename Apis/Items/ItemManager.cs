@@ -110,23 +110,23 @@ namespace BeforeOurTime.Business.Apis.Items
         protected List<ScriptCallbackItemLink> UpdateScriptCallbackLinks(Item item)
         {
             var callbackLinks = new List<ScriptCallbackItemLink>();
-            var invalidCallbacks = ScriptManager.GetInvalidCallbacks(item.Script);
+            var invalidCallbacks = ScriptManager.GetScriptInvalidCallbackDeclarations(item.Script);
             if (invalidCallbacks.Count > 0)
             {
                 var callbackStrs = "";
-                invalidCallbacks.ForEach(delegate (ScriptCallback invalidCallback)
+                invalidCallbacks.ForEach(delegate (ICallback invalidCallback)
                 {
-                    callbackStrs += (callbackStrs.Length == 0) ? invalidCallback.FunctionName :
-                                                               ", " + invalidCallback.FunctionName;
+                    callbackStrs += (callbackStrs.Length == 0) ? invalidCallback.GetFunctionName() :
+                                                               ", " + invalidCallback.GetFunctionName();
                 });
                 throw new Exception("Improperly declared script callback functions: " + callbackStrs);
             }
-            ScriptManager.GetCallbacks(item.Script).ForEach(delegate (ScriptCallback callback)
+            ScriptManager.GetScriptCallbackDefinitions(item.Script).ForEach(delegate (ICallback callback)
             {
                 callbackLinks.Add(new ScriptCallbackItemLink()
                 {
                     Item = item,
-                    Callback = callback
+                    CallbackId = callback.GetId()
                 });
             });
            return callbackLinks;
@@ -143,7 +143,7 @@ namespace BeforeOurTime.Business.Apis.Items
             var message = new Message()
             {
                 Sender = source,
-                Callback = ScriptManager.GetCallbackDefinition("onItemMove"),
+                CallbackId = ScriptManager.GetCallbackDefinition("onItemMove").GetId(),
                 Package = "",
                 //JsonConvert.SerializeObject(new OnItemMove()
                 //{

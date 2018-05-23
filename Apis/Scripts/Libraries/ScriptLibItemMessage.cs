@@ -34,7 +34,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
                 var message = new Message()
                 {
                     Sender = from,
-                    Callback = callback,
+                    CallbackId = callback.GetId(),
                     Package = JsonConvert.SerializeObject(msgBody)
                 };
                 Api.GetMessageManager().SendMessage(message, new List<Item>() { itemTo });

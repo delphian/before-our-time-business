@@ -89,7 +89,6 @@ namespace BeforeOurTime.Business
                 .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
                 .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
-                .AddScoped<IScriptCallbackRepo, ScriptCallbackRepo>()
                 .AddScoped<IScriptInterfaceRepo, ScriptInterfaceRepo>()
                 // Repositories (Items)
                 .AddScoped<IItemRepo, ItemRepo>()
@@ -128,7 +127,7 @@ namespace BeforeOurTime.Business
                         var callback = api.GetScriptManager().GetCallbackDefinition("onTerminalInput");
                         var clientMessage = new Message()
                         {
-                            Callback = callback,
+                            CallbackId = callback.GetId(),
                             Sender = from,
                             Package = JsonConvert.SerializeObject(new ArgTerminalInput() {
                                 Terminal = terminal,
@@ -148,12 +147,11 @@ namespace BeforeOurTime.Business
         {
             lock(thisLock)
             {
-                var itemRepo = ServiceProvider.GetService<IItemRepo>();
                 var api = ServiceProvider.GetService<IApi>();
-                var gameItem = itemRepo.Read(new List<Guid>() { new Guid("487a7282-0cad-4081-be92-83b14671fc23") }).First();
+                var gameItem = api.GetItemManager().Read(new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
                 var tickMessage = new Message()
                 {
-                    Callback = api.GetScriptManager().GetCallbackDefinition("onTick"),
+                    CallbackId = api.GetScriptManager().GetCallbackDefinition("onTick").GetId(),
                     Sender = gameItem,
                     Package = "{}"
                 };
@@ -169,9 +167,9 @@ namespace BeforeOurTime.Business
             lock(thisLock)
             {
                 var logger = ServiceProvider.GetService<ILogger>();
-                var itemRepo = ServiceProvider.GetService<IItemRepo>();
                 var messageRepo = ServiceProvider.GetService<IMessageRepo>();
                 var ScriptEngine = ServiceProvider.GetService<IScriptEngine>();
+                var api = ServiceProvider.GetService<IApi>();
                 // Create script global functions
                 var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
                 // Get messages
@@ -184,8 +182,9 @@ namespace BeforeOurTime.Business
                     try
                     {
 #endif
-                        var me = itemRepo.Read(new List<Guid>() { message.RecipientId }).First();
-                        if (ScriptEngine.GetFunctionDeclarations(me.Script.Trim()).Contains(message.Callback.FunctionName))
+                        var me = api.GetItemManager().Read(message.RecipientId);
+                        var functionDefinition = api.GetScriptManager().GetCallbackDefinition(message.CallbackId);
+                        if (ScriptEngine.GetFunctionDeclarations(me.Script.Trim()).Contains(functionDefinition.GetFunctionName()))
                         {
                             jsFunctionManager.AddJsFunctions(ScriptEngine);
                             ScriptEngine
@@ -194,12 +193,12 @@ namespace BeforeOurTime.Business
                                 .Execute("var data = JSON.parse(_data);")
                                 .Execute(me.Script)
                                 .Invoke(
-                                    message.Callback.FunctionName,
-                                    JsonConvert.DeserializeObject(message.Package, Type.GetType(message.Callback.ArgumentType))
+                                    functionDefinition.GetFunctionName(),
+                                    JsonConvert.DeserializeObject(message.Package, functionDefinition.GetArgumentType())
                                 );
                             // Save changes to item data
                             me.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
-                            itemRepo.Update(new List<Item>() { me });
+                            api.GetItemManager().Update(me);
                         }
                     }
 #if !DEBUG
