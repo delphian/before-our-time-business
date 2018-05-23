@@ -6,10 +6,10 @@ using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Items.Details;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
+using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Business.Logs;
-using BeforeOurTime.Business.Models.ScriptCallbacks.Arguments;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Dbs.EF.Items;
@@ -129,7 +129,7 @@ namespace BeforeOurTime.Business
                         {
                             DelegateId = scriptDelegate.GetId(),
                             Sender = from,
-                            Package = JsonConvert.SerializeObject(new ArgTerminalInput() {
+                            Package = JsonConvert.SerializeObject(new OnTerminalInputArgument() {
                                 Terminal = terminal,
                                 Raw = message
                             })
