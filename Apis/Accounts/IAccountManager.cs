@@ -16,6 +16,19 @@ namespace BeforeOurTime.Business.Apis.Accounts
         /// <param name="password">Password for account</param>
         Account Create(string name, string email, string password);
         /// <summary>
+        /// Read a single model
+        /// </summary>
+        /// <param name="id">Unique model identifier</param>
+        /// <returns></returns>
+        Account Read(Guid id);
+        /// <summary>
+        /// Read all accounts, or specify an offset and limit
+        /// </summary>
+        /// <param name="offset">Number of account records to skip</param>
+        /// <param name="limit">Maximum number of account records to return</param>
+        /// <returns></returns>
+        List<Account> Read(int? offset = null, int? limit = null);
+        /// <summary>
         /// Authenticate a user name and password
         /// </summary>
         /// <param name="email"></param>

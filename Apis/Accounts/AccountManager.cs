@@ -58,6 +58,25 @@ namespace BeforeOurTime.Business.Apis.Accounts
             return account;
         }
         /// <summary>
+        /// Read a single account
+        /// </summary>
+        /// <param name="id">Unique account identifier</param>
+        /// <returns></returns>
+        public Account Read(Guid id)
+        {
+            return AccountRepo.Read(id);
+        }
+        /// <summary>
+        /// Read all accounts, or specify an offset and limit
+        /// </summary>
+        /// <param name="offset">Number of account records to skip</param>
+        /// <param name="limit">Maximum number of account records to return</param>
+        /// <returns></returns>
+        public List<Account> Read(int? offset = null, int? limit = null)
+        {
+            return AccountRepo.Read(offset, limit);
+        }
+        /// <summary>
         /// Authenticate a user name and password
         /// </summary>
         /// <param name="email"></param>
