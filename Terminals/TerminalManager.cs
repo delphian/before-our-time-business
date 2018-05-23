@@ -40,7 +40,7 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         protected List<Terminal> Terminals = new List<Terminal>();
         /// <summary>
-        /// Callback definition of function subscribed to OnTerminalCreated
+        /// Definition of function that may subscribe to OnTerminalCreated
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         public delegate void TerminalCreated(Terminal terminal);
@@ -49,7 +49,7 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         public event TerminalCreated OnTerminalCreated;
         /// <summary>
-        /// Callback definition of function subscribed to OnTerminalDestroyed 
+        /// Definition of function that may subscribe to OnTerminalDestroyed 
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         public delegate void TerminalDestroyed(Terminal terminal);

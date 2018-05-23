@@ -42,7 +42,7 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="item">Item which is new and being created</param>
         public Item Create(Item item)
         {
-            item.FunctionLinks = UpdateScriptCallbackLinks(item);
+            item.DelegateLinks = UpdateScriptDelegateLinks(item);
             ItemRepo.Create(new List<Item>() { item });
             return item;
         }
@@ -81,7 +81,7 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <returns></returns>
         public Item Update(Item item)
         {
-            item.FunctionLinks = UpdateScriptCallbackLinks(item);
+            item.DelegateLinks = UpdateScriptDelegateLinks(item);
             return ItemRepo.Update(new List<Item>() { item }).FirstOrDefault();
         }
         /// <summary>
@@ -103,33 +103,33 @@ namespace BeforeOurTime.Business.Apis.Items
             ItemRepo.Delete(new List<Item>() { item });
         }
         /// <summary>
-        /// Generate callback links by parsing an item's script callback function definitions
+        /// Generate delegate links by parsing an item's script delegate declarations
         /// </summary>
-        /// <param name="item">Item to generate callback links for</param>
+        /// <param name="item">Item to generate delegate links for</param>
         /// <returns></returns>
-        protected List<ScriptCallbackItemLink> UpdateScriptCallbackLinks(Item item)
+        protected List<ScriptDelegateItemLink> UpdateScriptDelegateLinks(Item item)
         {
-            var callbackLinks = new List<ScriptCallbackItemLink>();
-            var invalidCallbacks = ScriptManager.GetScriptInvalidDelegates(item.Script);
-            if (invalidCallbacks.Count > 0)
+            var delegateLinks = new List<ScriptDelegateItemLink>();
+            var invalidDelegates = ScriptManager.GetScriptInvalidDelegates(item.Script);
+            if (invalidDelegates.Count > 0)
             {
-                var callbackStrs = "";
-                invalidCallbacks.ForEach(delegate (IDelegate invalidCallback)
+                var delegateStrs = "";
+                invalidDelegates.ForEach(delegate (IDelegate invalidDelegate)
                 {
-                    callbackStrs += (callbackStrs.Length == 0) ? invalidCallback.GetFunctionName() :
-                                                               ", " + invalidCallback.GetFunctionName();
+                    delegateStrs += (delegateStrs.Length == 0) ? invalidDelegate.GetFunctionName() :
+                                                               ", " + invalidDelegate.GetFunctionName();
                 });
-                throw new Exception("Improperly declared script callback functions: " + callbackStrs);
+                throw new Exception("Improperly declared script delegates: " + delegateStrs);
             }
-            ScriptManager.GetScriptValidDelegates(item.Script).ForEach(delegate (IDelegate callback)
+            ScriptManager.GetScriptValidDelegates(item.Script).ForEach(delegate (IDelegate scriptDelegate)
             {
-                callbackLinks.Add(new ScriptCallbackItemLink()
+                delegateLinks.Add(new ScriptDelegateItemLink()
                 {
                     Item = item,
-                    CallbackId = callback.GetId()
+                    DelegateId = scriptDelegate.GetId()
                 });
             });
-           return callbackLinks;
+           return delegateLinks;
         }
         /// <summary>
         /// Relocate an item
@@ -143,7 +143,7 @@ namespace BeforeOurTime.Business.Apis.Items
             var message = new Message()
             {
                 Sender = source,
-                CallbackId = ScriptManager.GetDelegateDefinition("onItemMove").GetId(),
+                DelegateId = ScriptManager.GetDelegateDefinition("onItemMove").GetId(),
                 Package = "",
                 //JsonConvert.SerializeObject(new OnItemMove()
                 //{

@@ -29,12 +29,12 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
                 string type,
                 object msgBody)
             {
-                var callback = Api.GetScriptManager().GetDelegateDefinition(type);
+                var scriptDelegate = Api.GetScriptManager().GetDelegateDefinition(type);
                 var itemTo = itemRepo.Read(new List<Guid>() { new Guid(toId) }).FirstOrDefault();
                 var message = new Message()
                 {
                     Sender = from,
-                    CallbackId = callback.GetId(),
+                    DelegateId = scriptDelegate.GetId(),
                     Package = JsonConvert.SerializeObject(msgBody)
                 };
                 Api.GetMessageManager().SendMessage(message, new List<Item>() { itemTo });

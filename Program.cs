@@ -124,10 +124,10 @@ namespace BeforeOurTime.Business
                         var itemRepo = serviceProvider.GetService<IItemRepo>();
                         var api = serviceProvider.GetService<IApi>();
                         var from = itemRepo.Read(new List<Guid>() { terminal.AvatarId }).First();
-                        var callback = api.GetScriptManager().GetDelegateDefinition("onTerminalInput");
+                        var scriptDelegate = api.GetScriptManager().GetDelegateDefinition("onTerminalInput");
                         var clientMessage = new Message()
                         {
-                            CallbackId = callback.GetId(),
+                            DelegateId = scriptDelegate.GetId(),
                             Sender = from,
                             Package = JsonConvert.SerializeObject(new ArgTerminalInput() {
                                 Terminal = terminal,
@@ -151,7 +151,7 @@ namespace BeforeOurTime.Business
                 var gameItem = api.GetItemManager().Read(new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
                 var tickMessage = new Message()
                 {
-                    CallbackId = api.GetScriptManager().GetDelegateDefinition("onTick").GetId(),
+                    DelegateId = api.GetScriptManager().GetDelegateDefinition("onTick").GetId(),
                     Sender = gameItem,
                     Package = "{}"
                 };
@@ -183,7 +183,7 @@ namespace BeforeOurTime.Business
                     {
 #endif
                         var me = api.GetItemManager().Read(message.RecipientId);
-                        var functionDefinition = api.GetScriptManager().GetDelegateDefinition(message.CallbackId);
+                        var functionDefinition = api.GetScriptManager().GetDelegateDefinition(message.DelegateId);
                         if (ScriptEngine.GetFunctionDeclarations(me.Script.Trim()).Contains(functionDefinition.GetFunctionName()))
                         {
                             jsFunctionManager.AddJsFunctions(ScriptEngine);
