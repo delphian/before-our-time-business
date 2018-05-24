@@ -49,6 +49,14 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             return ItemType.Game;
         }
         /// <summary>
+        /// Get the default game
+        /// </summary>
+        /// <returns></returns>
+        public DetailGame GetDefaultGame()
+        {
+            return DetailGameRepo.Read().First();
+        }
+        /// <summary>
         /// Get the default location of the default game
         /// </summary>
         /// <remarks>
@@ -58,7 +66,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// <returns></returns>
         public DetailLocation GetDefaultLocation()
         {
-            var defaultGame = DetailGameRepo.Read().First();
+            var defaultGame = GetDefaultGame();
             return DetailLocationRepo.Read(defaultGame.DefaultLocationId);
         }
         /// <summary>

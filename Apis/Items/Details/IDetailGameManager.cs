@@ -9,6 +9,11 @@ namespace BeforeOurTime.Business.Apis.Items.Details
     public interface IDetailGameManager : IDetailManager<DetailGame>
     {
         /// <summary>
+        /// Get the default game
+        /// </summary>
+        /// <returns></returns>
+        DetailGame GetDefaultGame();
+        /// <summary>
         /// Get the default location of the default game
         /// </summary>
         /// <remarks>

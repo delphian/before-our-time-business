@@ -148,13 +148,13 @@ namespace BeforeOurTime.Business
             lock(thisLock)
             {
                 var api = ServiceProvider.GetService<IApi>();
-                var gameItem = api.GetItemManager().Read(new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
+                var game = api.GetDetailManager<IDetailGameManager>().GetDefaultGame();
                 var onTickDelegate = api.GetScriptManager().GetDelegateDefinition("onTick");
                 var itemRecipients = api.GetItemManager().Read(onTickDelegate);
                 var tickMessage = new Message()
                 {
                     DelegateId = onTickDelegate.GetId(),
-                    Sender = gameItem,
+                    Sender = game.Item,
                     Package = "{}"
                 };
                 api.GetMessageManager().SendMessage(tickMessage, itemRecipients);
