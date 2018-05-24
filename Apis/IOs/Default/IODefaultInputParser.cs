@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.IO
+namespace BeforeOurTime.Business.Apis.IO.Default
 {
-    public class ParseInputDefault : IIOInputParser
+    public class IODefaultInputParser : IIOInputParser
     {
         private IApi Api { set; get; }
-        public ParseInputDefault(IApi api)
+        public IODefaultInputParser(IApi api)
         {
             Api = api;
         }

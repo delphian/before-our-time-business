@@ -9,10 +9,10 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.IO
 {
-    public class ParseInputList : IIOInputParser
+    public class IOListInputParser : IIOInputParser
     {
         private IApi Api { set; get; }
-        public ParseInputList(IApi api)
+        public IOListInputParser(IApi api)
         {
             Api = api;
         }
