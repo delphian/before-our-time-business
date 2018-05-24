@@ -184,24 +184,10 @@ namespace BeforeOurTime.Business
                     try
                     {
 #endif
-                        var me = api.GetItemManager().Read(message.RecipientId);
-                        var functionDefinition = api.GetScriptManager().GetDelegateDefinition(message.DelegateId);
-                        if (ScriptEngine.GetFunctionDeclarations(me.Script.Trim()).Contains(functionDefinition.GetFunctionName()))
-                        {
-                            jsFunctionManager.AddJsFunctions(ScriptEngine);
-                            ScriptEngine
-                                .SetValue("me", me)
-                                .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(me.Data)))
-                                .Execute("var data = JSON.parse(_data);")
-                                .Execute(me.Script)
-                                .Invoke(
-                                    functionDefinition.GetFunctionName(),
-                                    JsonConvert.DeserializeObject(message.Package, functionDefinition.GetArgumentType())
-                                );
-                            // Save changes to item data
-                            me.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
-                            api.GetItemManager().Update(me);
-                        }
+                        var item = api.GetItemManager().Read(message.RecipientId);
+                        var detailManager = api.GetDetailManager(item.Type);
+                        // Hand off message deliver to each item's manager code
+                        detailManager.DeliverMessage(message, item, jsFunctionManager);
                     }
 #if !DEBUG
                     catch (Exception ex)

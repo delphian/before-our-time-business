@@ -10,7 +10,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Scripts.Libraries
 {
-    class JsFunctionManager
+    public class JsFunctionManager
     {
         protected IConfigurationRoot Configuration { set; get; }
         protected IServiceProvider ServiceProvider { set; get; }
