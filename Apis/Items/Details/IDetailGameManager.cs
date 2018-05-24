@@ -9,8 +9,17 @@ namespace BeforeOurTime.Business.Apis.Items.Details
     public interface IDetailGameManager : IDetailManager<DetailGame>
     {
         /// <summary>
+        /// Create a game item
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns></returns>
+        DetailGame Create(DetailGame game);
+        /// <summary>
         /// Get the default game
         /// </summary>
+        /// <remarks>
+        /// Will create the default game if one does not already exist
+        /// </remarks>
         /// <returns></returns>
         DetailGame GetDefaultGame();
         /// <summary>

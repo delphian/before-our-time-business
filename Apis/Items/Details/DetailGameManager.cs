@@ -49,12 +49,47 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             return ItemType.Game;
         }
         /// <summary>
+        /// Create a game item
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns></returns>
+        public DetailGame Create(DetailGame game)
+        {
+            return DetailGameRepo.Create(game);
+        }
+        /// <summary>
         /// Get the default game
         /// </summary>
+        /// <remarks>
+        /// Will create the default game and a location if one does not already exist
+        /// </remarks>
         /// <returns></returns>
         public DetailGame GetDefaultGame()
         {
-            return DetailGameRepo.Read().First();
+            var defaultGame = DetailGameRepo.Read().FirstOrDefault();
+            if (defaultGame == null)
+            {
+                defaultGame = Create(new DetailGame()
+                {
+                    Name = "Brave New World",
+                    Item = new Item()
+                    {
+                        Type = ItemType.Game,
+                        UuidType = Guid.NewGuid(),
+                    },
+                    DefaultLocation = new DetailLocation()
+                    {
+                        Name = "The Dark Void",
+                        Description = "Eternal darkness and seperation from all the is good and holy.",
+                        Item = new Item()
+                        {
+                            Type = ItemType.Location,
+                            UuidType = Guid.NewGuid()
+                        }
+                    }
+                });
+            }
+            return defaultGame;
         }
         /// <summary>
         /// Get the default location of the default game
