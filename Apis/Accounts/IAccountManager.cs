@@ -48,5 +48,10 @@ namespace BeforeOurTime.Business.Apis.Accounts
         /// <param name="password">New password</param>
         /// <returns></returns>
         AuthenticationBotMeta UpdateCredentialPassword(AuthenticationBotMeta credential, string password);
+        /// <summary>
+        /// Delete a single account
+        /// </summary>
+        /// <param name="id">Account to delete</param>
+        void Delete(Account account);
     }
 }

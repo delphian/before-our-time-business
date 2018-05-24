@@ -112,5 +112,13 @@ namespace BeforeOurTime.Business.Apis.Accounts
             credential.Password = BCrypt.Net.BCrypt.HashPassword(password);
             return AuthenBotMetaRepo.Update(new List<AuthenticationBotMeta>() { credential }).FirstOrDefault();
         }
+        /// <summary>
+        /// Delete a single account
+        /// </summary>
+        /// <param name="id">Account to delete</param>
+        public void Delete(Account account)
+        {
+            AccountRepo.Delete(account);
+        }
     }
 }
