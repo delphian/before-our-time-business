@@ -72,20 +72,20 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                 defaultGame = Create(new DetailGame()
                 {
                     Name = "Brave New World",
-                    Item = new Item()
+                    Item = ItemManager.Create(new Item()
                     {
                         Type = ItemType.Game,
                         UuidType = Guid.NewGuid(),
-                    },
+                    }),
                     DefaultLocation = new DetailLocation()
                     {
                         Name = "The Dark Void",
-                        Description = "Eternal darkness and seperation from all the is good and holy.",
-                        Item = new Item()
+                        Description = "Eternal darkness reigns supreme in this place. Complete seperation from all that is good, holy, and pure are the only known virtues.",
+                        Item = ItemManager.Create(new Item()
                         {
                             Type = ItemType.Location,
                             UuidType = Guid.NewGuid()
-                        }
+                        })
                     }
                 });
             }

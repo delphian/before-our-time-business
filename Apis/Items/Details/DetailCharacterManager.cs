@@ -55,20 +55,19 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             Guid accountId,
             DetailLocation initialLocation)
         {
-            var characterItem = ItemManager.Create(new Item()
+            var character = DetailCharacterRepo.Create(new DetailCharacter()
             {
-                Type = ItemType.Character,
-                UuidType = Guid.NewGuid(),
-                ParentId = initialLocation.ItemId,
-                Data = "{}",
-                Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
-            });
-            var character = DetailCharacterRepo.Create(new List<DetailCharacter>() { new DetailCharacter()
-            {
-                Item = characterItem,
                 Name = name,
                 AccountId = accountId,
-            } }).FirstOrDefault();
+                Item = ItemManager.Create(new Item()
+                {
+                    Type = ItemType.Character,
+                    UuidType = Guid.NewGuid(),
+                    ParentId = initialLocation.ItemId,
+                    Data = "{}",
+                    Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
+                })
+            });
 
             //            ItemManager.Materialize(character);
 
