@@ -75,6 +75,15 @@ namespace BeforeOurTime.Business.Apis.Items
             return ItemRepo.Read(offset, limit);
         }
         /// <summary>
+        /// Read all items that implement a script delegate
+        /// </summary>
+        /// <param name="scriptDelegate">A script function name, it's argument type, and return type</param>
+        /// <returns></returns>
+        public List<Item> Read(IDelegate scriptDelegate)
+        {
+            return ItemRepo.Read(scriptDelegate);
+        }
+        /// <summary>
         /// Update any model that is derived from Item
         /// </summary>
         /// <param name="item">Item to be updated</param>

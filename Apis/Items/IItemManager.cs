@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -38,6 +39,12 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="limit">Maximum number of model records to return</param>
         /// <returns></returns>
         List<Item> Read(int? offset = null, int? limit = null);
+        /// <summary>
+        /// Read all items that implement a script delegate
+        /// </summary>
+        /// <param name="scriptDelegate">A script function name, it's argument type, and return type</param>
+        /// <returns></returns>
+        List<Item> Read(IDelegate scriptDelegate);
         /// <summary>
         /// Update any model that is derived from type Item
         /// </summary>

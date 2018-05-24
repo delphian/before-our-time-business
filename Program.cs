@@ -149,13 +149,15 @@ namespace BeforeOurTime.Business
             {
                 var api = ServiceProvider.GetService<IApi>();
                 var gameItem = api.GetItemManager().Read(new Guid("487a7282-0cad-4081-be92-83b14671fc23"));
+                var onTickDelegate = api.GetScriptManager().GetDelegateDefinition("onTick");
+                var itemRecipients = api.GetItemManager().Read(onTickDelegate);
                 var tickMessage = new Message()
                 {
-                    DelegateId = api.GetScriptManager().GetDelegateDefinition("onTick").GetId(),
+                    DelegateId = onTickDelegate.GetId(),
                     Sender = gameItem,
                     Package = "{}"
                 };
-                //api.SendMessage(tickMessage, itemRepo.Read());
+                api.GetMessageManager().SendMessage(tickMessage, itemRecipients);
             }
         }
         /// <summary>
