@@ -49,17 +49,17 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// </summary>
         /// <param name="name">Public name of the character</param>
         /// <param name="accountId">Account to which this character belongs</param>
-        /// <param name="parentId">Location of new item</param>
+        /// <param name="initialLocation">Location of new character</param>
         public DetailCharacter Create(
             string name,
             Guid accountId,
-            Guid parentId)
+            DetailLocation initialLocation)
         {
             var characterItem = ItemManager.Create(new Item()
             {
                 Type = ItemType.Character,
                 UuidType = Guid.NewGuid(),
-                ParentId = parentId,
+                ParentId = initialLocation.ItemId,
                 Data = "{}",
                 Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
             });

@@ -191,10 +191,11 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public DetailCharacter CreateCharacter(Terminal terminal, string name)
         {
+            DetailLocation defaultLocation = Api.GetDetailManager<IDetailGameManager>().GetDefaultLocation();
             DetailCharacter character = Api.GetDetailManager<IDetailCharacterManager>().Create(
-                name, 
-                terminal.AccountId, 
-                new Guid("e74713f3-9ea8-45e5-9715-3b019222af90"));
+                name,
+                terminal.AccountId,
+                defaultLocation);
             return character;
         }
     }

@@ -13,7 +13,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// </summary>
         /// <param name="name">Public name of the character</param>
         /// <param name="accountId">Account to which this character belongs</param>
-        /// <param name="parentId">Location of new item</param>
-        DetailCharacter Create(string name, Guid accountId, Guid parentId);
+        /// <param name="initialLocation">Location of new character</param>
+        DetailCharacter Create(string name, Guid accountId, DetailLocation initialLocation);
     }
 }

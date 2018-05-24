@@ -8,5 +8,14 @@ namespace BeforeOurTime.Business.Apis.Items.Details
 {
     public interface IDetailGameManager : IDetailManager<DetailGame>
     {
+        /// <summary>
+        /// Get the default location of the default game
+        /// </summary>
+        /// <remarks>
+        /// Default locations are used as the parent for item's whos parent is
+        /// not specified
+        /// </remarks>
+        /// <returns></returns>
+        DetailLocation GetDefaultLocation();
     }
 }

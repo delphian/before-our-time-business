@@ -166,11 +166,10 @@ namespace BeforeOurTime.Business
         /// <param name="o"></param>
         public static void DeliverMessages(object o)
         {
-            lock(thisLock)
+            lock (thisLock)
             {
                 var logger = ServiceProvider.GetService<ILogger>();
                 var messageRepo = ServiceProvider.GetService<IMessageRepo>();
-                var ScriptEngine = ServiceProvider.GetService<IScriptEngine>();
                 var api = ServiceProvider.GetService<IApi>();
                 // Create script global functions
                 var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
@@ -188,14 +187,14 @@ namespace BeforeOurTime.Business
                         var detailManager = api.GetDetailManager(item.Type);
                         // Hand off message deliver to each item's manager code
                         detailManager.DeliverMessage(message, item, jsFunctionManager);
-                    }
 #if !DEBUG
+                    }
                     catch (Exception ex)
                     {
                         logger.LogError("script failed: " + message.ToId + " " + ex.Message);
                     }
-                }
 #endif
+                }
             }
         }
     }

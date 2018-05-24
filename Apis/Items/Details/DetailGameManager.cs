@@ -3,11 +3,13 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Details;
 using BeforeOurTime.Repository.Models.Items.Details.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Details
@@ -16,6 +18,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailGameRepo DetailGameRepo { set; get; }
+        private IDetailLocationRepo DetailLocationRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
@@ -25,12 +28,14 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         public DetailGameManager(
             IItemRepo itemRepo,
             IDetailGameRepo detailGameRepo,
+            IDetailLocationRepo detailLocationRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
             IItemManager itemManager)
         {
             ItemRepo = itemRepo;
             DetailGameRepo = detailGameRepo;
+            DetailLocationRepo = detailLocationRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
@@ -42,6 +47,19 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         public ItemType GetItemType()
         {
             return ItemType.Game;
+        }
+        /// <summary>
+        /// Get the default location of the default game
+        /// </summary>
+        /// <remarks>
+        /// Default locations are used as the parent for item's whos parent is
+        /// not specified
+        /// </remarks>
+        /// <returns></returns>
+        public DetailLocation GetDefaultLocation()
+        {
+            var defaultGame = DetailGameRepo.Read().First();
+            return DetailLocationRepo.Read(defaultGame.DefaultLocationId);
         }
         /// <summary>
         /// Deliver a message to an item
