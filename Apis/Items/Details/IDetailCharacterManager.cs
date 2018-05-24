@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Details
 {
-    public interface IDetailCharacterManager : IDetailManager
+    public interface IDetailCharacterManager : IDetailManager<DetailCharacter>
     {
         /// <summary>
         /// Create a new character

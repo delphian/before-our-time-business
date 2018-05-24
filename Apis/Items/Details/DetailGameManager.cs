@@ -9,5 +9,13 @@ namespace BeforeOurTime.Business.Apis.Items.Details
 {
     public class DetailGameManager : IDetailGameManager
     {
+        /// <summary>
+        /// Get the item type that the manager is responsible for providing detail management for
+        /// </summary>
+        /// <returns></returns>
+        public ItemType GetItemType()
+        {
+            return ItemType.Game;
+        }
     }
 }

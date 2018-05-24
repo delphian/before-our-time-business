@@ -26,6 +26,14 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             ItemManager = itemManager;
         }
         /// <summary>
+        /// Get the item type that the manager is responsible for providing detail management for
+        /// </summary>
+        /// <returns></returns>
+        public ItemType GetItemType()
+        {
+            return ItemType.Character;
+        }
+        /// <summary>
         /// Create a new character
         /// </summary>
         /// <param name="name">Public name of the character</param>

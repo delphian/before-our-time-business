@@ -9,6 +9,8 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Items.Details;
+using BeforeOurTime.Repository.Models.Items.Details;
+using BeforeOurTime.Repository.Models.Items;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -63,9 +65,23 @@ namespace BeforeOurTime.Business.Apis
         {
             return ItemManager;
         }
+        /// <summary>
+        /// Get item detail manager based on detail manager type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public T GetDetailManager<T>() where T : IDetailManager
         {
             return (T)DetailManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
+        }
+        /// <summary>
+        /// Get item detail manager based on item type
+        /// </summary>
+        /// <param name="itemType"></param>
+        /// <returns></returns>
+        public IDetailManager GetDetailManager(ItemType itemType)
+        {
+            return DetailManagerList.Where(x => x.Value.GetItemType() == itemType).Select(x => x.Value).FirstOrDefault();
         }
     }
 }
