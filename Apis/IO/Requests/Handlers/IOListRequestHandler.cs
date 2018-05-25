@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.IO
+namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
 {
-    public class IOListInputParser : IIOInputParser
+    public class IOListRequestHandler : IIORequestHandler
     {
         private IApi Api { set; get; }
-        public IOListInputParser(IApi api)
+        public IOListRequestHandler(IApi api)
         {
             Api = api;
         }

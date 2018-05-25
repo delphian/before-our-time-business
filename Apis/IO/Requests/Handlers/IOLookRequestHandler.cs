@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.IO.Look
+namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
 {
-    public class IOLookInputParser : IIOInputParser
+    public class IOLookRequestHandler : IIORequestHandler
     {
         private IApi Api { set; get; }
-        public IOLookInputParser(IApi api)
+        public IOLookRequestHandler(IApi api)
         {
             Api = api;
         }
