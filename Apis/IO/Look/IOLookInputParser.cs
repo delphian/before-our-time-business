@@ -18,7 +18,10 @@ namespace BeforeOurTime.Business.Apis.IO.Look
         }
         public void ParseInput(Terminal terminal, string terminalInput)
         {
-
+            if (terminalInput == "look")
+            {
+                terminal.SendToClient("Not Implemented\r\n");
+            }
         }
     }
 }
