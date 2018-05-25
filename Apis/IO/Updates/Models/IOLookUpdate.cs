@@ -4,26 +4,26 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.IO.Updates.Models
 {
-    /// <summary>
-    /// A response or update to a terminal
-    /// </summary>
-    /// <remarks>
-    /// All communication to terminals must be in the form of IIOUpdate
-    /// </remarks>
-    public interface IIOUpdate
+    public class IOLookUpdate : IOUpdate, IIOUpdate
     {
         /// <summary>
         /// Unique terminal update identifier
         /// </summary>
         /// <returns></returns>
-        Guid GetId();
+        public Guid GetId()
+        {
+            return new Guid("57161c60-2754-4132-a274-e3cc6e19cb13");
+        }
         /// <summary>
         /// Human friendly name describing update type
         /// </summary>
         /// <remarks>
-        /// Such as "Look Command Results", or "Ping Result"
+        /// Such as "Look Command Results", or "Ping Results"
         /// </remarks>
         /// <returns></returns>
-        string GetName();
+        public string GetName()
+        {
+            return "Look Command Update";
+        }
     }
 }
