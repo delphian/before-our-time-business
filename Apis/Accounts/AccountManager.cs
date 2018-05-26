@@ -84,12 +84,12 @@ namespace BeforeOurTime.Business.Apis.Accounts
         /// <returns>User account if authenticated, otherwise null</returns>
         public Account Authenticate(string email, string password)
         {
-            var account = AccountRepo.Read(
-                new AuthenticationRequest() {
-                    PrincipalName = email,
-                    PrincipalPassword = BCrypt.Net.BCrypt.HashPassword(password)
-                })
-                .FirstOrDefault();
+            var authenRequest = new AuthenticationRequest()
+            {
+                PrincipalName = email,
+                PrincipalPassword = password
+            };
+            var account = AccountRepo.Read(authenRequest).FirstOrDefault();
             return account;
         }
         /// <summary>

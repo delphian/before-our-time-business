@@ -310,8 +310,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         private void receiveData(IAsyncResult result)
         {
-            try
-            {
+//            try
+//            {
                 Socket clientSocket = (Socket)result.AsyncState;
                 TelnetClient client = getClientBySocket(clientSocket);
 
@@ -375,9 +375,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
                 else
                     clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(receiveData), clientSocket);
-            }
+//            }
 
-            catch { }
+//            catch { }
         }
     }
 }

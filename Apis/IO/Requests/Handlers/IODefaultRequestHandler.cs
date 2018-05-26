@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.IO.Requests.Models;
+using BeforeOurTime.Business.Apis.Items.Details;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Messages;
@@ -17,7 +18,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         }
         public void HandleRequest(IApi api, Terminal terminal, IIORequest terminalInput)
         {
-            var from = api.GetItemManager().Read(new List<Guid>() { terminal.AvatarId }).First();
+            var from = terminal.Character.Item;
             var scriptDelegate = api.GetScriptManager().GetDelegateDefinition("onTerminalInput");
             var clientMessage = new Message()
             {

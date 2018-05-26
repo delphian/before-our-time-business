@@ -89,7 +89,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         s.sendMessageToClient(c, "\r\n> ");
                         break;
                     default:
-                        s.sendMessageToClient(c, "\r\nBad command.\r\n>");
+                        s.sendMessageToClient(c, "\r\nBad command.\r\n> ");
                         break;
                 }
             }

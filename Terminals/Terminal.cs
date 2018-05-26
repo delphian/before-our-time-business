@@ -43,9 +43,8 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Item currently attached to as terminal's avatar (in system representation)
         /// </summary>
-        [JsonProperty(PropertyName = "avatarId")]
-        [JsonConverter(typeof(GuidJsonConverter))]
-        public Guid AvatarId { set; get; }
+        [JsonProperty(PropertyName = "character")]
+        public DetailCharacter Character { set; get; }
         /// <summary>
         /// General purpose databag at the disposal of the client server
         /// </summary>
@@ -106,7 +105,7 @@ namespace BeforeOurTime.Business.Terminals
             var character = TerminalManager.AttachTerminal(this, itemId);
             if (character != null)
             {
-                AvatarId = character.Id;
+                Character = character;
                 Status = TerminalStatus.Attached;
             }
             return (character != null);
@@ -146,7 +145,7 @@ namespace BeforeOurTime.Business.Terminals
             var character = TerminalManager.CreateCharacter(this, name);
             if (character != null)
             {
-                AvatarId = character.Id;
+                Character = character;
                 Status = TerminalStatus.Attached;
             }
             return (character != null);

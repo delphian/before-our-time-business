@@ -76,13 +76,14 @@ namespace BeforeOurTime.Business.Terminals
             AccountManager = scopedProvider.GetService<IAccountManager>();
             DetailGameManager = scopedProvider.GetService<IDetailGameManager>();
             DetailCharacterManager = scopedProvider.GetService<IDetailCharacterManager>();
+            var api = serviceProvider.GetService<IApi>();
             // Register terminal middleware
             var interfaceType = typeof(ITerminalMiddleware);
-            //TerminalMiddlewares = AppDomain.CurrentDomain.GetAssemblies()
-            //    .SelectMany(x => x.GetTypes())
-            //    .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-            //    .Select(x => (ITerminalMiddleware)Activator.CreateInstance(x, Api))
-            //    .ToList();
+            TerminalMiddlewares = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => (ITerminalMiddleware)Activator.CreateInstance(x, api))
+                .ToList();
         }
         /// <summary>
         /// Create a new terminal
