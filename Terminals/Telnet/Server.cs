@@ -7,6 +7,8 @@ using System.Text;
 using BeforeOurTime.Repository.Models.Items;
 using System.Linq;
 using BeforeOurTime.Repository.Models.Items.Details;
+using BeforeOurTime.Business.Apis.IO.Updates.Models;
+using BeforeOurTime.Business.Apis.IO.Requests.Models;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -32,10 +34,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
             Console.WriteLine("SERVER STARTED: " + DateTime.Now);
         }
 
-        private static void MessageFromServer(Terminal terminal, string messageFromServer)
+        private static void MessageFromServer(Terminal terminal, IIOUpdate environmentUpdate)
         {
             s.sendMessageToClient(Clients[terminal.Id], "\r\n");
-            s.sendMessageToClient(Clients[terminal.Id], messageFromServer);
+            s.sendMessageToClient(Clients[terminal.Id], environmentUpdate.ToString());
             s.sendMessageToClient(Clients[terminal.Id], "\r\n> ");
         }
 
@@ -79,9 +81,15 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         s.sendMessageToClient(c, "\r\nCya...\r\n");
                         s.kickClient(c);
                         break;
-                    default:
-                        c.GetTerminal().SendToApi(message);
+                    case "look":
+                        c.GetTerminal().SendToApi(new IOLookRequest()
+                        {
+                            
+                        });
                         s.sendMessageToClient(c, "\r\n> ");
+                        break;
+                    default:
+                        s.sendMessageToClient(c, "\r\nBad command.\r\n>");
                         break;
                 }
             }
@@ -117,7 +125,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         break;
                     case "login":
                         s.sendMessageToClient(c, "\r\n");
-                        s.sendMessageToClient(c, "Name: ");
+                        s.sendMessageToClient(c, "Email: ");
                         c.GetTerminal().DataBag["step"] = "login_name";
                         break;
                     default:
@@ -146,6 +154,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 }
                 else
                 {
+                    c.GetTerminal().DataBag["step"] = "connected";
                     s.sendMessageToClient(c, "\r\n");
                     s.sendMessageToClient(c, "Bad username or password.\r\n\r\n");
                     s.sendMessageToClient(c, "Welcome> ");

@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
+﻿using BeforeOurTime.Business.Apis.IO.Requests.Models;
+using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
@@ -11,12 +12,10 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
 {
     public class IOListRequestHandler : IIORequestHandler
     {
-        private IApi Api { set; get; }
-        public IOListRequestHandler(IApi api)
+        public IOListRequestHandler()
         {
-            Api = api;
         }
-        public void ParseInput(Terminal terminal, string terminalInput)
+        public void HandleRequest(IApi api, Terminal terminal, IIORequest terminalInput)
         {
         }
     }

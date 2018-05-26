@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
+﻿using BeforeOurTime.Business.Apis.IO.Requests.Models;
+using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
@@ -11,15 +12,13 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
 {
     public class IODefaultRequestHandler : IIORequestHandler
     {
-        private IApi Api { set; get; }
-        public IODefaultRequestHandler(IApi api)
+        public IODefaultRequestHandler()
         {
-            Api = api;
         }
-        public void ParseInput(Terminal terminal, string terminalInput)
+        public void HandleRequest(IApi api, Terminal terminal, IIORequest terminalInput)
         {
-            var from = Api.GetItemManager().Read(new List<Guid>() { terminal.AvatarId }).First();
-            var scriptDelegate = Api.GetScriptManager().GetDelegateDefinition("onTerminalInput");
+            var from = api.GetItemManager().Read(new List<Guid>() { terminal.AvatarId }).First();
+            var scriptDelegate = api.GetScriptManager().GetDelegateDefinition("onTerminalInput");
             var clientMessage = new Message()
             {
                 DelegateId = scriptDelegate.GetId(),
@@ -27,10 +26,10 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 Package = JsonConvert.SerializeObject(new OnTerminalInputArgument()
                 {
                     Terminal = terminal,
-                    Raw = terminalInput
+                    Raw = terminalInput.GetId().ToString()
                 })
             };
-            Api.GetMessageManager().SendMessage(clientMessage, Api.GetItemManager().Read());
+            api.GetMessageManager().SendMessage(clientMessage, api.GetItemManager().Read());
         }
     }
 }

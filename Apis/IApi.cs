@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.Accounts;
+using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Items.Details;
 using BeforeOurTime.Business.Apis.Messages;
@@ -18,6 +19,7 @@ namespace BeforeOurTime.Business.Apis
         IMessageManager GetMessageManager();
         IAccountManager GetAccountManager();
         IScriptManager GetScriptManager();
+        IIOManager GetIOManager();
         IItemManager GetItemManager();
         /// <summary>
         /// Get item detail manager based on detail manager type

@@ -1,4 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.IO.Requests.Models;
+using BeforeOurTime.Business.Apis.IO.Updates.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,21 +13,21 @@ namespace BeforeOurTime.Business.Terminals.Middleware.Telnet
         /// <summary>
         /// Opportunity to alter a raw message heading toward the API from a client
         /// </summary>
-        /// <param name="message">Raw message headed toward the API</param>
+        /// <param name="terminalRequest"></param>
         /// <param name="next">Next middleware</param>
         /// <returns></returns>
-        public string ToApi(string message, Func<string, string> next) {
-            return (next != null) ? next(message) : message;
+        public IIORequest ToApi(IIORequest terminalRequest, Func<IIORequest, IIORequest> next) {
+            return (next != null) ? next(terminalRequest) : terminalRequest;
         }
         /// <summary>
         /// Opportunity to alter a raw message heading toward the client from the API
         /// </summary>
-        /// <param name="message">Raw message headed toward the client</param>
+        /// <param name="environmentUpdate"></param>
         /// <param name="next">Next middleware</param>
         /// <returns></returns>
-        public string ToClient(string message, Func<string, string> next)
+        public IIOUpdate ToClient(IIOUpdate environmentUpdate, Func<IIOUpdate, IIOUpdate> next)
         {
-            return (next != null) ? next(message) : message;
+            return (next != null) ? next(environmentUpdate) : environmentUpdate;
         }
     }
 }

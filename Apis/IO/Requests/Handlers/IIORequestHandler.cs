@@ -14,7 +14,9 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// <summary>
         /// Handle terminal request
         /// </summary>
+        /// <param name="api"></param>
+        /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        void HandleRequest(Terminal terminal, IIORequest terminalRequest);
+        void HandleRequest(IApi api, Terminal terminal, IIORequest terminalRequest);
     }
 }

@@ -1,4 +1,6 @@
-﻿using BeforeOurTime.Repository.Json;
+﻿using BeforeOurTime.Business.Apis.IO.Requests.Models;
+using BeforeOurTime.Business.Apis.IO.Updates.Models;
+using BeforeOurTime.Repository.Json;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Details;
@@ -50,19 +52,25 @@ namespace BeforeOurTime.Business.Terminals
         [JsonProperty(PropertyName = "dataBag")]
         public Dictionary<string, string> DataBag = new Dictionary<string, string>();
         /// <summary>
-        /// Define delgate that terminal and server can use to exchange messages
+        /// Define delgate that terminal can use to send requests to the environemnt
         /// </summary>
         /// <param name="terminal"></param>
-        /// <param name="message"></param>
-        public delegate void messageOnTerminal(Terminal terminal, string message);
+        /// <param name="terminalRequest"></param>
+        public delegate void messageToEnvironment(Terminal terminal, IIORequest terminalRequest);
         /// <summary>
-        /// Terminals may attach to this event to receive messages from server
+        /// Define delgate that environment can use to update terminal
         /// </summary>
-        public event messageOnTerminal OnMessageToTerminal;
+        /// <param name="terminal"></param>
+        /// <param name="terminalUpdate"></param>
+        public delegate void messageToTerminal(Terminal terminal, IIOUpdate terminalUpdate);
         /// <summary>
-        /// Server may attach to this event to receive messages from terminal
+        /// Terminals may attach to this event to receive updates from the environment
         /// </summary>
-        public event messageOnTerminal OnMessageToServer;
+        public event messageToTerminal OnMessageToTerminal;
+        /// <summary>
+        /// Environment may attach to this event to receive requests from terminals
+        /// </summary>
+        public event messageToEnvironment OnMessageToServer;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -146,47 +154,47 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Send a message to the terminal
         /// </summary>
-        /// <param name="message"></param>
-        public void SendToClient(string message)
+        /// <param name="environmentUpdate"></param>
+        public void SendToClient(IIOUpdate environmentUpdate)
         {
             var allMiddleware = TerminalManager.GetTerminalMiddleware().Select(x => x).ToList();
-            string Next(string msg)
+            IIOUpdate Next(IIOUpdate update)
             {
                 var middleware = allMiddleware.FirstOrDefault();
                 if (middleware != null)
                 {
                     allMiddleware.Remove(middleware);
-                    return middleware.ToClient(msg, Next);
+                    return middleware.ToClient(update, Next);
                 }
-                return msg;
+                return update;
             }
-            message = Next(message);
+            environmentUpdate = Next(environmentUpdate);
             if (OnMessageToTerminal != null)
             {
-                OnMessageToTerminal(this, message);
+                OnMessageToTerminal(this, environmentUpdate);
             }
         }
         /// <summary>
         /// Send a message to the server
         /// </summary>
-        /// <param name="message"></param>
-        public void SendToApi(string message)
+        /// <param name="terminalRequest"></param>
+        public void SendToApi(IIORequest terminalRequest)
         {
             var allMiddleware = TerminalManager.GetTerminalMiddleware().Select(x => x).ToList();
-            string Next(string msg)
+            IIORequest Next(IIORequest request)
             {
                 var middleware = allMiddleware.FirstOrDefault();
                 if (middleware != null)
                 {
                     allMiddleware.Remove(middleware);
-                    return middleware.ToApi(msg, Next);
+                    return middleware.ToApi(request, Next);
                 }
-                return msg;
+                return request;
             }
-            message = Next(message);
+            terminalRequest = Next(terminalRequest);
             if (OnMessageToServer != null)
             {
-                OnMessageToServer(this, message);
+                OnMessageToServer(this, terminalRequest);
             }
         }
         /// <summary>

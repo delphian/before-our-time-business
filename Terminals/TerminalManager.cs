@@ -11,6 +11,8 @@ using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Details;
 using BeforeOurTime.Business.Apis.Items.Details;
 using BeforeOurTime.Repository.Models.Items.Details.Repos;
+using BeforeOurTime.Business.Apis.IO.Updates.Models;
+using BeforeOurTime.Business.Apis.Accounts;
 
 namespace BeforeOurTime.Business.Terminals
 {
@@ -31,10 +33,9 @@ namespace BeforeOurTime.Business.Terminals
         /// Central data repository for all character items
         /// </summary>
         protected IDetailCharacterRepo DetailCharacterRepo { set; get; }
-        /// <summary>
-        /// Interface to the core environment
-        /// </summary>
-        protected IApi Api { set; get; }
+        private IAccountManager AccountManager { set; get; }
+        private IDetailGameManager DetailGameManager { set; get; }
+        private IDetailCharacterManager DetailCharacterManager { set; get; }
         /// <summary>
         /// List of all active terminals
         /// </summary>
@@ -64,20 +65,24 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Constructor
         /// </summary>
-        public TerminalManager(IServiceProvider serviceProvider)
+        public TerminalManager(
+            IServiceProvider serviceProvider
+        )
         {
             var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
             AccountRepo = scopedProvider.GetService<IAccountRepo>();
             ItemRepo = scopedProvider.GetService<IItemRepo>();
             DetailCharacterRepo = scopedProvider.GetService<IDetailCharacterRepo>();
-            Api = serviceProvider.GetService<IApi>();
+            AccountManager = scopedProvider.GetService<IAccountManager>();
+            DetailGameManager = scopedProvider.GetService<IDetailGameManager>();
+            DetailCharacterManager = scopedProvider.GetService<IDetailCharacterManager>();
             // Register terminal middleware
             var interfaceType = typeof(ITerminalMiddleware);
-            TerminalMiddlewares = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(x => x.GetTypes())
-                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (ITerminalMiddleware)Activator.CreateInstance(x, Api))
-                .ToList();
+            //TerminalMiddlewares = AppDomain.CurrentDomain.GetAssemblies()
+            //    .SelectMany(x => x.GetTypes())
+            //    .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+            //    .Select(x => (ITerminalMiddleware)Activator.CreateInstance(x, Api))
+            //    .ToList();
         }
         /// <summary>
         /// Create a new terminal
@@ -103,7 +108,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public Account AuthenticateTerminal(Terminal terminal, string name, string password)
         {
-            return Api.GetAccountManager().Authenticate(name, password);
+            return AccountManager.Authenticate(name, password);
         }
         /// <summary>
         /// Attach a terminal to an environment item as it's avatar
@@ -136,10 +141,10 @@ namespace BeforeOurTime.Business.Terminals
         /// Send a message to a specific terminal
         /// </summary>
         /// <param name="terminalId">Unique terminal identifier</param>
-        /// <param name="message">Raw message</param>
-        public void SendToTerminalId(Guid terminalId, string message)
+        /// <param name="environmentUpdate"></param>
+        public void SendToTerminalId(Guid terminalId, IIOUpdate environmentUpdate)
         {
-            Terminals.FirstOrDefault(x => x.Id == terminalId).SendToClient(message);
+            Terminals.FirstOrDefault(x => x.Id == terminalId).SendToClient(environmentUpdate);
         }
         /// <summary>
         /// Get list of all active terminals
@@ -181,7 +186,7 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public Account CreateAccount(Terminal terminal, string name, string email, string password)
         {
-            return Api.GetAccountManager().Create(name, email, password);
+            return AccountManager.Create(name, email, password);
         }
         /// <summary>
         /// Create character owned by account owner of terminal
@@ -191,8 +196,8 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public DetailCharacter CreateCharacter(Terminal terminal, string name)
         {
-            DetailLocation defaultLocation = Api.GetDetailManager<IDetailGameManager>().GetDefaultLocation();
-            DetailCharacter character = Api.GetDetailManager<IDetailCharacterManager>().Create(
+            DetailLocation defaultLocation = DetailGameManager.GetDefaultLocation();
+            DetailCharacter character = DetailCharacterManager.Create(
                 name,
                 terminal.AccountId,
                 defaultLocation);

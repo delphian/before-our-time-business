@@ -11,6 +11,7 @@ using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Items.Details;
 using BeforeOurTime.Repository.Models.Items.Details;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Business.Apis.IO;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -23,6 +24,7 @@ namespace BeforeOurTime.Business.Apis
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
+        private IIOManager IOManager { set; get; }
         private IItemManager ItemManager { set; get; }
         private IDetailGameManager DetailGameManager { set; get; }
         private IDetailCharacterManager DetailCharacterManager { set; get; }
@@ -36,6 +38,7 @@ namespace BeforeOurTime.Business.Apis
             IMessageManager messageManager,
             IAccountManager accountManager,
             IScriptManager scriptManager,
+            IIOManager ioManager,
             IItemManager itemManager,
             IDetailGameManager detailGameManager,
             IDetailCharacterManager detailCharacterManager,
@@ -44,6 +47,7 @@ namespace BeforeOurTime.Business.Apis
             MessageManager = messageManager;
             AccountManager = accountManager;
             ScriptManager = scriptManager;
+            IOManager = ioManager;
             ItemManager = itemManager;
             DetailManagerList.Add(typeof(IDetailGameManager), detailGameManager);
             DetailManagerList.Add(typeof(IDetailCharacterManager), detailCharacterManager);
@@ -60,6 +64,10 @@ namespace BeforeOurTime.Business.Apis
         public IScriptManager GetScriptManager()
         {
             return ScriptManager;
+        }
+        public IIOManager GetIOManager()
+        {
+            return IOManager;
         }
         public IItemManager GetItemManager()
         {

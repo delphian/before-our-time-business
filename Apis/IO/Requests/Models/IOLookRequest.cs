@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.IO.Requests.Models
 {
-    public class IORequestLook : IORequest, IIORequest
+    public class IOLookRequest : IORequest, IIORequest
     {
         /// <summary>
         /// Unique terminal request identifier

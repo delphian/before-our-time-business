@@ -2,6 +2,8 @@
 
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
+using BeforeOurTime.Business.Apis.IO;
+using BeforeOurTime.Business.Apis.IO.Requests.Models;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Items.Details;
 using BeforeOurTime.Business.Apis.Messages;
@@ -60,6 +62,7 @@ namespace BeforeOurTime.Business
             // Setup automatic message deliver and Tick counter for items
             var tickTimer = new System.Threading.Timer(Tick, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Tick"]));
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Delivery"]));
+
             ListenToTerminals(ServiceProvider.CreateScope().ServiceProvider);
             // Wait for user input
             Console.WriteLine("Hit 'q' and enter to abort\n");
@@ -100,11 +103,13 @@ namespace BeforeOurTime.Business
                 .AddScoped<IAccountManager, AccountManager>()
                 .AddScoped<IScriptManager, ScriptManager>()
                 .AddScoped<IMessageManager, MessageManager>()
+                .AddScoped<IIOManager, IOManager>()
+                // Items and details
                 .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IDetailGameManager, DetailGameManager>()
                 .AddScoped<IDetailLocationManager, DetailLocationManager>()
                 .AddScoped<IDetailCharacterManager, DetailCharacterManager>()
-                .AddScoped<IApi, Api>()
+                .AddSingleton<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }
         /// <summary>
@@ -115,26 +120,14 @@ namespace BeforeOurTime.Business
         {
             var terminalManager = serviceProvider.GetService<ITerminalManager>();
             var telnetServer = new Servers.Telnet.Server(serviceProvider);
+            var api = serviceProvider.GetService<IApi>();
             ((TerminalManager)terminalManager).OnTerminalCreated += delegate (Terminal terminal)
             {
-                terminal.OnMessageToServer += delegate (Terminal xterminal, string message)
+                terminal.OnMessageToServer += delegate (Terminal xterminal, IIORequest terminalRequest)
                 {
                     lock (thisLock)
                     {
-                        var itemRepo = serviceProvider.GetService<IItemRepo>();
-                        var api = serviceProvider.GetService<IApi>();
-                        var from = itemRepo.Read(new List<Guid>() { terminal.AvatarId }).First();
-                        var scriptDelegate = api.GetScriptManager().GetDelegateDefinition("onTerminalInput");
-                        var clientMessage = new Message()
-                        {
-                            DelegateId = scriptDelegate.GetId(),
-                            Sender = from,
-                            Package = JsonConvert.SerializeObject(new OnTerminalInputArgument() {
-                                Terminal = terminal,
-                                Raw = message
-                            })
-                        };
-                        api.GetMessageManager().SendMessage(clientMessage, itemRepo.Read());
+                        api.GetIOManager().HandleRequest(api, terminal, terminalRequest);
                     }
                 };
             };

@@ -76,6 +76,8 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                     {
                         Type = ItemType.Game,
                         UuidType = Guid.NewGuid(),
+                        Data = "{}",
+                        Script = ""
                     }),
                     DefaultLocation = new DetailLocation()
                     {
@@ -84,7 +86,9 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                         Item = ItemManager.Create(new Item()
                         {
                             Type = ItemType.Location,
-                            UuidType = Guid.NewGuid()
+                            UuidType = Guid.NewGuid(),
+                            Data = "{}",
+                            Script = ""
                         })
                     }
                 });
