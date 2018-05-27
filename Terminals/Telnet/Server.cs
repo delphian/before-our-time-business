@@ -37,15 +37,16 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
         private static void MessageFromServer(Terminal terminal, IIOUpdate environmentUpdate)
         {
-            if (environmentUpdate.GetId() == new Guid("61013c1e-84f3-4c2e-87fa-2f00e20b4411"))
+            if (environmentUpdate.GetType() == typeof(IOLocationUpdate))
             {
-                s.sendMessageToClient(Clients[terminal.Id], ((IODebugUpdate) environmentUpdate).Description);
+                s.sendMessageToClient(Clients[terminal.Id], "\r\n" + ((IOLocationUpdate) environmentUpdate).Name + "\r\n");
+                s.sendMessageToClient(Clients[terminal.Id], ((IOLocationUpdate) environmentUpdate).Description);
             } else
             {
                 s.sendMessageToClient(Clients[terminal.Id], "\r\nUnknown message from server:\r\n");
                 s.sendMessageToClient(Clients[terminal.Id], JsonConvert.SerializeObject(environmentUpdate));
             }
-            s.sendMessageToClient(Clients[terminal.Id], "\r\n> ");
+            s.sendMessageToClient(Clients[terminal.Id], "\r\n\r\n> ");
         }
 
         private static void clientConnected(TelnetClient c)
