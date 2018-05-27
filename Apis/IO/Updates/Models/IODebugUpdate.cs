@@ -4,15 +4,22 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.IO.Updates.Models
 {
-    public class IOLookUpdate : IOUpdate, IIOUpdate
+    /// <summary>
+    /// Description of error, runtime condition, or other detailed execution data
+    /// </summary>
+    public class IODebugUpdate : IOUpdate, IIOUpdate
     {
+        /// <summary>
+        /// Raw textual description
+        /// </summary>
+        public string Description { set; get; }
         /// <summary>
         /// Unique terminal update identifier
         /// </summary>
         /// <returns></returns>
         public Guid GetId()
         {
-            return new Guid("57161c60-2754-4132-a274-e3cc6e19cb13");
+            return new Guid("61013c1e-84f3-4c2e-87fa-2f00e20b4411");
         }
         /// <summary>
         /// Human friendly name describing update type
@@ -23,7 +30,7 @@ namespace BeforeOurTime.Business.Apis.IO.Updates.Models
         /// <returns></returns>
         public string GetName()
         {
-            return "Look Command Update";
+            return "Debug Update";
         }
     }
 }

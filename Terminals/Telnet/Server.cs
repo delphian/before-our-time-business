@@ -9,6 +9,7 @@ using System.Linq;
 using BeforeOurTime.Repository.Models.Items.Details;
 using BeforeOurTime.Business.Apis.IO.Updates.Models;
 using BeforeOurTime.Business.Apis.IO.Requests.Models;
+using Newtonsoft.Json;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -36,8 +37,14 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
         private static void MessageFromServer(Terminal terminal, IIOUpdate environmentUpdate)
         {
-            s.sendMessageToClient(Clients[terminal.Id], "\r\n");
-            s.sendMessageToClient(Clients[terminal.Id], environmentUpdate.ToString());
+            if (environmentUpdate.GetId() == new Guid("61013c1e-84f3-4c2e-87fa-2f00e20b4411"))
+            {
+                s.sendMessageToClient(Clients[terminal.Id], ((IODebugUpdate) environmentUpdate).Description);
+            } else
+            {
+                s.sendMessageToClient(Clients[terminal.Id], "\r\nUnknown message from server:\r\n");
+                s.sendMessageToClient(Clients[terminal.Id], JsonConvert.SerializeObject(environmentUpdate));
+            }
             s.sendMessageToClient(Clients[terminal.Id], "\r\n> ");
         }
 
@@ -82,11 +89,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         s.kickClient(c);
                         break;
                     case "look":
+                        s.sendMessageToClient(c, "\r\n");
                         c.GetTerminal().SendToApi(new IOLookRequest()
                         {
                             
                         });
-                        s.sendMessageToClient(c, "\r\n> ");
                         break;
                     default:
                         s.sendMessageToClient(c, "\r\nBad command.\r\n> ");
@@ -129,7 +136,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         c.GetTerminal().DataBag["step"] = "login_name";
                         break;
                     default:
-                        s.sendMessageToClient(c, "\r\nUnknown welcome command \"" + message + "\".\r\n\r\n");
+                        s.sendMessageToClient(c, "\r\nUnknown welcome command \"" + message + "\". Try \"help\".\r\n\r\n");
                         s.sendMessageToClient(c, "Welcome> ");
                         break;
                 }
@@ -267,7 +274,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         }
                         break;
                     default:
-                        s.sendMessageToClient(c, "\r\nUnknown account command \"" + message + "\".\r\n\r\n");
+                        s.sendMessageToClient(c, "\r\nUnknown account command \"" + message + "\". Try \"help\".\r\n\r\n");
                         s.sendMessageToClient(c, "Account> ");
                         break;
                 }

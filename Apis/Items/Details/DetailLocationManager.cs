@@ -3,6 +3,7 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Details;
 using BeforeOurTime.Repository.Models.Items.Details.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
@@ -69,6 +70,29 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                 item.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
                 ItemManager.Update(item);
             }
+        }
+        /// <summary>
+        /// Read item's detailed location
+        /// </summary>
+        /// <remarks>
+        /// If item itself has no location detail then item's parents will be 
+        /// traversed until one is found
+        /// </remarks>
+        /// <param name="item">Item that has attached detail location data</param>
+        /// <returns>The Item's detailed location data. Null if none found</returns>
+        public DetailLocation Read(Item item)
+        {
+            DetailLocation location = null;
+            Item traverseItem = item;
+            while (traverseItem.ParentId != null && traverseItem.Type != ItemType.Location)
+            {
+                traverseItem = ItemRepo.Read(traverseItem.ParentId.Value);
+            }
+            if (traverseItem.Type == ItemType.Location)
+            {
+                location = DetailLocationRepo.Read(traverseItem);
+            }
+            return location;
         }
     }
 }
