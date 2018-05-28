@@ -20,6 +20,9 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         public void HandleRequest(IApi api, Terminal terminal, IIORequest terminalInput)
         {
             var location = api.GetDetailManager<IDetailLocationManager>().Read(terminal.Character.Item);
+
+            // TODO : Get all Physical Detail items and enumerate.
+
             terminal.SendToClient(new IOLocationUpdate()
             {
                 Name = location.Name,

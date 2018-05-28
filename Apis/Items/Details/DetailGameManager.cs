@@ -82,7 +82,15 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                     DefaultLocation = new DetailLocation()
                     {
                         Name = "The Dark Void",
-                        Description = "Eternal darkness reigns supreme in this place. Complete seperation from all that is good, holy, and pure are the only known virtues.",
+                        Description = @"Cool mists and dark shadows shroud 
+everything in this place. Straining your eyes does little to resolve the 
+amorphous blobs that are circulating about. The oppresive silence is occationaly
+puncuated by a distressed weeping or soft sob. A chill runs through your blood
+when you realise these forms may have once been human. The smell of rain
+and rotting wood pains your nose while the occational drip of water tickles
+the top of skulls both real and imagined. Any attempt to navigate in this damp
+cavern causes 
+disorientation.",
                         Item = ItemManager.Create(new Item()
                         {
                             Type = ItemType.Location,
