@@ -28,10 +28,10 @@ namespace BeforeOurTime.Business.Apis
         /// <returns></returns>
         T GetDetailManager<T>() where T : IDetailManager;
         /// <summary>
-        /// Get item detail manager based on item type
+        /// Get all attribute managers for an item
         /// </summary>
-        /// <param name="itemType"></param>
+        /// <param name="item">Item to determine managers for</param>
         /// <returns></returns>
-        IDetailManager GetDetailManager(ItemType itemType);
+        List<IDetailManager> GetAttributeManagers(Item item);
     }
 }

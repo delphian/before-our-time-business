@@ -23,11 +23,23 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// </remarks>
         /// <param name="item"></param>
         void DeliverMessage(Message message, Item item, JsFunctionManager jsFunctionManager);
+        /// <summary>
+        /// Determine if an item has attributes that may be managed
+        /// </summary>
+        /// <param name="item">Item that may posses attributes</param>
+        bool IsManaging(Item item);
     }
     /// <summary>
     /// Manage details of an item's extended data
     /// </summary>
     public interface IDetailManager<T> : IDetailManager where T: IDetail
     {
+        /// <summary>
+        /// Attach new attributes to an existing item
+        /// </summary>
+        /// <param name="attributes">Unsaved new attributes</param>
+        /// <param name="item">Existing item that has already been saved</param>
+        /// <returns></returns>
+        T Attach(T attributes, Item item);
     }
 }

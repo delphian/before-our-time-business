@@ -55,22 +55,31 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             Guid accountId,
             DetailLocation initialLocation)
         {
-            var character = DetailCharacterRepo.Create(new DetailCharacter()
-            {
-                Name = name,
-                AccountId = accountId,
-                Item = ItemManager.Create(new Item()
+            var character = Attach(
+                new DetailCharacter()
+                {
+                    Name = name,
+                    AccountId = accountId,
+                }, ItemManager.Create(new Item()
                 {
                     Type = ItemType.Character,
                     UuidType = Guid.NewGuid(),
                     ParentId = initialLocation.ItemId,
                     Data = "{}",
                     Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
-                })
-            });
-
-            //            ItemManager.Materialize(character);
-
+                }));
+            return character;
+        }
+        /// <summary>
+        /// Attach new character attributes to an existing item
+        /// </summary>
+        /// <param name="characterAttributes">Unsaved new character attributes</param>
+        /// <param name="item">Existing item that has already been saved</param>
+        /// <returns></returns>
+        public DetailCharacter Attach(DetailCharacter characterAttributes, Item item)
+        {
+            characterAttributes.Item = item;
+            var character = DetailCharacterRepo.Create(characterAttributes);
             return character;
         }
         /// <summary>
@@ -99,6 +108,19 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                 item.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
                 ItemManager.Update(item);
             }
+        }
+        /// <summary>
+        /// Determine if an item has attributes that may be managed
+        /// </summary>
+        /// <param name="item">Item that may posses attributes</param>
+        public bool IsManaging(Item item)
+        {
+            var managed = false;
+            if (DetailCharacterRepo.Read(item.Id) != null)
+            {
+                managed = true;
+            }
+            return managed;
         }
     }
 }

@@ -83,13 +83,16 @@ namespace BeforeOurTime.Business.Apis
             return (T)DetailManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
         }
         /// <summary>
-        /// Get item detail manager based on item type
+        /// Get all attribute managers for an item
         /// </summary>
-        /// <param name="itemType"></param>
+        /// <param name="item">Item to determine managers for</param>
         /// <returns></returns>
-        public IDetailManager GetDetailManager(ItemType itemType)
+        public List<IDetailManager> GetAttributeManagers(Item item)
         {
-            return DetailManagerList.Where(x => x.Value.GetItemType() == itemType).Select(x => x.Value).FirstOrDefault();
+            return DetailManagerList
+                .Where(x => x.Value.IsManaging(item))
+                .Select(x => x.Value)
+                .ToList();
         }
     }
 }

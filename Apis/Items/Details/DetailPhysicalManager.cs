@@ -1,5 +1,4 @@
-﻿using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Scripts;
+﻿using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
@@ -9,29 +8,30 @@ using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Details
 {
-    public class DetailLocationManager : IDetailLocationManager
+    public class DetailPhysicalManager : IDetailPhysicalManager
     {
         private IItemRepo ItemRepo { set; get; }
-        private IDetailLocationRepo DetailLocationRepo { set; get; }
+        private IDetailPhysicalRepo DetailPhysicalRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public DetailLocationManager(
+        public DetailPhysicalManager(
             IItemRepo itemRepo,
-            IDetailLocationRepo detailLocationRepo,
+            IDetailPhysicalRepo detailPhysicalRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
             IItemManager itemManager)
         {
             ItemRepo = itemRepo;
-            DetailLocationRepo = detailLocationRepo;
+            DetailPhysicalRepo = detailPhysicalRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
@@ -42,19 +42,71 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// <returns></returns>
         public ItemType GetItemType()
         {
-            return ItemType.Location;
+            return ItemType.Generic;
         }
         /// <summary>
-        /// Attach new location attributes to an existing item
+        /// Attach new physical attributes to an existing item
         /// </summary>
-        /// <param name="locationAttributes">Unsaved new location attributes</param>
+        /// <param name="item">Existing item that has already been saved</param>
+        /// <param name="name">One, two, or three word short description of item</param>
+        /// <param name="description">A long description of the item. Include many sensory experiences</param>
+        /// <param name="volume">Volume</param>
+        /// <param name="weight">Weight</param>
+        public DetailPhysical Attach(
+            Item item,
+            string name,
+            string description,
+            int volume,
+            int weight)
+        {
+            var physicalAttributes = new DetailPhysical()
+            {
+                Name = name,
+                Description = description,
+                Volume = volume,
+                Weight = weight,
+                Item = item
+            };
+            var physical = Attach(physicalAttributes, item);
+            return physical;
+        }
+        /// <summary>
+        /// Create new item with new physical attributes
+        /// </summary>
+        /// <param name="parent">Parent item</param>
+        /// <param name="name">One, two, or three word short description of item</param>
+        /// <param name="description">A long description of the item. Include many sensory experiences</param>
+        /// <param name="volume">Volume</param>
+        /// <param name="weight">Weight</param>
+        public DetailPhysical Create(
+            Item parent,
+            string name,
+            string description,
+            int volume,
+            int weight)
+        {
+            var item = ItemManager.Create(new Item()
+            {
+                Type = ItemType.Generic,
+                UuidType = Guid.NewGuid(),
+                ParentId = parent.Id,
+                Data = "{}",
+                Script = ""
+            });
+            var physical = Create(item, name, description, volume, weight);
+            return physical;
+        }
+        /// <summary>
+        /// Attach new physical attributes to an existing item
+        /// </summary>
+        /// <param name="physicalAttributes">Unsaved new physical attributes</param>
         /// <param name="item">Existing item that has already been saved</param>
         /// <returns></returns>
-        public DetailLocation Attach(DetailLocation locationAttributes, Item item)
+        public DetailPhysical Attach(DetailPhysical physicalAttributes, Item item)
         {
-            locationAttributes.Item = item;
-            var location = DetailLocationRepo.Create(locationAttributes);
-            return location;
+            physicalAttributes.Item = item;
+            var physical = DetailPhysicalRepo.Create(physicalAttributes);
+            return physical;
         }
         /// <summary>
         /// Deliver a message to an item
@@ -84,37 +136,13 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             }
         }
         /// <summary>
-        /// Read item's detailed location
-        /// </summary>
-        /// <remarks>
-        /// If item itself has no location detail then item's parents will be 
-        /// traversed until one is found
-        /// </remarks>
-        /// <param name="item">Item that has attached detail location data</param>
-        /// <returns>The Item's detailed location data. Null if none found</returns>
-        public DetailLocation Read(Item item)
-        {
-            DetailLocation location = null;
-            Item traverseItem = item;
-            while (traverseItem.ParentId != null && traverseItem.Type != ItemType.Location)
-            {
-                traverseItem = ItemRepo.Read(traverseItem.ParentId.Value);
-            }
-            if (traverseItem.Type == ItemType.Location)
-            {
-                location = DetailLocationRepo.Read(traverseItem);
-            }
-            return location;
-        }
-        /// <summary>
         /// Determine if an item has attributes that may be managed
         /// </summary>
         /// <param name="item">Item that may posses attributes</param>
         public bool IsManaging(Item item)
         {
             var managed = false;
-            if (DetailLocationRepo.Read(item.Id) != null)
-            {
+            if (DetailPhysicalRepo.Read(item.Id) != null) {
                 managed = true;
             }
             return managed;

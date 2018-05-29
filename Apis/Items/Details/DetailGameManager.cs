@@ -117,6 +117,18 @@ disorientation.",
             return DetailLocationRepo.Read(defaultGame.DefaultLocationId);
         }
         /// <summary>
+        /// Attach new game attributes to an existing item
+        /// </summary>
+        /// <param name="gameAttributes">Unsaved new game attributes</param>
+        /// <param name="item">Existing item that has already been saved</param>
+        /// <returns></returns>
+        public DetailGame Attach(DetailGame gameAttributes, Item item)
+        {
+            gameAttributes.Item = item;
+            var game = DetailGameRepo.Create(gameAttributes);
+            return game;
+        }
+        /// <summary>
         /// Deliver a message to an item
         /// </summary>
         /// <remarks>
@@ -142,6 +154,19 @@ disorientation.",
                 item.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
                 ItemManager.Update(item);
             }
+        }
+        /// <summary>
+        /// Determine if an item has attributes that may be managed
+        /// </summary>
+        /// <param name="item">Item that may posses attributes</param>
+        public bool IsManaging(Item item)
+        {
+            var managed = false;
+            if (DetailGameRepo.Read(item.Id) != null)
+            {
+                managed = true;
+            }
+            return managed;
         }
     }
 }

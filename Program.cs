@@ -177,9 +177,14 @@ namespace BeforeOurTime.Business
                     {
 #endif
                         var item = api.GetItemManager().Read(message.RecipientId);
-                        var detailManager = api.GetDetailManager(item.Type);
+                        List<IDetailManager> attributeManagers = api.GetAttributeManagers(item);
                         // Hand off message deliver to each item's manager code
-                        detailManager.DeliverMessage(message, item, jsFunctionManager);
+                        attributeManagers.ForEach(delegate (IDetailManager attributeManager)
+                        {
+                            // TODO : This should probably just add items to jsFunctionManager
+                            // and then execute the script once instead of each manager executing the script
+                            attributeManager.DeliverMessage(message, item, jsFunctionManager);
+                        });
 #if !DEBUG
                     }
                     catch (Exception ex)
