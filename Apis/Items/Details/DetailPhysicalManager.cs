@@ -93,7 +93,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                 Data = "{}",
                 Script = ""
             });
-            var physical = Create(item, name, description, volume, weight);
+            var physical = Attach(item, name, description, volume, weight);
             return physical;
         }
         /// <summary>
@@ -107,6 +107,25 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             physicalAttributes.Item = item;
             var physical = DetailPhysicalRepo.Create(physicalAttributes);
             return physical;
+        }
+        /// <summary>
+        /// Read a single item with physical attributes
+        /// </summary>
+        /// <param name="id">Unique physical attribute identifier</param>
+        /// <returns></returns>
+        public DetailPhysical Read(Guid id)
+        {
+            return DetailPhysicalRepo.Read(id);
+        }
+        /// <summary>
+        /// Read all items with physical attributes, or specify an offset and limit
+        /// </summary>
+        /// <param name="offset">Number of records to skip</param>
+        /// <param name="limit">Maximum number of records to return</param>
+        /// <returns></returns>
+        public List<DetailPhysical> Read(int? offset = null, int? limit = null)
+        {
+            return DetailPhysicalRepo.Read(offset, limit);
         }
         /// <summary>
         /// Deliver a message to an item

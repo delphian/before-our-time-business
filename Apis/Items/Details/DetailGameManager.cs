@@ -49,13 +49,16 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             return ItemType.Game;
         }
         /// <summary>
-        /// Create a game item
+        /// Create new item with new game attributes
         /// </summary>
-        /// <param name="game"></param>
+        /// <param name="gameAttributes">Unsaved new game attributes</param>
         /// <returns></returns>
-        public DetailGame Create(DetailGame game)
+        public DetailGame Create(DetailGame gameAttributes)
         {
-            return DetailGameRepo.Create(game);
+            gameAttributes = Attach(
+                gameAttributes, 
+                ItemManager.Create(gameAttributes.Item));
+            return gameAttributes;
         }
         /// <summary>
         /// Get the default game
@@ -72,13 +75,13 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                 defaultGame = Create(new DetailGame()
                 {
                     Name = "Brave New World",
-                    Item = ItemManager.Create(new Item()
+                    Item = new Item()
                     {
                         Type = ItemType.Game,
                         UuidType = Guid.NewGuid(),
                         Data = "{}",
                         Script = ""
-                    }),
+                    },
                     DefaultLocation = new DetailLocation()
                     {
                         Name = "A Dark Void",
@@ -126,6 +129,25 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             gameAttributes.Item = item;
             var game = DetailGameRepo.Create(gameAttributes);
             return game;
+        }
+        /// <summary>
+        /// Read a single item with game attributes
+        /// </summary>
+        /// <param name="id">Unique game attribute identifier</param>
+        /// <returns></returns>
+        public DetailGame Read(Guid id)
+        {
+            return DetailGameRepo.Read(id);
+        }
+        /// <summary>
+        /// Read all items with game attributes, or specify an offset and limit
+        /// </summary>
+        /// <param name="offset">Number of records to skip</param>
+        /// <param name="limit">Maximum number of records to return</param>
+        /// <returns></returns>
+        public List<DetailGame> Read(int? offset = null, int? limit = null)
+        {
+            return DetailGameRepo.Read(offset, limit);
         }
         /// <summary>
         /// Deliver a message to an item

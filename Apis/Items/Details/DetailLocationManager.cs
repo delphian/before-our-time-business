@@ -57,6 +57,25 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             return location;
         }
         /// <summary>
+        /// Read a single item with location attributes
+        /// </summary>
+        /// <param name="id">Unique location attribute identifier</param>
+        /// <returns></returns>
+        public DetailLocation Read(Guid id)
+        {
+            return DetailLocationRepo.Read(id);
+        }
+        /// <summary>
+        /// Read all items with location attributes, or specify an offset and limit
+        /// </summary>
+        /// <param name="offset">Number of records to skip</param>
+        /// <param name="limit">Maximum number of records to return</param>
+        /// <returns></returns>
+        public List<DetailLocation> Read(int? offset = null, int? limit = null)
+        {
+            return DetailLocationRepo.Read(offset, limit);
+        }
+        /// <summary>
         /// Deliver a message to an item
         /// </summary>
         /// <remarks>

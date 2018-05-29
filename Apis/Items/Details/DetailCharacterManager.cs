@@ -83,6 +83,25 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             return character;
         }
         /// <summary>
+        /// Read a single item with character attributes
+        /// </summary>
+        /// <param name="id">Unique character attribute identifier</param>
+        /// <returns></returns>
+        public DetailCharacter Read(Guid id)
+        {
+            return DetailCharacterRepo.Read(id);
+        }
+        /// <summary>
+        /// Read all items with character attributes, or specify an offset and limit
+        /// </summary>
+        /// <param name="offset">Number of records to skip</param>
+        /// <param name="limit">Maximum number of records to return</param>
+        /// <returns></returns>
+        public List<DetailCharacter> Read(int? offset = null, int? limit = null)
+        {
+            return DetailCharacterRepo.Read(offset, limit);
+        }
+        /// <summary>
         /// Deliver a message to an item
         /// </summary>
         /// <remarks>
