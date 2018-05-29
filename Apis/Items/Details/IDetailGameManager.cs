@@ -6,14 +6,8 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Details
 {
-    public interface IDetailGameManager : IDetailManager<DetailGame>
+    public interface IDetailGameManager : IDetailManager<DetailGame>, IDetailManager
     {
-        /// <summary>
-        /// Create a game item
-        /// </summary>
-        /// <param name="game"></param>
-        /// <returns></returns>
-        DetailGame Create(DetailGame game);
         /// <summary>
         /// Get the default game
         /// </summary>
@@ -31,5 +25,12 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// </remarks>
         /// <returns></returns>
         DetailLocation GetDefaultLocation();
+        /// <summary>
+        /// Update games's name
+        /// </summary>
+        /// <param name="id">Unique game attribute identifier</param>
+        /// <param name="name">Game's new name</param>
+        /// <returns></returns>
+        DetailGame UpdateName(Guid id, string name);
     }
 }

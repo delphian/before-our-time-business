@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Details
 {
-    public interface IDetailPhysicalManager : IDetailManager<DetailPhysical>
+    public interface IDetailPhysicalManager : IDetailManager<DetailPhysical>, IDetailManager
     {
         /// <summary>
         /// Attach new physical attributes to an existing item

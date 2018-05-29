@@ -13,7 +13,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Details
 {
-    public class DetailPhysicalManager : IDetailPhysicalManager
+    public class DetailPhysicalManager : AttributeManager<DetailPhysical>, IDetailPhysicalManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailPhysicalRepo DetailPhysicalRepo { set; get; }
@@ -28,7 +28,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             IDetailPhysicalRepo detailPhysicalRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager)
+            IItemManager itemManager) : base(detailPhysicalRepo)
         {
             ItemRepo = itemRepo;
             DetailPhysicalRepo = detailPhysicalRepo;
@@ -95,37 +95,6 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             });
             var physical = Attach(item, name, description, volume, weight);
             return physical;
-        }
-        /// <summary>
-        /// Attach new physical attributes to an existing item
-        /// </summary>
-        /// <param name="physicalAttributes">Unsaved new physical attributes</param>
-        /// <param name="item">Existing item that has already been saved</param>
-        /// <returns></returns>
-        public DetailPhysical Attach(DetailPhysical physicalAttributes, Item item)
-        {
-            physicalAttributes.Item = item;
-            var physical = DetailPhysicalRepo.Create(physicalAttributes);
-            return physical;
-        }
-        /// <summary>
-        /// Read a single item with physical attributes
-        /// </summary>
-        /// <param name="id">Unique physical attribute identifier</param>
-        /// <returns></returns>
-        public DetailPhysical Read(Guid id)
-        {
-            return DetailPhysicalRepo.Read(id);
-        }
-        /// <summary>
-        /// Read all items with physical attributes, or specify an offset and limit
-        /// </summary>
-        /// <param name="offset">Number of records to skip</param>
-        /// <param name="limit">Maximum number of records to return</param>
-        /// <returns></returns>
-        public List<DetailPhysical> Read(int? offset = null, int? limit = null)
-        {
-            return DetailPhysicalRepo.Read(offset, limit);
         }
         /// <summary>
         /// Deliver a message to an item

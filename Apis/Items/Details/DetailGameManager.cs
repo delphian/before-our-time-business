@@ -14,7 +14,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Details
 {
-    public class DetailGameManager : IDetailGameManager
+    public class DetailGameManager : AttributeManager<DetailGame>, IDetailGameManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailGameRepo DetailGameRepo { set; get; }
@@ -31,7 +31,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             IDetailLocationRepo detailLocationRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager)
+            IItemManager itemManager) : base(detailGameRepo)
         {
             ItemRepo = itemRepo;
             DetailGameRepo = detailGameRepo;
@@ -47,18 +47,6 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         public ItemType GetItemType()
         {
             return ItemType.Game;
-        }
-        /// <summary>
-        /// Create new item with new game attributes
-        /// </summary>
-        /// <param name="gameAttributes">Unsaved new game attributes</param>
-        /// <returns></returns>
-        public DetailGame Create(DetailGame gameAttributes)
-        {
-            gameAttributes = Attach(
-                gameAttributes, 
-                ItemManager.Create(gameAttributes.Item));
-            return gameAttributes;
         }
         /// <summary>
         /// Get the default game
@@ -119,37 +107,6 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             return DetailLocationRepo.Read(defaultGame.DefaultLocationId);
         }
         /// <summary>
-        /// Attach new game attributes to an existing item
-        /// </summary>
-        /// <param name="gameAttributes">Unsaved new game attributes</param>
-        /// <param name="item">Existing item that has already been saved</param>
-        /// <returns></returns>
-        public DetailGame Attach(DetailGame gameAttributes, Item item)
-        {
-            gameAttributes.Item = item;
-            var game = DetailGameRepo.Create(gameAttributes);
-            return game;
-        }
-        /// <summary>
-        /// Read a single item with game attributes
-        /// </summary>
-        /// <param name="id">Unique game attribute identifier</param>
-        /// <returns></returns>
-        public DetailGame Read(Guid id)
-        {
-            return DetailGameRepo.Read(id);
-        }
-        /// <summary>
-        /// Read all items with game attributes, or specify an offset and limit
-        /// </summary>
-        /// <param name="offset">Number of records to skip</param>
-        /// <param name="limit">Maximum number of records to return</param>
-        /// <returns></returns>
-        public List<DetailGame> Read(int? offset = null, int? limit = null)
-        {
-            return DetailGameRepo.Read(offset, limit);
-        }
-        /// <summary>
         /// Deliver a message to an item
         /// </summary>
         /// <remarks>
@@ -188,6 +145,18 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                 managed = true;
             }
             return managed;
+        }
+        /// <summary>
+        /// Update games's name
+        /// </summary>
+        /// <param name="id">Unique game attribute identifier</param>
+        /// <param name="name">Game's new name</param>
+        /// <returns></returns>
+        public DetailGame UpdateName(Guid id, string name)
+        {
+            var gameAttribute = Read(id);
+            gameAttribute.Name = name;
+            return Update(gameAttribute);
         }
     }
 }

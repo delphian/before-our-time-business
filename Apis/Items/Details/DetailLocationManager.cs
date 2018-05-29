@@ -13,7 +13,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Details
 {
-    public class DetailLocationManager : IDetailLocationManager
+    public class DetailLocationManager : AttributeManager<DetailLocation>, IDetailLocationManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailLocationRepo DetailLocationRepo { set; get; }
@@ -28,7 +28,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             IDetailLocationRepo detailLocationRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager)
+            IItemManager itemManager) : base(detailLocationRepo)
         {
             ItemRepo = itemRepo;
             DetailLocationRepo = detailLocationRepo;
@@ -43,37 +43,6 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         public ItemType GetItemType()
         {
             return ItemType.Location;
-        }
-        /// <summary>
-        /// Attach new location attributes to an existing item
-        /// </summary>
-        /// <param name="locationAttributes">Unsaved new location attributes</param>
-        /// <param name="item">Existing item that has already been saved</param>
-        /// <returns></returns>
-        public DetailLocation Attach(DetailLocation locationAttributes, Item item)
-        {
-            locationAttributes.Item = item;
-            var location = DetailLocationRepo.Create(locationAttributes);
-            return location;
-        }
-        /// <summary>
-        /// Read a single item with location attributes
-        /// </summary>
-        /// <param name="id">Unique location attribute identifier</param>
-        /// <returns></returns>
-        public DetailLocation Read(Guid id)
-        {
-            return DetailLocationRepo.Read(id);
-        }
-        /// <summary>
-        /// Read all items with location attributes, or specify an offset and limit
-        /// </summary>
-        /// <param name="offset">Number of records to skip</param>
-        /// <param name="limit">Maximum number of records to return</param>
-        /// <returns></returns>
-        public List<DetailLocation> Read(int? offset = null, int? limit = null)
-        {
-            return DetailLocationRepo.Read(offset, limit);
         }
         /// <summary>
         /// Deliver a message to an item
@@ -111,7 +80,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// </remarks>
         /// <param name="item">Item that has attached detail location data</param>
         /// <returns>The Item's detailed location data. Null if none found</returns>
-        public DetailLocation Read(Item item)
+        new public DetailLocation Read(Item item)
         {
             DetailLocation location = null;
             Item traverseItem = item;
@@ -137,6 +106,13 @@ namespace BeforeOurTime.Business.Apis.Items.Details
                 managed = true;
             }
             return managed;
+        }
+
+        public DetailLocation UpdateName(Guid id, string name)
+        {
+            var locationAttribute = Read(id);
+            locationAttribute.Name = name;
+            return Update(locationAttribute);
         }
     }
 }
