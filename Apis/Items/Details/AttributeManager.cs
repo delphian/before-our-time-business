@@ -4,6 +4,7 @@ using BeforeOurTime.Repository.Models.Items.Details;
 using BeforeOurTime.Repository.Models.Items.Details.Repos;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Details
@@ -19,11 +20,6 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             AttributeRepo = attributeRepo;
         }
 
-        public T Read(Item item)
-        {
-            throw new NotImplementedException();
-        }
-
         public List<T> Create(List<T> models)
         {
             return AttributeRepo.Create(models);
@@ -36,42 +32,47 @@ namespace BeforeOurTime.Business.Apis.Items.Details
 
         public List<T> Read(List<Guid> ids)
         {
-            throw new NotImplementedException();
+            return AttributeRepo.Read(ids);
         }
 
         public T Read(Guid id)
         {
-            throw new NotImplementedException();
+            return Read(new List<Guid>() { id }).FirstOrDefault();
         }
 
         public List<T> Read(int? offset = null, int? limit = null)
         {
-            throw new NotImplementedException();
+            return AttributeRepo.Read(offset, limit);
+        }
+
+        public T Read(Item item)
+        {
+            return AttributeRepo.Read(item);
         }
 
         public List<T> Update(List<T> models)
         {
-            throw new NotImplementedException();
+            return AttributeRepo.Update(models);
         }
 
         public T Update(T model)
         {
-            throw new NotImplementedException();
+            return Update(new List<T>() { model }).FirstOrDefault();
         }
 
         public void Delete(List<T> models)
         {
-            throw new NotImplementedException();
+            AttributeRepo.Delete(models);
         }
 
         public void Delete(T model)
         {
-            throw new NotImplementedException();
+            Delete(new List<T>() { model });
         }
 
         public void Delete()
         {
-            throw new NotImplementedException();
+            AttributeRepo.Delete();
         }
         /// <summary>
         /// Attach new attributes to an existing item
