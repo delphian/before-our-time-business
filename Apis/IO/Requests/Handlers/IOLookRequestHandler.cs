@@ -38,7 +38,6 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     ioLocationUpdate.Adendums.Add("Someone is here");
                 }
             });
-            // TODO : Get all Physical Detail items and enumerate.
             terminal.SendToClient(ioLocationUpdate);
         }
     }

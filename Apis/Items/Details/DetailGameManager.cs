@@ -161,7 +161,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         public bool IsManaging(Item item)
         {
             var managed = false;
-            if (DetailGameRepo.Read(item.Id) != null)
+            if (DetailGameRepo.Read(item) != null)
             {
                 managed = true;
             }

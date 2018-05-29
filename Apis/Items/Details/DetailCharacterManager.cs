@@ -116,7 +116,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         public bool IsManaging(Item item)
         {
             var managed = false;
-            if (DetailCharacterRepo.Read(item.Id) != null)
+            if (DetailCharacterRepo.Read(item) != null)
             {
                 managed = true;
             }
