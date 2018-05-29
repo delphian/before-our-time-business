@@ -40,7 +40,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
             if (environmentUpdate.GetType() == typeof(IOLocationUpdate))
             {
                 s.sendMessageToClient(Clients[terminal.Id], "\r\n" + ((IOLocationUpdate) environmentUpdate).Name + "\r\n");
-                s.sendMessageToClient(Clients[terminal.Id], ((IOLocationUpdate) environmentUpdate).Description);
+                s.sendMessageToClient(Clients[terminal.Id], ((IOLocationUpdate) environmentUpdate).Description + "\r\n");
+                ((IOLocationUpdate)environmentUpdate).Adendums.ForEach(delegate (string adendum)
+                {
+                    s.sendMessageToClient(Clients[terminal.Id], adendum + "\r\n");
+                });
             } else
             {
                 s.sendMessageToClient(Clients[terminal.Id], "\r\nUnknown message from server:\r\n");

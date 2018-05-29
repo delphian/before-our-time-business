@@ -98,6 +98,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IDetailCharacterRepo, DetailCharacterRepo>()
                 .AddScoped<IDetailGameRepo, DetailGameRepo>()
                 .AddScoped<IDetailLocationRepo, DetailLocationRepo>()
+                .AddScoped<IDetailPhysicalRepo, DetailPhysicalRepo>()
                 // Main environment interface API
                 .AddScoped<IScriptEngine, JsScriptEngine>()
                 .AddScoped<IAccountManager, AccountManager>()
@@ -109,6 +110,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IDetailGameManager, DetailGameManager>()
                 .AddScoped<IDetailLocationManager, DetailLocationManager>()
                 .AddScoped<IDetailCharacterManager, DetailCharacterManager>()
+                .AddScoped<IDetailPhysicalManager, DetailPhysicalManager>()
                 .AddSingleton<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }

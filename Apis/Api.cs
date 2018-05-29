@@ -29,6 +29,7 @@ namespace BeforeOurTime.Business.Apis
         private IDetailGameManager DetailGameManager { set; get; }
         private IDetailCharacterManager DetailCharacterManager { set; get; }
         private IDetailLocationManager DetailLocationManager { set; get; }
+        private IDetailPhysicalManager DetailPhysicalManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -42,7 +43,8 @@ namespace BeforeOurTime.Business.Apis
             IItemManager itemManager,
             IDetailGameManager detailGameManager,
             IDetailCharacterManager detailCharacterManager,
-            IDetailLocationManager detailLocationManager)
+            IDetailLocationManager detailLocationManager,
+            IDetailPhysicalManager detailPhysicalManager)
         {
             MessageManager = messageManager;
             AccountManager = accountManager;
@@ -52,6 +54,7 @@ namespace BeforeOurTime.Business.Apis
             DetailManagerList.Add(typeof(IDetailGameManager), detailGameManager);
             DetailManagerList.Add(typeof(IDetailCharacterManager), detailCharacterManager);
             DetailManagerList.Add(typeof(IDetailLocationManager), detailLocationManager);
+            DetailManagerList.Add(typeof(IDetailPhysicalManager), detailPhysicalManager);
         }
         public IMessageManager GetMessageManager()
         {
