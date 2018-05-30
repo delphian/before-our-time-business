@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Details
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
 {
-    public interface IDetailPhysicalManager : IDetailManager<DetailPhysical>, IDetailManager
+    public interface IAttributePhysicalManager : IAttributeManager<DetailPhysical>, IAttributeManager
     {
         /// <summary>
         /// Attach new physical attributes to an existing item

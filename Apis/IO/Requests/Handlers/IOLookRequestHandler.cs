@@ -1,6 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.IO.Requests.Models;
 using BeforeOurTime.Business.Apis.IO.Updates.Models;
-using BeforeOurTime.Business.Apis.Items.Details;
+using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Items;
@@ -20,7 +20,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         }
         public void HandleRequest(IApi api, Terminal terminal, IIORequest terminalInput)
         {
-            var location = api.GetDetailManager<IDetailLocationManager>().Read(terminal.Character.Item);
+            var location = api.GetDetailManager<IAttributeLocationManager>().Read(terminal.Character.Item);
             var ioLocationUpdate = new IOLocationUpdate()
             {
                 DetailLocationId = location.Id,
@@ -29,11 +29,11 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
             };
             location.Item.Children.ForEach(delegate (Item item)
             {
-                if (api.GetDetailManager<IDetailPhysicalManager>().IsManaging(item))
+                if (api.GetDetailManager<IAttributePhysicalManager>().IsManaging(item))
                 {
                     ioLocationUpdate.Adendums.Add("Something is here");
                 }
-                if (api.GetDetailManager<IDetailCharacterManager>().IsManaging(item))
+                if (api.GetDetailManager<IAttributeCharacterManager>().IsManaging(item))
                 {
                     ioLocationUpdate.Adendums.Add("Someone is here");
                 }

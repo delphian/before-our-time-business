@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Details
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
 {
-    public interface IDetailLocationManager : IDetailManager<DetailLocation>, IDetailManager
+    public interface IAttributeLocationManager : IAttributeManager<DetailLocation>, IAttributeManager
     {
         /// <summary>
         /// Read item's detailed location

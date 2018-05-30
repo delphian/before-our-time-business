@@ -1,7 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Items;
-using BeforeOurTime.Business.Apis.Items.Details;
+using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Repository.Models.Items;
@@ -26,12 +26,12 @@ namespace BeforeOurTime.Business.Apis
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        T GetDetailManager<T>() where T : IDetailManager;
+        T GetDetailManager<T>() where T : IAttributeManager;
         /// <summary>
         /// Get all attribute managers for an item
         /// </summary>
         /// <param name="item">Item to determine managers for</param>
         /// <returns></returns>
-        List<IDetailManager> GetAttributeManagers(Item item);
+        List<IAttributeManager> GetAttributeManagers(Item item);
     }
 }

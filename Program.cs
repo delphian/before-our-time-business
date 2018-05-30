@@ -5,7 +5,8 @@ using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.IO.Requests.Models;
 using BeforeOurTime.Business.Apis.Items;
-using BeforeOurTime.Business.Apis.Items.Details;
+using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
@@ -105,12 +106,12 @@ namespace BeforeOurTime.Business
                 .AddScoped<IScriptManager, ScriptManager>()
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<IIOManager, IOManager>()
-                // Items and details
+                // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
-                .AddScoped<IDetailGameManager, DetailGameManager>()
-                .AddScoped<IDetailLocationManager, DetailLocationManager>()
-                .AddScoped<IDetailCharacterManager, DetailCharacterManager>()
-                .AddScoped<IDetailPhysicalManager, DetailPhysicalManager>()
+                .AddScoped<IAttributeGameManager, AttributeGameManager>()
+                .AddScoped<IAttributeLocationManager, AttributeLocationManager>()
+                .AddScoped<IAttributeCharacterManager, AttributeCharacterManager>()
+                .AddScoped<IAttributePhysicalManager, AttributePhysicalManager>()
                 .AddSingleton<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }
@@ -143,7 +144,7 @@ namespace BeforeOurTime.Business
             lock(thisLock)
             {
                 var api = ServiceProvider.GetService<IApi>();
-                var game = api.GetDetailManager<IDetailGameManager>().GetDefaultGame();
+                var game = api.GetDetailManager<IAttributeGameManager>().GetDefaultGame();
                 var onTickDelegate = api.GetScriptManager().GetDelegateDefinition("onTick");
                 var itemRecipients = api.GetItemManager().Read(onTickDelegate);
                 var tickMessage = new Message()
@@ -179,9 +180,9 @@ namespace BeforeOurTime.Business
                     {
 #endif
                         var item = api.GetItemManager().Read(message.RecipientId);
-                        List<IDetailManager> attributeManagers = api.GetAttributeManagers(item);
+                        List<IAttributeManager> attributeManagers = api.GetAttributeManagers(item);
                         // Hand off message deliver to each item's manager code
-                        attributeManagers.ForEach(delegate (IDetailManager attributeManager)
+                        attributeManagers.ForEach(delegate (IAttributeManager attributeManager)
                         {
                             // TODO : This should probably just add items to jsFunctionManager
                             // and then execute the script once instead of each manager executing the script

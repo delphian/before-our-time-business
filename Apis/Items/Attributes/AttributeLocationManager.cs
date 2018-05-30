@@ -1,4 +1,6 @@
-﻿using BeforeOurTime.Business.Apis.Scripts;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+using BeforeOurTime.Business.Apis.Messages;
+using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
@@ -8,30 +10,29 @@ using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Details
+namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class DetailCharacterManager : AttributeManager<DetailCharacter>, IDetailCharacterManager
+    public class AttributeLocationManager : AttributeManager<DetailLocation>, IAttributeLocationManager
     {
         private IItemRepo ItemRepo { set; get; }
-        private IDetailCharacterRepo DetailCharacterRepo { set; get; }
+        private IDetailLocationRepo DetailLocationRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public DetailCharacterManager(
+        public AttributeLocationManager(
             IItemRepo itemRepo,
-            IDetailCharacterRepo detailCharacterRepo,
+            IDetailLocationRepo detailLocationRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(detailCharacterRepo)
+            IItemManager itemManager) : base(detailLocationRepo)
         {
             ItemRepo = itemRepo;
-            DetailCharacterRepo = detailCharacterRepo;
+            DetailLocationRepo = detailLocationRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
@@ -42,33 +43,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// <returns></returns>
         public ItemType GetItemType()
         {
-            return ItemType.Character;
-        }
-        /// <summary>
-        /// Create a new character
-        /// </summary>
-        /// <param name="name">Public name of the character</param>
-        /// <param name="accountId">Account to which this character belongs</param>
-        /// <param name="initialLocation">Location of new character</param>
-        public DetailCharacter Create(
-            string name,
-            Guid accountId,
-            DetailLocation initialLocation)
-        {
-            var character = Attach(
-                new DetailCharacter()
-                {
-                    Name = name,
-                    AccountId = accountId,
-                }, ItemManager.Create(new Item()
-                {
-                    Type = ItemType.Character,
-                    UuidType = Guid.NewGuid(),
-                    ParentId = initialLocation.ItemId,
-                    Data = "{}",
-                    Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
-                }));
-            return character;
+            return ItemType.Location;
         }
         /// <summary>
         /// Deliver a message to an item
@@ -98,17 +73,47 @@ namespace BeforeOurTime.Business.Apis.Items.Details
             }
         }
         /// <summary>
+        /// Read item's detailed location
+        /// </summary>
+        /// <remarks>
+        /// If item itself has no location detail then item's parents will be 
+        /// traversed until one is found
+        /// </remarks>
+        /// <param name="item">Item that has attached detail location data</param>
+        /// <returns>The Item's detailed location data. Null if none found</returns>
+        new public DetailLocation Read(Item item)
+        {
+            DetailLocation location = null;
+            Item traverseItem = item;
+            while (traverseItem.ParentId != null && traverseItem.Type != ItemType.Location)
+            {
+                traverseItem = ItemRepo.Read(traverseItem.ParentId.Value);
+            }
+            if (traverseItem.Type == ItemType.Location)
+            {
+                location = DetailLocationRepo.Read(traverseItem);
+            }
+            return location;
+        }
+        /// <summary>
         /// Determine if an item has attributes that may be managed
         /// </summary>
         /// <param name="item">Item that may posses attributes</param>
         public bool IsManaging(Item item)
         {
             var managed = false;
-            if (DetailCharacterRepo.Read(item) != null)
+            if (DetailLocationRepo.Read(item) != null)
             {
                 managed = true;
             }
             return managed;
+        }
+
+        public DetailLocation UpdateName(Guid id, string name)
+        {
+            var locationAttribute = Read(id);
+            locationAttribute.Name = name;
+            return Update(locationAttribute);
         }
     }
 }

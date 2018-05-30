@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Details
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
 {
-    public interface IDetailCharacterManager : IDetailManager<DetailCharacter>, IDetailManager
+    public interface IAttributeCharacterManager : IAttributeManager<DetailCharacter>, IAttributeManager
     {
         /// <summary>
         /// Create a new character

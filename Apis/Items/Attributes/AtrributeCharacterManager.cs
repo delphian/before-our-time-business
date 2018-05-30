@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Business.Apis.Scripts;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
@@ -11,27 +12,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Details
+namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class DetailPhysicalManager : AttributeManager<DetailPhysical>, IDetailPhysicalManager
+    public class AttributeCharacterManager : AttributeManager<DetailCharacter>, IAttributeCharacterManager
     {
         private IItemRepo ItemRepo { set; get; }
-        private IDetailPhysicalRepo DetailPhysicalRepo { set; get; }
+        private IDetailCharacterRepo DetailCharacterRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public DetailPhysicalManager(
+        public AttributeCharacterManager(
             IItemRepo itemRepo,
-            IDetailPhysicalRepo detailPhysicalRepo,
+            IDetailCharacterRepo detailCharacterRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(detailPhysicalRepo)
+            IItemManager itemManager) : base(detailCharacterRepo)
         {
             ItemRepo = itemRepo;
-            DetailPhysicalRepo = detailPhysicalRepo;
+            DetailCharacterRepo = detailCharacterRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
@@ -42,59 +43,33 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// <returns></returns>
         public ItemType GetItemType()
         {
-            return ItemType.Generic;
+            return ItemType.Character;
         }
         /// <summary>
-        /// Attach new physical attributes to an existing item
+        /// Create a new character
         /// </summary>
-        /// <param name="item">Existing item that has already been saved</param>
-        /// <param name="name">One, two, or three word short description of item</param>
-        /// <param name="description">A long description of the item. Include many sensory experiences</param>
-        /// <param name="volume">Volume</param>
-        /// <param name="weight">Weight</param>
-        public DetailPhysical Attach(
-            Item item,
+        /// <param name="name">Public name of the character</param>
+        /// <param name="accountId">Account to which this character belongs</param>
+        /// <param name="initialLocation">Location of new character</param>
+        public DetailCharacter Create(
             string name,
-            string description,
-            int volume,
-            int weight)
+            Guid accountId,
+            DetailLocation initialLocation)
         {
-            var physicalAttributes = new DetailPhysical()
-            {
-                Name = name,
-                Description = description,
-                Volume = volume,
-                Weight = weight,
-                Item = item
-            };
-            var physical = Attach(physicalAttributes, item);
-            return physical;
-        }
-        /// <summary>
-        /// Create new item with new physical attributes
-        /// </summary>
-        /// <param name="parent">Parent item</param>
-        /// <param name="name">One, two, or three word short description of item</param>
-        /// <param name="description">A long description of the item. Include many sensory experiences</param>
-        /// <param name="volume">Volume</param>
-        /// <param name="weight">Weight</param>
-        public DetailPhysical Create(
-            Item parent,
-            string name,
-            string description,
-            int volume,
-            int weight)
-        {
-            var item = ItemManager.Create(new Item()
-            {
-                Type = ItemType.Generic,
-                UuidType = Guid.NewGuid(),
-                ParentId = parent.Id,
-                Data = "{}",
-                Script = ""
-            });
-            var physical = Attach(item, name, description, volume, weight);
-            return physical;
+            var character = Attach(
+                new DetailCharacter()
+                {
+                    Name = name,
+                    AccountId = accountId,
+                }, ItemManager.Create(new Item()
+                {
+                    Type = ItemType.Character,
+                    UuidType = Guid.NewGuid(),
+                    ParentId = initialLocation.ItemId,
+                    Data = "{}",
+                    Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
+                }));
+            return character;
         }
         /// <summary>
         /// Deliver a message to an item
@@ -130,7 +105,8 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         public bool IsManaging(Item item)
         {
             var managed = false;
-            if (DetailPhysicalRepo.Read(item) != null) {
+            if (DetailCharacterRepo.Read(item) != null)
+            {
                 managed = true;
             }
             return managed;

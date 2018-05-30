@@ -7,9 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Details
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
 {
-    public interface IDetailManager
+    public interface IAttributeManager
     {
         /// <summary>
         /// Get the item type that the manager is responsible for providing detail management for
@@ -33,7 +33,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
     /// <summary>
     /// Manage details of an item's extended data
     /// </summary>
-    public interface IDetailManager<T> : IAttributeRepository<T> where T: Detail
+    public interface IAttributeManager<T> : IAttributeRepository<T> where T: Detail
     {
         /// <summary>
         /// Attach new attributes to an existing item

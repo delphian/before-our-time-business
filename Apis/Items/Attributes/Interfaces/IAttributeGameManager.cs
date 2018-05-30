@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Details
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
 {
-    public interface IDetailGameManager : IDetailManager<DetailGame>, IDetailManager
+    public interface IAttributeGameManager : IAttributeManager<DetailGame>, IAttributeManager
     {
         /// <summary>
         /// Get the default game

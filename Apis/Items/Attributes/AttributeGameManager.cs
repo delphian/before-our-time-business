@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Business.Apis.Messages;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
@@ -12,9 +13,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Details
+namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class DetailGameManager : AttributeManager<DetailGame>, IDetailGameManager
+    public class AttributeGameManager : AttributeManager<DetailGame>, IAttributeGameManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailGameRepo DetailGameRepo { set; get; }
@@ -25,7 +26,7 @@ namespace BeforeOurTime.Business.Apis.Items.Details
         /// <summary>
         /// Constructor
         /// </summary>
-        public DetailGameManager(
+        public AttributeGameManager(
             IItemRepo itemRepo,
             IDetailGameRepo detailGameRepo,
             IDetailLocationRepo detailLocationRepo,

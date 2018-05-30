@@ -8,8 +8,7 @@ using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Items.Details;
-using BeforeOurTime.Repository.Models.Items.Details;
+using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Business.Apis.IO;
 
@@ -20,16 +19,16 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
-        private Dictionary<Type, IDetailManager> DetailManagerList = new Dictionary<Type, IDetailManager>();
+        private Dictionary<Type, IAttributeManager> DetailManagerList = new Dictionary<Type, IAttributeManager>();
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IIOManager IOManager { set; get; }
         private IItemManager ItemManager { set; get; }
-        private IDetailGameManager DetailGameManager { set; get; }
-        private IDetailCharacterManager DetailCharacterManager { set; get; }
-        private IDetailLocationManager DetailLocationManager { set; get; }
-        private IDetailPhysicalManager DetailPhysicalManager { set; get; }
+        private IAttributeGameManager DetailGameManager { set; get; }
+        private IAttributeCharacterManager DetailCharacterManager { set; get; }
+        private IAttributeLocationManager DetailLocationManager { set; get; }
+        private IAttributePhysicalManager DetailPhysicalManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -41,20 +40,20 @@ namespace BeforeOurTime.Business.Apis
             IScriptManager scriptManager,
             IIOManager ioManager,
             IItemManager itemManager,
-            IDetailGameManager detailGameManager,
-            IDetailCharacterManager detailCharacterManager,
-            IDetailLocationManager detailLocationManager,
-            IDetailPhysicalManager detailPhysicalManager)
+            IAttributeGameManager detailGameManager,
+            IAttributeCharacterManager detailCharacterManager,
+            IAttributeLocationManager detailLocationManager,
+            IAttributePhysicalManager detailPhysicalManager)
         {
             MessageManager = messageManager;
             AccountManager = accountManager;
             ScriptManager = scriptManager;
             IOManager = ioManager;
             ItemManager = itemManager;
-            DetailManagerList.Add(typeof(IDetailGameManager), detailGameManager);
-            DetailManagerList.Add(typeof(IDetailCharacterManager), detailCharacterManager);
-            DetailManagerList.Add(typeof(IDetailLocationManager), detailLocationManager);
-            DetailManagerList.Add(typeof(IDetailPhysicalManager), detailPhysicalManager);
+            DetailManagerList.Add(typeof(IAttributeGameManager), detailGameManager);
+            DetailManagerList.Add(typeof(IAttributeCharacterManager), detailCharacterManager);
+            DetailManagerList.Add(typeof(IAttributeLocationManager), detailLocationManager);
+            DetailManagerList.Add(typeof(IAttributePhysicalManager), detailPhysicalManager);
         }
         public IMessageManager GetMessageManager()
         {
@@ -81,7 +80,7 @@ namespace BeforeOurTime.Business.Apis
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetDetailManager<T>() where T : IDetailManager
+        public T GetDetailManager<T>() where T : IAttributeManager
         {
             return (T)DetailManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
         }
@@ -90,7 +89,7 @@ namespace BeforeOurTime.Business.Apis
         /// </summary>
         /// <param name="item">Item to determine managers for</param>
         /// <returns></returns>
-        public List<IDetailManager> GetAttributeManagers(Item item)
+        public List<IAttributeManager> GetAttributeManagers(Item item)
         {
             return DetailManagerList
                 .Where(x => x.Value.IsManaging(item))

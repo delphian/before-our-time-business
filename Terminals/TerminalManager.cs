@@ -9,7 +9,7 @@ using BeforeOurTime.Business.Terminals.Middleware;
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Details;
-using BeforeOurTime.Business.Apis.Items.Details;
+using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Repository.Models.Items.Details.Repos;
 using BeforeOurTime.Business.Apis.IO.Updates.Models;
 using BeforeOurTime.Business.Apis.Accounts;
@@ -34,8 +34,8 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         protected IDetailCharacterRepo DetailCharacterRepo { set; get; }
         private IAccountManager AccountManager { set; get; }
-        private IDetailGameManager DetailGameManager { set; get; }
-        private IDetailCharacterManager DetailCharacterManager { set; get; }
+        private IAttributeGameManager DetailGameManager { set; get; }
+        private IAttributeCharacterManager DetailCharacterManager { set; get; }
         /// <summary>
         /// List of all active terminals
         /// </summary>
@@ -74,8 +74,8 @@ namespace BeforeOurTime.Business.Terminals
             ItemRepo = scopedProvider.GetService<IItemRepo>();
             DetailCharacterRepo = scopedProvider.GetService<IDetailCharacterRepo>();
             AccountManager = scopedProvider.GetService<IAccountManager>();
-            DetailGameManager = scopedProvider.GetService<IDetailGameManager>();
-            DetailCharacterManager = scopedProvider.GetService<IDetailCharacterManager>();
+            DetailGameManager = scopedProvider.GetService<IAttributeGameManager>();
+            DetailCharacterManager = scopedProvider.GetService<IAttributeCharacterManager>();
             var api = serviceProvider.GetService<IApi>();
             // Register terminal middleware
             var interfaceType = typeof(ITerminalMiddleware);

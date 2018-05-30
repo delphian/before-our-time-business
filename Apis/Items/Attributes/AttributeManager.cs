@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Repository.Dbs.EF;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Details;
 using BeforeOurTime.Repository.Models.Items.Details.Repos;
@@ -7,12 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Details
+namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
     /// <summary>
     /// Manage details of an item's extended attributes
     /// </summary>
-    public class AttributeManager<T> : IDetailManager<T> where T : Detail
+    public class AttributeManager<T> : IAttributeManager<T> where T : Detail
     {
         private IAttributeRepository<T> AttributeRepo { set; get; }
         public AttributeManager(IAttributeRepository<T> attributeRepo)
