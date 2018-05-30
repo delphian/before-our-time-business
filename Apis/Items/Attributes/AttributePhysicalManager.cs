@@ -3,8 +3,8 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Details;
-using BeforeOurTime.Repository.Models.Items.Details.Repos;
+using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
@@ -14,7 +14,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class AttributePhysicalManager : AttributeManager<DetailPhysical>, IAttributePhysicalManager
+    public class AttributePhysicalManager : AttributeManager<AttributePhysical>, IAttributePhysicalManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailPhysicalRepo DetailPhysicalRepo { set; get; }
@@ -53,14 +53,14 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="description">A long description of the item. Include many sensory experiences</param>
         /// <param name="volume">Volume</param>
         /// <param name="weight">Weight</param>
-        public DetailPhysical Attach(
+        public AttributePhysical Attach(
             Item item,
             string name,
             string description,
             int volume,
             int weight)
         {
-            var physicalAttributes = new DetailPhysical()
+            var physicalAttributes = new AttributePhysical()
             {
                 Name = name,
                 Description = description,
@@ -79,7 +79,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="description">A long description of the item. Include many sensory experiences</param>
         /// <param name="volume">Volume</param>
         /// <param name="weight">Weight</param>
-        public DetailPhysical Create(
+        public AttributePhysical Create(
             Item parent,
             string name,
             string description,

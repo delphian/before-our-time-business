@@ -3,7 +3,7 @@ using BeforeOurTime.Business.Apis.IO.Updates.Models;
 using BeforeOurTime.Repository.Json;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Details;
+using BeforeOurTime.Repository.Models.Items.Attributes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -44,7 +44,7 @@ namespace BeforeOurTime.Business.Terminals
         /// Item currently attached to as terminal's avatar (in system representation)
         /// </summary>
         [JsonProperty(PropertyName = "character")]
-        public DetailCharacter Character { set; get; }
+        public AttributeCharacter Character { set; get; }
         /// <summary>
         /// General purpose databag at the disposal of the client server
         /// </summary>
@@ -114,7 +114,7 @@ namespace BeforeOurTime.Business.Terminals
         /// Get available characters for terminal attachment
         /// </summary>
         /// <returns></returns>
-        public List<DetailCharacter> GetAttachable()
+        public List<AttributeCharacter> GetAttachable()
         {
             return TerminalManager.GetAttachableAvatars(this);
         }

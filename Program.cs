@@ -16,13 +16,13 @@ using BeforeOurTime.Business.Logs;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Dbs.EF.Items;
-using BeforeOurTime.Repository.Dbs.EF.Items.Details;
+using BeforeOurTime.Repository.Dbs.EF.Items.Attributes;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
 using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Details.Repos;
+using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using BeforeOurTime.Repository.Models.Scripts.Interfaces;
@@ -96,10 +96,10 @@ namespace BeforeOurTime.Business
                 .AddScoped<IScriptInterfaceRepo, ScriptInterfaceRepo>()
                 // Repositories (Items)
                 .AddScoped<IItemRepo, ItemRepo>()
-                .AddScoped<IDetailCharacterRepo, DetailCharacterRepo>()
-                .AddScoped<IDetailGameRepo, DetailGameRepo>()
-                .AddScoped<IDetailLocationRepo, DetailLocationRepo>()
-                .AddScoped<IDetailPhysicalRepo, DetailPhysicalRepo>()
+                .AddScoped<IDetailCharacterRepo, AttributeCharacterRepo>()
+                .AddScoped<IDetailGameRepo, AttributeGameRepo>()
+                .AddScoped<IDetailLocationRepo, AttributeLocationRepo>()
+                .AddScoped<IDetailPhysicalRepo, AttributePhysicalRepo>()
                 // Main environment interface API
                 .AddScoped<IScriptEngine, JsScriptEngine>()
                 .AddScoped<IAccountManager, AccountManager>()

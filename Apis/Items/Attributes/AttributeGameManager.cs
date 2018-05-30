@@ -4,8 +4,8 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Details;
-using BeforeOurTime.Repository.Models.Items.Details.Repos;
+using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
@@ -15,7 +15,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class AttributeGameManager : AttributeManager<DetailGame>, IAttributeGameManager
+    public class AttributeGameManager : AttributeManager<AttributeGame>, IAttributeGameManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailGameRepo DetailGameRepo { set; get; }
@@ -56,12 +56,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// Will create the default game and a location if one does not already exist
         /// </remarks>
         /// <returns></returns>
-        public DetailGame GetDefaultGame()
+        public AttributeGame GetDefaultGame()
         {
             var defaultGame = DetailGameRepo.Read().FirstOrDefault();
             if (defaultGame == null)
             {
-                defaultGame = Create(new DetailGame()
+                defaultGame = Create(new AttributeGame()
                 {
                     Name = "Brave New World",
                     Item = new Item()
@@ -71,7 +71,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                         Data = "{}",
                         Script = ""
                     },
-                    DefaultLocation = new DetailLocation()
+                    DefaultLocation = new AttributeLocation()
                     {
                         Name = "A Dark Void",
                         Description = "Cool mists and dark shadows shroud " 
@@ -102,7 +102,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// not specified
         /// </remarks>
         /// <returns></returns>
-        public DetailLocation GetDefaultLocation()
+        public AttributeLocation GetDefaultLocation()
         {
             var defaultGame = GetDefaultGame();
             return DetailLocationRepo.Read(defaultGame.DefaultLocationId);
@@ -153,7 +153,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique game attribute identifier</param>
         /// <param name="name">Game's new name</param>
         /// <returns></returns>
-        public DetailGame UpdateName(Guid id, string name)
+        public AttributeGame UpdateName(Guid id, string name)
         {
             var gameAttribute = Read(id);
             gameAttribute.Name = name;

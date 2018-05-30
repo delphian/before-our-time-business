@@ -4,8 +4,8 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Details;
-using BeforeOurTime.Repository.Models.Items.Details.Repos;
+using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
@@ -14,7 +14,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class AttributeLocationManager : AttributeManager<DetailLocation>, IAttributeLocationManager
+    public class AttributeLocationManager : AttributeManager<AttributeLocation>, IAttributeLocationManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailLocationRepo DetailLocationRepo { set; get; }
@@ -81,9 +81,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// </remarks>
         /// <param name="item">Item that has attached detail location data</param>
         /// <returns>The Item's detailed location data. Null if none found</returns>
-        new public DetailLocation Read(Item item)
+        new public AttributeLocation Read(Item item)
         {
-            DetailLocation location = null;
+            AttributeLocation location = null;
             Item traverseItem = item;
             while (traverseItem.ParentId != null && traverseItem.Type != ItemType.Location)
             {
@@ -109,7 +109,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             return managed;
         }
 
-        public DetailLocation UpdateName(Guid id, string name)
+        public AttributeLocation UpdateName(Guid id, string name)
         {
             var locationAttribute = Read(id);
             locationAttribute.Name = name;

@@ -3,8 +3,8 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Details;
-using BeforeOurTime.Repository.Models.Items.Details.Repos;
+using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
@@ -14,7 +14,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class AttributeCharacterManager : AttributeManager<DetailCharacter>, IAttributeCharacterManager
+    public class AttributeCharacterManager : AttributeManager<AttributeCharacter>, IAttributeCharacterManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IDetailCharacterRepo DetailCharacterRepo { set; get; }
@@ -51,13 +51,13 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="name">Public name of the character</param>
         /// <param name="accountId">Account to which this character belongs</param>
         /// <param name="initialLocation">Location of new character</param>
-        public DetailCharacter Create(
+        public AttributeCharacter Create(
             string name,
             Guid accountId,
-            DetailLocation initialLocation)
+            AttributeLocation initialLocation)
         {
             var character = Attach(
-                new DetailCharacter()
+                new AttributeCharacter()
                 {
                     Name = name,
                     AccountId = accountId,

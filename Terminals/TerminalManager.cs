@@ -8,9 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using BeforeOurTime.Business.Terminals.Middleware;
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Details;
+using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
-using BeforeOurTime.Repository.Models.Items.Details.Repos;
+using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Business.Apis.IO.Updates.Models;
 using BeforeOurTime.Business.Apis.Accounts;
 
@@ -117,9 +117,9 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        public DetailCharacter AttachTerminal(Terminal terminal, Guid itemId)
+        public AttributeCharacter AttachTerminal(Terminal terminal, Guid itemId)
         {
-            DetailCharacter avatar = null;
+            AttributeCharacter avatar = null;
             var character = DetailCharacterRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
             if (character != null && terminal.AccountId == character.AccountId)
             {
@@ -168,9 +168,9 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <returns></returns>
-        public List<DetailCharacter> GetAttachableAvatars(Terminal terminal)
+        public List<AttributeCharacter> GetAttachableAvatars(Terminal terminal)
         {
-            var avatars = new List<DetailCharacter>();
+            var avatars = new List<AttributeCharacter>();
             if (terminal.AccountId != null)
             {
                 avatars = DetailCharacterRepo.ReadCharacters(terminal.AccountId);
@@ -195,10 +195,10 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="name">Friendly name of character</param>
         /// <returns></returns>
-        public DetailCharacter CreateCharacter(Terminal terminal, string name)
+        public AttributeCharacter CreateCharacter(Terminal terminal, string name)
         {
-            DetailLocation defaultLocation = DetailGameManager.GetDefaultLocation();
-            DetailCharacter character = DetailCharacterManager.Create(
+            AttributeLocation defaultLocation = DetailGameManager.GetDefaultLocation();
+            AttributeCharacter character = DetailCharacterManager.Create(
                 name,
                 terminal.AccountId,
                 defaultLocation);

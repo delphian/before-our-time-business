@@ -1,12 +1,12 @@
 ﻿using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Details;
+using BeforeOurTime.Repository.Models.Items.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
 {
-    public interface IAttributeGameManager : IAttributeManager<DetailGame>, IAttributeManager
+    public interface IAttributeGameManager : IAttributeManager<AttributeGame>, IAttributeManager
     {
         /// <summary>
         /// Get the default game
@@ -15,7 +15,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// Will create the default game if one does not already exist
         /// </remarks>
         /// <returns></returns>
-        DetailGame GetDefaultGame();
+        AttributeGame GetDefaultGame();
         /// <summary>
         /// Get the default location of the default game
         /// </summary>
@@ -24,13 +24,13 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// not specified
         /// </remarks>
         /// <returns></returns>
-        DetailLocation GetDefaultLocation();
+        AttributeLocation GetDefaultLocation();
         /// <summary>
         /// Update games's name
         /// </summary>
         /// <param name="id">Unique game attribute identifier</param>
         /// <param name="name">Game's new name</param>
         /// <returns></returns>
-        DetailGame UpdateName(Guid id, string name);
+        AttributeGame UpdateName(Guid id, string name);
     }
 }

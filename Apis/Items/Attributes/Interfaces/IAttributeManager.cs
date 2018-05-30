@@ -1,7 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Details;
-using BeforeOurTime.Repository.Models.Items.Details.Repos;
+using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using System;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
     /// <summary>
     /// Manage details of an item's extended data
     /// </summary>
-    public interface IAttributeManager<T> : IAttributeRepository<T> where T: Detail
+    public interface IAttributeManager<T> : IAttributeRepository<T> where T: Repository.Models.Items.Attributes.Attribute
     {
         /// <summary>
         /// Attach new attributes to an existing item
