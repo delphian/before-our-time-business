@@ -159,5 +159,17 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             gameAttribute.Name = name;
             return Update(gameAttribute);
         }
+        /// <summary>
+        /// Update games's default location
+        /// </summary>
+        /// <param name="id">Unique game attribute identifier</param>
+        /// <param name="locationId">Game's new default location</param>
+        /// <returns></returns>
+        public AttributeGame UpdateDefaultLocation(Guid id, Guid locationId)
+        {
+            var gameAttribute = Read(id);
+            gameAttribute.DefaultLocationId = locationId;
+            return Update(gameAttribute);
+        }
     }
 }

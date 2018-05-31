@@ -32,5 +32,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="name">Game's new name</param>
         /// <returns></returns>
         AttributeGame UpdateName(Guid id, string name);
+        /// <summary>
+        /// Update games's default location
+        /// </summary>
+        /// <param name="id">Unique game attribute identifier</param>
+        /// <param name="locationId">Game's new default location</param>
+        /// <returns></returns>
+        AttributeGame UpdateDefaultLocation(Guid id, Guid locationId);
     }
 }
