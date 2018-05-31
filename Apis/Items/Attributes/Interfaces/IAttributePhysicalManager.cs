@@ -36,5 +36,41 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
             string description,
             int volume,
             int weight);
+        /// <summary>
+        /// Update the physical name
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="description">New name of the physical</param>
+        /// <returns></returns>
+        AttributePhysical UpdateName(
+            Guid id, 
+            string name);
+        /// <summary>
+        /// Update the physical description
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="description">New description of the physical</param>
+        /// <returns></returns>
+        AttributePhysical UpdateDescription(
+            Guid id, 
+            string description);
+        /// <summary>
+        /// Update the physical volume
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="volume">New volume of the physical</param>
+        /// <returns></returns>
+        AttributePhysical UpdateVolume(
+            Guid id, 
+            int volume);
+        /// <summary>
+        /// Update the physical weight
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="weight">New weight of the physical</param>
+        /// <returns></returns>
+        AttributePhysical UpdateWeight(
+            Guid id,
+            int weight);
     }
 }

@@ -136,5 +136,53 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             }
             return managed;
         }
+        /// <summary>
+        /// Update the physical name
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="description">New name of the physical</param>
+        /// <returns></returns>
+        public AttributePhysical UpdateName(Guid id, string name)
+        {
+            var physicalAttribute = Read(id);
+            physicalAttribute.Name = name;
+            return Update(physicalAttribute);
+        }
+        /// <summary>
+        /// Update the physical description
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="description">New description of the physical</param>
+        /// <returns></returns>
+        public AttributePhysical UpdateDescription(Guid id, string description)
+        {
+            var physicalAttribute = Read(id);
+            physicalAttribute.Description = description;
+            return Update(physicalAttribute);
+        }
+        /// <summary>
+        /// Update the physical volume
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="volume">New volume of the physical</param>
+        /// <returns></returns>
+        public AttributePhysical UpdateVolume(Guid id, int volume)
+        {
+            var physicalAttribute = Read(id);
+            physicalAttribute.Volume = volume;
+            return Update(physicalAttribute);
+        }
+        /// <summary>
+        /// Update the physical weight
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="weight">New weight of the physical</param>
+        /// <returns></returns>
+        public AttributePhysical UpdateWeight(Guid id, int weight)
+        {
+            var physicalAttribute = Read(id);
+            physicalAttribute.Weight = weight;
+            return Update(physicalAttribute);
+        }
     }
 }
