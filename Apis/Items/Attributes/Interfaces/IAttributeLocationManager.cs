@@ -25,5 +25,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="name">Location's new name</param>
         /// <returns></returns>
         AttributeLocation UpdateName(Guid id, string name);
+        /// <summary>
+        /// Update the location description
+        /// </summary>
+        /// <param name="id">Unique location attribute identifier</param>
+        /// <param name="description">New description of the location</param>
+        /// <returns></returns>
+        AttributeLocation UpdateDescription(Guid id, string description);
     }
 }

@@ -108,11 +108,28 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             }
             return managed;
         }
-
+        /// <summary>
+        /// Update the location name
+        /// </summary>
+        /// <param name="id">Unique location attribute identifier</param>
+        /// <param name="name">New name of the location</param>
+        /// <returns></returns>
         public AttributeLocation UpdateName(Guid id, string name)
         {
             var locationAttribute = Read(id);
             locationAttribute.Name = name;
+            return Update(locationAttribute);
+        }
+        /// <summary>
+        /// Update the location description
+        /// </summary>
+        /// <param name="id">Unique location attribute identifier</param>
+        /// <param name="description">New description of the location</param>
+        /// <returns></returns>
+        public AttributeLocation UpdateDescription(Guid id, string description)
+        {
+            var locationAttribute = Read(id);
+            locationAttribute.Description = description;
             return Update(locationAttribute);
         }
     }
