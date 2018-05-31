@@ -18,8 +18,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
     public class AttributeGameManager : AttributeManager<AttributeGame>, IAttributeGameManager
     {
         private IItemRepo ItemRepo { set; get; }
-        private IDetailGameRepo DetailGameRepo { set; get; }
-        private IDetailLocationRepo DetailLocationRepo { set; get; }
+        private IAttributeGameRepo DetailGameRepo { set; get; }
+        private IAttributeLocationRepo DetailLocationRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
@@ -28,8 +28,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// </summary>
         public AttributeGameManager(
             IItemRepo itemRepo,
-            IDetailGameRepo detailGameRepo,
-            IDetailLocationRepo detailLocationRepo,
+            IAttributeGameRepo detailGameRepo,
+            IAttributeLocationRepo detailLocationRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
             IItemManager itemManager) : base(detailGameRepo)

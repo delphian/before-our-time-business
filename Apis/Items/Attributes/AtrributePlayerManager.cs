@@ -14,19 +14,19 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class AttributeCharacterManager : AttributeManager<AttributeCharacter>, IAttributeCharacterManager
+    public class AttributePlayerManager : AttributeManager<AttributePlayer>, IAttributePlayerManager
     {
         private IItemRepo ItemRepo { set; get; }
-        private IDetailCharacterRepo DetailCharacterRepo { set; get; }
+        private IAttributePlayerRepo DetailCharacterRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public AttributeCharacterManager(
+        public AttributePlayerManager(
             IItemRepo itemRepo,
-            IDetailCharacterRepo detailCharacterRepo,
+            IAttributePlayerRepo detailCharacterRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
             IItemManager itemManager) : base(detailCharacterRepo)
@@ -51,13 +51,13 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="name">Public name of the character</param>
         /// <param name="accountId">Account to which this character belongs</param>
         /// <param name="initialLocation">Location of new character</param>
-        public AttributeCharacter Create(
+        public AttributePlayer Create(
             string name,
             Guid accountId,
             AttributeLocation initialLocation)
         {
             var character = Attach(
-                new AttributeCharacter()
+                new AttributePlayer()
                 {
                     Name = name,
                     AccountId = accountId,

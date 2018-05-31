@@ -245,7 +245,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     case "list":
                         s.sendMessageToClient(c, "\r\n\r\n");
                         var characters = c.GetTerminal().GetAttachable();
-                        characters.ForEach(delegate (AttributeCharacter character)
+                        characters.ForEach(delegate (AttributePlayer character)
                         {
                             s.sendMessageToClient(c, "  " + character.Name + " (" + character.Id + ")\r\n");
                         });
@@ -259,7 +259,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         break;
                     case "play":
                         var name = message.Split(' ').Last().ToLower();
-                        c.GetTerminal().GetAttachable().ForEach(delegate (AttributeCharacter character)
+                        c.GetTerminal().GetAttachable().ForEach(delegate (AttributePlayer character)
                         {
                             if (character.Name.ToLower() == name)
                             {

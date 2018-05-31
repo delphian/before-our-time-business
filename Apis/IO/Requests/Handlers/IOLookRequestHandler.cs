@@ -33,7 +33,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 {
                     ioLocationUpdate.Adendums.Add("Something is here");
                 }
-                if (api.GetDetailManager<IAttributeCharacterManager>().IsManaging(item))
+                if (api.GetDetailManager<IAttributePlayerManager>().IsManaging(item))
                 {
                     ioLocationUpdate.Adendums.Add("Someone is here");
                 }

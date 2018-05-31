@@ -32,10 +32,10 @@ namespace BeforeOurTime.Business.Terminals
         /// <summary>
         /// Central data repository for all character items
         /// </summary>
-        protected IDetailCharacterRepo DetailCharacterRepo { set; get; }
+        protected IAttributePlayerRepo DetailCharacterRepo { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IAttributeGameManager DetailGameManager { set; get; }
-        private IAttributeCharacterManager DetailCharacterManager { set; get; }
+        private IAttributePlayerManager DetailCharacterManager { set; get; }
         /// <summary>
         /// List of all active terminals
         /// </summary>
@@ -72,10 +72,10 @@ namespace BeforeOurTime.Business.Terminals
             var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
             AccountRepo = scopedProvider.GetService<IAccountRepo>();
             ItemRepo = scopedProvider.GetService<IItemRepo>();
-            DetailCharacterRepo = scopedProvider.GetService<IDetailCharacterRepo>();
+            DetailCharacterRepo = scopedProvider.GetService<IAttributePlayerRepo>();
             AccountManager = scopedProvider.GetService<IAccountManager>();
             DetailGameManager = scopedProvider.GetService<IAttributeGameManager>();
-            DetailCharacterManager = scopedProvider.GetService<IAttributeCharacterManager>();
+            DetailCharacterManager = scopedProvider.GetService<IAttributePlayerManager>();
             var api = serviceProvider.GetService<IApi>();
             // Register terminal middleware
             var interfaceType = typeof(ITerminalMiddleware);
@@ -117,9 +117,9 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        public AttributeCharacter AttachTerminal(Terminal terminal, Guid itemId)
+        public AttributePlayer AttachTerminal(Terminal terminal, Guid itemId)
         {
-            AttributeCharacter avatar = null;
+            AttributePlayer avatar = null;
             var character = DetailCharacterRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
             if (character != null && terminal.AccountId == character.AccountId)
             {
@@ -168,9 +168,9 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <returns></returns>
-        public List<AttributeCharacter> GetAttachableAvatars(Terminal terminal)
+        public List<AttributePlayer> GetAttachableAvatars(Terminal terminal)
         {
-            var avatars = new List<AttributeCharacter>();
+            var avatars = new List<AttributePlayer>();
             if (terminal.AccountId != null)
             {
                 avatars = DetailCharacterRepo.ReadCharacters(terminal.AccountId);
@@ -195,10 +195,10 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="name">Friendly name of character</param>
         /// <returns></returns>
-        public AttributeCharacter CreateCharacter(Terminal terminal, string name)
+        public AttributePlayer CreateCharacter(Terminal terminal, string name)
         {
             AttributeLocation defaultLocation = DetailGameManager.GetDefaultLocation();
-            AttributeCharacter character = DetailCharacterManager.Create(
+            AttributePlayer character = DetailCharacterManager.Create(
                 name,
                 terminal.AccountId,
                 defaultLocation);

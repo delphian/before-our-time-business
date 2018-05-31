@@ -96,10 +96,10 @@ namespace BeforeOurTime.Business
                 .AddScoped<IScriptInterfaceRepo, ScriptInterfaceRepo>()
                 // Repositories (Items)
                 .AddScoped<IItemRepo, ItemRepo>()
-                .AddScoped<IDetailCharacterRepo, AttributeCharacterRepo>()
-                .AddScoped<IDetailGameRepo, AttributeGameRepo>()
-                .AddScoped<IDetailLocationRepo, AttributeLocationRepo>()
-                .AddScoped<IDetailPhysicalRepo, AttributePhysicalRepo>()
+                .AddScoped<IAttributePlayerRepo, AttributePlayerRepo>()
+                .AddScoped<IAttributeGameRepo, AttributeGameRepo>()
+                .AddScoped<IAttributeLocationRepo, AttributeLocationRepo>()
+                .AddScoped<IAttributePhysicalRepo, AttributePhysicalRepo>()
                 // Main environment interface API
                 .AddScoped<IScriptEngine, JsScriptEngine>()
                 .AddScoped<IAccountManager, AccountManager>()
@@ -110,7 +110,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IAttributeGameManager, AttributeGameManager>()
                 .AddScoped<IAttributeLocationManager, AttributeLocationManager>()
-                .AddScoped<IAttributeCharacterManager, AttributeCharacterManager>()
+                .AddScoped<IAttributePlayerManager, AttributePlayerManager>()
                 .AddScoped<IAttributePhysicalManager, AttributePhysicalManager>()
                 .AddSingleton<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();

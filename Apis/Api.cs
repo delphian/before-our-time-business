@@ -26,7 +26,7 @@ namespace BeforeOurTime.Business.Apis
         private IIOManager IOManager { set; get; }
         private IItemManager ItemManager { set; get; }
         private IAttributeGameManager DetailGameManager { set; get; }
-        private IAttributeCharacterManager DetailCharacterManager { set; get; }
+        private IAttributePlayerManager DetailCharacterManager { set; get; }
         private IAttributeLocationManager DetailLocationManager { set; get; }
         private IAttributePhysicalManager DetailPhysicalManager { set; get; }
         /// <summary>
@@ -41,7 +41,7 @@ namespace BeforeOurTime.Business.Apis
             IIOManager ioManager,
             IItemManager itemManager,
             IAttributeGameManager detailGameManager,
-            IAttributeCharacterManager detailCharacterManager,
+            IAttributePlayerManager detailCharacterManager,
             IAttributeLocationManager detailLocationManager,
             IAttributePhysicalManager detailPhysicalManager)
         {
@@ -51,7 +51,7 @@ namespace BeforeOurTime.Business.Apis
             IOManager = ioManager;
             ItemManager = itemManager;
             DetailManagerList.Add(typeof(IAttributeGameManager), detailGameManager);
-            DetailManagerList.Add(typeof(IAttributeCharacterManager), detailCharacterManager);
+            DetailManagerList.Add(typeof(IAttributePlayerManager), detailCharacterManager);
             DetailManagerList.Add(typeof(IAttributeLocationManager), detailLocationManager);
             DetailManagerList.Add(typeof(IAttributePhysicalManager), detailPhysicalManager);
         }

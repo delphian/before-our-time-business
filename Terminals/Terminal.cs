@@ -44,7 +44,7 @@ namespace BeforeOurTime.Business.Terminals
         /// Item currently attached to as terminal's avatar (in system representation)
         /// </summary>
         [JsonProperty(PropertyName = "character")]
-        public AttributeCharacter Character { set; get; }
+        public AttributePlayer Character { set; get; }
         /// <summary>
         /// General purpose databag at the disposal of the client server
         /// </summary>
@@ -114,7 +114,7 @@ namespace BeforeOurTime.Business.Terminals
         /// Get available characters for terminal attachment
         /// </summary>
         /// <returns></returns>
-        public List<AttributeCharacter> GetAttachable()
+        public List<AttributePlayer> GetAttachable()
         {
             return TerminalManager.GetAttachableAvatars(this);
         }

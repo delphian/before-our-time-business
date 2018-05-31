@@ -1,38 +1,37 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
-using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
 using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class AttributeLocationManager : AttributeManager<AttributeLocation>, IAttributeLocationManager
+    public class AttributeExitManager : AttributeManager<AttributeExit>, IAttributeExitManager
     {
         private IItemRepo ItemRepo { set; get; }
-        private IAttributeLocationRepo DetailLocationRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public AttributeLocationManager(
+        public AttributeExitManager(
             IItemRepo itemRepo,
-            IAttributeLocationRepo detailLocationRepo,
+            IAttributeExitRepo attributeExitRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(detailLocationRepo)
+            IItemManager itemManager) : base(attributeExitRepo)
         {
             ItemRepo = itemRepo;
-            DetailLocationRepo = detailLocationRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
@@ -43,7 +42,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <returns></returns>
         public ItemType GetItemType()
         {
-            return ItemType.Location;
+            return ItemType.Generic;
         }
         /// <summary>
         /// Deliver a message to an item
@@ -73,64 +72,28 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             }
         }
         /// <summary>
-        /// Read item's detailed location
-        /// </summary>
-        /// <remarks>
-        /// If item itself has no location detail then item's parents will be 
-        /// traversed until one is found
-        /// </remarks>
-        /// <param name="item">Item that has attached detail location data</param>
-        /// <returns>The Item's detailed location data. Null if none found</returns>
-        new public AttributeLocation Read(Item item)
-        {
-            AttributeLocation location = null;
-            Item traverseItem = item;
-            while (traverseItem.ParentId != null && traverseItem.Type != ItemType.Location)
-            {
-                traverseItem = ItemRepo.Read(traverseItem.ParentId.Value);
-            }
-            if (traverseItem.Type == ItemType.Location)
-            {
-                location = DetailLocationRepo.Read(traverseItem);
-            }
-            return location;
-        }
-        /// <summary>
         /// Determine if an item has attributes that may be managed
         /// </summary>
         /// <param name="item">Item that may posses attributes</param>
         public bool IsManaging(Item item)
         {
             var managed = false;
-            if (DetailLocationRepo.Read(item) != null)
-            {
+            if (AttributeRepo.Read(item) != null) {
                 managed = true;
             }
             return managed;
         }
         /// <summary>
-        /// Update the location name
+        /// Update the destination location
         /// </summary>
-        /// <param name="id">Unique location attribute identifier</param>
-        /// <param name="name">New name of the location</param>
+        /// <param name="id">Unique exit attribute identifier</param>
+        /// <param name="destinationLocationId">New location id of the exit destination</param>
         /// <returns></returns>
-        public AttributeLocation UpdateName(Guid id, string name)
+        public AttributeExit UpdateDestination(Guid id, Guid destinationLocationId)
         {
-            var locationAttribute = Read(id);
-            locationAttribute.Name = name;
-            return Update(locationAttribute);
-        }
-        /// <summary>
-        /// Update the location description
-        /// </summary>
-        /// <param name="id">Unique location attribute identifier</param>
-        /// <param name="description">New description of the location</param>
-        /// <returns></returns>
-        public AttributeLocation UpdateDescription(Guid id, string description)
-        {
-            var locationAttribute = Read(id);
-            locationAttribute.Description = description;
-            return Update(locationAttribute);
+            var exitAttribute = Read(id);
+            exitAttribute.DestinationLocationId = destinationLocationId;
+            return Update(exitAttribute);
         }
     }
 }

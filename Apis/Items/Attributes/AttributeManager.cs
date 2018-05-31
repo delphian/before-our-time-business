@@ -15,7 +15,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
     /// </summary>
     public class AttributeManager<T> : IAttributeManager<T> where T : Repository.Models.Items.Attributes.Attribute
     {
-        private IAttributeRepository<T> AttributeRepo { set; get; }
+        protected IAttributeRepository<T> AttributeRepo { set; get; }
         public AttributeManager(IAttributeRepository<T> attributeRepo)
         {
             AttributeRepo = attributeRepo;
