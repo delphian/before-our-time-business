@@ -25,10 +25,6 @@ namespace BeforeOurTime.Business.Apis
         private IScriptManager ScriptManager { set; get; }
         private IIOManager IOManager { set; get; }
         private IItemManager ItemManager { set; get; }
-        private IAttributeGameManager DetailGameManager { set; get; }
-        private IAttributePlayerManager DetailCharacterManager { set; get; }
-        private IAttributeLocationManager DetailLocationManager { set; get; }
-        private IAttributePhysicalManager DetailPhysicalManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -43,7 +39,8 @@ namespace BeforeOurTime.Business.Apis
             IAttributeGameManager detailGameManager,
             IAttributePlayerManager detailCharacterManager,
             IAttributeLocationManager detailLocationManager,
-            IAttributePhysicalManager detailPhysicalManager)
+            IAttributePhysicalManager detailPhysicalManager,
+            IAttributeExitManager attributeExitManager)
         {
             MessageManager = messageManager;
             AccountManager = accountManager;
@@ -54,6 +51,7 @@ namespace BeforeOurTime.Business.Apis
             DetailManagerList.Add(typeof(IAttributePlayerManager), detailCharacterManager);
             DetailManagerList.Add(typeof(IAttributeLocationManager), detailLocationManager);
             DetailManagerList.Add(typeof(IAttributePhysicalManager), detailPhysicalManager);
+            DetailManagerList.Add(typeof(IAttributeExitManager), attributeExitManager);
         }
         public IMessageManager GetMessageManager()
         {

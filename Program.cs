@@ -112,6 +112,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IAttributeLocationManager, AttributeLocationManager>()
                 .AddScoped<IAttributePlayerManager, AttributePlayerManager>()
                 .AddScoped<IAttributePhysicalManager, AttributePhysicalManager>()
+                .AddScoped<IAttributeExitManager, AttributeExitManager>()
                 .AddSingleton<IApi, Api>()
                 .AddSingleton<ITerminalManager, TerminalManager>();
         }
