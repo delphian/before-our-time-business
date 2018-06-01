@@ -26,7 +26,7 @@ namespace BeforeOurTime.Business.Apis
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        T GetDetailManager<T>() where T : IAttributeManager;
+        T GetAttributeManager<T>() where T : IAttributeManager;
         /// <summary>
         /// Get all attribute managers for an item
         /// </summary>

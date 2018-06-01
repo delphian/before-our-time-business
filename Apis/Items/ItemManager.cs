@@ -94,24 +94,6 @@ namespace BeforeOurTime.Business.Apis.Items
             return ItemRepo.Update(new List<Item>() { item }).FirstOrDefault();
         }
         /// <summary>
-        /// Permenantly delete an item and remove from data store
-        /// </summary>
-        /// <remarks>
-        /// All children will be re-homed to the item parent unless otherwise specified
-        /// </remarks>
-        /// <param name="item">Item to delete</param>
-        /// <param name="deleteChildren">Also delete all children</param>
-        public void Delete(Item item, bool? deleteChildren = false)
-        {
-            // Move the item
-            var oldParent = item.Parent;
-            item.Children.ForEach(delegate (Item child)
-            {
-                Move(child, oldParent, item);
-            });
-            ItemRepo.Delete(new List<Item>() { item });
-        }
-        /// <summary>
         /// Generate delegate links by parsing an item's script delegate declarations
         /// </summary>
         /// <param name="item">Item to generate delegate links for</param>
@@ -139,6 +121,48 @@ namespace BeforeOurTime.Business.Apis.Items
                 });
             });
            return delegateLinks;
+        }
+        /// <summary>
+        /// Update the item name
+        /// </summary>
+        /// <param name="id">Unique item identifier</param>
+        /// <param name="name">New name of the item</param>
+        /// <returns></returns>
+        public Item UpdateName(Guid id, string name)
+        {
+            var item = Read(id);
+            item.Name = name;
+            return Update(item);
+        }
+        /// <summary>
+        /// Update the item description
+        /// </summary>
+        /// <param name="id">Unique item identifier</param>
+        /// <param name="description">New description of the item</param>
+        /// <returns></returns>
+        public Item UpdateDescription(Guid id, string description)
+        {
+            var item = Read(id);
+            item.Description = description;
+            return Update(item);
+        }
+        /// <summary>
+        /// Permenantly delete an item and remove from data store
+        /// </summary>
+        /// <remarks>
+        /// All children will be re-homed to the item parent unless otherwise specified
+        /// </remarks>
+        /// <param name="item">Item to delete</param>
+        /// <param name="deleteChildren">Also delete all children</param>
+        public void Delete(Item item, bool? deleteChildren = false)
+        {
+            // Move the item
+            var oldParent = item.Parent;
+            item.Children.ForEach(delegate (Item child)
+            {
+                Move(child, oldParent, item);
+            });
+            ItemRepo.Delete(new List<Item>() { item });
         }
         /// <summary>
         /// Relocate an item

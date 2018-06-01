@@ -17,7 +17,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
     public class AttributePlayerManager : AttributeManager<AttributePlayer>, IAttributePlayerManager
     {
         private IItemRepo ItemRepo { set; get; }
-        private IAttributePlayerRepo DetailCharacterRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
@@ -26,13 +25,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// </summary>
         public AttributePlayerManager(
             IItemRepo itemRepo,
-            IAttributePlayerRepo detailCharacterRepo,
+            IAttributePlayerRepo attributePlayerRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(detailCharacterRepo)
+            IItemManager itemManager) : base(attributePlayerRepo)
         {
             ItemRepo = itemRepo;
-            DetailCharacterRepo = detailCharacterRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
@@ -46,11 +44,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             return ItemType.Character;
         }
         /// <summary>
-        /// Create a new character
+        /// Create a new player
         /// </summary>
-        /// <param name="name">Public name of the character</param>
-        /// <param name="accountId">Account to which this character belongs</param>
-        /// <param name="initialLocation">Location of new character</param>
+        /// <param name="name">Public name of the player</param>
+        /// <param name="accountId">Account to which this player belongs</param>
+        /// <param name="initialLocation">Location of new player</param>
         public AttributePlayer Create(
             string name,
             Guid accountId,
@@ -105,7 +103,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         public bool IsManaging(Item item)
         {
             var managed = false;
-            if (DetailCharacterRepo.Read(item) != null)
+            if (AttributeRepo.Read(item) != null)
             {
                 managed = true;
             }

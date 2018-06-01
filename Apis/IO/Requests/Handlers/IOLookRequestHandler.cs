@@ -20,7 +20,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         }
         public void HandleRequest(IApi api, Terminal terminal, IIORequest terminalInput)
         {
-            var location = api.GetDetailManager<IAttributeLocationManager>().Read(terminal.Character.Item);
+            var location = api.GetAttributeManager<IAttributeLocationManager>().Read(terminal.Character.Item);
             var ioLocationUpdate = new IOLocationUpdate()
             {
                 DetailLocationId = location.Id,
@@ -29,11 +29,11 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
             };
             location.Item.Children.ForEach(delegate (Item item)
             {
-                if (api.GetDetailManager<IAttributePhysicalManager>().IsManaging(item))
+                if (api.GetAttributeManager<IAttributePhysicalManager>().IsManaging(item))
                 {
                     ioLocationUpdate.Adendums.Add("Something is here");
                 }
-                if (api.GetDetailManager<IAttributePlayerManager>().IsManaging(item))
+                if (api.GetAttributeManager<IAttributePlayerManager>().IsManaging(item))
                 {
                     ioLocationUpdate.Adendums.Add("Someone is here");
                 }

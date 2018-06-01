@@ -52,6 +52,20 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <returns></returns>
         Item Update(Item item);
         /// <summary>
+        /// Update the item name
+        /// </summary>
+        /// <param name="id">Unique item identifier</param>
+        /// <param name="name">New name of the item</param>
+        /// <returns></returns>
+        Item UpdateName(Guid id, string name);
+        /// <summary>
+        /// Update the item description
+        /// </summary>
+        /// <param name="id">Unique item identifier</param>
+        /// <param name="description">New description of the item</param>
+        /// <returns></returns>
+        Item UpdateDescription(Guid id, string description);
+        /// <summary>
         /// Permenantly delete an item and remove from data store
         /// </summary>
         /// <remarks>

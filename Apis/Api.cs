@@ -19,7 +19,7 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
-        private Dictionary<Type, IAttributeManager> DetailManagerList = new Dictionary<Type, IAttributeManager>();
+        private Dictionary<Type, IAttributeManager> AttributeManagerList = new Dictionary<Type, IAttributeManager>();
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
@@ -36,10 +36,10 @@ namespace BeforeOurTime.Business.Apis
             IScriptManager scriptManager,
             IIOManager ioManager,
             IItemManager itemManager,
-            IAttributeGameManager detailGameManager,
-            IAttributePlayerManager detailCharacterManager,
-            IAttributeLocationManager detailLocationManager,
-            IAttributePhysicalManager detailPhysicalManager,
+            IAttributeGameManager attributeGameManager,
+            IAttributePlayerManager attributePlayerManager,
+            IAttributeLocationManager attributeLocationManager,
+            IAttributePhysicalManager attributePhysicalManager,
             IAttributeExitManager attributeExitManager)
         {
             MessageManager = messageManager;
@@ -47,11 +47,11 @@ namespace BeforeOurTime.Business.Apis
             ScriptManager = scriptManager;
             IOManager = ioManager;
             ItemManager = itemManager;
-            DetailManagerList.Add(typeof(IAttributeGameManager), detailGameManager);
-            DetailManagerList.Add(typeof(IAttributePlayerManager), detailCharacterManager);
-            DetailManagerList.Add(typeof(IAttributeLocationManager), detailLocationManager);
-            DetailManagerList.Add(typeof(IAttributePhysicalManager), detailPhysicalManager);
-            DetailManagerList.Add(typeof(IAttributeExitManager), attributeExitManager);
+            AttributeManagerList.Add(typeof(IAttributeGameManager), attributeGameManager);
+            AttributeManagerList.Add(typeof(IAttributePlayerManager), attributePlayerManager);
+            AttributeManagerList.Add(typeof(IAttributeLocationManager), attributeLocationManager);
+            AttributeManagerList.Add(typeof(IAttributePhysicalManager), attributePhysicalManager);
+            AttributeManagerList.Add(typeof(IAttributeExitManager), attributeExitManager);
         }
         public IMessageManager GetMessageManager()
         {
@@ -78,9 +78,9 @@ namespace BeforeOurTime.Business.Apis
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetDetailManager<T>() where T : IAttributeManager
+        public T GetAttributeManager<T>() where T : IAttributeManager
         {
-            return (T)DetailManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
+            return (T)AttributeManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
         }
         /// <summary>
         /// Get all attribute managers for an item
@@ -89,7 +89,7 @@ namespace BeforeOurTime.Business.Apis
         /// <returns></returns>
         public List<IAttributeManager> GetAttributeManagers(Item item)
         {
-            return DetailManagerList
+            return AttributeManagerList
                 .Where(x => x.Value.IsManaging(item))
                 .Select(x => x.Value)
                 .ToList();

@@ -173,7 +173,7 @@ namespace BeforeOurTime.Business.Terminals
             var avatars = new List<AttributePlayer>();
             if (terminal.AccountId != null)
             {
-                avatars = DetailCharacterRepo.ReadCharacters(terminal.AccountId);
+                avatars = DetailCharacterRepo.ReadPlayers(terminal.AccountId);
             }
             return avatars;
         }

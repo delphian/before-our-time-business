@@ -9,11 +9,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
     public interface IAttributePlayerManager : IAttributeManager<AttributePlayer>, IAttributeManager
     {
         /// <summary>
-        /// Create a new character
+        /// Create a new player
         /// </summary>
-        /// <param name="name">Public name of the character</param>
-        /// <param name="accountId">Account to which this character belongs</param>
-        /// <param name="initialLocation">Location of new character</param>
+        /// <param name="name">Public name of the player</param>
+        /// <param name="accountId">Account to which this player belongs</param>
+        /// <param name="initialLocation">Location of new player</param>
         AttributePlayer Create(string name, Guid accountId, AttributeLocation initialLocation);
     }
 }
