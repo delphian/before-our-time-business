@@ -100,6 +100,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IAttributeGameRepo, AttributeGameRepo>()
                 .AddScoped<IAttributeLocationRepo, AttributeLocationRepo>()
                 .AddScoped<IAttributePhysicalRepo, AttributePhysicalRepo>()
+                .AddScoped<IAttributeExitRepo, AttributeExitRepo>()
                 // Main environment interface API
                 .AddScoped<IScriptEngine, JsScriptEngine>()
                 .AddScoped<IAccountManager, AccountManager>()
