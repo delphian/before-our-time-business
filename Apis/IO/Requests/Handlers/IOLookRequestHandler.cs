@@ -37,6 +37,11 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 {
                     ioLocationUpdate.Adendums.Add("Someone is here");
                 }
+                if (api.GetAttributeManager<IAttributeExitManager>().IsManaging(item))
+                {
+                    var exit = api.GetAttributeManager<IAttributeExitManager>().Read(item);
+                    ioLocationUpdate.Adendums.Add("Exit: " + exit.Name);
+                }
             });
             terminal.SendToClient(ioLocationUpdate);
         }
