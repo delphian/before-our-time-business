@@ -84,6 +84,30 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             return managed;
         }
         /// <summary>
+        /// Update the attribute name
+        /// </summary>
+        /// <param name="id">Unique attribute identifier</param>
+        /// <param name="name">New name of the attribute</param>
+        /// <returns></returns>
+        public AttributeExit UpdateName(Guid id, string name)
+        {
+            var attribute = Read(id);
+            attribute.Name = name;
+            return Update(attribute);
+        }
+        /// <summary>
+        /// Update the attribute description
+        /// </summary>
+        /// <param name="id">Unique attribute identifier</param>
+        /// <param name="description">New description of the attribute</param>
+        /// <returns></returns>
+        public AttributeExit UpdateDescription(Guid id, string description)
+        {
+            var attribute = Read(id);
+            attribute.Description = description;
+            return Update(attribute);
+        }
+        /// <summary>
         /// Update the destination location
         /// </summary>
         /// <param name="id">Unique exit attribute identifier</param>

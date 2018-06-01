@@ -19,17 +19,17 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <returns>The Item's detailed location data. Null if none found</returns>
         new AttributeLocation Read(Item item);
         /// <summary>
-        /// Update location's name
+        /// Update attribute's name
         /// </summary>
-        /// <param name="id">Unique location attribute identifier</param>
-        /// <param name="name">Location's new name</param>
+        /// <param name="id">Unique attribute identifier</param>
+        /// <param name="name">Attribute's new name</param>
         /// <returns></returns>
         AttributeLocation UpdateName(Guid id, string name);
         /// <summary>
-        /// Update the location description
+        /// Update attribute's description
         /// </summary>
-        /// <param name="id">Unique location attribute identifier</param>
-        /// <param name="description">New description of the location</param>
+        /// <param name="id">Unique attribute identifier</param>
+        /// <param name="description">Attribute's new description</param>
         /// <returns></returns>
         AttributeLocation UpdateDescription(Guid id, string description);
     }

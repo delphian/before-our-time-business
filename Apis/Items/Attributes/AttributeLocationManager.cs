@@ -109,10 +109,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             return managed;
         }
         /// <summary>
-        /// Update the location name
+        /// Update attribute's name
         /// </summary>
-        /// <param name="id">Unique location attribute identifier</param>
-        /// <param name="name">New name of the location</param>
+        /// <param name="id">Unique attribute identifier</param>
+        /// <param name="name">Attribute's new name</param>
         /// <returns></returns>
         public AttributeLocation UpdateName(Guid id, string name)
         {
@@ -121,10 +121,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             return Update(locationAttribute);
         }
         /// <summary>
-        /// Update the location description
+        /// Update attribute's description
         /// </summary>
-        /// <param name="id">Unique location attribute identifier</param>
-        /// <param name="description">New description of the location</param>
+        /// <param name="id">Unique attribute identifier</param>
+        /// <param name="description">Attribute's new description</param>
         /// <returns></returns>
         public AttributeLocation UpdateDescription(Guid id, string description)
         {
