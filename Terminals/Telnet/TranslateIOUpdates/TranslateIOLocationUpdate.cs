@@ -27,7 +27,7 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         /// Translate structured data from the environment to pure text
         /// </summary>
         /// <param name="environmentUpdate">Update from the environment</param>
-        public void Translate(IOUpdate environmentUpdate)
+        public void Translate(IIOUpdate environmentUpdate)
         {
             var ioLocationUpdate = (IOLocationUpdate)Convert.ChangeType(environmentUpdate, typeof(IOLocationUpdate));
             TelnetServer.sendMessageToClient(TelnetClient, "\r\n" + ioLocationUpdate.Name + "\r\n");

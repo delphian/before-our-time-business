@@ -11,6 +11,6 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         /// Translate structured data from the environment to pure text
         /// </summary>
         /// <param name="environmentUpdate">Update from the environment</param>
-        void Translate(IOUpdate environmentUpdate);
+        void Translate(IIOUpdate environmentUpdate);
     }
 }

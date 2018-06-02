@@ -21,96 +21,122 @@ namespace BeforeOurTime.Business.Servers.Telnet
         public static TelnetServer s { set; get; }
         public static Dictionary<uint, string> UserName = new Dictionary<uint, string>();
         public static Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="serviceProvider"></param>
         public TelnetManager(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
             TerminalManager = ServiceProvider.GetService<ITerminalManager>();
             s = new TelnetServer(IPAddress.Any);
-            s.ClientConnected += clientConnected;
-            s.ClientDisconnected += clientDisconnected;
-            s.ConnectionBlocked += connectionBlocked;
-            s.MessageReceived += messageReceived;
+            s.ClientConnected += ClientConnected;
+            s.ClientDisconnected += ClientDisconnected;
+            s.ConnectionBlocked += ClientBlocked;
+            s.MessageReceived += MessageFromClient;
             s.start();
-
-            Console.WriteLine("SERVER STARTED: " + DateTime.Now);
+            Console.WriteLine("TELNET SERVER STARTED: " + DateTime.Now);
         }
-
-        private static void MessageFromServer(Terminal terminal, IIOUpdate environmentUpdate)
+        /// <summary>
+        /// Assign new telnet client an environment terminal and send greeting
+        /// </summary>
+        /// <param name="telnetClient"></param>
+        private static void ClientConnected(TelnetClient telnetClient)
+        {
+            telnetClient.SetTerminal(TerminalManager.RequestTerminal());
+            telnetClient.GetTerminal().DataBag["step"] = "connected";
+            s.clearClientScreen(telnetClient);
+            s.sendMessageToClient(telnetClient, "Terminal granted " + telnetClient.GetTerminal().Id + ".\r\n\r\n");
+            s.sendMessageToClient(telnetClient, "Welcome to Before Our Time. For help type \"help\".\r\n\r\n");
+            s.sendMessageToClient(telnetClient, "Welcome> ");
+        }
+        /// <summary>
+        /// Remove terminal from disconnected telnet client
+        /// </summary>
+        /// <param name="telnetClient"></param>
+        private static void ClientDisconnected(TelnetClient telnetClient)
+        {
+            TerminalManager.DestroyTerminal(telnetClient.GetTerminal());
+            telnetClient.SetTerminal(null);
+        }
+        /// <summary>
+        /// TODO : Record attempt from blocked ip address
+        /// </summary>
+        /// <param name="ep"></param>
+        private static void ClientBlocked(IPEndPoint ep)
+        {
+        }
+        /// <summary>
+        /// Process a message from the terminal to the telnet client
+        /// </summary>
+        /// <param name="terminal"></param>
+        /// <param name="environmentUpdate"></param>
+        private static void MessageFromTerminal(Terminal terminal, IIOUpdate environmentUpdate)
         {
             if (environmentUpdate.GetType() == typeof(IOLocationUpdate))
             {
-
-                var ioLocationUpdate = (IOLocationUpdate)Convert.ChangeType(environmentUpdate, typeof(IOLocationUpdate));
-                var translate = new TranslateIOLocationUpdate(s, Clients[terminal.Id]);
-                translate.Translate(ioLocationUpdate);
-            } else
+                new TranslateIOLocationUpdate(s, Clients[terminal.Id]).Translate(environmentUpdate);
+            }
+            else
             {
                 s.sendMessageToClient(Clients[terminal.Id], "\r\nUnknown message from server:\r\n");
                 s.sendMessageToClient(Clients[terminal.Id], JsonConvert.SerializeObject(environmentUpdate));
             }
             s.sendMessageToClient(Clients[terminal.Id], "\r\n\r\n> ");
         }
-
-        private static void clientConnected(TelnetClient c)
+        /// <summary>
+        /// Process a message from the telnet client (MFC) to the terminal
+        /// </summary>
+        /// <param name="telnetClient"></param>
+        /// <param name="message"></param>
+        private static void MessageFromClient(TelnetClient telnetClient, string message)
         {
-            c.SetTerminal(TerminalManager.RequestTerminal());
-            c.GetTerminal().DataBag["step"] = "connected";
-            s.clearClientScreen(c);
-            s.sendMessageToClient(c, "Terminal granted " + c.GetTerminal().Id + ".\r\n\r\n");
-            s.sendMessageToClient(c, "Welcome to Before Our Time. For help type \"help\".\r\n\r\n");
-            s.sendMessageToClient(c, "Welcome> ");
-        }
-
-        private static void clientDisconnected(TelnetClient c)
-        {
-            TerminalManager.DestroyTerminal(c.GetTerminal());
-            c.SetTerminal(null);
-        }
-
-        private static void connectionBlocked(IPEndPoint ep)
-        {
-        }
-
-        private static void messageReceived(TelnetClient c, string message)
-        {
-            if (c.GetTerminal().Status == TerminalStatus.Guest)
+            if (telnetClient.GetTerminal().Status == TerminalStatus.Guest)
             {
-                HandleMessageFromGuest(c, message);
+                MFCTerminalGuest(telnetClient, message);
             }
-            else if (c.GetTerminal().Status == TerminalStatus.Authenticated)
+            else if (telnetClient.GetTerminal().Status == TerminalStatus.Authenticated)
             {
-                HandleMessageFromAuthenticated(c, message);
+                MFCTerminalAuthenticated(telnetClient, message);
             }
-            else if (c.GetTerminal().Status == TerminalStatus.Attached)
+            else if (telnetClient.GetTerminal().Status == TerminalStatus.Attached)
             {
-                switch (message)
-                {
-                    case "bye":
-                    case "q":
-                    case "exit":
-                        s.sendMessageToClient(c, "\r\nCya...\r\n");
-                        s.kickClient(c);
-                        break;
-                    case "look":
-                        s.sendMessageToClient(c, "\r\n");
-                        c.GetTerminal().SendToApi(new IOLookRequest()
-                        {
-                            
-                        });
-                        break;
-                    default:
-                        s.sendMessageToClient(c, "\r\nBad command.\r\n> ");
-                        break;
-                }
+                MFCTerminalAttached(telnetClient, message);
             }
         }
         /// <summary>
-        /// Handle all client messages from terminal with Guest status
+        /// Handle Message From client when associated terminal is in attached status (playing!)
+        /// </summary>
+        /// <param name="telnetClient"></param>
+        /// <param name="message"></param>
+        private static void MFCTerminalAttached(TelnetClient telnetClient, string message)
+        {
+            switch (message)
+            {
+                case "bye":
+                case "q":
+                case "exit":
+                    s.sendMessageToClient(telnetClient, "\r\nCya...\r\n");
+                    s.kickClient(telnetClient);
+                    break;
+                case "look":
+                    s.sendMessageToClient(telnetClient, "\r\n");
+                    telnetClient.GetTerminal().SendToApi(new IOLookRequest()
+                    {
+
+                    });
+                    break;
+                default:
+                    s.sendMessageToClient(telnetClient, "\r\nBad command.\r\n> ");
+                    break;
+            }
+        }
+        /// <summary>
+        /// Handle Message From Client when associated terminal is in guest status
         /// </summary>
         /// <param name="c">Telnet client</param>
         /// <param name="message">message from client</param>
-        private static void HandleMessageFromGuest(TelnetClient c, string message)
+        private static void MFCTerminalGuest(TelnetClient c, string message)
         {
             if (c.GetTerminal().DataBag["step"] == "connected")
             {
@@ -156,7 +182,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
             {
                 if (c.GetTerminal().Authenticate(c.GetTerminal().DataBag["login_name"], message))
                 {
-                    c.GetTerminal().OnMessageToTerminal += MessageFromServer;
+                    c.GetTerminal().OnMessageToTerminal += MessageFromTerminal;
                     Clients[c.GetTerminal().Id] = c;
                     c.GetTerminal().DataBag["step"] = "authenticated";
                     s.sendMessageToClient(c, "\r\n");
@@ -192,7 +218,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     c.GetTerminal().DataBag["create_email"],
                     message))
                 {
-                    c.GetTerminal().OnMessageToTerminal += MessageFromServer;
+                    c.GetTerminal().OnMessageToTerminal += MessageFromTerminal;
                     Clients[c.GetTerminal().Id] = c;
                     c.GetTerminal().DataBag["step"] = "authenticated";
                     s.sendMessageToClient(c, "\r\n");
@@ -208,15 +234,15 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
         }
         /// <summary>
-        /// Handle all client messages from terminal with Guest status
+        /// Handle Message From Client when associated terminal is in authenticated status
         /// </summary>
         /// <param name="c">Telnet client</param>
         /// <param name="message">message from client</param>
-        private static void HandleMessageFromAuthenticated(TelnetClient c, string message)
+        private static void MFCTerminalAuthenticated(TelnetClient c, string message)
         {
             if (c.GetTerminal().DataBag["step"] == "create_character")
             {
-                MessageStepCreateCharacter(c, message);
+                MFCTerminalAuthenticatedCreatePlayer(c, message);
             }
             else if (c.GetTerminal().DataBag["step"] == "authenticated")
             {
@@ -239,7 +265,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         break;
                     case "new":
                         c.GetTerminal().DataBag["step"] = "create_character";
-                        MessageStepCreateCharacter(c, message);
+                        MFCTerminalAuthenticatedCreatePlayer(c, message);
                         break;
                     case "list":
                         s.sendMessageToClient(c, "\r\n\r\n");
@@ -285,40 +311,40 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
         }
         /// <summary>
-        /// Create new character during login process
+        /// Handle Message From Client when associated terminal is in authenticated status
         /// </summary>
         /// <remarks>
         /// Handles all messages when DataBag step is "create_character"
         /// </remarks>
-        /// <param name="c">Telnet client</param>
+        /// <param name="telnetClient">Telnet client</param>
         /// <param name="message">message from client</param>
-        private static void MessageStepCreateCharacter(TelnetClient c, string message)
+        private static void MFCTerminalAuthenticatedCreatePlayer(TelnetClient telnetClient, string message)
         {
-            if (!c.GetTerminal().DataBag.ContainsKey("create_character_step"))
+            if (!telnetClient.GetTerminal().DataBag.ContainsKey("create_character_step"))
             {
-                c.GetTerminal().DataBag["create_character_step"] = "create";
+                telnetClient.GetTerminal().DataBag["create_character_step"] = "create";
             }
-            switch (c.GetTerminal().DataBag["create_character_step"])
+            switch (telnetClient.GetTerminal().DataBag["create_character_step"])
             {
                 case "create":
-                    s.sendMessageToClient(c, "\r\nOk, let's create a new character.\r\n\r\n");
-                    s.sendMessageToClient(c, "\r\n Name: ");
-                    c.GetTerminal().DataBag["create_character_step"] = "save_name";
+                    s.sendMessageToClient(telnetClient, "\r\nOk, let's create a new character.\r\n\r\n");
+                    s.sendMessageToClient(telnetClient, "\r\n Name: ");
+                    telnetClient.GetTerminal().DataBag["create_character_step"] = "save_name";
                     break;
                 case "save_name":
-                    c.GetTerminal().DataBag["create_character_name"] = message;
-                    if (c.GetTerminal().CreateCharacter(c.GetTerminal().DataBag["create_character_name"]))
+                    telnetClient.GetTerminal().DataBag["create_character_name"] = message;
+                    if (telnetClient.GetTerminal().CreateCharacter(telnetClient.GetTerminal().DataBag["create_character_name"]))
                     {
-                        c.GetTerminal().DataBag["step"] = "attached";
-                        s.sendMessageToClient(c, "\r\nTerminal attached to avatar. Play!\r\n\r\n");
-                        s.sendMessageToClient(c, "> ");
+                        telnetClient.GetTerminal().DataBag["step"] = "attached";
+                        s.sendMessageToClient(telnetClient, "\r\nTerminal attached to avatar. Play!\r\n\r\n");
+                        s.sendMessageToClient(telnetClient, "> ");
                     } else
                     {
-                        c.GetTerminal().DataBag["step"] = "attached";
-                        c.GetTerminal().DataBag.Remove("create_character_name");
-                        c.GetTerminal().DataBag.Remove("create_character_step");
-                        s.sendMessageToClient(c, "\r\nSomething went wrong. Character not created.\r\n\r\n");
-                        s.sendMessageToClient(c, "Account> ");
+                        telnetClient.GetTerminal().DataBag["step"] = "attached";
+                        telnetClient.GetTerminal().DataBag.Remove("create_character_name");
+                        telnetClient.GetTerminal().DataBag.Remove("create_character_step");
+                        s.sendMessageToClient(telnetClient, "\r\nSomething went wrong. Character not created.\r\n\r\n");
+                        s.sendMessageToClient(telnetClient, "Account> ");
                     }
                     break;
             }
