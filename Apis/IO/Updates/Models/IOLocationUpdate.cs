@@ -23,7 +23,11 @@ namespace BeforeOurTime.Business.Apis.IO.Updates.Models
         /// </summary>
         public string Image { set; get; }
         /// <summary>
-        /// Additional descrete adendums to the description
+        /// Potential exits from the location
+        /// </summary>
+        public List<IOExitUpdate> Exits { set; get; }
+        /// <summary>
+        /// Additional descrete textual adendums to the description
         /// </summary>
         public List<string> Adendums = new List<string>();
         /// <summary>

@@ -10,10 +10,11 @@ using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Business.Apis.IO.Updates.Models;
 using BeforeOurTime.Business.Apis.IO.Requests.Models;
 using Newtonsoft.Json;
+using BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
-    public class Server
+    public class TelnetManager
     {
         public static IServiceProvider ServiceProvider { set; get; }
         public static ITerminalManager TerminalManager { set; get; }
@@ -21,7 +22,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         public static Dictionary<uint, string> UserName = new Dictionary<uint, string>();
         public static Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
 
-        public Server(IServiceProvider serviceProvider)
+        public TelnetManager(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
             TerminalManager = ServiceProvider.GetService<ITerminalManager>();
@@ -39,12 +40,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
         {
             if (environmentUpdate.GetType() == typeof(IOLocationUpdate))
             {
-                s.sendMessageToClient(Clients[terminal.Id], "\r\n" + ((IOLocationUpdate) environmentUpdate).Name + "\r\n");
-                s.sendMessageToClient(Clients[terminal.Id], ((IOLocationUpdate) environmentUpdate).Description + "\r\n");
-                ((IOLocationUpdate)environmentUpdate).Adendums.ForEach(delegate (string adendum)
-                {
-                    s.sendMessageToClient(Clients[terminal.Id], adendum + "\r\n");
-                });
+
+                var ioLocationUpdate = (IOLocationUpdate)Convert.ChangeType(environmentUpdate, typeof(IOLocationUpdate));
+                var translate = new TranslateIOLocationUpdate(s, Clients[terminal.Id]);
+                translate.Translate(ioLocationUpdate);
             } else
             {
                 s.sendMessageToClient(Clients[terminal.Id], "\r\nUnknown message from server:\r\n");

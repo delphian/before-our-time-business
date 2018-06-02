@@ -13,22 +13,24 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
 {
-    public class IOLookRequestHandler : IIORequestHandler
+    public class IOGoRequestHandler : IIORequestHandler
     {
-        public IOLookRequestHandler()
+        public IOGoRequestHandler()
         {
         }
         public void HandleRequest(IApi api, Terminal terminal, IIORequest terminalInput)
         {
-            if (terminalInput.GetType() == typeof(IOLookRequest))
+            if (terminalInput.GetType() == typeof(IOGoRequest))
             {
-                var location = api.GetAttributeManager<IAttributeLocationManager>().Read(terminal.Character.Item);
+                var ioGoRequest = (IOGoRequest) Convert.ChangeType(terminalInput, typeof(IOGoRequest));
+                var locationExit = api.GetAttributeManager<IAttributeExitManager>().Read(ioGoRequest.ExitId);
+                var location = api.GetAttributeManager<IAttributeLocationManager>().Read(locationExit.DestinationLocationId);
+                api.GetItemManager().Move(terminal.Character.Item, location.Item, locationExit.Item);
                 var ioLocationUpdate = new IOLocationUpdate()
                 {
                     DetailLocationId = location.Id,
                     Name = location.Name,
-                    Description = location.Description,
-                    Exits = new List<IOExitUpdate>()
+                    Description = location.Description
                 };
                 location.Item.Children.ForEach(delegate (Item item)
                 {
@@ -49,6 +51,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                             Name = exit.Name,
                             Description = exit.Description
                         });
+                        ioLocationUpdate.Adendums.Add("Exit: " + exit.Name);
                     }
                 });
                 terminal.SendToClient(ioLocationUpdate);

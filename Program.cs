@@ -72,7 +72,7 @@ namespace BeforeOurTime.Business
             {
                 clientInput = Console.ReadLine();
             }
-            Servers.Telnet.Server.s.stop();
+            Servers.Telnet.TelnetManager.s.stop();
         }
         /// <summary>
         /// Setup services
@@ -124,7 +124,7 @@ namespace BeforeOurTime.Business
         private static void ListenToTerminals(IServiceProvider serviceProvider)
         {
             var terminalManager = serviceProvider.GetService<ITerminalManager>();
-            var telnetServer = new Servers.Telnet.Server(serviceProvider);
+            var telnetServer = new Servers.Telnet.TelnetManager(serviceProvider);
             var api = serviceProvider.GetService<IApi>();
             ((TerminalManager)terminalManager).OnTerminalCreated += delegate (Terminal terminal)
             {
