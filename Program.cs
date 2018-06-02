@@ -72,7 +72,7 @@ namespace BeforeOurTime.Business
             {
                 clientInput = Console.ReadLine();
             }
-            Servers.Telnet.TelnetManager.s.stop();
+            Servers.Telnet.TelnetManager.TelnetServer.stop();
         }
         /// <summary>
         /// Setup services

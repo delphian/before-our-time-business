@@ -18,7 +18,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
     {
         public static IServiceProvider ServiceProvider { set; get; }
         public static ITerminalManager TerminalManager { set; get; }
-        public static TelnetServer s { set; get; }
+        public static TelnetServer TelnetServer { set; get; }
         public static Dictionary<uint, string> UserName = new Dictionary<uint, string>();
         public static Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
         /// <summary>
@@ -29,12 +29,12 @@ namespace BeforeOurTime.Business.Servers.Telnet
         {
             ServiceProvider = serviceProvider;
             TerminalManager = ServiceProvider.GetService<ITerminalManager>();
-            s = new TelnetServer(IPAddress.Any);
-            s.ClientConnected += ClientConnected;
-            s.ClientDisconnected += ClientDisconnected;
-            s.ConnectionBlocked += ClientBlocked;
-            s.MessageReceived += MessageFromClient;
-            s.start();
+            TelnetServer = new TelnetServer(IPAddress.Any);
+            TelnetServer.ClientConnected += ClientConnected;
+            TelnetServer.ClientDisconnected += ClientDisconnected;
+            TelnetServer.ConnectionBlocked += ClientBlocked;
+            TelnetServer.MessageReceived += MessageFromClient;
+            TelnetServer.start();
             Console.WriteLine("TELNET SERVER STARTED: " + DateTime.Now);
         }
         /// <summary>
@@ -45,10 +45,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
         {
             telnetClient.SetTerminal(TerminalManager.RequestTerminal());
             telnetClient.GetTerminal().DataBag["step"] = "connected";
-            s.clearClientScreen(telnetClient);
-            s.sendMessageToClient(telnetClient, "Terminal granted " + telnetClient.GetTerminal().Id + ".\r\n\r\n");
-            s.sendMessageToClient(telnetClient, "Welcome to Before Our Time. For help type \"help\".\r\n\r\n");
-            s.sendMessageToClient(telnetClient, "Welcome> ");
+            TelnetServer.clearClientScreen(telnetClient);
+            TelnetServer.sendMessageToClient(telnetClient, 
+                "Terminal granted " + telnetClient.GetTerminal().Id + ".\r\n\r\n"
+                + "Welcome to Before Our Time. For help type \"help\".\r\n\r\n"
+                + "Welcome> ");
         }
         /// <summary>
         /// Remove terminal from disconnected telnet client
@@ -75,14 +76,15 @@ namespace BeforeOurTime.Business.Servers.Telnet
         {
             if (environmentUpdate.GetType() == typeof(IOLocationUpdate))
             {
-                new TranslateIOLocationUpdate(s, Clients[terminal.Id]).Translate(environmentUpdate);
+                new TranslateIOLocationUpdate(TelnetServer, Clients[terminal.Id]).Translate(environmentUpdate);
             }
             else
             {
-                s.sendMessageToClient(Clients[terminal.Id], "\r\nUnknown message from server:\r\n");
-                s.sendMessageToClient(Clients[terminal.Id], JsonConvert.SerializeObject(environmentUpdate));
+                TelnetServer.sendMessageToClient(Clients[terminal.Id], "\r\n"
+                    + "Unknown message from server:\r\n"
+                    + JsonConvert.SerializeObject(environmentUpdate));
             }
-            s.sendMessageToClient(Clients[terminal.Id], "\r\n\r\n> ");
+            TelnetServer.sendMessageToClient(Clients[terminal.Id], "\r\n\r\n> ");
         }
         /// <summary>
         /// Process a message from the telnet client (MFC) to the terminal
@@ -116,18 +118,20 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 case "bye":
                 case "q":
                 case "exit":
-                    s.sendMessageToClient(telnetClient, "\r\nCya...\r\n");
-                    s.kickClient(telnetClient);
+                    TelnetServer.sendMessageToClient(telnetClient, "\r\nCya...\r\n");
+                    TelnetServer.kickClient(telnetClient);
                     break;
                 case "look":
-                    s.sendMessageToClient(telnetClient, "\r\n");
+                    TelnetServer.sendMessageToClient(telnetClient, "\r\n");
                     telnetClient.GetTerminal().SendToApi(new IOLookRequest()
                     {
 
                     });
                     break;
+                case "go":
+                    break;
                 default:
-                    s.sendMessageToClient(telnetClient, "\r\nBad command.\r\n> ");
+                    TelnetServer.sendMessageToClient(telnetClient, "\r\nBad command.\r\n> ");
                     break;
             }
         }
@@ -144,30 +148,31 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 {
                     case "?":
                     case "help":
-                        s.sendMessageToClient(c, "\r\n\r\n");
-                        s.sendMessageToClient(c, "  new    - Create a new account\r\n");
-                        s.sendMessageToClient(c, "  login  - Login to an existing account\r\n");
-                        s.sendMessageToClient(c, "  bye    - Disconnect\r\n\r\n");
-                        s.sendMessageToClient(c, "Welcome> ");
+                        TelnetServer.sendMessageToClient(c, "\r\n\r\n"
+                            + "  new    - Create a new account\r\n"
+                            + "  login  - Login to an existing account\r\n"
+                            + "  bye    - Disconnect\r\n\r\n"
+                            + "Welcome> ");
                         break;
                     case "q":
                     case "bye":
-                        s.sendMessageToClient(c, "Cya...\r\n");
-                        s.kickClient(c);
+                        TelnetServer.sendMessageToClient(c, "Cya...\r\n");
+                        TelnetServer.kickClient(c);
                         break;
                     case "new":
-                        s.sendMessageToClient(c, "\r\n");
-                        s.sendMessageToClient(c, "Name: ");
+                        TelnetServer.sendMessageToClient(c, "\r\n"
+                            + "Name: ");
                         c.GetTerminal().DataBag["step"] = "create_name";
                         break;
                     case "login":
-                        s.sendMessageToClient(c, "\r\n");
-                        s.sendMessageToClient(c, "Email: ");
+                        TelnetServer.sendMessageToClient(c, "\r\n"
+                            + "Email: ");
                         c.GetTerminal().DataBag["step"] = "login_name";
                         break;
                     default:
-                        s.sendMessageToClient(c, "\r\nUnknown welcome command \"" + message + "\". Try \"help\".\r\n\r\n");
-                        s.sendMessageToClient(c, "Welcome> ");
+                        TelnetServer.sendMessageToClient(c, "\r\n"
+                            + "Unknown welcome command \"" + message + "\". Try \"help\".\r\n\r\n"
+                            + "Welcome> ");
                         break;
                 }
             }
@@ -175,8 +180,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
             {
                 c.GetTerminal().DataBag["login_name"] = message;
                 c.GetTerminal().DataBag["step"] = "login_password";
-                s.sendMessageToClient(c, "\r\n");
-                s.sendMessageToClient(c, "Password: ");
+                TelnetServer.sendMessageToClient(c, "\r\n"
+                    + "Password: ");
             }
             else if (c.GetTerminal().DataBag["step"] == "login_password")
             {
@@ -185,31 +190,31 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     c.GetTerminal().OnMessageToTerminal += MessageFromTerminal;
                     Clients[c.GetTerminal().Id] = c;
                     c.GetTerminal().DataBag["step"] = "authenticated";
-                    s.sendMessageToClient(c, "\r\n");
-                    s.sendMessageToClient(c, "Hello " + c.GetTerminal().DataBag["login_name"] + "\r\n\r\n");
-                    s.sendMessageToClient(c, "Account> ");
+                    TelnetServer.sendMessageToClient(c, "\r\n"
+                        + "Hello " + c.GetTerminal().DataBag["login_name"] + "\r\n\r\n"
+                        + "Account> ");
                 }
                 else
                 {
                     c.GetTerminal().DataBag["step"] = "connected";
-                    s.sendMessageToClient(c, "\r\n");
-                    s.sendMessageToClient(c, "Bad username or password.\r\n\r\n");
-                    s.sendMessageToClient(c, "Welcome> ");
+                    TelnetServer.sendMessageToClient(c, "\r\n"
+                        + "Bad username or password.\r\n\r\n"
+                        + "Welcome> ");
                 }
             }
             else if (c.GetTerminal().DataBag["step"] == "create_name")
             {
                 c.GetTerminal().DataBag["create_name"] = message;
                 c.GetTerminal().DataBag["step"] = "create_email";
-                s.sendMessageToClient(c, "\r\n");
-                s.sendMessageToClient(c, "Email: ");
+                TelnetServer.sendMessageToClient(c, "\r\n"
+                    + "Email: ");
             }
             else if (c.GetTerminal().DataBag["step"] == "create_email")
             {
                 c.GetTerminal().DataBag["create_email"] = message;
                 c.GetTerminal().DataBag["step"] = "create_password";
-                s.sendMessageToClient(c, "\r\n");
-                s.sendMessageToClient(c, "Password: ");
+                TelnetServer.sendMessageToClient(c, "\r\n"
+                    + "Password: ");
             }
             else if (c.GetTerminal().DataBag["step"] == "create_password")
             {
@@ -221,15 +226,15 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     c.GetTerminal().OnMessageToTerminal += MessageFromTerminal;
                     Clients[c.GetTerminal().Id] = c;
                     c.GetTerminal().DataBag["step"] = "authenticated";
-                    s.sendMessageToClient(c, "\r\n");
-                    s.sendMessageToClient(c, "Hello " + c.GetTerminal().DataBag["create_name"] + "\r\n\r\n");
-                    s.sendMessageToClient(c, "Account> ");
+                    TelnetServer.sendMessageToClient(c, "\r\n"
+                        + "Hello " + c.GetTerminal().DataBag["create_name"] + "\r\n\r\n"
+                        + "Account> ");
                 }
                 else
                 {
-                    s.sendMessageToClient(c, "\r\n");
-                    s.sendMessageToClient(c, "Unable to create account.\r\n\r\n");
-                    s.sendMessageToClient(c, "Welcome> ");
+                    TelnetServer.sendMessageToClient(c, "\r\n"
+                        + "Unable to create account.\r\n\r\n"
+                        + "Welcome> ");
                 }
             }
         }
@@ -250,37 +255,37 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 {
                     case "?":
                     case "help":
-                        s.sendMessageToClient(c, "\r\n\r\n");
-                        s.sendMessageToClient(c, "  new         - Create a new character\r\n");
-                        s.sendMessageToClient(c, "  list        - List existing characters\r\n");
-                        s.sendMessageToClient(c, "  play {name} - Play an existing character\r\n");
-                        s.sendMessageToClient(c, "  back        - Return to previous screen\r\n");
-                        s.sendMessageToClient(c, "  bye         - Disconnect\r\n\r\n");
-                        s.sendMessageToClient(c, "Account> ");
+                        TelnetServer.sendMessageToClient(c, "\r\n\r\n"
+                            + "  new         - Create a new character\r\n"
+                            + "  list        - List existing characters\r\n"
+                            + "  play {name} - Play an existing character\r\n"
+                            + "  back        - Return to previous screen\r\n"
+                            + "  bye         - Disconnect\r\n\r\n"
+                            + "Account> ");
                         break;
                     case "back":
                         c.GetTerminal().Status = TerminalStatus.Guest;
                         c.GetTerminal().DataBag["step"] = "connected";
-                        s.sendMessageToClient(c, "\r\nWelcome> ");
+                        TelnetServer.sendMessageToClient(c, "\r\nWelcome> ");
                         break;
                     case "new":
                         c.GetTerminal().DataBag["step"] = "create_character";
                         MFCTerminalAuthenticatedCreatePlayer(c, message);
                         break;
                     case "list":
-                        s.sendMessageToClient(c, "\r\n\r\n");
+                        TelnetServer.sendMessageToClient(c, "\r\n\r\n");
                         var characters = c.GetTerminal().GetAttachable();
                         characters.ForEach(delegate (AttributePlayer character)
                         {
-                            s.sendMessageToClient(c, "  " + character.Name + " (" + character.Id + ")\r\n");
+                            TelnetServer.sendMessageToClient(c, "  " + character.Name + " (" + character.Id + ")\r\n");
                         });
-                        s.sendMessageToClient(c, "\r\n");
-                        s.sendMessageToClient(c, "Account> ");
+                        TelnetServer.sendMessageToClient(c, "\r\n");
+                        TelnetServer.sendMessageToClient(c, "Account> ");
                         break;
                     case "q":
                     case "bye":
-                        s.sendMessageToClient(c, "Cya...\r\n");
-                        s.kickClient(c);
+                        TelnetServer.sendMessageToClient(c, "Cya...\r\n");
+                        TelnetServer.kickClient(c);
                         break;
                     case "play":
                         var name = message.Split(' ').Last().ToLower();
@@ -291,21 +296,23 @@ namespace BeforeOurTime.Business.Servers.Telnet
                                 if (c.GetTerminal().Attach(character.Id))
                                 {
                                     c.GetTerminal().DataBag["step"] = "attached";
-                                    s.sendMessageToClient(c, "\r\n");
-                                    s.sendMessageToClient(c, "Terminal attached to avatar. Play!\r\n\r\n");
-                                    s.sendMessageToClient(c, "> ");
+                                    TelnetServer.sendMessageToClient(c, "\r\n"
+                                        + "Terminal attached to avatar. Play!\r\n\r\n"
+                                        + "> ");
                                 }
                             }
                         });
                         if (c.GetTerminal().Status != TerminalStatus.Attached)
                         {
-                            s.sendMessageToClient(c, "\r\nUnknown character \"" + name + "\"\r\n");
-                            s.sendMessageToClient(c, "Account> ");
+                            TelnetServer.sendMessageToClient(c, "\r\n"
+                                + "Unknown character \"" + name + "\"\r\n"
+                                + "Account> ");
                         }
                         break;
                     default:
-                        s.sendMessageToClient(c, "\r\nUnknown account command \"" + message + "\". Try \"help\".\r\n\r\n");
-                        s.sendMessageToClient(c, "Account> ");
+                        TelnetServer.sendMessageToClient(c, "\r\n"
+                            + "Unknown account command \"" + message + "\". Try \"help\".\r\n\r\n"
+                            + "Account> ");
                         break;
                 }
             }
@@ -327,8 +334,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
             switch (telnetClient.GetTerminal().DataBag["create_character_step"])
             {
                 case "create":
-                    s.sendMessageToClient(telnetClient, "\r\nOk, let's create a new character.\r\n\r\n");
-                    s.sendMessageToClient(telnetClient, "\r\n Name: ");
+                    TelnetServer.sendMessageToClient(telnetClient, "\r\n"
+                        + "Ok, let's create a new character.\r\n\r\n"
+                        + " Name: ");
                     telnetClient.GetTerminal().DataBag["create_character_step"] = "save_name";
                     break;
                 case "save_name":
@@ -336,15 +344,17 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     if (telnetClient.GetTerminal().CreateCharacter(telnetClient.GetTerminal().DataBag["create_character_name"]))
                     {
                         telnetClient.GetTerminal().DataBag["step"] = "attached";
-                        s.sendMessageToClient(telnetClient, "\r\nTerminal attached to avatar. Play!\r\n\r\n");
-                        s.sendMessageToClient(telnetClient, "> ");
+                        TelnetServer.sendMessageToClient(telnetClient, "\r\n"
+                            + "Terminal attached to avatar. Play!\r\n\r\n"
+                            + "> ");
                     } else
                     {
                         telnetClient.GetTerminal().DataBag["step"] = "attached";
                         telnetClient.GetTerminal().DataBag.Remove("create_character_name");
                         telnetClient.GetTerminal().DataBag.Remove("create_character_step");
-                        s.sendMessageToClient(telnetClient, "\r\nSomething went wrong. Character not created.\r\n\r\n");
-                        s.sendMessageToClient(telnetClient, "Account> ");
+                        TelnetServer.sendMessageToClient(telnetClient, "\r\n"
+                            + "Something went wrong. Character not created.\r\n\r\n"
+                            + "Account> ");
                     }
                     break;
             }
