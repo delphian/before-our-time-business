@@ -123,7 +123,6 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     TelnetServer.kickClient(telnetClient);
                     break;
                 case "look":
-                    TelnetServer.sendMessageToClient(telnetClient, "\r\n");
                     telnetClient.GetTerminal().SendToApi(new IOLookRequest()
                     {
 

@@ -52,7 +52,6 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                             Name = exit.Name,
                             Description = exit.Description
                         });
-                        ioLocationUpdate.Adendums.Add("Exit: " + exit.Name);
                     }
                 });
                 terminal.SendToClient(ioLocationUpdate);

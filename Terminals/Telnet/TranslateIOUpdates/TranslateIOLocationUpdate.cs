@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Business.Apis.IO.Updates.Models;
 using BeforeOurTime.Business.Servers.Telnet;
+using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 
 namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
 {
@@ -31,25 +32,30 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         {
             var ioLocationUpdate = (IOLocationUpdate)Convert.ChangeType(environmentUpdate, typeof(IOLocationUpdate));
             TelnetClient.ItemExits.Clear();
-            TelnetServer.sendMessageToClient(TelnetClient, "\r\n" + ioLocationUpdate.Name + "\r\n");
-            TelnetServer.sendMessageToClient(TelnetClient, ioLocationUpdate.Description + "\r\n");
+            // Send location name and description
+            TelnetServer.sendMessageToClient(TelnetClient, "\r\n\r\n" 
+                + $"{AnsiColors.greenB}{ioLocationUpdate.Name}{AnsiColors.reset}\r\n"
+                + ioLocationUpdate.Description + "\r\n");
             ioLocationUpdate.Adendums.ForEach(delegate (string adendum)
             {
-                TelnetServer.sendMessageToClient(TelnetClient, adendum + "\r\n");
+                TelnetServer.sendMessageToClient(TelnetClient, " - " + adendum + "\r\n");
             });
-            TelnetServer.sendMessageToClient(TelnetClient, "Exits:\r\n");
+            // Send location exits
+            string exits = null;
             if (ioLocationUpdate.Exits.Count() > 0)
             {
                 ioLocationUpdate.Exits.ForEach(delegate (IOExitUpdate ioExitUpdate)
                 {
                     TelnetClient.ItemExits.Add(ioExitUpdate);
-                    TelnetServer.sendMessageToClient(TelnetClient, " " + ioExitUpdate.Name + " (" + ioExitUpdate.ExitId + ")\r\n");
+                    exits = (exits != null) ? ", " : exits;
+                    exits += $"{AnsiColors.purpleB}{ioExitUpdate.Name}{AnsiColors.reset}";
                 });
             }
             else
             {
-                TelnetServer.sendMessageToClient(TelnetClient, "None\r\n");
+                exits = "None\r\n";
             }
+            TelnetServer.sendMessageToClient(TelnetClient, $" - Exits: {exits}");
         }
     }
 }
