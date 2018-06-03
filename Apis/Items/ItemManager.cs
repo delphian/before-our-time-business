@@ -172,20 +172,19 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="source">Item responsible for doing the moving</param>
         public Item Move(Item item, Item newParent, Item source = null)
         {
-            // Construct the message
-            var message = new Message()
-            {
-                Sender = source,
-                DelegateId = ScriptManager.GetDelegateDefinition("onItemMove").GetId(),
-                Package = "",
-                //JsonConvert.SerializeObject(new OnItemMove()
-                //{
-                //    Type = MessageType.EventItemMove,
-                //    From = child.Parent,
-                //    To = newParent,
-                //    Item = child
-                //})
-            };
+            //// Construct the message
+            //var message = new Message()
+            //{
+            //    Sender = source,
+            //    DelegateId = ScriptManager.GetDelegateDefinition("onItemMove").GetId(),
+            //    Package = JsonConvert.SerializeObject(new OnItemMove()
+            //    {
+            //        Type = MessageType.EventItemMove,
+            //        From = child.Parent,
+            //        To = newParent,
+            //        Item = child
+            //    })
+            //};
             // Move the item
             var oldParent = item.Parent;
             oldParent?.Children.Remove(item);
@@ -197,13 +196,13 @@ namespace BeforeOurTime.Business.Apis.Items
                 updateItems.Add(oldParent);
             }
             ItemRepo.Update(updateItems);
-            // Distribute message
-            var recipients = new List<Item>() { item, newParent };
-            if (oldParent != null)
-            {
-                recipients.Add(oldParent);
-            }
-            MessageManager.SendMessage(message, recipients);
+            //// Distribute message
+            //var recipients = new List<Item>() { item, newParent };
+            //if (oldParent != null)
+            //{
+            //    recipients.Add(oldParent);
+            //}
+            //MessageManager.SendMessage(message, recipients);
             return item;
         }
     }

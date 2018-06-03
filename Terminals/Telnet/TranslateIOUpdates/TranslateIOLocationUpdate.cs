@@ -30,6 +30,7 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         public void Translate(IIOUpdate environmentUpdate)
         {
             var ioLocationUpdate = (IOLocationUpdate)Convert.ChangeType(environmentUpdate, typeof(IOLocationUpdate));
+            TelnetClient.ItemExits.Clear();
             TelnetServer.sendMessageToClient(TelnetClient, "\r\n" + ioLocationUpdate.Name + "\r\n");
             TelnetServer.sendMessageToClient(TelnetClient, ioLocationUpdate.Description + "\r\n");
             ioLocationUpdate.Adendums.ForEach(delegate (string adendum)
@@ -41,6 +42,7 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
             {
                 ioLocationUpdate.Exits.ForEach(delegate (IOExitUpdate ioExitUpdate)
                 {
+                    TelnetClient.ItemExits.Add(ioExitUpdate);
                     TelnetServer.sendMessageToClient(TelnetClient, " " + ioExitUpdate.Name + " (" + ioExitUpdate.ExitId + ")\r\n");
                 });
             }

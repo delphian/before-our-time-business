@@ -25,7 +25,8 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var ioGoRequest = (IOGoRequest) Convert.ChangeType(terminalInput, typeof(IOGoRequest));
                 var locationExit = api.GetAttributeManager<IAttributeExitManager>().Read(ioGoRequest.ExitId);
                 var location = api.GetAttributeManager<IAttributeLocationManager>().Read(locationExit.DestinationLocationId);
-                api.GetItemManager().Move(terminal.Character.Item, location.Item, locationExit.Item);
+                var player = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
+                api.GetItemManager().Move(player.Item, location.Item, locationExit.Item);
                 var ioLocationUpdate = new IOLocationUpdate()
                 {
                     DetailLocationId = location.Id,

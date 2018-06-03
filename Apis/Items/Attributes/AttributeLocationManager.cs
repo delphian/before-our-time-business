@@ -85,11 +85,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         {
             AttributeLocation location = null;
             Item traverseItem = item;
-            while (traverseItem.ParentId != null && traverseItem.Type != ItemType.Location)
+            while (traverseItem.ParentId != null && !IsManaging(traverseItem))
             {
                 traverseItem = ItemRepo.Read(traverseItem.ParentId.Value);
             }
-            if (traverseItem.Type == ItemType.Location)
+            if (IsManaging(traverseItem))
             {
                 location = DetailLocationRepo.Read(traverseItem);
             }

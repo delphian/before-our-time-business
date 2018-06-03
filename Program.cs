@@ -51,6 +51,7 @@ namespace BeforeOurTime.Business
         public static Object thisLock = new Object();
         static void Main(string[] args)
         {
+            Console.WriteLine("Main thread: " + Thread.CurrentThread.ManagedThreadId.ToString());
             // Setup configuration
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -63,8 +64,7 @@ namespace BeforeOurTime.Business
             // Setup automatic message deliver and Tick counter for items
             var tickTimer = new System.Threading.Timer(Tick, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Tick"]));
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Delivery"]));
-
-            ListenToTerminals(ServiceProvider.CreateScope().ServiceProvider);
+            ListenToTerminals(ServiceProvider);
             // Wait for user input
             Console.WriteLine("Hit 'q' and enter to abort\n");
             string clientInput = Console.ReadLine();
@@ -114,8 +114,8 @@ namespace BeforeOurTime.Business
                 .AddScoped<IAttributePlayerManager, AttributePlayerManager>()
                 .AddScoped<IAttributePhysicalManager, AttributePhysicalManager>()
                 .AddScoped<IAttributeExitManager, AttributeExitManager>()
-                .AddSingleton<IApi, Api>()
-                .AddSingleton<ITerminalManager, TerminalManager>();
+                .AddScoped<IApi, Api>()
+                .AddScoped<ITerminalManager, TerminalManager>();
         }
         /// <summary>
         /// Monitor terminal connections and forward messages
@@ -123,6 +123,7 @@ namespace BeforeOurTime.Business
         /// <param name="serviceProvider"></param>
         private static void ListenToTerminals(IServiceProvider serviceProvider)
         {
+            Console.WriteLine("Terminal thread: " + Thread.CurrentThread.ManagedThreadId.ToString());
             var terminalManager = serviceProvider.GetService<ITerminalManager>();
             var telnetServer = new Servers.Telnet.TelnetManager(serviceProvider);
             var api = serviceProvider.GetService<IApi>();

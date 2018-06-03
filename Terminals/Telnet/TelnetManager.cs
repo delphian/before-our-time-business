@@ -113,7 +113,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="message"></param>
         private static void MFCTerminalAttached(TelnetClient telnetClient, string message)
         {
-            switch (message)
+            string firstWord = message.Split(' ').First();
+            switch (firstWord)
             {
                 case "bye":
                 case "q":
@@ -129,10 +130,31 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     });
                     break;
                 case "go":
+                    MFCGo(telnetClient, message);
                     break;
                 default:
                     TelnetServer.sendMessageToClient(telnetClient, "\r\nBad command.\r\n> ");
                     break;
+            }
+        }
+        /// <summary>
+        /// Handle Message From Client when Go command is issued
+        /// </summary>
+        /// <param name="telnetClient"></param>
+        /// <param name="message"></param>
+        private static void MFCGo(TelnetClient telnetClient, string message)
+        {
+            string secondWord = message.Split(' ').LastOrDefault();
+            var exitAttribute = telnetClient.ItemExits.Where(x => x.Name.ToLower().Contains(secondWord.ToLower())).FirstOrDefault();
+            if (exitAttribute != null)
+            {
+                telnetClient.GetTerminal().SendToApi(new IOGoRequest()
+                {
+                    ExitId = exitAttribute.ExitId
+                });
+            } else
+            {
+                TelnetServer.sendMessageToClient(telnetClient, "\r\nGo where??\r\n> ");
             }
         }
         /// <summary>

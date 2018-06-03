@@ -25,7 +25,7 @@ namespace BeforeOurTime.Business.Apis.IO.Updates.Models
         /// <summary>
         /// Potential exits from the location
         /// </summary>
-        public List<IOExitUpdate> Exits { set; get; }
+        public List<IOExitUpdate> Exits = new List<IOExitUpdate>();
         /// <summary>
         /// Additional descrete textual adendums to the description
         /// </summary>

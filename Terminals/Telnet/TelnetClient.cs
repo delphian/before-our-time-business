@@ -1,5 +1,7 @@
-﻿using BeforeOurTime.Business.Terminals;
+﻿using BeforeOurTime.Business.Apis.IO.Updates.Models;
+using BeforeOurTime.Business.Terminals;
 using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace BeforeOurTime.Business.Servers.Telnet
@@ -47,6 +49,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Single generic connection used by the environment to communicate with clients
         /// </summary>
         private Terminal Terminal { set; get; }
+        /// <summary>
+        /// Currently tracked available location exits
+        /// </summary>
+        public List<IOExitUpdate> ItemExits = new List<IOExitUpdate>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TelnetClient"/> class.

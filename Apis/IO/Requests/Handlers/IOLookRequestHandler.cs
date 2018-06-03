@@ -22,7 +22,8 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         {
             if (terminalInput.GetType() == typeof(IOLookRequest))
             {
-                var location = api.GetAttributeManager<IAttributeLocationManager>().Read(terminal.Character.Item);
+                var player = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
+                var location = api.GetAttributeManager<IAttributeLocationManager>().Read(player.Item);
                 var ioLocationUpdate = new IOLocationUpdate()
                 {
                     DetailLocationId = location.Id,
