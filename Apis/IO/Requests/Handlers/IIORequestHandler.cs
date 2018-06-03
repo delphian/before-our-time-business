@@ -12,11 +12,16 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
     public interface IIORequestHandler
     {
         /// <summary>
+        /// Register to handle a specific set of IO requests
+        /// </summary>
+        /// <returns></returns>
+        List<string> RegisterForIORequests();
+        /// <summary>
         /// Handle terminal request
         /// </summary>
         /// <param name="api"></param>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        void HandleRequest(IApi api, Terminal terminal, IIORequest terminalRequest);
+        void HandleIORequest(IApi api, Terminal terminal, IIORequest terminalRequest);
     }
 }

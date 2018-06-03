@@ -18,7 +18,24 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         public IOGoRequestHandler()
         {
         }
-        public void HandleRequest(IApi api, Terminal terminal, IIORequest terminalInput)
+        /// <summary>
+        /// Register to handle a specific set of IO requests
+        /// </summary>
+        /// <returns></returns>
+        public List<string> RegisterForIORequests()
+        {
+            return new List<string>()
+            {
+                typeof(IOGoRequest).ToString()
+            };
+        }
+        /// <summary>
+        /// Handle terminal request
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="terminal"></param>
+        /// <param name="terminalRequest"></param>
+        public void HandleIORequest(IApi api, Terminal terminal, IIORequest terminalInput)
         {
             if (terminalInput.GetType() == typeof(IOGoRequest))
             {
