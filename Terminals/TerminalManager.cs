@@ -197,12 +197,17 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public AttributePlayer CreateCharacter(Terminal terminal, string name)
         {
-            AttributeLocation defaultLocation = DetailGameManager.GetDefaultLocation();
-            AttributePlayer character = DetailCharacterManager.Create(
+            AttributePlayer player = DetailCharacterManager.Create(
                 name,
                 terminal.AccountId,
-                defaultLocation);
-            return character;
+                new AttributePhysical()
+                {
+                    Name = name,
+                    Description = "A player",
+                    Weight = 100
+                },
+                DetailGameManager.GetDefaultLocation());
+            return player;
         }
     }
 }

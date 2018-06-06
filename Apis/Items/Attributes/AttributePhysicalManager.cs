@@ -51,20 +51,20 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="item">Existing item that has already been saved</param>
         /// <param name="name">One, two, or three word short description of item</param>
         /// <param name="description">A long description of the item. Include many sensory experiences</param>
-        /// <param name="volume">Volume</param>
+        /// <param name="height">Height</param>
         /// <param name="weight">Weight</param>
         public AttributePhysical Attach(
             Item item,
             string name,
             string description,
-            int volume,
+            int height,
             int weight)
         {
             var physicalAttributes = new AttributePhysical()
             {
                 Name = name,
                 Description = description,
-                Volume = volume,
+                Height = height,
                 Weight = weight,
                 Item = item
             };
@@ -164,12 +164,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// Update the physical volume
         /// </summary>
         /// <param name="id">Unique phsyical attribute identifier</param>
-        /// <param name="volume">New volume of the physical</param>
+        /// <param name="volume">New height of the physical</param>
         /// <returns></returns>
-        public AttributePhysical UpdateVolume(Guid id, int volume)
+        public AttributePhysical UpdateHeight(Guid id, int height)
         {
             var physicalAttribute = Read(id);
-            physicalAttribute.Volume = volume;
+            physicalAttribute.Height = height;
             return Update(physicalAttribute);
         }
         /// <summary>

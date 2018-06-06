@@ -83,7 +83,7 @@ namespace BeforeOurTime.Business
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services
                 .AddSingleton<ILogger>(new FileLogger())
-                .AddDbContext<BaseContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Scoped)
+                .AddDbContext<BaseContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped)
                 .AddLogging()
                 // Repositories
                 .AddScoped<IAccountRepo, AccountRepo>()

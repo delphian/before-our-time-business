@@ -14,13 +14,13 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="item">Existing item that has already been saved</param>
         /// <param name="name">One, two, or three word short description of item</param>
         /// <param name="description">A long description of the item. Include many sensory experiences</param>
-        /// <param name="volume">Volume</param>
+        /// <param name="height">Volume</param>
         /// <param name="weight">Weight</param>
         AttributePhysical Attach(
             Item item,
             string name,
             string description,
-            int volume,
+            int height,
             int weight);
         /// <summary>
         /// Create new item with new physical attributes
@@ -58,11 +58,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// Update the physical volume
         /// </summary>
         /// <param name="id">Unique phsyical attribute identifier</param>
-        /// <param name="volume">New volume of the physical</param>
+        /// <param name="height">New height of the physical</param>
         /// <returns></returns>
-        AttributePhysical UpdateVolume(
+        AttributePhysical UpdateHeight(
             Guid id, 
-            int volume);
+            int height);
         /// <summary>
         /// Update the physical weight
         /// </summary>

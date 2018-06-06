@@ -20,6 +20,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
+        private IAttributePhysicalManager AttributePhysicalManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -28,12 +29,14 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             IAttributePlayerRepo attributePlayerRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(attributePlayerRepo)
+            IItemManager itemManager,
+            IAttributePhysicalManager attributePhysicalManager) : base(attributePlayerRepo)
         {
             ItemRepo = itemRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
+            AttributePhysicalManager = attributePhysicalManager;
         }
         /// <summary>
         /// Get the item type that the manager is responsible for providing detail management for
@@ -48,26 +51,33 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// </summary>
         /// <param name="name">Public name of the player</param>
         /// <param name="accountId">Account to which this player belongs</param>
+        /// <param name="physical">Physical attributes</param>
         /// <param name="initialLocation">Location of new player</param>
         public AttributePlayer Create(
             string name,
             Guid accountId,
+            AttributePhysical physical,
             AttributeLocation initialLocation)
         {
-            var character = Attach(
-                new AttributePlayer()
-                {
-                    Name = name,
-                    AccountId = accountId,
-                }, ItemManager.Create(new Item()
-                {
-                    Type = ItemType.Character,
-                    UuidType = Guid.NewGuid(),
-                    ParentId = initialLocation.ItemId,
-                    Data = "{}",
-                    Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
-                }));
-            return character;
+            // Create item
+            var item = ItemManager.Create(new Item()
+            {
+                Type = ItemType.Character,
+                UuidType = Guid.NewGuid(),
+                ParentId = initialLocation.ItemId,
+                Data = "{}",
+                Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
+            });
+            // Create player attributes
+            var player = new AttributePlayer()
+            {
+                Name = name,
+                AccountId = accountId,
+            };
+            // Attach all attributes
+            Attach(player, item);
+            AttributePhysicalManager.Attach(physical, item);
+            return player;
         }
         /// <summary>
         /// Deliver a message to an item

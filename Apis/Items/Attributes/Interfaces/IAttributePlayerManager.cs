@@ -11,9 +11,17 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <summary>
         /// Create a new player
         /// </summary>
+        /// <remarks>
+        /// Creates new item and attaches all attributes
+        /// </remarks>
         /// <param name="name">Public name of the player</param>
         /// <param name="accountId">Account to which this player belongs</param>
+        /// <param name="physical">Physical attributes</param>
         /// <param name="initialLocation">Location of new player</param>
-        AttributePlayer Create(string name, Guid accountId, AttributeLocation initialLocation);
+        AttributePlayer Create(
+            string name, 
+            Guid accountId, 
+            AttributePhysical physical,
+            AttributeLocation initialLocation);
     }
 }
