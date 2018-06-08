@@ -13,7 +13,7 @@ namespace BeforeOurTime.Business.Apis.IO.Updates.Models
     public interface IIOUpdate
     {
         /// <summary>
-        /// Unique terminal update identifier
+        /// Unique update identifier
         /// </summary>
         /// <returns></returns>
         Guid GetId();
