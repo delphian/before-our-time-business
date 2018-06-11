@@ -51,7 +51,7 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <returns></returns>
-        List<AttributePlayer> GetAttachableAvatars(Terminal terminal);
+        List<Item> GetAttachableAvatars(Terminal terminal);
         /// <summary>
         /// Create a new account and local authentication credentials
         /// </summary>

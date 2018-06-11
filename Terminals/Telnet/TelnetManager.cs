@@ -297,9 +297,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     case "list":
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n\r\n");
                         var characters = telnetClient.GetTerminal().GetAttachable();
-                        characters.ForEach(delegate (AttributePlayer character)
+                        characters.ForEach(delegate (Item player)
                         {
-                            TelnetServer.SendMessageToClient(telnetClient, "  " + character.Name + " (" + character.Id + ")\r\n");
+                            TelnetServer.SendMessageToClient(telnetClient, "  " + 
+                                player.GetAttribute<AttributePlayer>().Name + 
+                                " (" + player.GetAttribute<AttributePlayer>().Id + ")\r\n");
                         });
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n");
                         TelnetServer.SendMessageToClient(telnetClient, "Account> ");
@@ -311,11 +313,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         break;
                     case "play":
                         var name = message.Split(' ').Last().ToLower();
-                        telnetClient.GetTerminal().GetAttachable().ForEach(delegate (AttributePlayer character)
+                        telnetClient.GetTerminal().GetAttachable().ForEach(delegate (Item player)
                         {
-                            if (character.Name.ToLower() == name)
+                            if (player.GetAttribute<AttributePlayer>().Name.ToLower() == name)
                             {
-                                if (telnetClient.GetTerminal().Attach(character.Id))
+                                if (telnetClient.GetTerminal().Attach(player.GetAttribute<AttributePlayer>().Id))
                                 {
                                     telnetClient.GetTerminal().DataBag["step"] = "attached";
                                     TelnetServer.SendMessageToClient(telnetClient, "\r\n"

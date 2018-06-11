@@ -15,7 +15,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// Will create the default game if one does not already exist
         /// </remarks>
         /// <returns></returns>
-        AttributeGame GetDefaultGame();
+        Item GetDefaultGame();
         /// <summary>
         /// Get the default location of the default game
         /// </summary>

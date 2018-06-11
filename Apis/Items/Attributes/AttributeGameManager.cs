@@ -57,7 +57,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// Will create the default game and a location if one does not already exist
         /// </remarks>
         /// <returns></returns>
-        public AttributeGame GetDefaultGame()
+        public Item GetDefaultGame()
         {
             var defaultGame = DetailGameRepo.Read().FirstOrDefault();
             if (defaultGame == null)
@@ -97,7 +97,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                     }
                 });
             }
-            return defaultGame;
+            return ItemRepo.Read(defaultGame.ItemId);
         }
         /// <summary>
         /// Get the default location of the default game
@@ -109,8 +109,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <returns></returns>
         public AttributeLocation GetDefaultLocation()
         {
-            var defaultGame = GetDefaultGame();
-            return DetailLocationRepo.Read(defaultGame.DefaultLocationId);
+            var game = GetDefaultGame();
+            return DetailLocationRepo.Read(game.GetAttribute<AttributeGame>().DefaultLocationId);
         }
         /// <summary>
         /// Deliver a message to an item

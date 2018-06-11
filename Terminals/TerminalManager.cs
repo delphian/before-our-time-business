@@ -168,9 +168,9 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <returns></returns>
-        public List<AttributePlayer> GetAttachableAvatars(Terminal terminal)
+        public List<Item> GetAttachableAvatars(Terminal terminal)
         {
-            var avatars = new List<AttributePlayer>();
+            var avatars = new List<Item>();
             if (terminal.AccountId != null)
             {
                 avatars = DetailCharacterRepo.ReadPlayers(terminal.AccountId);

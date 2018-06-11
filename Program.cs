@@ -154,7 +154,7 @@ namespace BeforeOurTime.Business
                 var tickMessage = new SavedMessage()
                 {
                     DelegateId = onTickDelegate.GetId(),
-                    Sender = game.Item,
+                    SenderId = game.Id,
                     Package = "{}"
                 };
                 api.GetMessageManager().SendMessage(tickMessage, itemRecipients);
