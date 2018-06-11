@@ -2,6 +2,7 @@
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Requests;
 using BeforeOurTime.Repository.Models.Messages.Requests.Look;
@@ -41,6 +42,11 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
             if (terminalInput.GetType() == typeof(LookRequest))
             {
                 var player = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
+                // TODO :
+                //Item.Children.Where(x => x.HasAttribute(typeof(AttributeExit)).ForEach(delegate ()
+                //{
+
+                //});
                 var location = api.GetAttributeManager<IAttributeLocationManager>().Read(player.Item);
                 var ioLocationUpdate = new LocationResponse()
                 {
@@ -61,12 +67,13 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     }
                     if (api.GetAttributeManager<IAttributeExitManager>().IsManaging(item))
                     {
-                        var exit = api.GetAttributeManager<IAttributeExitManager>().Read(item);
+                        var exitItem = api.GetItemManager().Read(item.Id);
+                        var exitAttribute = (AttributeExit)exitItem.GetAttribute(typeof(AttributeExit));
                         ioLocationUpdate.Exits.Add(new ExitResponse()
                         {
-                            ExitId = exit.Id,
-                            Name = exit.Name,
-                            Description = exit.Description
+                            ExitId = exitAttribute.Id,
+                            Name = exitAttribute.Name,
+                            Description = exitAttribute.Description
                         });
                     }
                 });
