@@ -162,7 +162,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Removes the last character from the
         /// client's last received data.
         /// </summary>
-        public void removeLastCharacterReceived()
+        public void RemoveLastCharacterReceived()
         {
             receivedData = receivedData.Substring(0, receivedData.Length - 1);
         }

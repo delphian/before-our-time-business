@@ -338,11 +338,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     else
                     {
                         // 0x08 => backspace character
-                        if (data[0] == 0x08)
+                        if (data[0] == 0x08 || data[0] == 0x7f)
                         {
                             if (receivedData.Length > 0)
                             {
-                                client.removeLastCharacterReceived();
+                                client.RemoveLastCharacterReceived();
                                 SendBytesToSocket(clientSocket, new byte[] { 0x08, 0x20, 0x08 });
                             }
 
