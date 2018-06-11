@@ -45,7 +45,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var playerAttribute = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
                 var player = api.GetItemManager().Read(playerAttribute.ItemId);
                 var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
-                AttributeLocation locationAttributes = (AttributeLocation)location.GetAttribute(typeof(AttributeLocation));
+                AttributeLocation locationAttributes = location.GetAttribute<AttributeLocation>();
                 var ioLocationUpdate = new LocationResponse()
                 {
                     LocationId = locationAttributes.Id,
@@ -58,7 +58,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     .Where(x => x.HasAttribute(typeof(AttributeExit))).ToList()
                     .ForEach(delegate (Item item)
                     {
-                        var attribute = (AttributeExit)item.GetAttribute(typeof(AttributeExit));
+                        var attribute = item.GetAttribute<AttributeExit>();
                         ioLocationUpdate.Exits.Add(new ExitResponse()
                         {
                             ExitId = attribute.Id,
@@ -71,7 +71,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     .Where(x => x.HasAttribute(typeof(AttributePhysical))).ToList()
                     .ForEach(delegate (Item item)
                     {
-                        var attribute = (AttributePhysical)item.GetAttribute(typeof(AttributePhysical));
+                        var attribute = item.GetAttribute<AttributePhysical>();
                         ioLocationUpdate.Adendums.Add($"A {attribute.Name} is here");
                     });
                 // Add player items
@@ -79,8 +79,8 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     .Where(x => x.HasAttribute(typeof(AttributePlayer))).ToList()
                     .ForEach(delegate (Item item)
                     {
-                        var attribute = (AttributePhysical)item.GetAttribute(typeof(AttributePhysical));
-                        ioLocationUpdate.Adendums.Add($"{attribute.Name} is here");
+                        var attribute = item.GetAttribute<AttributePlayer>();
+                        ioLocationUpdate.Adendums.Add($"{attribute.Name} is standing here");
                     });
                 terminal.SendToClient(ioLocationUpdate);
             }
