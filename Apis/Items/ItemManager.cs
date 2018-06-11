@@ -84,6 +84,24 @@ namespace BeforeOurTime.Business.Apis.Items
             return ItemRepo.Read(scriptDelegate);
         }
         /// <summary>
+        /// Read item and fully load all immediate children
+        /// </summary>
+        /// <param name="itemId">Unique item identifier</param>
+        /// <returns></returns>
+        public Item ReadWithChildren(Guid itemId)
+        {
+            return ItemRepo.ReadWithChildren(itemId);
+        }
+        /// <summary>
+        /// Get the item identifiers of all item's children
+        /// </summary>
+        /// <param name="itemId">Unique item identifier of potential parent</param>
+        /// <returns></returns>
+        public List<Guid> GetChildrenIds(Guid itemId)
+        {
+            return ItemRepo.GetChildrenIds(itemId);
+        }
+        /// <summary>
         /// Update any model that is derived from Item
         /// </summary>
         /// <param name="item">Item to be updated</param>

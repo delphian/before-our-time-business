@@ -46,6 +46,18 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <returns></returns>
         List<Item> Read(IDelegate scriptDelegate);
         /// <summary>
+        /// Read item and fully load all immediate children
+        /// </summary>
+        /// <param name="itemId">Unique item identifier</param>
+        /// <returns></returns>
+        Item ReadWithChildren(Guid itemId);
+        /// <summary>
+        /// Get the item identifiers of all item's children
+        /// </summary>
+        /// <param name="itemId">Unique item identifier of potential parent</param>
+        /// <returns></returns>
+        List<Guid> GetChildrenIds(Guid itemId);
+        /// <summary>
         /// Update any model that is derived from type Item
         /// </summary>
         /// <param name="item">Item to be updated</param>

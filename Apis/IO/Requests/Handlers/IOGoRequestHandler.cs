@@ -42,37 +42,16 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
             {
                 var ioGoRequest = (GoRequest) Convert.ChangeType(terminalInput, typeof(GoRequest));
                 var locationExit = api.GetAttributeManager<IAttributeExitManager>().Read(ioGoRequest.ExitId);
-                var location = api.GetAttributeManager<IAttributeLocationManager>().Read(locationExit.DestinationLocationId);
-                var player = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
-                api.GetItemManager().Move(player.Item, location.Item, locationExit.Item);
-                var ioLocationUpdate = new LocationResponse()
+                var locationAttribute = api.GetAttributeManager<IAttributeLocationManager>().Read(locationExit.DestinationLocationId);
+                var playerAttribute = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
+                var newLocation = api.GetItemManager().Read(locationAttribute.ItemId);
+                api.GetItemManager().Move(playerAttribute.Item, newLocation, locationExit.Item);
+
+                var lookRequestHandler = new IOLookRequestHandler();
+                lookRequestHandler.HandleIORequest(api, terminal, new LookRequest()
                 {
-                    LocationId = location.Id,
-                    Name = location.Name,
-                    Description = location.Description
-                };
-                location.Item.Children.ForEach(delegate (Item item)
-                {
-                    if (api.GetAttributeManager<IAttributePhysicalManager>().IsManaging(item))
-                    {
-                        ioLocationUpdate.Adendums.Add("Something is here");
-                    }
-                    if (api.GetAttributeManager<IAttributePlayerManager>().IsManaging(item))
-                    {
-                        ioLocationUpdate.Adendums.Add("Someone is here");
-                    }
-                    if (api.GetAttributeManager<IAttributeExitManager>().IsManaging(item))
-                    {
-                        var exit = api.GetAttributeManager<IAttributeExitManager>().Read(item);
-                        ioLocationUpdate.Exits.Add(new ExitResponse()
-                        {
-                            ExitId = exit.Id,
-                            Name = exit.Name,
-                            Description = exit.Description
-                        });
-                    }
+
                 });
-                terminal.SendToClient(ioLocationUpdate);
             }
         }
     }

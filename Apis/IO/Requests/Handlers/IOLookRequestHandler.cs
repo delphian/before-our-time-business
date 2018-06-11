@@ -2,6 +2,7 @@
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Requests;
@@ -41,42 +42,46 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         {
             if (terminalInput.GetType() == typeof(LookRequest))
             {
-                var player = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
-                // TODO :
-                //Item.Children.Where(x => x.HasAttribute(typeof(AttributeExit)).ForEach(delegate ()
-                //{
-
-                //});
-                var location = api.GetAttributeManager<IAttributeLocationManager>().Read(player.Item);
+                var playerAttribute = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
+                var player = api.GetItemManager().Read(playerAttribute.ItemId);
+                var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
+                AttributeLocation locationAttributes = (AttributeLocation)location.GetAttribute(typeof(AttributeLocation));
                 var ioLocationUpdate = new LocationResponse()
                 {
-                    LocationId = location.Id,
-                    Name = location.Name,
-                    Description = location.Description,
+                    LocationId = locationAttributes.Id,
+                    Name = locationAttributes.Name,
+                    Description = locationAttributes.Description,
                     Exits = new List<ExitResponse>()
                 };
-                location.Item.Children.ForEach(delegate (Item item)
-                {
-                    if (api.GetAttributeManager<IAttributePhysicalManager>().IsManaging(item))
+                // Add exits
+                location.Children
+                    .Where(x => x.HasAttribute(typeof(AttributeExit))).ToList()
+                    .ForEach(delegate (Item item)
                     {
-                        ioLocationUpdate.Adendums.Add("Something is here");
-                    }
-                    if (api.GetAttributeManager<IAttributePlayerManager>().IsManaging(item))
-                    {
-                        ioLocationUpdate.Adendums.Add("Someone is here");
-                    }
-                    if (api.GetAttributeManager<IAttributeExitManager>().IsManaging(item))
-                    {
-                        var exitItem = api.GetItemManager().Read(item.Id);
-                        var exitAttribute = (AttributeExit)exitItem.GetAttribute(typeof(AttributeExit));
+                        var attribute = (AttributeExit)item.GetAttribute(typeof(AttributeExit));
                         ioLocationUpdate.Exits.Add(new ExitResponse()
                         {
-                            ExitId = exitAttribute.Id,
-                            Name = exitAttribute.Name,
-                            Description = exitAttribute.Description
+                            ExitId = attribute.Id,
+                            Name = attribute.Name,
+                            Description = attribute.Description
                         });
-                    }
-                });
+                    });
+                // Add physical items
+                location.Children
+                    .Where(x => x.HasAttribute(typeof(AttributePhysical))).ToList()
+                    .ForEach(delegate (Item item)
+                    {
+                        var attribute = (AttributePhysical)item.GetAttribute(typeof(AttributePhysical));
+                        ioLocationUpdate.Adendums.Add($"A {attribute.Name} is here");
+                    });
+                // Add player items
+                location.Children
+                    .Where(x => x.HasAttribute(typeof(AttributePlayer))).ToList()
+                    .ForEach(delegate (Item item)
+                    {
+                        var attribute = (AttributePhysical)item.GetAttribute(typeof(AttributePhysical));
+                        ioLocationUpdate.Adendums.Add($"{attribute.Name} is here");
+                    });
                 terminal.SendToClient(ioLocationUpdate);
             }
         }
