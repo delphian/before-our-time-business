@@ -31,14 +31,13 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
                 object msgBody)
             {
                 var scriptDelegate = Api.GetScriptManager().GetDelegateDefinition(type);
-                var itemTo = itemRepo.Read(new List<Guid>() { new Guid(toId) }).FirstOrDefault();
                 var message = new SavedMessage()
                 {
                     Sender = from,
                     DelegateId = scriptDelegate.GetId(),
                     Package = JsonConvert.SerializeObject(msgBody)
                 };
-                Api.GetMessageManager().SendMessage(message, new List<Item>() { itemTo });
+                Api.GetMessageManager().SendMessage(message, new List<Guid>() { new Guid(toId) });
                 return true;
             };
             Engine

@@ -26,15 +26,15 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// </summary>
         /// <param name="message"></param>
         /// <param name="recipients"></param>
-        public void SendMessage(SavedMessage message, List<Item> recipients)
+        public void SendMessage(SavedMessage message, List<Guid> recipientIds)
         {
             if (message.SenderId != null)
             {
                 var messages = new List<SavedMessage>();
-                recipients.ForEach(delegate (Item recipient)
+                recipientIds.ForEach(delegate (Guid recipientId)
                 {
                     var messageCopy = (SavedMessage)message.Clone();
-                    messageCopy.RecipientId = recipient.Id;
+                    messageCopy.RecipientId = recipientId;
                     messages.Add(messageCopy);
                 });
                 MessageRepo.Create(messages);

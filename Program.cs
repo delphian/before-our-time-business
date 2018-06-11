@@ -150,7 +150,7 @@ namespace BeforeOurTime.Business
                 var api = ServiceProvider.GetService<IApi>();
                 var game = api.GetAttributeManager<IAttributeGameManager>().GetDefaultGame();
                 var onTickDelegate = api.GetScriptManager().GetDelegateDefinition("onTick");
-                var itemRecipients = api.GetItemManager().Read(onTickDelegate);
+                var itemRecipients = api.GetItemManager().GetDelegateImplementerIds(onTickDelegate);
                 var tickMessage = new SavedMessage()
                 {
                     DelegateId = onTickDelegate.GetId(),

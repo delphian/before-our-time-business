@@ -10,6 +10,8 @@ using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System.Linq;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Business.Apis.Messages;
+using BeforeOurTime.Repository.Models.Messages.Events;
+using BeforeOurTime.Repository.Models.Messages.Data;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
@@ -75,13 +77,13 @@ namespace BeforeOurTime.Business.Apis.Items
             return ItemRepo.Read(offset, limit);
         }
         /// <summary>
-        /// Read all items that implement a script delegate
+        /// Get all item ids that implement a script delegate
         /// </summary>
         /// <param name="scriptDelegate">A script function name, it's argument type, and return type</param>
         /// <returns></returns>
-        public List<Item> Read(IDelegate scriptDelegate)
+        public List<Guid> GetDelegateImplementerIds(IDelegate scriptDelegate)
         {
-            return ItemRepo.Read(scriptDelegate);
+            return ItemRepo.GetDelegateImplementerIds(scriptDelegate);
         }
         /// <summary>
         /// Read item and fully load all immediate children
@@ -190,22 +192,10 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="source">Item responsible for doing the moving</param>
         public Item Move(Item item, Item newParent, Item source = null)
         {
-            //// Construct the message
-            //var message = new Message()
-            //{
-            //    Sender = source,
-            //    DelegateId = ScriptManager.GetDelegateDefinition("onItemMove").GetId(),
-            //    Package = JsonConvert.SerializeObject(new OnItemMove()
-            //    {
-            //        Type = MessageType.EventItemMove,
-            //        From = child.Parent,
-            //        To = newParent,
-            //        Item = child
-            //    })
-            //};
-            // Move the item
+            // Remove from old parent
             var oldParent = item.Parent;
             oldParent?.Children.Remove(item);
+            // Append to new parent
             newParent.Children.Add(item);
             item.Parent = newParent;
             var updateItems = new List<Item>() { newParent, item };
@@ -214,13 +204,21 @@ namespace BeforeOurTime.Business.Apis.Items
                 updateItems.Add(oldParent);
             }
             ItemRepo.Update(updateItems);
-            //// Distribute message
-            //var recipients = new List<Item>() { item, newParent };
-            //if (oldParent != null)
-            //{
-            //    recipients.Add(oldParent);
-            //}
-            //MessageManager.SendMessage(message, recipients);
+            // Construct arrival message
+            var arrivalMessage = new SavedMessage()
+            {
+                SenderId = source.Id,
+                DelegateId = ScriptManager.GetDelegateDefinition("onArrival").GetId(),
+                Package = JsonConvert.SerializeObject(new ArrivalEvent()
+                {
+                    Item = item
+                })
+            };
+            // Distribute message
+            var location = ItemRepo.ReadWithChildren(newParent.Id);
+            var recipientIds = new List<Guid>() { location.Id };
+            recipientIds.AddRange(location.Children.Select(x => x.Id).ToList());
+            MessageManager.SendMessage(arrivalMessage, recipientIds);
             return item;
         }
     }

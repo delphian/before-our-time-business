@@ -40,11 +40,11 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <returns></returns>
         List<Item> Read(int? offset = null, int? limit = null);
         /// <summary>
-        /// Read all items that implement a script delegate
+        /// Get all item ids that implement a script delegate
         /// </summary>
         /// <param name="scriptDelegate">A script function name, it's argument type, and return type</param>
         /// <returns></returns>
-        List<Item> Read(IDelegate scriptDelegate);
+        List<Guid> GetDelegateImplementerIds(IDelegate scriptDelegate);
         /// <summary>
         /// Read item and fully load all immediate children
         /// </summary>

@@ -16,7 +16,7 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// Send a message to multiple recipient items
         /// </summary>
         /// <param name="message"></param>
-        /// <param name="recipients"></param>
-        void SendMessage(SavedMessage message, List<Item> recipients);
+        /// <param name="recipients">List of unique item identifiers that should recieve message</param>
+        void SendMessage(SavedMessage message, List<Guid> recipientIds);
     }
 }
