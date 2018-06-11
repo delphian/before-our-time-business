@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Business.Apis.IO.Updates.Models;
 using BeforeOurTime.Business.Servers.Telnet;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
+using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 
 namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
 {
@@ -28,23 +29,23 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         /// Translate structured data from the environment to pure text
         /// </summary>
         /// <param name="environmentUpdate">Update from the environment</param>
-        public void Translate(IIOUpdate environmentUpdate)
+        public void Translate(IMessage environmentUpdate)
         {
-            var ioLocationUpdate = (IOLocationUpdate)Convert.ChangeType(environmentUpdate, typeof(IOLocationUpdate));
+            var ioLocationUpdate = (LocationResponse)Convert.ChangeType(environmentUpdate, typeof(LocationResponse));
             TelnetClient.ItemExits.Clear();
             // Send location name and description
-            TelnetServer.sendMessageToClient(TelnetClient, "\r\n\r\n" 
+            TelnetServer.SendMessageToClient(TelnetClient, "\r\n\r\n" 
                 + $"{AnsiColors.greenB}{ioLocationUpdate.Name}{AnsiColors.reset}\r\n"
                 + ioLocationUpdate.Description + "\r\n");
             ioLocationUpdate.Adendums.ForEach(delegate (string adendum)
             {
-                TelnetServer.sendMessageToClient(TelnetClient, " - " + adendum + "\r\n");
+                TelnetServer.SendMessageToClient(TelnetClient, " - " + adendum + "\r\n");
             });
             // Send location exits
             string exits = null;
             if (ioLocationUpdate.Exits.Count() > 0)
             {
-                ioLocationUpdate.Exits.ForEach(delegate (IOExitUpdate ioExitUpdate)
+                ioLocationUpdate.Exits.ForEach(delegate (ExitResponse ioExitUpdate)
                 {
                     TelnetClient.ItemExits.Add(ioExitUpdate);
                     exits = (exits != null) ? ", " : exits;
@@ -55,7 +56,7 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
             {
                 exits = "None\r\n";
             }
-            TelnetServer.sendMessageToClient(TelnetClient, $" - Exits: {exits}");
+            TelnetServer.SendMessageToClient(TelnetClient, $" - Exits: {exits}");
         }
     }
 }

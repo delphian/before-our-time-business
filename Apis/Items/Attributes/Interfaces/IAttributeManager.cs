@@ -3,6 +3,7 @@ using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -23,7 +24,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// Often results in the item's script executing and parsing the message package
         /// </remarks>
         /// <param name="item"></param>
-        void DeliverMessage(Message message, Item item, JsFunctionManager jsFunctionManager);
+        void DeliverMessage(SavedMessage message, Item item, JsFunctionManager jsFunctionManager);
         /// <summary>
         /// Determine if an item has attributes that may be managed
         /// </summary>

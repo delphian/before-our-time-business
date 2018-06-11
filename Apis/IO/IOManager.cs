@@ -1,6 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.IO.Requests.Handlers;
-using BeforeOurTime.Business.Apis.IO.Requests.Models;
 using BeforeOurTime.Business.Terminals;
+using BeforeOurTime.Repository.Models.Messages.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -81,7 +81,7 @@ namespace BeforeOurTime.Business.Apis.IO
         /// <param name="api"></param>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="terminalRequest">A request from a terminal</param>
-        public void HandleRequest(IApi api, Terminal terminal, IIORequest terminalRequest)
+        public void HandleRequest(IApi api, Terminal terminal, IRequest terminalRequest)
         {
             var requestType = terminalRequest.GetType().ToString();
             var requestHandlersForType = IORequestHandlersForTypes

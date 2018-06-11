@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Business.Apis.IO.Updates.Models;
+﻿using BeforeOurTime.Repository.Models.Messages;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +11,6 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         /// Translate structured data from the environment to pure text
         /// </summary>
         /// <param name="environmentUpdate">Update from the environment</param>
-        void Translate(IIOUpdate environmentUpdate);
+        void Translate(IMessage environmentUpdate);
     }
 }

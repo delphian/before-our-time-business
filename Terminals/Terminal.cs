@@ -1,9 +1,9 @@
-﻿using BeforeOurTime.Business.Apis.IO.Requests.Models;
-using BeforeOurTime.Business.Apis.IO.Updates.Models;
-using BeforeOurTime.Repository.Json;
+﻿using BeforeOurTime.Repository.Json;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Requests;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -55,13 +55,13 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        public delegate void messageToEnvironment(Terminal terminal, IIORequest terminalRequest);
+        public delegate void messageToEnvironment(Terminal terminal, IRequest terminalRequest);
         /// <summary>
         /// Define delgate that environment can use to update terminal
         /// </summary>
         /// <param name="terminal"></param>
         /// <param name="terminalUpdate"></param>
-        public delegate void messageToTerminal(Terminal terminal, IIOUpdate terminalUpdate);
+        public delegate void messageToTerminal(Terminal terminal, IMessage terminalUpdate);
         /// <summary>
         /// Terminals may attach to this event to receive updates from the environment
         /// </summary>
@@ -154,10 +154,10 @@ namespace BeforeOurTime.Business.Terminals
         /// Send a message to the terminal
         /// </summary>
         /// <param name="environmentUpdate"></param>
-        public void SendToClient(IIOUpdate environmentUpdate)
+        public void SendToClient(IMessage environmentUpdate)
         {
             var allMiddleware = TerminalManager.GetTerminalMiddleware().Select(x => x).ToList();
-            IIOUpdate Next(IIOUpdate update)
+            IMessage Next(IMessage update)
             {
                 var middleware = allMiddleware.FirstOrDefault();
                 if (middleware != null)
@@ -177,10 +177,10 @@ namespace BeforeOurTime.Business.Terminals
         /// Send a message to the server
         /// </summary>
         /// <param name="terminalRequest"></param>
-        public void SendToApi(IIORequest terminalRequest)
+        public void SendToApi(IRequest terminalRequest)
         {
             var allMiddleware = TerminalManager.GetTerminalMiddleware().Select(x => x).ToList();
-            IIORequest Next(IIORequest request)
+            IRequest Next(IRequest request)
             {
                 var middleware = allMiddleware.FirstOrDefault();
                 if (middleware != null)

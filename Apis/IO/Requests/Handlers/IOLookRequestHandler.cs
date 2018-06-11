@@ -1,10 +1,11 @@
-﻿using BeforeOurTime.Business.Apis.IO.Requests.Models;
-using BeforeOurTime.Business.Apis.IO.Updates.Models;
-using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Requests;
+using BeforeOurTime.Repository.Models.Messages.Requests.Look;
+using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         {
             return new List<string>()
             {
-                typeof(IOLookRequest).ToString()
+                typeof(LookRequest).ToString()
             };
         }
         /// <summary>
@@ -35,18 +36,18 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// <param name="api"></param>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        public void HandleIORequest(IApi api, Terminal terminal, IIORequest terminalInput)
+        public void HandleIORequest(IApi api, Terminal terminal, IRequest terminalInput)
         {
-            if (terminalInput.GetType() == typeof(IOLookRequest))
+            if (terminalInput.GetType() == typeof(LookRequest))
             {
                 var player = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
                 var location = api.GetAttributeManager<IAttributeLocationManager>().Read(player.Item);
-                var ioLocationUpdate = new IOLocationUpdate()
+                var ioLocationUpdate = new LocationResponse()
                 {
-                    DetailLocationId = location.Id,
+                    LocationId = location.Id,
                     Name = location.Name,
                     Description = location.Description,
-                    Exits = new List<IOExitUpdate>()
+                    Exits = new List<ExitResponse>()
                 };
                 location.Item.Children.ForEach(delegate (Item item)
                 {
@@ -61,7 +62,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     if (api.GetAttributeManager<IAttributeExitManager>().IsManaging(item))
                     {
                         var exit = api.GetAttributeManager<IAttributeExitManager>().Read(item);
-                        ioLocationUpdate.Exits.Add(new IOExitUpdate()
+                        ioLocationUpdate.Exits.Add(new ExitResponse()
                         {
                             ExitId = exit.Id,
                             Name = exit.Name,

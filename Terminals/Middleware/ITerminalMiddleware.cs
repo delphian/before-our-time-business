@@ -1,5 +1,5 @@
-﻿using BeforeOurTime.Business.Apis.IO.Requests.Models;
-using BeforeOurTime.Business.Apis.IO.Updates.Models;
+﻿using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Requests;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,13 +17,13 @@ namespace BeforeOurTime.Business.Terminals.Middleware
         /// <param name="terminalRequest">A request from a terminal</param>
         /// <param name="next">Next middleware</param>
         /// <returns></returns>
-        IIORequest ToApi(IIORequest terminalRequest, Func<IIORequest, IIORequest> next);
+        IRequest ToApi(IRequest terminalRequest, Func<IRequest, IRequest> next);
         /// <summary>
         /// Opportunity to alter a raw message heading toward the client from the API
         /// </summary>
         /// <param name="environmentUpdate">A response or update to a terminal</param>
         /// <param name="next">Next middleware</param>
         /// <returns></returns>
-        IIOUpdate ToClient(IIOUpdate environmentUpdate, Func<IIOUpdate, IIOUpdate> next);
+        IMessage ToClient(IMessage environmentUpdate, Func<IMessage, IMessage> next);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.IO.Requests.Models;
-using BeforeOurTime.Business.Apis.IO.Updates.Models;
+using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Requests;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,7 +16,7 @@ namespace BeforeOurTime.Business.Terminals.Middleware.Telnet
         /// <param name="terminalRequest"></param>
         /// <param name="next">Next middleware</param>
         /// <returns></returns>
-        public IIORequest ToApi(IIORequest terminalRequest, Func<IIORequest, IIORequest> next) {
+        public IRequest ToApi(IRequest terminalRequest, Func<IRequest, IRequest> next) {
             return (next != null) ? next(terminalRequest) : terminalRequest;
         }
         /// <summary>
@@ -25,7 +25,7 @@ namespace BeforeOurTime.Business.Terminals.Middleware.Telnet
         /// <param name="environmentUpdate"></param>
         /// <param name="next">Next middleware</param>
         /// <returns></returns>
-        public IIOUpdate ToClient(IIOUpdate environmentUpdate, Func<IIOUpdate, IIOUpdate> next)
+        public IMessage ToClient(IMessage environmentUpdate, Func<IMessage, IMessage> next)
         {
             return (next != null) ? next(environmentUpdate) : environmentUpdate;
         }

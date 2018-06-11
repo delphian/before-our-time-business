@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -25,14 +26,14 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// </summary>
         /// <param name="message"></param>
         /// <param name="recipients"></param>
-        public void SendMessage(Message message, List<Item> recipients)
+        public void SendMessage(SavedMessage message, List<Item> recipients)
         {
             if (message.SenderId != null)
             {
-                var messages = new List<Message>();
+                var messages = new List<SavedMessage>();
                 recipients.ForEach(delegate (Item recipient)
                 {
-                    var messageCopy = (Message)message.Clone();
+                    var messageCopy = (SavedMessage)message.Clone();
                     messageCopy.RecipientId = recipient.Id;
                     messages.Add(messageCopy);
                 });

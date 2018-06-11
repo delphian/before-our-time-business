@@ -1,5 +1,5 @@
-﻿using BeforeOurTime.Business.Apis.IO.Requests.Models;
-using BeforeOurTime.Business.Terminals;
+﻿using BeforeOurTime.Business.Terminals;
+using BeforeOurTime.Repository.Models.Messages.Requests;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,6 +22,6 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// <param name="api"></param>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        void HandleIORequest(IApi api, Terminal terminal, IIORequest terminalRequest);
+        void HandleIORequest(IApi api, Terminal terminal, IRequest terminalRequest);
     }
 }

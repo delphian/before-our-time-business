@@ -7,6 +7,7 @@ using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -118,7 +119,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// Often results in the item's script executing and parsing the message package
         /// </remarks>
         /// <param name="item"></param>
-        public void DeliverMessage(Message message, Item item, JsFunctionManager jsFunctionManager)
+        public void DeliverMessage(SavedMessage message, Item item, JsFunctionManager jsFunctionManager)
         {
             var functionDefinition = ScriptManager.GetDelegateDefinition(message.DelegateId);
             if (ScriptEngine.GetFunctionDeclarations(item.Script.Trim()).Contains(functionDefinition.GetFunctionName()))

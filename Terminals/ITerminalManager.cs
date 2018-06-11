@@ -1,7 +1,7 @@
-﻿using BeforeOurTime.Business.Apis.IO.Updates.Models;
-using BeforeOurTime.Repository.Models.Accounts;
+﻿using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models.Messages;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,7 +35,7 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminalId">Unique terminal identifier</param>
         /// <param name="environmentUpdate"></param>
-        void SendToTerminalId(Guid terminalId, IIOUpdate environmentUpdate);
+        void SendToTerminalId(Guid terminalId, IMessage environmentUpdate);
         /// <summary>
         /// Destroy a terminal and notify subscribers
         /// </summary>

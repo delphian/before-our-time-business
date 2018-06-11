@@ -3,7 +3,6 @@
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.IO;
-using BeforeOurTime.Business.Apis.IO.Requests.Models;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
@@ -24,6 +23,8 @@ using BeforeOurTime.Repository.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Data;
+using BeforeOurTime.Repository.Models.Messages.Requests;
 using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using BeforeOurTime.Repository.Models.Scripts.Interfaces;
 using BeforeOutTime.Repository.Dbs.EF;
@@ -72,7 +73,7 @@ namespace BeforeOurTime.Business
             {
                 clientInput = Console.ReadLine();
             }
-            Servers.Telnet.TelnetManager.TelnetServer.stop();
+            Servers.Telnet.TelnetManager.TelnetServer.Stop();
         }
         /// <summary>
         /// Setup services
@@ -129,7 +130,7 @@ namespace BeforeOurTime.Business
             var api = serviceProvider.GetService<IApi>();
             ((TerminalManager)terminalManager).OnTerminalCreated += delegate (Terminal terminal)
             {
-                terminal.OnMessageToServer += delegate (Terminal xterminal, IIORequest terminalRequest)
+                terminal.OnMessageToServer += delegate (Terminal xterminal, IRequest terminalRequest)
                 {
                     lock (thisLock)
                     {
@@ -150,7 +151,7 @@ namespace BeforeOurTime.Business
                 var game = api.GetAttributeManager<IAttributeGameManager>().GetDefaultGame();
                 var onTickDelegate = api.GetScriptManager().GetDelegateDefinition("onTick");
                 var itemRecipients = api.GetItemManager().Read(onTickDelegate);
-                var tickMessage = new Message()
+                var tickMessage = new SavedMessage()
                 {
                     DelegateId = onTickDelegate.GetId(),
                     Sender = game.Item,
@@ -173,10 +174,10 @@ namespace BeforeOurTime.Business
                 // Create script global functions
                 var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
                 // Get messages
-                List<Message> messages = messageRepo.Read();
+                List<SavedMessage> messages = messageRepo.Read();
                 messageRepo.Delete();
                 // Deliver message to each recipient
-                foreach (Message message in messages)
+                foreach (SavedMessage message in messages)
                 {
 #if !DEBUG
                     try

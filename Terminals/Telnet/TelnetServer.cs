@@ -91,13 +91,13 @@ namespace BeforeOurTime.Business.Servers.Telnet
         {
             serverSocket.Bind(new IPEndPoint(ip, PORT));
             serverSocket.Listen(0);
-            serverSocket.BeginAccept(new AsyncCallback(handleIncomingConnection), serverSocket);
+            serverSocket.BeginAccept(new AsyncCallback(HandleIncomingConnection), serverSocket);
         }
 
         /// <summary>
         /// Stops the server.
         /// </summary>
-        public void stop()
+        public void Stop()
         {
             serverSocket.Close();
         }
@@ -116,7 +116,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <summary>
         /// Denies the incoming connections.
         /// </summary>
-        public void denyIncomingConnections()
+        public void DenyIncomingConnections()
         {
             this.acceptIncomingConnections = false;
         }
@@ -135,9 +135,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="c">The client on which
         /// to clear the screen.</param>
-        public void clearClientScreen(TelnetClient c)
+        public void ClearClientScreen(TelnetClient c)
         {
-            sendMessageToClient(c, "\u001B[1J\u001B[H");
+            SendMessageToClient(c, "\u001B[1J\u001B[H");
         }
 
         /// <summary>
@@ -146,10 +146,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="c">The client.</param>
         /// <param name="message">The message.</param>
-        public void sendMessageToClient(TelnetClient c, string message)
+        public void SendMessageToClient(TelnetClient c, string message)
         {
-            Socket clientSocket = getSocketByClient(c);
-            sendMessageToSocket(clientSocket, message);
+            Socket clientSocket = GetSocketByClient(c);
+            SendMessageToSocket(clientSocket, message);
         }
 
         /// <summary>
@@ -158,10 +158,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="s">The socket.</param>
         /// <param name="message">The message.</param>
-        private void sendMessageToSocket(Socket s, string message)
+        private void SendMessageToSocket(Socket s, string message)
         {
             byte[] data = Encoding.ASCII.GetBytes(message);
-            sendBytesToSocket(s, data);
+            SendBytesToSocket(s, data);
         }
 
         /// <summary>
@@ -169,20 +169,20 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="s">The socket.</param>
         /// <param name="data">The bytes.</param>
-        private void sendBytesToSocket(Socket s, byte[] data)
+        private void SendBytesToSocket(Socket s, byte[] data)
         {
-            s.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(sendData), s);
+            s.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendData), s);
         }
 
         /// <summary>
         /// Sends a message to all connected clients.
         /// </summary>
         /// <param name="message">The message.</param>
-        public void sendMessageToAll(string message)
+        public void SendMessageToAll(string message)
         {
             foreach (Socket s in clients.Keys)
             {
-                try { sendMessageToSocket(s, message); }
+                try { SendMessageToSocket(s, message); }
                 catch { clients.Remove(s); }
             }
         }
@@ -193,7 +193,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="clientSocket">The client's socket.</param>
         /// <returns>If the socket is found, the client instance
         /// is returned; otherwise null is returned.</returns>
-        private TelnetClient getClientBySocket(Socket clientSocket)
+        private TelnetClient GetClientBySocket(Socket clientSocket)
         {
             TelnetClient c;
 
@@ -209,11 +209,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="client">The client instance.</param>
         /// <returns>If the client is found, the socket is
         /// returned; otherwise null is returned.</returns>
-        private Socket getSocketByClient(TelnetClient client)
+        private Socket GetSocketByClient(TelnetClient client)
         {
             Socket s;
 
-            s = clients.FirstOrDefault(x => x.Value.getClientID() == client.getClientID()).Key;
+            s = clients.FirstOrDefault(x => x.Value.GetClientID() == client.GetClientID()).Key;
 
             return s;
         }
@@ -222,9 +222,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Kicks the specified client from the server.
         /// </summary>
         /// <param name="client">The client.</param>
-        public void kickClient(TelnetClient client)
+        public void KickClient(TelnetClient client)
         {
-            closeSocket(getSocketByClient(client));
+            CloseSocket(GetSocketByClient(client));
             ClientDisconnected(client);
         }
 
@@ -233,7 +233,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// the clients list.
         /// </summary>
         /// <param name="clientSocket">The client socket.</param>
-        private void closeSocket(Socket clientSocket)
+        private void CloseSocket(Socket clientSocket)
         {
             clients.Remove(clientSocket);
             clientSocket.Close();
@@ -247,7 +247,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Else, the connection blocked event is
         /// triggered.
         /// </summary>
-        private void handleIncomingConnection(IAsyncResult result)
+        private void HandleIncomingConnection(IAsyncResult result)
         {
             try
             {
@@ -265,7 +265,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     // Do Remote Flow Control
                     // Will Echo
                     // Will Suppress Go Ahead
-                    sendBytesToSocket(
+                    SendBytesToSocket(
                         newSocket,
                         new byte[] { 0xff, 0xfd, 0x01, 0xff, 0xfd, 0x21, 0xff, 0xfb, 0x01, 0xff, 0xfb, 0x03 }
                     );
@@ -274,7 +274,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
                     ClientConnected(client);
 
-                    serverSocket.BeginAccept(new AsyncCallback(handleIncomingConnection), serverSocket);
+                    serverSocket.BeginAccept(new AsyncCallback(HandleIncomingConnection), serverSocket);
                 }
 
                 else
@@ -289,7 +289,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <summary>
         /// Sends data to a socket.
         /// </summary>
-        private void sendData(IAsyncResult result)
+        private void SendData(IAsyncResult result)
         {
             try
             {
@@ -297,7 +297,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
                 clientSocket.EndSend(result);
 
-                clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(receiveData), clientSocket);
+                clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(ReceiveData), clientSocket);
             }
 
             catch { }
@@ -308,30 +308,30 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// It triggers the message received event in
         /// case the client pressed the return key.
         /// </summary>
-        private void receiveData(IAsyncResult result)
+        private void ReceiveData(IAsyncResult result)
         {
 //            try
 //            {
                 Socket clientSocket = (Socket)result.AsyncState;
-                TelnetClient client = getClientBySocket(clientSocket);
+                TelnetClient client = GetClientBySocket(clientSocket);
 
                 int bytesReceived = clientSocket.EndReceive(result);
 
                 if (bytesReceived == 0)
                 {
-                    closeSocket(clientSocket);
-                    serverSocket.BeginAccept(new AsyncCallback(handleIncomingConnection), serverSocket);
+                    CloseSocket(clientSocket);
+                    serverSocket.BeginAccept(new AsyncCallback(HandleIncomingConnection), serverSocket);
                 }
 
                 else if (data[0] < 0xF0)
                 {
-                    string receivedData = client.getReceivedData();
+                    string receivedData = client.GetReceivedData();
                     // 0x2E = '.', 0x0D = carriage return, 0x0A = new line
                     if ((data[0] == 0x2E && data[1] == 0x0D && receivedData.Length == 0) ||
                         (data[0] == 0x0D))
                     {
                         //sendMessageToSocket(clientSocket, "\u001B[1J\u001B[H");
-                        MessageReceived(client, client.getReceivedData());
+                        MessageReceived(client, client.GetReceivedData());
                         client.resetReceivedData();
                     }
 
@@ -343,16 +343,16 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             if (receivedData.Length > 0)
                             {
                                 client.removeLastCharacterReceived();
-                                sendBytesToSocket(clientSocket, new byte[] { 0x08, 0x20, 0x08 });
+                                SendBytesToSocket(clientSocket, new byte[] { 0x08, 0x20, 0x08 });
                             }
 
                             else
-                                clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(receiveData), clientSocket);
+                                clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(ReceiveData), clientSocket);
                         }
 
                         // 0x7F => delete character
                         else if (data[0] == 0x7F)
-                            clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(receiveData), clientSocket);
+                            clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(ReceiveData), clientSocket);
 
                         else
                         {
@@ -360,21 +360,21 @@ namespace BeforeOurTime.Business.Servers.Telnet
 
                             // Echo back the received character
                             // if client is not writing any password
-                            if (client.getCurrentStatus() != EClientStatus.Authenticating)
-                                sendBytesToSocket(clientSocket, new byte[] { data[0] });
+                            if (client.GetCurrentStatus() != EClientStatus.Authenticating)
+                                SendBytesToSocket(clientSocket, new byte[] { data[0] });
 
                             // Echo back asterisks if client is
                             // writing a password
                             else
-                                sendMessageToSocket(clientSocket, "*");
+                                SendMessageToSocket(clientSocket, "*");
 
-                            clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(receiveData), clientSocket);
+                            clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(ReceiveData), clientSocket);
                         }
                     }
                 }
 
                 else
-                    clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(receiveData), clientSocket);
+                    clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(ReceiveData), clientSocket);
 //            }
 
 //            catch { }

@@ -11,8 +11,8 @@ using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
-using BeforeOurTime.Business.Apis.IO.Updates.Models;
 using BeforeOurTime.Business.Apis.Accounts;
+using BeforeOurTime.Repository.Models.Messages;
 
 namespace BeforeOurTime.Business.Terminals
 {
@@ -143,7 +143,7 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminalId">Unique terminal identifier</param>
         /// <param name="environmentUpdate"></param>
-        public void SendToTerminalId(Guid terminalId, IIOUpdate environmentUpdate)
+        public void SendToTerminalId(Guid terminalId, IMessage environmentUpdate)
         {
             Terminals.FirstOrDefault(x => x.Id == terminalId).SendToClient(environmentUpdate);
         }

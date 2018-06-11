@@ -1,5 +1,5 @@
-﻿using BeforeOurTime.Business.Apis.IO.Updates.Models;
-using BeforeOurTime.Business.Terminals;
+﻿using BeforeOurTime.Business.Terminals;
+using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -52,7 +52,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <summary>
         /// Currently tracked available location exits
         /// </summary>
-        public List<IOExitUpdate> ItemExits = new List<IOExitUpdate>();
+        public List<ExitResponse> ItemExits = new List<ExitResponse>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TelnetClient"/> class.
@@ -72,7 +72,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Gets the client identifier.
         /// </summary>
         /// <returns>Client's identifier.</returns>
-        public uint getClientID()
+        public uint GetClientID()
         {
             return id;
         }
@@ -81,7 +81,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Gets the remote address.
         /// </summary>
         /// <returns>Client's remote address.</returns>
-        public IPEndPoint getRemoteAddress()
+        public IPEndPoint GetRemoteAddress()
         {
             return remoteAddr;
         }
@@ -90,7 +90,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Gets the connection time.
         /// </summary>
         /// <returns>The connection time.</returns>
-        public DateTime getConnectionTime()
+        public DateTime GetConnectionTime()
         {
             return connectedAt;
         }
@@ -99,7 +99,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Gets the client's current status.
         /// </summary>
         /// <returns>The client's status.</returns>
-        public EClientStatus getCurrentStatus()
+        public EClientStatus GetCurrentStatus()
         {
             return status;
         }
@@ -108,7 +108,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Gets the client's last received data.
         /// </summary>
         /// <returns>Client's last received data.</returns>
-        public string getReceivedData()
+        public string GetReceivedData()
         {
             return receivedData;
         }
@@ -126,7 +126,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Sets the client's current status.
         /// </summary>
         /// <param name="newStatus">The new status.</param>
-        public void setStatus(EClientStatus newStatus)
+        public void SetStatus(EClientStatus newStatus)
         {
             this.status = newStatus;
         }

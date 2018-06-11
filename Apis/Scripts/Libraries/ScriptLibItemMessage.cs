@@ -2,6 +2,7 @@
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Data;
 using Jint;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +32,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
             {
                 var scriptDelegate = Api.GetScriptManager().GetDelegateDefinition(type);
                 var itemTo = itemRepo.Read(new List<Guid>() { new Guid(toId) }).FirstOrDefault();
-                var message = new Message()
+                var message = new SavedMessage()
                 {
                     Sender = from,
                     DelegateId = scriptDelegate.GetId(),
