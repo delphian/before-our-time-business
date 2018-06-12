@@ -33,7 +33,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
                 var scriptDelegate = Api.GetScriptManager().GetDelegateDefinition(type);
                 var message = new SavedMessage()
                 {
-                    Sender = from,
+                    SenderId = from.Id,
                     DelegateId = scriptDelegate.GetId(),
                     Package = JsonConvert.SerializeObject(msgBody)
                 };
