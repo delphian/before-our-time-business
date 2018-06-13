@@ -151,14 +151,14 @@ namespace BeforeOurTime.Business.Terminals
             return (player != null);
         }
         /// <summary>
-        /// Send a message to the terminal
+        /// Send a message to the client
         /// </summary>
-        /// <param name="environmentUpdate"></param>
-        public void SendToClient(IMessage environmentUpdate)
+        /// <param name="message"></param>
+        public void SendToClient(IMessage message)
         {
             if (OnMessageToTerminal != null)
             {
-                OnMessageToTerminal(this, environmentUpdate);
+                OnMessageToTerminal(this, message);
             }
         }
         /// <summary>
