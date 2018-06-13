@@ -24,6 +24,7 @@ using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
+using BeforeOurTime.Repository.Models.Messages.Events;
 using BeforeOurTime.Repository.Models.Messages.Requests;
 using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using BeforeOurTime.Repository.Models.Scripts.Interfaces;
@@ -150,14 +151,10 @@ namespace BeforeOurTime.Business
                 var api = ServiceProvider.GetService<IApi>();
                 var game = api.GetAttributeManager<IAttributeGameManager>().GetDefaultGame();
                 var onTickDelegate = api.GetScriptManager().GetDelegateDefinition("onTick");
-                var itemRecipients = api.GetItemManager().GetDelegateImplementerIds(onTickDelegate);
-                var tickMessage = new SavedMessage()
-                {
-                    DelegateId = onTickDelegate.GetId(),
-                    SenderId = game.Id,
-                    Package = "{}"
-                };
-                api.GetMessageManager().SendMessage(tickMessage, itemRecipients);
+                var itemRecipientIds = api.GetItemManager().GetDelegateImplementerIds(onTickDelegate);
+                var itemRecipients = api.GetItemManager().Read(itemRecipientIds);
+                var tickEvent = new TickEvent() { };
+                api.GetMessageManager().SendMessage(tickEvent, itemRecipients, game.Id);
             }
         }
         /// <summary>

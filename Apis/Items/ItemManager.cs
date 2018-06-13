@@ -205,20 +205,15 @@ namespace BeforeOurTime.Business.Apis.Items
             }
             ItemRepo.Update(updateItems);
             // Construct arrival message
-            var arrivalMessage = new SavedMessage()
+            var arrivalEvent = new ArrivalEvent()
             {
-                SenderId = source.Id,
-                DelegateId = ScriptManager.GetDelegateDefinition("onArrival").GetId(),
-                Package = JsonConvert.SerializeObject(new ArrivalEvent()
-                {
-                    Item = item
-                })
+                Item = item
             };
             // Distribute message
             var location = ItemRepo.ReadWithChildren(newParent.Id);
-            var recipientIds = new List<Guid>() { location.Id };
-            recipientIds.AddRange(location.Children.Select(x => x.Id).ToList());
-            MessageManager.SendMessage(arrivalMessage, recipientIds);
+            var recipients = new List<Item>() { location };
+            recipients.AddRange(location.Children);
+            MessageManager.SendMessage(arrivalEvent, recipients, source.Id);
             return item;
         }
     }

@@ -12,6 +12,7 @@ using BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using BeforeOurTime.Repository.Models.Messages.Requests.Look;
+using BeforeOurTime.Repository.Models.Messages.Events;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -78,6 +79,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
             if (environmentUpdate.GetType() == typeof(LocationResponse))
             {
                 new TranslateIOLocationUpdate(TelnetServer, Clients[terminal.Id]).Translate(environmentUpdate);
+            }
+            if (environmentUpdate.GetType() == typeof(ArrivalEvent))
+            {
+                new TranslateArrivalEvent(TelnetServer, Clients[terminal.Id]).Translate(environmentUpdate);
             }
             else
             {

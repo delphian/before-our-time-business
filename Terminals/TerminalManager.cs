@@ -5,7 +5,6 @@ using System.Text;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Accounts.Authentication;
 using Microsoft.Extensions.DependencyInjection;
-using BeforeOurTime.Business.Terminals.Middleware;
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
@@ -59,10 +58,6 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         public event TerminalDestroyed OnTerminalDestroyed;
         /// <summary>
-        /// Features that may insert themselves between terminal and api or terminal and server
-        /// </summary>
-        public List<ITerminalMiddleware> TerminalMiddlewares = new List<ITerminalMiddleware>();
-        /// <summary>
         /// Constructor
         /// </summary>
         public TerminalManager(
@@ -76,14 +71,6 @@ namespace BeforeOurTime.Business.Terminals
             AccountManager = scopedProvider.GetService<IAccountManager>();
             DetailGameManager = scopedProvider.GetService<IAttributeGameManager>();
             DetailCharacterManager = scopedProvider.GetService<IAttributePlayerManager>();
-            var api = serviceProvider.GetService<IApi>();
-            // Register terminal middleware
-            var interfaceType = typeof(ITerminalMiddleware);
-            TerminalMiddlewares = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(x => x.GetTypes())
-                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (ITerminalMiddleware)Activator.CreateInstance(x, api))
-                .ToList();
         }
         /// <summary>
         /// Create a new terminal
@@ -154,14 +141,6 @@ namespace BeforeOurTime.Business.Terminals
         public List<Terminal> GetTerminals()
         {
             return Terminals;
-        }
-        /// <summary>
-        /// Get list of all terminal middleware
-        /// </summary>
-        /// <returns></returns>
-        public List<ITerminalMiddleware> GetTerminalMiddleware()
-        {
-            return TerminalMiddlewares;
         }
         /// <summary>
         /// Get all possible characters that a terminal may attach to

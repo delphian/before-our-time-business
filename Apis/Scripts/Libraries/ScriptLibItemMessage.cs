@@ -37,7 +37,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
                     DelegateId = scriptDelegate.GetId(),
                     Package = JsonConvert.SerializeObject(msgBody)
                 };
-                Api.GetMessageManager().SendMessage(message, new List<Guid>() { new Guid(toId) });
+//                Api.GetMessageManager().SendMessage(message, new List<Guid>() { new Guid(toId) });
                 return true;
             };
             Engine

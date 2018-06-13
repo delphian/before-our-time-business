@@ -156,18 +156,6 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="environmentUpdate"></param>
         public void SendToClient(IMessage environmentUpdate)
         {
-            var allMiddleware = TerminalManager.GetTerminalMiddleware().Select(x => x).ToList();
-            IMessage Next(IMessage update)
-            {
-                var middleware = allMiddleware.FirstOrDefault();
-                if (middleware != null)
-                {
-                    allMiddleware.Remove(middleware);
-                    return middleware.ToClient(update, Next);
-                }
-                return update;
-            }
-            environmentUpdate = Next(environmentUpdate);
             if (OnMessageToTerminal != null)
             {
                 OnMessageToTerminal(this, environmentUpdate);
@@ -179,18 +167,6 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="terminalRequest"></param>
         public void SendToApi(IRequest terminalRequest)
         {
-            var allMiddleware = TerminalManager.GetTerminalMiddleware().Select(x => x).ToList();
-            IRequest Next(IRequest request)
-            {
-                var middleware = allMiddleware.FirstOrDefault();
-                if (middleware != null)
-                {
-                    allMiddleware.Remove(middleware);
-                    return middleware.ToApi(request, Next);
-                }
-                return request;
-            }
-            terminalRequest = Next(terminalRequest);
             if (OnMessageToServer != null)
             {
                 OnMessageToServer(this, terminalRequest);

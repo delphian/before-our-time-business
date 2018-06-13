@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Repository.Models.Scripts.Delegates;
+﻿using BeforeOurTime.Repository.Models.Messages.Events;
+using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Text;
 namespace BeforeOurTime.Business.Apis.Scripts.Delegates.OnTick
 {
     /// <summary>
-    /// Periodic poke from the server indicating passage of time
+    /// Game tick
     /// </summary>
     public class OnTickDelegate : ScriptDelegate, IDelegate
     {
@@ -15,9 +16,9 @@ namespace BeforeOurTime.Business.Apis.Scripts.Delegates.OnTick
         /// </summary>
         public OnTickDelegate()
         {
-            DelegateId = new Guid("a20ef1ab-0e3f-40df-aca9-a70e18e51f32");
+            DelegateId = new Guid("88d81bff-1a43-497a-81e6-965ef8b37634");
             DelegateFunctionName = "onTick";
-            DelegateArgumentType = typeof(OnTickArgument);
+            DelegateArgumentType = typeof(TickEvent);
             DelegateReturnType = typeof(OnTickReturn);
         }
     }
