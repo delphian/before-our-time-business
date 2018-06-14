@@ -14,6 +14,7 @@ using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using BeforeOurTime.Repository.Models.Messages.Requests.Look;
 using BeforeOurTime.Repository.Models.Messages.Events;
 using BeforeOurTime.Repository.Models.Messages.Events.Emotes;
+using BeforeOurTime.Business.Apis.Terminals;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {

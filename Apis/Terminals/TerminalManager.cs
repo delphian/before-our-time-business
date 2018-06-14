@@ -13,7 +13,7 @@ using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Repository.Models.Messages;
 
-namespace BeforeOurTime.Business.Terminals
+namespace BeforeOurTime.Business.Apis.Terminals
 {
     /// <summary>
     /// Central manager of all client connections regardless of protocol (telnet, websocket, etc)

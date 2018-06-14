@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Business.Terminals;
+﻿using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Repository.Models.Messages.Requests;
 using BeforeOurTime.Repository.Models.Messages.Responses;
 using System;

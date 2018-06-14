@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Business.Terminals;
+﻿using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using System;

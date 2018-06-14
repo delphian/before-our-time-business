@@ -1,5 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.Scripts;
-using BeforeOurTime.Business.Terminals;
+using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;

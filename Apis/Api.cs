@@ -11,6 +11,7 @@ using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Business.Apis.IO;
+using BeforeOurTime.Business.Apis.Terminals;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -25,6 +26,7 @@ namespace BeforeOurTime.Business.Apis
         private IScriptManager ScriptManager { set; get; }
         private IIOManager IOManager { set; get; }
         private IItemManager ItemManager { set; get; }
+        private ITerminalManager TerminalManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -36,6 +38,7 @@ namespace BeforeOurTime.Business.Apis
             IScriptManager scriptManager,
             IIOManager ioManager,
             IItemManager itemManager,
+            ITerminalManager terminalManager,
             IAttributeGameManager attributeGameManager,
             IAttributePlayerManager attributePlayerManager,
             IAttributeLocationManager attributeLocationManager,
@@ -47,6 +50,7 @@ namespace BeforeOurTime.Business.Apis
             ScriptManager = scriptManager;
             IOManager = ioManager;
             ItemManager = itemManager;
+            TerminalManager = terminalManager;
             AttributeManagerList.Add(typeof(IAttributeGameManager), attributeGameManager);
             AttributeManagerList.Add(typeof(IAttributePlayerManager), attributePlayerManager);
             AttributeManagerList.Add(typeof(IAttributeLocationManager), attributeLocationManager);
@@ -72,6 +76,10 @@ namespace BeforeOurTime.Business.Apis
         public IItemManager GetItemManager()
         {
             return ItemManager;
+        }
+        public ITerminalManager GetTerminalManager()
+        {
+            return TerminalManager;
         }
         /// <summary>
         /// Get item detail manager based on detail manager type

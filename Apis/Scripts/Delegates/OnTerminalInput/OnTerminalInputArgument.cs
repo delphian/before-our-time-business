@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Business.Terminals;
+﻿using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using Newtonsoft.Json;
 using System;

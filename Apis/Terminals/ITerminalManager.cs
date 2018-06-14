@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Terminals
+namespace BeforeOurTime.Business.Apis.Terminals
 {
     public interface ITerminalManager
     {

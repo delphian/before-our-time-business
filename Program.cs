@@ -11,8 +11,8 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
+using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Logs;
-using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Dbs.EF.Items;
 using BeforeOurTime.Repository.Dbs.EF.Items.Attributes;
@@ -110,6 +110,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IScriptManager, ScriptManager>()
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<IIOManager, IOManager>()
+                .AddScoped<ITerminalManager, TerminalManager>()
                 // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IAttributeGameManager, AttributeGameManager>()
@@ -117,8 +118,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IAttributePlayerManager, AttributePlayerManager>()
                 .AddScoped<IAttributePhysicalManager, AttributePhysicalManager>()
                 .AddScoped<IAttributeExitManager, AttributeExitManager>()
-                .AddScoped<IApi, Api>()
-                .AddScoped<ITerminalManager, TerminalManager>();
+                .AddScoped<IApi, Api>();
         }
         /// <summary>
         /// Monitor terminal connections and forward messages

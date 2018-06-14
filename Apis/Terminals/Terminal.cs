@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Terminals
+namespace BeforeOurTime.Business.Apis.Terminals
 {
     /// <summary>
     /// Single generic connection used by the environment to communicate with clients
