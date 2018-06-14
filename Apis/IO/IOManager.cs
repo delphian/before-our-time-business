@@ -18,31 +18,31 @@ namespace BeforeOurTime.Business.Apis.IO
         /// <summary>
         /// List of handlers to process terminal input requests
         /// </summary>
-        private List<IIORequestHandler> IORequestHandlers = new List<IIORequestHandler>();
+        private List<IRequestHandler> RequestHandlers = new List<IRequestHandler>();
         /// <summary>
         /// List of handlers to process terminal input requests keyed by request type
         /// </summary>
-        private Dictionary<string, List<IIORequestHandler>> IORequestHandlersForTypes = new Dictionary<string, List<IIORequestHandler>>();
+        private Dictionary<string, List<IRequestHandler>> RequestHandlersForTypes = new Dictionary<string, List<IRequestHandler>>();
         /// <summary>
         /// Constructor
         /// </summary>
         public IOManager()
         {
-            IORequestHandlers = BuildRequestHandlers();
-            IORequestHandlersForTypes = BuildRequestHandlersForTypes(IORequestHandlers);
+            RequestHandlers = BuildRequestHandlers();
+            RequestHandlersForTypes = BuildRequestHandlersForTypes(RequestHandlers);
         }
         /// <summary>
         /// Use reflection to register all classes which will handle a terminal request
         /// </summary>
         /// <returns></returns>
-        private List<IIORequestHandler> BuildRequestHandlers()
+        private List<IRequestHandler> BuildRequestHandlers()
         {
-            var requestHandlers = new List<IIORequestHandler>();
-            var interfaceType = typeof(IIORequestHandler);
+            var requestHandlers = new List<IRequestHandler>();
+            var interfaceType = typeof(IRequestHandler);
             requestHandlers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (IIORequestHandler) Activator.CreateInstance(x))
+                .Select(x => (IRequestHandler) Activator.CreateInstance(x))
                 .ToList();
             return requestHandlers;
         }
@@ -51,19 +51,19 @@ namespace BeforeOurTime.Business.Apis.IO
         /// </summary>
         /// <param name="requestHandlers">List of handlers to process terminal input requests</param>
         /// <returns></returns>
-        private Dictionary<string, List<IIORequestHandler>> BuildRequestHandlersForTypes(
-            List<IIORequestHandler> requestHandlers)
+        private Dictionary<string, List<IRequestHandler>> BuildRequestHandlersForTypes(
+            List<IRequestHandler> requestHandlers)
         {
-            var requestHandlersForTypes = new Dictionary<string, List<IIORequestHandler>>();
-            requestHandlers.ForEach(delegate (IIORequestHandler requestHandler)
+            var requestHandlersForTypes = new Dictionary<string, List<IRequestHandler>>();
+            requestHandlers.ForEach(delegate (IRequestHandler requestHandler)
             {
-                var requestTypes = requestHandler.RegisterForIORequests();
+                var requestTypes = requestHandler.RegisterForRequests();
                 requestTypes.ForEach(delegate (string requestType)
                 {
                     var requestHandlersForType = requestHandlersForTypes.GetValueOrDefault(requestType);
                     if (requestHandlersForType == null)
                     {
-                        requestHandlersForType = new List<IIORequestHandler>()
+                        requestHandlersForType = new List<IRequestHandler>()
                         {
                             requestHandler
                         };
@@ -86,13 +86,13 @@ namespace BeforeOurTime.Business.Apis.IO
         {
             IResponse response = new Response() { ResponseSuccess = false };
             var requestType = request.GetType().ToString();
-            var requestHandlersForType = IORequestHandlersForTypes
+            var requestHandlersForType = RequestHandlersForTypes
                 .Where(x => x.Key == requestType)
                 .Select(x => x.Value)
                 .FirstOrDefault();
-            requestHandlersForType.ForEach(delegate (IIORequestHandler requestHandler)
+            requestHandlersForType.ForEach(delegate (IRequestHandler requestHandler)
             {
-                response = requestHandler.HandleIORequest(api, terminal, request, response);
+                response = requestHandler.HandleRequest(api, terminal, request, response);
             });
             return response;
         }

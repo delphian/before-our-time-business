@@ -86,7 +86,10 @@ namespace BeforeOurTime.Business.Terminals
         public TerminalManager DestroyTerminal(Terminal terminal)
         {
             Terminals.Remove(terminal);
-            OnTerminalDestroyed((Terminal)terminal.Clone());
+            if (OnTerminalDestroyed != null)
+            {
+                OnTerminalDestroyed((Terminal)terminal.Clone());
+            }
             terminal = null;
             return this;
         }

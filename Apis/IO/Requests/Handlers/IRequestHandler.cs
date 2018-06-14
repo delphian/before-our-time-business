@@ -10,13 +10,13 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
     /// <summary>
     /// Handle one or more terminal requests
     /// </summary>
-    public interface IIORequestHandler
+    public interface IRequestHandler
     {
         /// <summary>
         /// Register to handle a specific set of IO requests
         /// </summary>
         /// <returns></returns>
-        List<string> RegisterForIORequests();
+        List<string> RegisterForRequests();
         /// <summary>
         /// Handle terminal request
         /// </summary>
@@ -24,6 +24,6 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// <param name="terminal"></param>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        IResponse HandleIORequest(IApi api, Terminal terminal, IRequest request, IResponse response);
+        IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response);
     }
 }

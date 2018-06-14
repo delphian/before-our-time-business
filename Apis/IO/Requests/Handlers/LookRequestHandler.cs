@@ -17,16 +17,16 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
 {
-    public class IOLookRequestHandler : IIORequestHandler
+    public class LookRequestHandler : IRequestHandler
     {
-        public IOLookRequestHandler()
+        public LookRequestHandler()
         {
         }
         /// <summary>
         /// Register to handle a specific set of IO requests
         /// </summary>
         /// <returns></returns>
-        public List<string> RegisterForIORequests()
+        public List<string> RegisterForRequests()
         {
             return new List<string>()
             {
@@ -40,7 +40,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// <param name="terminal"></param>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        public IResponse HandleIORequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
         {
             if (request.GetType() == typeof(LookRequest))
             {

@@ -21,16 +21,16 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
 {
-    public class IOListAccountCharactersRequestHandler : IIORequestHandler
+    public class ListAccountCharactersRequestHandler : IRequestHandler
     {
-        public IOListAccountCharactersRequestHandler()
+        public ListAccountCharactersRequestHandler()
         {
         }
         /// <summary>
         /// Register to handle a specific set of IO requests
         /// </summary>
         /// <returns></returns>
-        public List<string> RegisterForIORequests()
+        public List<string> RegisterForRequests()
         {
             return new List<string>()
             {
@@ -43,7 +43,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// <param name="api"></param>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        public IResponse HandleIORequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
         {
             if (request.IsMessageType<ListAccountCharactersRequest>())
             {

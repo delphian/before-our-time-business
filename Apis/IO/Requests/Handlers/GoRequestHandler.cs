@@ -16,16 +16,16 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
 {
-    public class IOGoRequestHandler : IIORequestHandler
+    public class GoRequestHandler : IRequestHandler
     {
-        public IOGoRequestHandler()
+        public GoRequestHandler()
         {
         }
         /// <summary>
         /// Register to handle a specific set of IO requests
         /// </summary>
         /// <returns></returns>
-        public List<string> RegisterForIORequests()
+        public List<string> RegisterForRequests()
         {
             return new List<string>()
             {
@@ -38,7 +38,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// <param name="api"></param>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        public IResponse HandleIORequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
         {
             if (request.GetType() == typeof(GoRequest))
             {
@@ -49,8 +49,8 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     .Read(exit.GetAttribute<AttributeExit>().DestinationLocationId);
                 var location = api.GetItemManager().Read(locationAttribute.ItemId);
                 api.GetItemManager().Move(player, location, exit);
-                var lookRequestHandler = new IOLookRequestHandler();
-                response = lookRequestHandler.HandleIORequest(api, terminal, new LookRequest()
+                var lookRequestHandler = new LookRequestHandler();
+                response = lookRequestHandler.HandleRequest(api, terminal, new LookRequest()
                 {
 
                 }, response);
