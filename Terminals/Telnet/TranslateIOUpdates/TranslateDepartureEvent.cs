@@ -10,7 +10,7 @@ using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 
 namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
 {
-    public class TranslateArrivalEvent : TranslateIOUpdate, ITranslateIOUpdate
+    public class TranslateDepartureEvent : TranslateIOUpdate, ITranslateIOUpdate
     {
         protected TelnetServer TelnetServer { set; get; }
         protected TelnetClient TelnetClient { set; get; }
@@ -19,7 +19,7 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         /// </summary>
         /// <param name="telnetServer"></param>
         /// <param name="telnetClient"></param>
-        public TranslateArrivalEvent(
+        public TranslateDepartureEvent(
             TelnetServer telnetServer, 
             TelnetClient telnetClient)
         {
@@ -32,9 +32,9 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         /// <param name="message">Message from the environment</param>
         public void Translate(IMessage message)
         {
-            var arrivalEvent = message.GetMessageAsType<ArrivalEvent>();
+            var departureEvent = message.GetMessageAsType<DepartureEvent>();
             TelnetServer.SendMessageToClient(TelnetClient, "\r\n"
-                + $"{AnsiColors.green}{arrivalEvent.Name} has arrived{AnsiColors.reset}");
+                + $"{AnsiColors.green}{departureEvent.Name} has departed{AnsiColors.reset}");
         }
     }
 }

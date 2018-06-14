@@ -6,11 +6,12 @@ using BeforeOurTime.Business.Servers.Telnet;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Events;
+using BeforeOurTime.Repository.Models.Messages.Events.Emotes;
 using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 
 namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
 {
-    public class TranslateArrivalEvent : TranslateIOUpdate, ITranslateIOUpdate
+    public class TranslateEmoteEvent : TranslateIOUpdate, ITranslateIOUpdate
     {
         protected TelnetServer TelnetServer { set; get; }
         protected TelnetClient TelnetClient { set; get; }
@@ -19,7 +20,7 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         /// </summary>
         /// <param name="telnetServer"></param>
         /// <param name="telnetClient"></param>
-        public TranslateArrivalEvent(
+        public TranslateEmoteEvent(
             TelnetServer telnetServer, 
             TelnetClient telnetClient)
         {
@@ -32,9 +33,12 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         /// <param name="message">Message from the environment</param>
         public void Translate(IMessage message)
         {
-            var arrivalEvent = message.GetMessageAsType<ArrivalEvent>();
+            var emoteEvent = message.GetMessageAsType<EmoteEvent>();
+            var emote = "";
+            emote = emoteEvent.Type == EmoteType.Smile ? $"{emoteEvent.Name} smiles happily" : emote;
+            emote = emoteEvent.Type == EmoteType.Frown ? $"{emoteEvent.Name} frowns" : emote;
             TelnetServer.SendMessageToClient(TelnetClient, "\r\n"
-                + $"{AnsiColors.green}{arrivalEvent.Name} has arrived{AnsiColors.reset}");
+                + $"{AnsiColors.whiteB}{emote}{AnsiColors.reset}");
         }
     }
 }

@@ -85,6 +85,14 @@ namespace BeforeOurTime.Business.Servers.Telnet
             {
                 new TranslateArrivalEvent(TelnetServer, Clients[terminal.Id]).Translate(message);
             }
+            else if (message.IsMessageType<DepartureEvent>())
+            {
+                new TranslateDepartureEvent(TelnetServer, Clients[terminal.Id]).Translate(message);
+            }
+            else if (message.IsMessageType<EmoteEvent>())
+            {
+                new TranslateEmoteEvent(TelnetServer, Clients[terminal.Id]).Translate(message);
+            }
             else
             {
                 TelnetServer.SendMessageToClient(Clients[terminal.Id], "\r\n\r\n"
