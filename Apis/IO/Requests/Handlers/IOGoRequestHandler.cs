@@ -2,6 +2,7 @@
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Requests;
 using BeforeOurTime.Repository.Models.Messages.Requests.Look;
@@ -41,12 +42,13 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         {
             if (request.GetType() == typeof(GoRequest))
             {
-                var ioGoRequest = (GoRequest) Convert.ChangeType(request, typeof(GoRequest));
-                var locationExit = api.GetAttributeManager<IAttributeExitManager>().Read(ioGoRequest.ExitId);
-                var locationAttribute = api.GetAttributeManager<IAttributeLocationManager>().Read(locationExit.DestinationLocationId);
-                var playerAttribute = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
-                var newLocation = api.GetItemManager().Read(locationAttribute.ItemId);
-                api.GetItemManager().Move(playerAttribute.Item, newLocation, locationExit.Item);
+                var goRequest = request.GetMessageAsType<GoRequest>();
+                var exit = api.GetItemManager().Read(goRequest.ItemId);
+                var player = api.GetItemManager().Read(terminal.PlayerId);
+                var locationAttribute = api.GetAttributeManager<IAttributeLocationManager>()
+                    .Read(exit.GetAttribute<AttributeExit>().DestinationLocationId);
+                var location = api.GetItemManager().Read(locationAttribute.ItemId);
+                api.GetItemManager().Move(player, location, exit);
                 var lookRequestHandler = new IOLookRequestHandler();
                 response = lookRequestHandler.HandleIORequest(api, terminal, new LookRequest()
                 {

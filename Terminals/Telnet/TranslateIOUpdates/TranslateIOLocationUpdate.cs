@@ -54,7 +54,7 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
             }
             else
             {
-                exits = "None\r\n";
+                exits = "None";
             }
             TelnetServer.SendMessageToClient(TelnetClient, $" - Exits: {exits}");
         }

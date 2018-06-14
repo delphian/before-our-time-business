@@ -161,7 +161,7 @@ namespace BeforeOurTime.Business.Terminals
             var response = SendToApi(createPlayerRequest);
             if (response.IsSuccess())
             {
-                var createPlayerResponse = (CreatePlayerResponse)response.GetMessageAsType<CreatePlayerResponse>();
+                var createPlayerResponse = response.GetMessageAsType<CreatePlayerResponse>();
                 PlayerId = createPlayerResponse.PlayerCreatedEvent.ItemId;
                 Status = TerminalStatus.Attached;
             }

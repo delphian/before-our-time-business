@@ -44,15 +44,13 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         {
             if (request.GetType() == typeof(LookRequest))
             {
-                var playerAttribute = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
-                var player = api.GetItemManager().Read(playerAttribute.ItemId);
+                var player = api.GetItemManager().Read(terminal.PlayerId);
                 var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
-                AttributeLocation locationAttributes = location.GetAttribute<AttributeLocation>();
                 var ioLocationUpdate = new LocationResponse()
                 {
-                    LocationId = locationAttributes.Id,
-                    Name = locationAttributes.Name,
-                    Description = locationAttributes.Description,
+                    ItemId = location.Id,
+                    Name = location.GetAttribute<AttributeLocation>().Name,
+                    Description = location.GetAttribute<AttributeLocation>().Description,
                     Exits = new List<ExitResponse>()
                 };
                 // Add exits
@@ -63,7 +61,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                         var attribute = item.GetAttribute<AttributeExit>();
                         ioLocationUpdate.Exits.Add(new ExitResponse()
                         {
-                            ExitId = attribute.Id,
+                            ItemId = attribute.ItemId,
                             Name = attribute.Name,
                             Description = attribute.Description
                         });

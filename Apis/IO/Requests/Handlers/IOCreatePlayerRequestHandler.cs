@@ -58,6 +58,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     api.GetAttributeManager<IAttributeGameManager>().GetDefaultLocation());
                 var createPlayerResponse = new CreatePlayerResponse()
                 {
+                    ResponseSuccess = true,
                     PlayerCreatedEvent = new PlayerCreatedEvent()
                     {
                         ItemId = player.ItemId,

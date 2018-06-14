@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Terminals;
+using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using System;
 using System.Collections.Generic;
@@ -53,7 +54,6 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Currently tracked available location exits
         /// </summary>
         public List<ExitResponse> ItemExits = new List<ExitResponse>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TelnetClient"/> class.
         /// </summary>

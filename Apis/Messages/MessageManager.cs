@@ -53,10 +53,13 @@ namespace BeforeOurTime.Business.Apis.Messages
                 if (playerAttribute != null)
                 {
                     var terminalId = TerminalManager.GetTerminals()
-                        .Where(x => x.PlayerId == playerAttribute.Id)
+                        .Where(x => x.PlayerId == recipient.Id)
                         .Select(x => x.Id)
                         .FirstOrDefault();
-                    TerminalManager.SendToTerminalId(terminalId, message);
+                    if (terminalId != Guid.Empty)
+                    {
+                        TerminalManager.SendToTerminalId(terminalId, message);
+                    }
                 } else
                 {
                     var messageCopy = (SavedMessage)savedMessage.Clone();

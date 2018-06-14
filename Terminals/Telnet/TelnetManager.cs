@@ -74,21 +74,21 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="terminal"></param>
         /// <param name="environmentUpdate"></param>
-        private static void MessageFromTerminal(Terminal terminal, IMessage environmentUpdate)
+        private static void MessageFromTerminal(Terminal terminal, IMessage message)
         {
-            if (environmentUpdate.GetType() == typeof(LocationResponse))
+            if (message.IsMessageType<LocationResponse>())
             {
-                new TranslateIOLocationUpdate(TelnetServer, Clients[terminal.Id]).Translate(environmentUpdate);
+                new TranslateIOLocationUpdate(TelnetServer, Clients[terminal.Id]).Translate(message);
             }
-            if (environmentUpdate.GetType() == typeof(ArrivalEvent))
+            else if (message.IsMessageType<ArrivalEvent>())
             {
-                new TranslateArrivalEvent(TelnetServer, Clients[terminal.Id]).Translate(environmentUpdate);
+                new TranslateArrivalEvent(TelnetServer, Clients[terminal.Id]).Translate(message);
             }
             else
             {
-                TelnetServer.SendMessageToClient(Clients[terminal.Id], "\r\n"
-                    + "Unknown message from server:\r\n"
-                    + JsonConvert.SerializeObject(environmentUpdate));
+                TelnetServer.SendMessageToClient(Clients[terminal.Id], "\r\n\r\n"
+                    + $"Unknown message from server ({message.GetType().ToString()}):\r\n"
+                    + JsonConvert.SerializeObject(message));
             }
             TelnetServer.SendMessageToClient(Clients[terminal.Id], "\r\n\r\n> ");
         }
@@ -129,10 +129,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     TelnetServer.KickClient(telnetClient);
                     break;
                 case "look":
-                    telnetClient.GetTerminal().SendToApi(new LookRequest()
-                    {
-
-                    });
+                    var response = telnetClient.GetTerminal().SendToApi(new LookRequest()
+                        {
+                        });
+                    telnetClient.GetTerminal().SendToClient(response);
                     break;
                 case "go":
                     MFCGo(telnetClient, message);
@@ -150,13 +150,17 @@ namespace BeforeOurTime.Business.Servers.Telnet
         private static void MFCGo(TelnetClient telnetClient, string message)
         {
             string secondWord = message.Split(' ').LastOrDefault();
-            var exitAttribute = telnetClient.ItemExits.Where(x => x.Name.ToLower().Contains(secondWord.ToLower())).FirstOrDefault();
-            if (exitAttribute != null)
+            var exitResponse = telnetClient.ItemExits
+                .Where(x => x.Name.ToLower()
+                .Contains(secondWord.ToLower()))
+                .FirstOrDefault();
+            if (exitResponse != null)
             {
-                telnetClient.GetTerminal().SendToApi(new GoRequest()
-                {
-                    ExitId = exitAttribute.ExitId
-                });
+                var response = telnetClient.GetTerminal().SendToApi(new GoRequest()
+                    {
+                        ItemId = exitResponse.ItemId
+                    });
+                telnetClient.GetTerminal().SendToClient(response);
             } else
             {
                 TelnetServer.SendMessageToClient(telnetClient, "\r\nGo where??\r\n> ");

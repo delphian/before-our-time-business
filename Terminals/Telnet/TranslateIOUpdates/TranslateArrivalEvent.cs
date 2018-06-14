@@ -29,12 +29,12 @@ namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
         /// <summary>
         /// Translate structured data from the environment to pure text
         /// </summary>
-        /// <param name="environmentUpdate">Update from the environment</param>
-        public void Translate(IMessage environmentUpdate)
+        /// <param name="message">Message from the environment</param>
+        public void Translate(IMessage message)
         {
-            var arrivalEvent = (ArrivalEvent)Convert.ChangeType(environmentUpdate, typeof(ArrivalEvent));
-            TelnetServer.SendMessageToClient(TelnetClient, "\r\n\r\n"
-                + $"{AnsiColors.redB}Something has arrived{AnsiColors.reset}\r\n");
+            var arrivalEvent = message.GetMessageAsType<ArrivalEvent>();
+            TelnetServer.SendMessageToClient(TelnetClient, "\r\n"
+                + $"{AnsiColors.redB}{arrivalEvent.Name} has arrived{AnsiColors.reset}");
         }
     }
 }

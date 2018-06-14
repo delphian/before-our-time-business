@@ -12,6 +12,7 @@ using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Repository.Models.Messages.Events;
 using BeforeOurTime.Repository.Models.Messages.Data;
+using BeforeOurTime.Repository.Models.Items.Attributes;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
@@ -204,10 +205,15 @@ namespace BeforeOurTime.Business.Apis.Items
                 updateItems.Add(oldParent);
             }
             ItemRepo.Update(updateItems);
+            var name = item.Name;
+            if (item.HasAttribute<AttributePlayer>())
+            {
+                name = item.GetAttribute<AttributePlayer>().Name;
+            }
             // Construct arrival message
             var arrivalEvent = new ArrivalEvent()
             {
-                Item = item
+                Name = item.Name
             };
             // Distribute message
             var location = ItemRepo.ReadWithChildren(newParent.Id);
