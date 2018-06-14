@@ -4,6 +4,7 @@ using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
+using BeforeOurTime.Repository.Models.Messages.Events;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -67,6 +68,58 @@ namespace BeforeOurTime.Business.Apis.Messages
                     MessageRepo.Create(messageCopy);
                 }
             });
+        }
+        /// <summary>
+        /// Distribute a message to all items at a location
+        /// </summary>
+        /// <param name="message">Message to be delivered</param>
+        /// <param name="location">Location item, including children, where message is to be delivered</param>
+        /// <param name="actorId">Initiator of the message</param>
+        public void SendMessageToLocation(IMessage message, Item location, Guid actorId)
+        {
+            var recipients = new List<Item>() { location };
+            recipients.AddRange(location.Children);
+            SendMessage(message, recipients, actorId);
+        }
+        /// <summary>
+        /// Distribute message to all items at a location of an item's arrival
+        /// </summary>
+        /// <param name="item">Item that has arrived</param>
+        /// <param name="location">Location item, including children, where the item has arrived</param>
+        /// <param name="actorId">Initiator of the movement</param>
+        public void SendArrivalEvent(Item item, Item location, Guid actorId)
+        {
+            var name = item.Name;
+            if (item.HasAttribute<AttributePlayer>())
+            {
+                name = item.GetAttribute<AttributePlayer>().Name;
+            }
+            SendMessageToLocation(new ArrivalEvent()
+                {
+                    ItemId = item.Id,
+                    Name = name
+                }
+                , location, actorId);
+        }
+        /// <summary>
+        /// Distribute message to all items at a location of an item's departure
+        /// </summary>
+        /// <param name="item">Item that has departed</param>
+        /// <param name="location">Location item, including children, where the item has departed</param>
+        /// <param name="actorId">Initiator of the movement</param>
+        public void SendDepartureEvent(Item item, Item location, Guid actorId)
+        {
+            var name = item.Name;
+            if (item.HasAttribute<AttributePlayer>())
+            {
+                name = item.GetAttribute<AttributePlayer>().Name;
+            }
+            SendMessageToLocation(new DepartureEvent()
+                {
+                    ItemId = item.Id,
+                    Name = name
+                }
+                , location, actorId);
         }
     }
 }

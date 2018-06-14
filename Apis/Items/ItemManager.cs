@@ -193,6 +193,9 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="source">Item responsible for doing the moving</param>
         public Item Move(Item item, Item newParent, Item source = null)
         {
+            // Send departure message
+            var oldLocation = ItemRepo.ReadWithChildren(item.ParentId.Value);
+            MessageManager.SendDepartureEvent(item, oldLocation, source.Id);
             // Remove from old parent
             var oldParent = item.Parent;
             oldParent?.Children.Remove(item);
@@ -205,21 +208,9 @@ namespace BeforeOurTime.Business.Apis.Items
                 updateItems.Add(oldParent);
             }
             ItemRepo.Update(updateItems);
-            var name = item.Name;
-            if (item.HasAttribute<AttributePlayer>())
-            {
-                name = item.GetAttribute<AttributePlayer>().Name;
-            }
-            // Construct arrival message
-            var arrivalEvent = new ArrivalEvent()
-            {
-                Name = item.Name
-            };
-            // Distribute message
-            var location = ItemRepo.ReadWithChildren(newParent.Id);
-            var recipients = new List<Item>() { location };
-            recipients.AddRange(location.Children);
-            MessageManager.SendMessage(arrivalEvent, recipients, source.Id);
+            // Send arrival message
+            var newLocation = ItemRepo.ReadWithChildren(newParent.Id);
+            MessageManager.SendArrivalEvent(item, newLocation, source.Id);
             return item;
         }
     }
