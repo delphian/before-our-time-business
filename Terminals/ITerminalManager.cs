@@ -24,13 +24,6 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         Account AuthenticateTerminal(Terminal terminal, string name, string password);
         /// <summary>
-        /// Attach a terminal to an environment item as it's avatar
-        /// </summary>
-        /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
-        /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
-        /// <returns></returns>
-        AttributePlayer AttachTerminal(Terminal terminal, Guid itemId);
-        /// <summary>
         /// Send a message to a specific terminal
         /// </summary>
         /// <param name="terminalId">Unique terminal identifier</param>
@@ -47,12 +40,6 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         List<Terminal> GetTerminals();
         /// <summary>
-        /// Get all possible characters that a terminal may attach to
-        /// </summary>
-        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        /// <returns></returns>
-        List<Item> GetAttachableAvatars(Terminal terminal);
-        /// <summary>
         /// Create a new account and local authentication credentials
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
@@ -61,12 +48,5 @@ namespace BeforeOurTime.Business.Terminals
         /// <param name="password">Password for account</param>
         /// <returns></returns>
         Account CreateAccount(Terminal terminal, string name, string email, string password);
-        /// <summary>
-        /// Create character owned by account owner of terminal
-        /// </summary>
-        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        /// <param name="name">Friendly name of character</param>
-        /// <returns></returns>
-        AttributePlayer CreateCharacter(Terminal terminal, string name);
     }
 }

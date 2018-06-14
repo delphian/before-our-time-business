@@ -26,6 +26,7 @@ using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using BeforeOurTime.Repository.Models.Messages.Events;
 using BeforeOurTime.Repository.Models.Messages.Requests;
+using BeforeOurTime.Repository.Models.Messages.Responses;
 using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using BeforeOurTime.Repository.Models.Scripts.Interfaces;
 using BeforeOutTime.Repository.Dbs.EF;
@@ -131,11 +132,12 @@ namespace BeforeOurTime.Business
             var api = serviceProvider.GetService<IApi>();
             ((TerminalManager)terminalManager).OnTerminalCreated += delegate (Terminal terminal)
             {
-                terminal.OnMessageToServer += delegate (Terminal xterminal, IRequest terminalRequest)
+                terminal.OnMessageToServer += delegate (Terminal xterminal, IRequest request)
                 {
                     lock (thisLock)
                     {
-                        api.GetIOManager().HandleRequest(api, terminal, terminalRequest);
+                        var response = api.GetIOManager().HandleRequest(api, terminal, request);
+                        return response;
                     }
                 };
             };

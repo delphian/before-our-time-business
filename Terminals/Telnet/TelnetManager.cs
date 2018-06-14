@@ -322,7 +322,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         {
                             if (player.GetAttribute<AttributePlayer>().Name.ToLower() == name)
                             {
-                                if (telnetClient.GetTerminal().Attach(player.GetAttribute<AttributePlayer>().Id))
+                                if (telnetClient.GetTerminal().Attach(player.Id))
                                 {
                                     telnetClient.GetTerminal().DataBag["step"] = "attached";
                                     TelnetServer.SendMessageToClient(telnetClient, "\r\n"
@@ -370,7 +370,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     break;
                 case "save_name":
                     telnetClient.GetTerminal().DataBag["create_character_name"] = message;
-                    if (telnetClient.GetTerminal().CreateCharacter(telnetClient.GetTerminal().DataBag["create_character_name"]))
+                    if (telnetClient.GetTerminal().CreatePlayer(telnetClient.GetTerminal().DataBag["create_character_name"]))
                     {
                         telnetClient.GetTerminal().DataBag["step"] = "attached";
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n"

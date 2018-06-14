@@ -20,21 +20,7 @@ namespace BeforeOurTime.Business.Terminals
     /// </summary>
     public class TerminalManager : ITerminalManager
     {
-        /// <summary>
-        /// Account repository
-        /// </summary>
-        protected IAccountRepo AccountRepo { set; get; }
-        /// <summary>
-        /// Item repository
-        /// </summary>
-        protected IItemRepo ItemRepo { set; get; }
-        /// <summary>
-        /// Central data repository for all character items
-        /// </summary>
-        protected IAttributePlayerRepo DetailCharacterRepo { set; get; }
         private IAccountManager AccountManager { set; get; }
-        private IAttributeGameManager DetailGameManager { set; get; }
-        private IAttributePlayerManager DetailCharacterManager { set; get; }
         /// <summary>
         /// List of all active terminals
         /// </summary>
@@ -65,12 +51,7 @@ namespace BeforeOurTime.Business.Terminals
         )
         {
             var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
-            AccountRepo = scopedProvider.GetService<IAccountRepo>();
-            ItemRepo = scopedProvider.GetService<IItemRepo>();
-            DetailCharacterRepo = scopedProvider.GetService<IAttributePlayerRepo>();
             AccountManager = scopedProvider.GetService<IAccountManager>();
-            DetailGameManager = scopedProvider.GetService<IAttributeGameManager>();
-            DetailCharacterManager = scopedProvider.GetService<IAttributePlayerManager>();
         }
         /// <summary>
         /// Create a new terminal
@@ -97,22 +78,6 @@ namespace BeforeOurTime.Business.Terminals
         public Account AuthenticateTerminal(Terminal terminal, string name, string password)
         {
             return AccountManager.Authenticate(name, password);
-        }
-        /// <summary>
-        /// Attach a terminal to an environment item as it's avatar
-        /// </summary>
-        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
-        /// <returns></returns>
-        public AttributePlayer AttachTerminal(Terminal terminal, Guid itemId)
-        {
-            AttributePlayer avatar = null;
-            var character = DetailCharacterRepo.Read(new List<Guid>() { itemId }).FirstOrDefault();
-            if (character != null && terminal.AccountId == character.AccountId)
-            {
-                avatar = character;
-            }
-            return avatar;
         }
         /// <summary>
         /// Destroy a terminal and notify subscribers
@@ -143,20 +108,6 @@ namespace BeforeOurTime.Business.Terminals
             return Terminals;
         }
         /// <summary>
-        /// Get all possible characters that a terminal may attach to
-        /// </summary>
-        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        /// <returns></returns>
-        public List<Item> GetAttachableAvatars(Terminal terminal)
-        {
-            var avatars = new List<Item>();
-            if (terminal.AccountId != null)
-            {
-                avatars = DetailCharacterRepo.ReadPlayers(terminal.AccountId);
-            }
-            return avatars;
-        }
-        /// <summary>
         /// Create a new account and local authentication credentials
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
@@ -167,26 +118,6 @@ namespace BeforeOurTime.Business.Terminals
         public Account CreateAccount(Terminal terminal, string name, string email, string password)
         {
             return AccountManager.Create(name, email, password);
-        }
-        /// <summary>
-        /// Create character owned by account owner of terminal
-        /// </summary>
-        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        /// <param name="name">Friendly name of character</param>
-        /// <returns></returns>
-        public AttributePlayer CreateCharacter(Terminal terminal, string name)
-        {
-            AttributePlayer player = DetailCharacterManager.Create(
-                name,
-                terminal.AccountId,
-                new AttributePhysical()
-                {
-                    Name = name,
-                    Description = "A player",
-                    Weight = 100
-                },
-                DetailGameManager.GetDefaultLocation());
-            return player;
         }
     }
 }

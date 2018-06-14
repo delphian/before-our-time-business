@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis.IO.Requests.Handlers;
 using BeforeOurTime.Business.Terminals;
 using BeforeOurTime.Repository.Models.Messages.Requests;
+using BeforeOurTime.Repository.Models.Messages.Responses;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +18,8 @@ namespace BeforeOurTime.Business.Apis.IO
         /// </summary>
         /// <param name="api"></param>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        /// <param name="terminalRequest">A request from a terminal</param>
-        void HandleRequest(IApi api, Terminal terminal, IRequest terminalRequest);
+        /// <param name="request">A request from a terminal</param>
+        /// <param name="response">A response to the terminal</param>
+        IResponse HandleRequest(IApi api, Terminal terminal, IRequest request);
     }
 }

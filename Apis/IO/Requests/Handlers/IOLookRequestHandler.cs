@@ -7,6 +7,7 @@ using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Requests;
 using BeforeOurTime.Repository.Models.Messages.Requests.Look;
+using BeforeOurTime.Repository.Models.Messages.Responses;
 using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using Newtonsoft.Json;
 using System;
@@ -37,10 +38,11 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// </summary>
         /// <param name="api"></param>
         /// <param name="terminal"></param>
-        /// <param name="terminalRequest"></param>
-        public void HandleIORequest(IApi api, Terminal terminal, IRequest terminalInput)
+        /// <param name="request"></param>
+        /// <param name="response"></param>
+        public IResponse HandleIORequest(IApi api, Terminal terminal, IRequest request, IResponse response)
         {
-            if (terminalInput.GetType() == typeof(LookRequest))
+            if (request.GetType() == typeof(LookRequest))
             {
                 var playerAttribute = api.GetAttributeManager<IAttributePlayerManager>().Read(terminal.PlayerId);
                 var player = api.GetItemManager().Read(playerAttribute.ItemId);
@@ -82,8 +84,9 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                         var attribute = item.GetAttribute<AttributePlayer>();
                         ioLocationUpdate.Adendums.Add($"{attribute.Name} is standing here");
                     });
-                terminal.SendToClient(ioLocationUpdate);
+                response = ioLocationUpdate;
             }
+            return response;
         }
     }
 }

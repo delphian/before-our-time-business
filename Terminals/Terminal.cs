@@ -4,6 +4,11 @@ using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Requests;
+using BeforeOurTime.Repository.Models.Messages.Requests.List;
+using BeforeOurTime.Repository.Models.Messages.Requests.Look;
+using BeforeOurTime.Repository.Models.Messages.Responses;
+using BeforeOurTime.Repository.Models.Messages.Responses.Create;
+using BeforeOurTime.Repository.Models.Messages.Responses.List;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -55,7 +60,7 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        public delegate void messageToEnvironment(Terminal terminal, IRequest terminalRequest);
+        public delegate IResponse messageToEnvironment(Terminal terminal, IRequest terminalRequest);
         /// <summary>
         /// Define delgate that environment can use to update terminal
         /// </summary>
@@ -102,21 +107,28 @@ namespace BeforeOurTime.Business.Terminals
         /// <returns></returns>
         public bool Attach(Guid itemId)
         {
-            var character = TerminalManager.AttachTerminal(this, itemId);
-            if (character != null)
-            {
-                PlayerId = character.Id;
-                Status = TerminalStatus.Attached;
-            }
-            return (character != null);
+            PlayerId = itemId;
+            Status = TerminalStatus.Attached;
+            return true;
         }
         /// <summary>
         /// Get available characters for terminal attachment
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Detached items</returns>
         public List<Item> GetAttachable()
         {
-            return TerminalManager.GetAttachableAvatars(this);
+            var accountCharacters = new List<Item>();
+            var request = new ListAccountCharactersRequest()
+            {
+                AccountId = AccountId
+            };
+            var response = SendToApi(request);
+            if (response.IsSuccess())
+            {
+                var listAccountCharactersResponse = (ListAccountCharactersResponse)response.GetMessageAsType<ListAccountCharactersResponse>();
+                accountCharacters = listAccountCharactersResponse.AccountCharacters;
+            }
+            return accountCharacters;
         }
         /// <summary>
         /// Create a new account and local authentication credentials. Authenticate on new account
@@ -140,15 +152,20 @@ namespace BeforeOurTime.Business.Terminals
         /// </summary>
         /// <param name="name">Friendly name of character</param>
         /// <returns></returns>
-        public bool CreateCharacter(string name)
+        public bool CreatePlayer(string name)
         {
-            var player = TerminalManager.CreateCharacter(this, name);
-            if (player != null)
+            var createPlayerRequest = new CreatePlayerRequest()
             {
-                PlayerId = player.Id;
+                Name = name
+            };
+            var response = SendToApi(createPlayerRequest);
+            if (response.IsSuccess())
+            {
+                var createPlayerResponse = (CreatePlayerResponse)response.GetMessageAsType<CreatePlayerResponse>();
+                PlayerId = createPlayerResponse.PlayerCreatedEvent.ItemId;
                 Status = TerminalStatus.Attached;
             }
-            return (player != null);
+            return (response.IsSuccess());
         }
         /// <summary>
         /// Send a message to the client
@@ -162,15 +179,16 @@ namespace BeforeOurTime.Business.Terminals
             }
         }
         /// <summary>
-        /// Send a message to the server
+        /// Send a message to the environment
         /// </summary>
         /// <param name="terminalRequest"></param>
-        public void SendToApi(IRequest terminalRequest)
+        public IResponse SendToApi(IRequest terminalRequest)
         {
-            if (OnMessageToServer != null)
+            if (OnMessageToServer == null)
             {
-                OnMessageToServer(this, terminalRequest);
+                throw new Exception("Environment is not listening");
             }
+            return OnMessageToServer(this, terminalRequest);
         }
         /// <summary>
         /// Get the terminal status
