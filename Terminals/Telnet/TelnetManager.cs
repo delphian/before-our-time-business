@@ -13,6 +13,7 @@ using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using BeforeOurTime.Repository.Models.Messages.Requests.Look;
 using BeforeOurTime.Repository.Models.Messages.Events;
+using BeforeOurTime.Repository.Models.Messages.Events.Emotes;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -125,7 +126,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 case "bye":
                 case "q":
                 case "exit":
-                    TelnetServer.SendMessageToClient(telnetClient, "\r\nCya...\r\n");
+                    TelnetServer.SendMessageToClient(telnetClient, "\r\n\r\nCya...\r\n");
                     TelnetServer.KickClient(telnetClient);
                     break;
                 case "look":
@@ -137,8 +138,20 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 case "go":
                     MFCGo(telnetClient, message);
                     break;
+                case "smile":
+                case "frown":
+                    MFCEmote(telnetClient, message);
+                    break;
+                case "help":
+                    TelnetServer.SendMessageToClient(telnetClient, "\r\n\r\n" +
+                        " - Look\r\n" +
+                        " - Bye\r\n" +
+                        " - Go {exit name, or partial exit name}\r\n" +
+                        " - Smile\r\n" +
+                        " - Frown\r\n\r\n> ");
+                    break;
                 default:
-                    TelnetServer.SendMessageToClient(telnetClient, "\r\nBad command.\r\n> ");
+                    TelnetServer.SendMessageToClient(telnetClient, "\r\nBad command. Try \"help\"\r\n> ");
                     break;
             }
         }
@@ -165,6 +178,21 @@ namespace BeforeOurTime.Business.Servers.Telnet
             {
                 TelnetServer.SendMessageToClient(telnetClient, "\r\nGo where??\r\n> ");
             }
+        }
+        /// <summary>
+        /// Handle Message From Client when emote command is issued
+        /// </summary>
+        /// <param name="telnetClient"></param>
+        /// <param name="message"></param>
+        private static void MFCEmote(TelnetClient telnetClient, string message)
+        {
+            EmoteType? emoteType = null;
+            emoteType = (message == "smile") ? EmoteType.Smile : emoteType;
+            emoteType = (message == "frown") ? EmoteType.Frown : emoteType;
+            telnetClient.GetTerminal().SendToApi(new EmoteRequest()
+            {
+                Type = emoteType.Value
+            });
         }
         /// <summary>
         /// Handle Message From Client when associated terminal is in guest status
