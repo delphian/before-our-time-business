@@ -8,32 +8,38 @@ using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Events;
 using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 
-namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
+namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {
-    public class TranslateDepartureEvent : TranslateIOUpdate, ITranslateIOUpdate
+    public class DepartureEventTranslate : Translate, ITranslate
     {
-        protected TelnetServer TelnetServer { set; get; }
-        protected TelnetClient TelnetClient { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="telnetServer"></param>
-        /// <param name="telnetClient"></param>
-        public TranslateDepartureEvent(
-            TelnetServer telnetServer, 
-            TelnetClient telnetClient)
+        public DepartureEventTranslate() { }
+        /// <summary>
+        /// Register to handle a specific set of messages
+        /// </summary>
+        /// <returns></returns>
+        public List<Type> RegisterForMessages()
         {
-            TelnetServer = telnetServer;
-            TelnetClient = telnetClient;
+            return new List<Type>()
+            {
+                typeof(DepartureEvent)
+            };
         }
         /// <summary>
         /// Translate structured data from the environment to pure text
         /// </summary>
         /// <param name="message">Message from the environment</param>
-        public void Translate(IMessage message)
+        /// <param name="telnetServer"></param>
+        /// <param name="telnetClient"></param>
+        public void Translate(
+            IMessage message,
+            TelnetServer telnetServer,
+            TelnetClient telnetClient)
         {
             var departureEvent = message.GetMessageAsType<DepartureEvent>();
-            TelnetServer.SendMessageToClient(TelnetClient, "\r\n"
+            telnetServer.SendMessageToClient(telnetClient, "\r\n"
                 + $"{AnsiColors.green}{departureEvent.Name} has departed{AnsiColors.reset}");
         }
     }

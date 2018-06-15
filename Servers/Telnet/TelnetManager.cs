@@ -8,7 +8,7 @@ using BeforeOurTime.Repository.Models.Items;
 using System.Linq;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using Newtonsoft.Json;
-using BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates;
+using BeforeOurTime.Business.Servers.Telnet.Translate;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using BeforeOurTime.Repository.Models.Messages.Requests.Look;
@@ -26,6 +26,14 @@ namespace BeforeOurTime.Business.Servers.Telnet
         public static Dictionary<uint, string> UserName = new Dictionary<uint, string>();
         public static Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
         /// <summary>
+        /// Classes which will handle a message from terminal
+        /// </summary>
+        public static List<ITranslate> MessageHandlers { set; get; }
+        /// <summary>
+        /// Organize message handlers by the type of message's they register for
+        /// </summary>
+        public static Dictionary<Type, List<ITranslate>> MessageHandlersByType { set; get; }
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="serviceProvider"></param>
@@ -40,6 +48,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
             TelnetServer.MessageReceived += MessageFromClient;
             TelnetServer.start();
             Console.WriteLine("TELNET SERVER STARTED: " + DateTime.Now);
+            MessageHandlers = BuildMessageHandlers();
+            MessageHandlersByType = BuildMessageHandlersByType(MessageHandlers);
         }
         /// <summary>
         /// Assign new telnet client an environment terminal and send greeting
@@ -72,27 +82,56 @@ namespace BeforeOurTime.Business.Servers.Telnet
         {
         }
         /// <summary>
+        /// Use reflection to register all classes which will handle a message from terminal
+        /// </summary>
+        /// <returns></returns>
+        private List<ITranslate> BuildMessageHandlers()
+        {
+            var interfaceType = typeof(ITranslate);
+            var messageHandlers = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => (ITranslate)Activator.CreateInstance(x))
+                .ToList();
+            return messageHandlers;
+        }
+        /// <summary>
+        /// Organize message handlers by the type of message's they register for
+        /// </summary>
+        /// <param name="messageHandlers"></param>
+        /// <returns></returns>
+        private Dictionary<Type, List<ITranslate>> BuildMessageHandlersByType(
+            List<ITranslate> messageHandlers)
+        {
+            var messageHandlersByType = new Dictionary<Type, List<ITranslate>>();
+            messageHandlers.ForEach(delegate (ITranslate handler)
+            {
+                List<Type> handledTypes = handler.RegisterForMessages();
+                handledTypes.ForEach(delegate (Type type)
+                {
+                    if (messageHandlersByType.ContainsKey(type))
+                    {
+                        messageHandlersByType[type].Add(handler);
+                    } else
+                    {
+                        messageHandlersByType.Add(type, new List<ITranslate>() { handler });
+                    }
+                });
+            });
+            return messageHandlersByType;
+        }
+        /// <summary>
         /// Process a message from the terminal to the telnet client
         /// </summary>
         /// <param name="terminal"></param>
         /// <param name="environmentUpdate"></param>
         private static void MessageFromTerminal(Terminal terminal, IMessage message)
         {
-            if (message.IsMessageType<LocationResponse>())
-            {
-                new TranslateIOLocationUpdate(TelnetServer, Clients[terminal.Id]).Translate(message);
-            }
-            else if (message.IsMessageType<ArrivalEvent>())
-            {
-                new TranslateArrivalEvent(TelnetServer, Clients[terminal.Id]).Translate(message);
-            }
-            else if (message.IsMessageType<DepartureEvent>())
-            {
-                new TranslateDepartureEvent(TelnetServer, Clients[terminal.Id]).Translate(message);
-            }
-            else if (message.IsMessageType<EmoteEvent>())
-            {
-                new TranslateEmoteEvent(TelnetServer, Clients[terminal.Id]).Translate(message);
+            if (MessageHandlersByType.ContainsKey(message.GetType())) {
+                MessageHandlersByType[message.GetType()].ForEach(delegate (ITranslate handler)
+                {
+                    handler.Translate(message, TelnetServer, Clients[terminal.Id]);
+                });
             }
             else
             {

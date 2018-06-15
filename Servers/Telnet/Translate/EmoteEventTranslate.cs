@@ -9,35 +9,41 @@ using BeforeOurTime.Repository.Models.Messages.Events;
 using BeforeOurTime.Repository.Models.Messages.Events.Emotes;
 using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 
-namespace BeforeOurTime.Business.Terminals.Telnet.TranslateIOUpdates
+namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {
-    public class TranslateEmoteEvent : TranslateIOUpdate, ITranslateIOUpdate
+    public class EmoteEventTranslate : Translate, ITranslate
     {
-        protected TelnetServer TelnetServer { set; get; }
-        protected TelnetClient TelnetClient { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="telnetServer"></param>
-        /// <param name="telnetClient"></param>
-        public TranslateEmoteEvent(
-            TelnetServer telnetServer, 
-            TelnetClient telnetClient)
+        public EmoteEventTranslate() { }
+        /// <summary>
+        /// Register to handle a specific set of messages
+        /// </summary>
+        /// <returns></returns>
+        public List<Type> RegisterForMessages()
         {
-            TelnetServer = telnetServer;
-            TelnetClient = telnetClient;
+            return new List<Type>()
+            {
+                typeof(EmoteEvent)
+            };
         }
         /// <summary>
         /// Translate structured data from the environment to pure text
         /// </summary>
         /// <param name="message">Message from the environment</param>
-        public void Translate(IMessage message)
+        /// <param name="telnetServer"></param>
+        /// <param name="telnetClient"></param>
+        public void Translate(
+            IMessage message, 
+            TelnetServer telnetServer, 
+            TelnetClient telnetClient)
         {
             var emoteEvent = message.GetMessageAsType<EmoteEvent>();
             var emote = "";
             emote = emoteEvent.Type == EmoteType.Smile ? $"{emoteEvent.Name} smiles happily" : emote;
             emote = emoteEvent.Type == EmoteType.Frown ? $"{emoteEvent.Name} frowns" : emote;
-            TelnetServer.SendMessageToClient(TelnetClient, "\r\n"
+            telnetServer.SendMessageToClient(telnetClient, "\r\n"
                 + $"{AnsiColors.whiteB}{emote}{AnsiColors.reset}");
         }
     }

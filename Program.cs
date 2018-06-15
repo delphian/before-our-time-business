@@ -54,7 +54,6 @@ namespace BeforeOurTime.Business
         public static Object thisLock = new Object();
         static void Main(string[] args)
         {
-            Console.WriteLine("Main thread: " + Thread.CurrentThread.ManagedThreadId.ToString());
             // Setup configuration
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -126,7 +125,6 @@ namespace BeforeOurTime.Business
         /// <param name="serviceProvider"></param>
         private static void ListenToTerminals(IServiceProvider serviceProvider)
         {
-            Console.WriteLine("Terminal thread: " + Thread.CurrentThread.ManagedThreadId.ToString());
             var terminalManager = serviceProvider.GetService<ITerminalManager>();
             var telnetServer = new Servers.Telnet.TelnetManager(serviceProvider);
             var api = serviceProvider.GetService<IApi>();
