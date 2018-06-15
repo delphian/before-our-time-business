@@ -4,7 +4,7 @@
     },
     "Setup": "Setups",
     "Timing": {
-        "Tick": 5000,
+        "Tick": 30000,
         "Delivery": 1000
     }
 }

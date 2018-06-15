@@ -13,6 +13,7 @@ using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Logs;
+using BeforeOurTime.Business.Servers;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Dbs.EF.Items;
 using BeforeOurTime.Repository.Dbs.EF.Items.Attributes;
@@ -51,6 +52,7 @@ namespace BeforeOurTime.Business
     {
         public static IConfigurationRoot Configuration { set; get; }
         public static IServiceProvider ServiceProvider { set; get; }
+        public static List<IServer> Servers { set; get; }
         public static Object thisLock = new Object();
         static void Main(string[] args)
         {
@@ -67,8 +69,11 @@ namespace BeforeOurTime.Business
             var tickTimer = new System.Threading.Timer(Tick, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Tick"]));
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Delivery"]));
             // Start servers
-            var telnetServer = new Servers.Telnet.TelnetManager(ServiceProvider);
-            telnetServer.Start();
+            Servers = BuildServerList(ServiceProvider.GetService<IApi>());
+            Servers.ForEach(delegate (IServer server)
+            {
+                server.Start();
+            });
             ListenToTerminals(ServiceProvider);
             // Wait for user input
             Console.WriteLine("Hit 'q' and enter to abort\n");
@@ -77,7 +82,11 @@ namespace BeforeOurTime.Business
             {
                 clientInput = Console.ReadLine();
             }
-            telnetServer.Stop();
+            // Stop servers
+            Servers.ForEach(delegate (IServer server)
+            {
+                server.Stop();
+            });
         }
         /// <summary>
         /// Setup services
@@ -121,6 +130,22 @@ namespace BeforeOurTime.Business
                 .AddScoped<IAttributePhysicalManager, AttributePhysicalManager>()
                 .AddScoped<IAttributeExitManager, AttributeExitManager>()
                 .AddScoped<IApi, Api>();
+        }
+        /// <summary>
+        /// Use reflection to register all classes which will be initialised as client servers
+        /// </summary>
+        /// <param name="api">Before Our Time API</param>
+        /// <returns></returns>
+        private static List<IServer> BuildServerList(IApi api)
+        {
+            var serverList = new List<IServer>();
+            var interfaceType = typeof(IServer);
+            serverList = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => (IServer)Activator.CreateInstance(x, api))
+                .ToList();
+            return serverList;
         }
         /// <summary>
         /// Monitor terminal connections and forward messages

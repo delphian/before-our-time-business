@@ -12,13 +12,16 @@ using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Requests.Look;
 using BeforeOurTime.Repository.Models.Messages.Events.Emotes;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Business.Apis;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
     public class TelnetManager : IServer
     {
-        public IServiceProvider ServiceProvider { set; get; }
-        public ITerminalManager TerminalManager { set; get; }
+        /// <summary>
+        /// Before Our Time API
+        /// </summary>
+        public IApi Api { set; get; }
         public TelnetServer TelnetServer { set; get; }
         public Dictionary<uint, string> UserName = new Dictionary<uint, string>();
         public Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
@@ -34,10 +37,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Constructor
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public TelnetManager(IServiceProvider serviceProvider)
+        public TelnetManager(IApi api)
         {
-            ServiceProvider = serviceProvider;
-            TerminalManager = ServiceProvider.GetService<ITerminalManager>();
+            Api = api;
             TelnetServer = new TelnetServer(IPAddress.Any);
             TelnetServer.ClientConnected += ClientConnected;
             TelnetServer.ClientDisconnected += ClientDisconnected;
@@ -68,7 +70,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="telnetClient"></param>
         private void ClientConnected(TelnetClient telnetClient)
         {
-            telnetClient.SetTerminal(TerminalManager.RequestTerminal());
+            telnetClient.SetTerminal(Api.GetTerminalManager().RequestTerminal());
             telnetClient.GetTerminal().DataBag["step"] = "connected";
             TelnetServer.ClearClientScreen(telnetClient);
             TelnetServer.SendMessageToClient(telnetClient, 
@@ -82,7 +84,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="telnetClient"></param>
         private void ClientDisconnected(TelnetClient telnetClient)
         {
-            TerminalManager.DestroyTerminal(telnetClient.GetTerminal());
+            Api.GetTerminalManager().DestroyTerminal(telnetClient.GetTerminal());
             telnetClient.SetTerminal(null);
         }
         /// <summary>
