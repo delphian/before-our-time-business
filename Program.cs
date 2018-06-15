@@ -66,6 +66,9 @@ namespace BeforeOurTime.Business
             // Setup automatic message deliver and Tick counter for items
             var tickTimer = new System.Threading.Timer(Tick, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Tick"]));
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Delivery"]));
+            // Start servers
+            var telnetServer = new Servers.Telnet.TelnetManager(ServiceProvider);
+            telnetServer.Start();
             ListenToTerminals(ServiceProvider);
             // Wait for user input
             Console.WriteLine("Hit 'q' and enter to abort\n");
@@ -74,7 +77,7 @@ namespace BeforeOurTime.Business
             {
                 clientInput = Console.ReadLine();
             }
-            Servers.Telnet.TelnetManager.TelnetServer.Stop();
+            telnetServer.Stop();
         }
         /// <summary>
         /// Setup services
@@ -126,7 +129,6 @@ namespace BeforeOurTime.Business
         private static void ListenToTerminals(IServiceProvider serviceProvider)
         {
             var terminalManager = serviceProvider.GetService<ITerminalManager>();
-            var telnetServer = new Servers.Telnet.TelnetManager(serviceProvider);
             var api = serviceProvider.GetService<IApi>();
             ((TerminalManager)terminalManager).OnTerminalCreated += delegate (Terminal terminal)
             {

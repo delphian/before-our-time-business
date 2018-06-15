@@ -1,5 +1,4 @@
-﻿using BeforeOurTime.Business.Terminals;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
@@ -10,29 +9,27 @@ using BeforeOurTime.Repository.Models.Items.Attributes;
 using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
 using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using BeforeOurTime.Repository.Models.Messages.Requests.Look;
-using BeforeOurTime.Repository.Models.Messages.Events;
 using BeforeOurTime.Repository.Models.Messages.Events.Emotes;
 using BeforeOurTime.Business.Apis.Terminals;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
-    public class TelnetManager
+    public class TelnetManager : IServer
     {
-        public static IServiceProvider ServiceProvider { set; get; }
-        public static ITerminalManager TerminalManager { set; get; }
-        public static TelnetServer TelnetServer { set; get; }
-        public static Dictionary<uint, string> UserName = new Dictionary<uint, string>();
-        public static Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
+        public IServiceProvider ServiceProvider { set; get; }
+        public ITerminalManager TerminalManager { set; get; }
+        public TelnetServer TelnetServer { set; get; }
+        public Dictionary<uint, string> UserName = new Dictionary<uint, string>();
+        public Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
         /// <summary>
         /// Classes which will handle a message from terminal
         /// </summary>
-        public static List<ITranslate> MessageHandlers { set; get; }
+        public List<ITranslate> MessageHandlers { set; get; }
         /// <summary>
         /// Organize message handlers by the type of message's they register for
         /// </summary>
-        public static Dictionary<Type, List<ITranslate>> MessageHandlersByType { set; get; }
+        public Dictionary<Type, List<ITranslate>> MessageHandlersByType { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -46,16 +43,30 @@ namespace BeforeOurTime.Business.Servers.Telnet
             TelnetServer.ClientDisconnected += ClientDisconnected;
             TelnetServer.ConnectionBlocked += ClientBlocked;
             TelnetServer.MessageReceived += MessageFromClient;
-            TelnetServer.start();
-            Console.WriteLine("TELNET SERVER STARTED: " + DateTime.Now);
             MessageHandlers = BuildMessageHandlers();
             MessageHandlersByType = BuildMessageHandlersByType(MessageHandlers);
+        }
+        /// <summary>
+        /// Start the server
+        /// </summary>
+        public void Start()
+        {
+            TelnetServer.start();
+            Console.WriteLine("TELNET SERVER STARTED: " + DateTime.Now);
+        }
+        /// <summary>
+        /// Stop the server
+        /// </summary>
+        public void Stop()
+        {
+            TelnetServer.Stop();
+            Console.WriteLine("TELNET SERVER STOPPED: " + DateTime.Now);
         }
         /// <summary>
         /// Assign new telnet client an environment terminal and send greeting
         /// </summary>
         /// <param name="telnetClient"></param>
-        private static void ClientConnected(TelnetClient telnetClient)
+        private void ClientConnected(TelnetClient telnetClient)
         {
             telnetClient.SetTerminal(TerminalManager.RequestTerminal());
             telnetClient.GetTerminal().DataBag["step"] = "connected";
@@ -69,7 +80,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Remove terminal from disconnected telnet client
         /// </summary>
         /// <param name="telnetClient"></param>
-        private static void ClientDisconnected(TelnetClient telnetClient)
+        private void ClientDisconnected(TelnetClient telnetClient)
         {
             TerminalManager.DestroyTerminal(telnetClient.GetTerminal());
             telnetClient.SetTerminal(null);
@@ -78,7 +89,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// TODO : Record attempt from blocked ip address
         /// </summary>
         /// <param name="ep"></param>
-        private static void ClientBlocked(IPEndPoint ep)
+        private void ClientBlocked(IPEndPoint ep)
         {
         }
         /// <summary>
@@ -125,7 +136,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="terminal"></param>
         /// <param name="environmentUpdate"></param>
-        private static void MessageFromTerminal(Terminal terminal, IMessage message)
+        private void MessageFromTerminal(Terminal terminal, IMessage message)
         {
             if (MessageHandlersByType.ContainsKey(message.GetType())) {
                 MessageHandlersByType[message.GetType()].ForEach(delegate (ITranslate handler)
@@ -146,7 +157,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="telnetClient"></param>
         /// <param name="message"></param>
-        private static void MessageFromClient(TelnetClient telnetClient, string message)
+        private void MessageFromClient(TelnetClient telnetClient, string message)
         {
             if (telnetClient.GetTerminal().Status == TerminalStatus.Guest)
             {
@@ -166,7 +177,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="telnetClient"></param>
         /// <param name="message"></param>
-        private static void MFCTerminalAttached(TelnetClient telnetClient, string message)
+        private void MFCTerminalAttached(TelnetClient telnetClient, string message)
         {
             string firstWord = message.Split(' ').First();
             switch (firstWord)
@@ -208,7 +219,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="telnetClient"></param>
         /// <param name="message"></param>
-        private static void MFCGo(TelnetClient telnetClient, string message)
+        private void MFCGo(TelnetClient telnetClient, string message)
         {
             string secondWord = message.Split(' ').LastOrDefault();
             var exitResponse = telnetClient.ItemExits
@@ -232,7 +243,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="telnetClient"></param>
         /// <param name="message"></param>
-        private static void MFCEmote(TelnetClient telnetClient, string message)
+        private void MFCEmote(TelnetClient telnetClient, string message)
         {
             EmoteType? emoteType = null;
             emoteType = (message == "smile") ? EmoteType.Smile : emoteType;
@@ -247,7 +258,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="telnetClient">Telnet client</param>
         /// <param name="message">message from client</param>
-        private static void MFCTerminalGuest(TelnetClient telnetClient, string message)
+        private void MFCTerminalGuest(TelnetClient telnetClient, string message)
         {
             if (telnetClient.GetTerminal().DataBag["step"] == "connected")
             {
@@ -350,7 +361,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="telnetClient">Telnet client</param>
         /// <param name="message">message from client</param>
-        private static void MFCTerminalAuthenticated(TelnetClient telnetClient, string message)
+        private void MFCTerminalAuthenticated(TelnetClient telnetClient, string message)
         {
             if (telnetClient.GetTerminal().DataBag["step"] == "create_character")
             {
@@ -434,7 +445,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </remarks>
         /// <param name="telnetClient">Telnet client</param>
         /// <param name="message">message from client</param>
-        private static void MFCTerminalAuthenticatedCreatePlayer(TelnetClient telnetClient, string message)
+        private void MFCTerminalAuthenticatedCreatePlayer(TelnetClient telnetClient, string message)
         {
             if (!telnetClient.GetTerminal().DataBag.ContainsKey("create_character_step"))
             {
