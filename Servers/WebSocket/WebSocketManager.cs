@@ -19,6 +19,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -52,7 +53,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             WebSocketServer = new WebHostBuilder()
                 .UseKestrel(options =>
                 {
-                    
+                    options.ListenAnyIP(5000);
                 })
                 .UseStartup<WebSocketStartup>()
                 .Build();
@@ -63,7 +64,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         public void Start()
         {
             WebSocketServer.RunAsync();
-            Console.WriteLine("WEBSOCKET SERVER STARTED: " + DateTime.Now);
+            var address = WebSocketServer.ServerFeatures.Get<IServerAddressesFeature>().Addresses.FirstOrDefault();
+            Console.WriteLine($"WEBSOCKET SERVER STARTED AT {address}: {DateTime.Now}");
         }
         /// <summary>
         /// Stop the server
@@ -89,6 +91,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         System.Net.WebSockets.WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                        Console.WriteLine("WEBSOCKET CONNECTION");
                         await Echo(context, webSocket);
                     }
                     else
