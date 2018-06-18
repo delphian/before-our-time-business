@@ -10,7 +10,6 @@ using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System.Linq;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Repository.Models.Messages.Events;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 

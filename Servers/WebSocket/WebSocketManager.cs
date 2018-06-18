@@ -9,8 +9,6 @@ using BeforeOurTime.Repository.Models.Items.Attributes;
 using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
 using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Requests.Look;
-using BeforeOurTime.Repository.Models.Messages.Events.Emotes;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Apis;
 using Microsoft.AspNetCore.Hosting;

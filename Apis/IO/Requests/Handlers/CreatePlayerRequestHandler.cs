@@ -2,16 +2,14 @@
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Terminals;
+using BeforeOurTime.Models.Messages.Events.Created;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Requests.Create;
+using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Messages.Responses.Create;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
-using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Events;
-using BeforeOurTime.Repository.Models.Messages.Requests;
-using BeforeOurTime.Repository.Models.Messages.Requests.Look;
-using BeforeOurTime.Repository.Models.Messages.Responses;
-using BeforeOurTime.Repository.Models.Messages.Responses.Create;
-using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -60,7 +58,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var createPlayerResponse = new CreatePlayerResponse()
                 {
                     ResponseSuccess = true,
-                    PlayerCreatedEvent = new PlayerCreatedEvent()
+                    CreatedPlayerEvent = new CreatedPlayerEvent()
                     {
                         ItemId = player.ItemId,
                         Name = player.Name

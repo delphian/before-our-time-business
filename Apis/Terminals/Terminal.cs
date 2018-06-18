@@ -1,14 +1,14 @@
-﻿using BeforeOurTime.Repository.Json;
+﻿using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Json;
+using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Requests.Create;
+using BeforeOurTime.Models.Messages.Requests.List;
+using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Messages.Responses.Create;
+using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Repository.Models.Accounts;
-using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
-using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Requests;
-using BeforeOurTime.Repository.Models.Messages.Requests.List;
-using BeforeOurTime.Repository.Models.Messages.Requests.Look;
-using BeforeOurTime.Repository.Models.Messages.Responses;
-using BeforeOurTime.Repository.Models.Messages.Responses.Create;
-using BeforeOurTime.Repository.Models.Messages.Responses.List;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -162,7 +162,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
             if (response.IsSuccess())
             {
                 var createPlayerResponse = response.GetMessageAsType<CreatePlayerResponse>();
-                PlayerId = createPlayerResponse.PlayerCreatedEvent.ItemId;
+                PlayerId = createPlayerResponse.CreatedPlayerEvent.ItemId;
                 Status = TerminalStatus.Attached;
             }
             return (response.IsSuccess());

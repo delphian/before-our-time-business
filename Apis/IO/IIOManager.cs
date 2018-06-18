@@ -1,6 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Repository.Models.Messages.Requests;
-using BeforeOurTime.Repository.Models.Messages.Responses;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Responses;
 using System;
 using System.Collections.Generic;
 using System.Text;

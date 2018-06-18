@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Business.Servers.Telnet;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
+using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {
@@ -23,7 +24,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
         {
             return new List<Type>()
             {
-                typeof(LocationResponse)
+                typeof(ListLocationResponse)
             };
         }
         /// <summary>
@@ -37,7 +38,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             TelnetServer telnetServer,
             TelnetClient telnetClient)
         {
-            var locationResponse = message.GetMessageAsType<LocationResponse>();
+            var locationResponse = message.GetMessageAsType<ListLocationResponse>();
             telnetClient.ItemExits.Clear();
             // Send location name and description
             telnetServer.SendMessageToClient(telnetClient, "\r\n\r\n" 
@@ -51,7 +52,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             string exits = null;
             if (locationResponse.Exits.Count() > 0)
             {
-                locationResponse.Exits.ForEach(delegate (ExitResponse ioExitUpdate)
+                locationResponse.Exits.ForEach(delegate (ListExitResponse ioExitUpdate)
                 {
                     telnetClient.ItemExits.Add(ioExitUpdate);
                     exits = (exits != null) ? ", " : exits;

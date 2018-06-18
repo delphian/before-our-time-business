@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Messages.Events;
+﻿using BeforeOurTime.Models.Messages.Events.Ticks;
 using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System;
 using System.Collections.Generic;

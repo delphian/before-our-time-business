@@ -1,5 +1,5 @@
-﻿using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Messages;
+﻿using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using System;
 using System.Collections.Generic;

@@ -1,14 +1,13 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Requests.Look;
+using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
-using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Requests;
-using BeforeOurTime.Repository.Models.Messages.Requests.Look;
-using BeforeOurTime.Repository.Models.Messages.Responses;
-using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -46,12 +45,12 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
             {
                 var player = api.GetItemManager().Read(terminal.PlayerId);
                 var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
-                var ioLocationUpdate = new LocationResponse()
+                var ioLocationUpdate = new ListLocationResponse()
                 {
                     ItemId = location.Id,
                     Name = location.GetAttribute<AttributeLocation>().Name,
                     Description = location.GetAttribute<AttributeLocation>().Description,
-                    Exits = new List<ExitResponse>()
+                    Exits = new List<ListExitResponse>()
                 };
                 // Add exits
                 location.Children
@@ -59,7 +58,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     .ForEach(delegate (Item item)
                     {
                         var attribute = item.GetAttribute<AttributeExit>();
-                        ioLocationUpdate.Exits.Add(new ExitResponse()
+                        ioLocationUpdate.Exits.Add(new ListExitResponse()
                         {
                             ItemId = attribute.ItemId,
                             Name = attribute.Name,

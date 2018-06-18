@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Messages;
+﻿using BeforeOurTime.Models.Messages;
 using System;
 using System.Collections.Generic;
 using System.Text;

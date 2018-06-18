@@ -1,13 +1,12 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Requests.Go;
+using BeforeOurTime.Models.Messages.Requests.Look;
+using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
-using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Requests;
-using BeforeOurTime.Repository.Models.Messages.Requests.Look;
-using BeforeOurTime.Repository.Models.Messages.Responses;
-using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

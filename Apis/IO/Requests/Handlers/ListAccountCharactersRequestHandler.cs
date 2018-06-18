@@ -1,18 +1,13 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Requests.List;
+using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
-using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Events;
-using BeforeOurTime.Repository.Models.Messages.Requests;
-using BeforeOurTime.Repository.Models.Messages.Requests.List;
-using BeforeOurTime.Repository.Models.Messages.Requests.Look;
-using BeforeOurTime.Repository.Models.Messages.Responses;
-using BeforeOurTime.Repository.Models.Messages.Responses.Create;
-using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
-using BeforeOurTime.Repository.Models.Messages.Responses.List;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -56,7 +51,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var listAccountCharactersResponse = new ListAccountCharactersResponse()
                 {
                     ResponseSuccess = true,
-                    AccountCharacters = api.GetItemManager().Read(itemIds)
+                    AccountCharacters = api.GetItemManager().Read(itemIds).Select(x => x.GetDTO()).ToList()
                 };
                 response = listAccountCharactersResponse;
             }

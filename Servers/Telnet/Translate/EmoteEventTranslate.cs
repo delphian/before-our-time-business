@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Business.Servers.Telnet;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
+using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Events;
-using BeforeOurTime.Repository.Models.Messages.Events.Emotes;
-using BeforeOurTime.Repository.Models.Messages.Responses.Enumerate;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {

@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Text;
-using BeforeOurTime.Repository.Models.Items;
 using System.Linq;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
 using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Requests.Look;
-using BeforeOurTime.Repository.Models.Messages.Events.Emotes;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.Requests.Look;
+using BeforeOurTime.Models.Messages.Requests.Go;
+using BeforeOurTime.Models.Messages.Events.Emotes;
+using BeforeOurTime.Models.Messages.Requests.Emote;
+using BeforeOurTime.Models.Items;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -398,8 +401,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         characters.ForEach(delegate (Item player)
                         {
                             TelnetServer.SendMessageToClient(telnetClient, "  " + 
-                                player.GetAttribute<AttributePlayer>().Name + 
-                                " (" + player.GetAttribute<AttributePlayer>().Id + ")\r\n");
+                                player.Name + 
+                                " (" + player.Id + ")\r\n");
                         });
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n");
                         TelnetServer.SendMessageToClient(telnetClient, "Account> ");
@@ -413,7 +416,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         var name = message.Split(' ').Last().ToLower();
                         telnetClient.GetTerminal().GetAttachable().ForEach(delegate (Item player)
                         {
-                            if (player.GetAttribute<AttributePlayer>().Name.ToLower() == name)
+                            if (player.Name.ToLower() == name)
                             {
                                 if (telnetClient.GetTerminal().Attach(player.Id))
                                 {
