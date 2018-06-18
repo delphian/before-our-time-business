@@ -13,6 +13,9 @@ using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.Responses.List;
+using BeforeOurTime.Models.Messages.Responses.Login;
+using BeforeOurTime.Models.Messages.Requests.Login;
 
 namespace BeforeOurTime.Business.Apis.Terminals
 {
@@ -68,17 +71,6 @@ namespace BeforeOurTime.Business.Apis.Terminals
                 OnTerminalCreated(terminal);
             }
             return terminal;
-        }
-        /// <summary>
-        /// Authenticate a terminal to use an account
-        /// </summary>
-        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        /// <param name="name">User name</param>
-        /// <param name="password">User password</param>
-        /// <returns></returns>
-        public Account AuthenticateTerminal(Terminal terminal, string name, string password)
-        {
-            return AccountManager.Authenticate(name, password);
         }
         /// <summary>
         /// Destroy a terminal and notify subscribers

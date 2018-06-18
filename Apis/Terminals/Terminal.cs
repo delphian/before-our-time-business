@@ -4,9 +4,11 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Create;
 using BeforeOurTime.Models.Messages.Requests.List;
+using BeforeOurTime.Models.Messages.Requests.Login;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.Create;
 using BeforeOurTime.Models.Messages.Responses.List;
+using BeforeOurTime.Models.Messages.Responses.Login;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using Newtonsoft.Json;
@@ -92,13 +94,18 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <returns></returns>
         public bool Authenticate(string name, string password)
         {
-            var account = TerminalManager.AuthenticateTerminal(this, name, password);
-            if (account != null)
+            var response = SendToApi(new LoginRequest()
             {
-                AccountId = account.Id;
+                Email = name,
+                Password = password
+            });
+            if (response.IsSuccess())
+            {
+                var loginResponse = response.GetMessageAsType<LoginResponse>();
+                AccountId = loginResponse.AccountId.Value;
                 Status = TerminalStatus.Authenticated;
             }
-            return (account != null);
+            return (response.IsSuccess());
         }
         /// <summary>
         /// Attach to environment item as avatar

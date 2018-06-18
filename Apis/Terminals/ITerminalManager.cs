@@ -16,14 +16,6 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <returns></returns>
         Terminal RequestTerminal();
         /// <summary>
-        /// Authenticate a terminal to use an account
-        /// </summary>
-        /// <param name="terminal">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
-        /// <param name="name">User name</param>
-        /// <param name="password">User password</param>
-        /// <returns></returns>
-        Account AuthenticateTerminal(Terminal terminal, string name, string password);
-        /// <summary>
         /// Send a message to a specific terminal
         /// </summary>
         /// <param name="terminalId">Unique terminal identifier</param>
