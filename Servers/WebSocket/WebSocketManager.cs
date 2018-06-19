@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using BeforeOurTime.Models.Messages.Requests;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -89,7 +90,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         System.Net.WebSockets.WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                        Console.WriteLine("WEBSOCKET CONNECTION");
+                        Console.WriteLine($"{DateTime.Now} Websocket connection from {context.Connection.RemoteIpAddress}");
                         await Echo(context, webSocket);
                     }
                     else
@@ -115,6 +116,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             while (!result.CloseStatus.HasValue)
             {
+                var requestString = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                var request = JsonConvert.DeserializeObject<Request>(requestString);
                 await webSocket.SendAsync(
                     new ArraySegment<byte>(buffer, 0, result.Count), 
                     result.MessageType, 
