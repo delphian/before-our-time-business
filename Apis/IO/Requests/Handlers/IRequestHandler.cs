@@ -16,7 +16,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// Register to handle a specific set of IO requests
         /// </summary>
         /// <returns></returns>
-        List<string> RegisterForRequests();
+        List<Guid> RegisterForRequests();
         /// <summary>
         /// Handle terminal request
         /// </summary>

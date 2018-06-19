@@ -54,6 +54,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 {
                     options.ListenAnyIP(5000);
                 })
+                .ConfigureServices(services => { services.AddSingleton<IApi>(Api); })
                 .UseStartup<WebSocketStartup>()
                 .Build();
         }
@@ -82,6 +83,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
     {
         public void Configure(IApplicationBuilder app)
         {
+            var api = app.ApplicationServices.GetService<IApi>();
             app.UseWebSockets();
             app.Use(async (context, next) =>
             {
@@ -91,7 +93,12 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     {
                         System.Net.WebSockets.WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
                         Console.WriteLine($"{DateTime.Now} Websocket connection from {context.Connection.RemoteIpAddress}");
-                        await Echo(context, webSocket);
+                        var terminal = api.GetTerminalManager().RequestTerminal();
+                        Console.WriteLine($"{DateTime.Now} - Terminal granted");
+                        var webSocketClient = new WebSocketClient(api, terminal, context, webSocket);
+                        Console.WriteLine($"{DateTime.Now} - Listening...");
+                        await webSocketClient.HandleWebSocket();
+                        Console.WriteLine($"{DateTime.Now} - Terminal destroyed");
                     }
                     else
                     {
@@ -103,31 +110,6 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     await next();
                 }
             });
-        }
-        /// <summary>
-        /// Handle a websocket request
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="webSocket"></param>
-        /// <returns></returns>
-        private async Task Echo(HttpContext context, System.Net.WebSockets.WebSocket webSocket)
-        {
-            var buffer = new byte[1024 * 4];
-            WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            while (!result.CloseStatus.HasValue)
-            {
-                var requestString = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                var request = JsonConvert.DeserializeObject<Request>(requestString);
-                await webSocket.SendAsync(
-                    new ArraySegment<byte>(buffer, 0, result.Count), 
-                    result.MessageType, 
-                    result.EndOfMessage, 
-                    CancellationToken.None);
-                result = await webSocket.ReceiveAsync(
-                    new ArraySegment<byte>(buffer), 
-                    CancellationToken.None);
-            }
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
         }
     }
 }

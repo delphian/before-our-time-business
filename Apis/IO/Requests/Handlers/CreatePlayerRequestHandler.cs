@@ -27,11 +27,11 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// Register to handle a specific set of IO requests
         /// </summary>
         /// <returns></returns>
-        public List<string> RegisterForRequests()
+        public List<Guid> RegisterForRequests()
         {
-            return new List<string>()
+            return new List<Guid>()
             {
-                typeof(CreatePlayerRequest).ToString()
+                CreatePlayerRequest._Id
             };
         }
         /// <summary>

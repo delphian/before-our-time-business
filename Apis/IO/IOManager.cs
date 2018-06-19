@@ -22,7 +22,7 @@ namespace BeforeOurTime.Business.Apis.IO
         /// <summary>
         /// List of handlers to process terminal input requests keyed by request type
         /// </summary>
-        private Dictionary<string, List<IRequestHandler>> RequestHandlersForTypes = new Dictionary<string, List<IRequestHandler>>();
+        private Dictionary<Guid, List<IRequestHandler>> RequestHandlersForTypes = new Dictionary<Guid, List<IRequestHandler>>();
         /// <summary>
         /// Constructor
         /// </summary>
@@ -51,16 +51,16 @@ namespace BeforeOurTime.Business.Apis.IO
         /// </summary>
         /// <param name="requestHandlers">List of handlers to process terminal input requests</param>
         /// <returns></returns>
-        private Dictionary<string, List<IRequestHandler>> BuildRequestHandlersForTypes(
+        private Dictionary<Guid, List<IRequestHandler>> BuildRequestHandlersForTypes(
             List<IRequestHandler> requestHandlers)
         {
-            var requestHandlersForTypes = new Dictionary<string, List<IRequestHandler>>();
+            var requestHandlersForTypes = new Dictionary<Guid, List<IRequestHandler>>();
             requestHandlers.ForEach(delegate (IRequestHandler requestHandler)
             {
-                var requestTypes = requestHandler.RegisterForRequests();
-                requestTypes.ForEach(delegate (string requestType)
+                var requestGuids = requestHandler.RegisterForRequests();
+                requestGuids.ForEach(delegate (Guid requestGuid)
                 {
-                    var requestHandlersForType = requestHandlersForTypes.GetValueOrDefault(requestType);
+                    var requestHandlersForType = requestHandlersForTypes.GetValueOrDefault(requestGuid);
                     if (requestHandlersForType == null)
                     {
                         requestHandlersForType = new List<IRequestHandler>()
@@ -71,7 +71,7 @@ namespace BeforeOurTime.Business.Apis.IO
                     {
                         requestHandlersForType.Add(requestHandler);
                     }
-                    requestHandlersForTypes[requestType] = requestHandlersForType;
+                    requestHandlersForTypes[requestGuid] = requestHandlersForType;
                 });
             });
             return requestHandlersForTypes;
@@ -85,9 +85,9 @@ namespace BeforeOurTime.Business.Apis.IO
         public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request)
         {
             IResponse response = new Response() { ResponseSuccess = false };
-            var requestType = request.GetType().ToString();
+            var requestGuid = request.GetMessageId();
             var requestHandlersForType = RequestHandlersForTypes
-                .Where(x => x.Key == requestType)
+                .Where(x => x.Key == requestGuid)
                 .Select(x => x.Value)
                 .FirstOrDefault();
             requestHandlersForType.ForEach(delegate (IRequestHandler requestHandler)
