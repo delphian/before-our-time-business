@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using BeforeOurTime.Models.Messages.Requests;
+using Microsoft.Extensions.Logging;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -55,6 +56,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     options.ListenAnyIP(5000);
                 })
                 .ConfigureServices(services => { services.AddSingleton<IApi>(Api); })
+                .SuppressStatusMessages(true)
                 .UseStartup<WebSocketStartup>()
                 .Build();
         }
@@ -65,7 +67,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             WebSocketServer.RunAsync();
             var address = WebSocketServer.ServerFeatures.Get<IServerAddressesFeature>().Addresses.FirstOrDefault();
-            Console.WriteLine($"WEBSOCKET SERVER STARTED AT {address}: {DateTime.Now}");
+            Api.GetLogger().LogInformation($"Websocket server started on {address}");
         }
         /// <summary>
         /// Stop the server
@@ -73,7 +75,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         public void Stop()
         {
             WebSocketServer.StopAsync();
-            Console.WriteLine("WEBSOCKET SERVER STOPPED: " + DateTime.Now);
+            Api.GetLogger().LogInformation($"Websocket server stopped");
         }
     }
     /// <summary>
@@ -92,13 +94,11 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         System.Net.WebSockets.WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                        Console.WriteLine($"{DateTime.Now} Websocket connection from {context.Connection.RemoteIpAddress}");
-                        var terminal = api.GetTerminalManager().RequestTerminal();
-                        Console.WriteLine($"{DateTime.Now} - Terminal granted");
+                        var terminal = api.GetTerminalManager().RequestTerminal(
+                            "WebSocket", 
+                            new IPEndPoint(context.Connection.RemoteIpAddress, context.Connection.RemotePort));
                         var webSocketClient = new WebSocketClient(api, terminal, context, webSocket);
-                        Console.WriteLine($"{DateTime.Now} - Listening...");
                         await webSocketClient.HandleWebSocket();
-                        Console.WriteLine($"{DateTime.Now} - Terminal destroyed");
                     }
                     else
                     {

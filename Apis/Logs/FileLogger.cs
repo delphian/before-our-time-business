@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace BeforeOurTime.Business.Logs
+namespace BeforeOurTime.Business.Apis.Logs
 {
     class FileLogger : ILogger
     {
@@ -43,6 +43,7 @@ namespace BeforeOurTime.Business.Logs
         {
             using (StreamWriter outputFile = File.AppendText(pathToFile))
             {
+                Console.WriteLine($"{DateTime.Now.ToString()} {logLevel.ToString()}: {state.ToString()}");
                 outputFile.WriteLine(logLevel.ToString() + ": " + DateTime.Now.ToString() + ": " + state.ToString());
             }
         }

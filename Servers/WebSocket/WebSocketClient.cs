@@ -1,6 +1,10 @@
 ﻿using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Requests.Login;
+using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Messages.Responses.Login;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
@@ -9,6 +13,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -62,22 +67,28 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             while (!result.CloseStatus.HasValue)
             {
-                string response;
+                IResponse response;
+                string responseJson;
                 try
                 {
-                    var requestString = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                    var requestConcrete = JsonConvert.DeserializeObject<Request>(requestString);
-                    // implement static method Message.GetType(Guid)
-                    // concrete discards other properties! Json Convert must have correct subclass
-                    IRequest request = (IRequest)requestConcrete;
-                    response = JsonConvert.SerializeObject(Terminal.SendToApi(request));
+                    var message = JsonConvert.DeserializeObject<Message>(Encoding.UTF8.GetString(buffer, 0, buffer.Length));
+                    var request = (IRequest)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(buffer, 0, buffer.Length),
+                        Message.GetMessageTypeDictionary()[message.GetMessageId()]);
+                    if (Terminal.Status == TerminalStatus.Guest)
+                    {
+                        response = HandleMessageFromGuest(request);
+                    } else
+                    {
+                        response = Terminal.SendToApi(request);
+                    }
+                    responseJson = JsonConvert.SerializeObject(Terminal.SendToApi(request));
                 } catch(Exception e)
                 {
-                    response = e.Message;
+                    responseJson = e.Message;
                 }
-                System.Text.Encoding.UTF8.GetBytes(response, 0, response.Length, buffer, 0);
+                Encoding.UTF8.GetBytes(responseJson, 0, responseJson.Length, buffer, 0);
                 await WebSocket.SendAsync(
-                    new ArraySegment<byte>(buffer, 0, response.Length),
+                    new ArraySegment<byte>(buffer, 0, responseJson.Length),
                     result.MessageType,
                     result.EndOfMessage,
                     CancellationToken.None);
@@ -87,6 +98,26 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             }
             await WebSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             Api.GetTerminalManager().DestroyTerminal(Terminal);
+        }
+        /// <summary>
+        /// Handle all messages from terminals with guest status
+        /// </summary>
+        /// <param name="request"></param>
+        public IResponse HandleMessageFromGuest(IRequest request)
+        {
+            IResponse response = new Response()
+            {
+                ResponseSuccess = false
+            };
+            if (request.IsMessageType<LoginRequest>()) {
+                response = Terminal.SendToApi(request);
+                var loginResponse = response.GetMessageAsType<LoginResponse>();
+                if (loginResponse.IsSuccess())
+                {
+                    Terminal.Authenticate(loginResponse.AccountId.Value);
+                }
+            }
+            return response;
         }
     }
 }

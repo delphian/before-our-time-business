@@ -16,6 +16,9 @@ using BeforeOurTime.Models.Messages.Requests.Go;
 using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Models.Messages.Requests.Emote;
 using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Messages.Requests.Login;
+using BeforeOurTime.Models.Messages.Responses.Login;
+using Microsoft.Extensions.Logging;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -57,7 +60,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         public void Start()
         {
             TelnetServer.start();
-            Console.WriteLine("TELNET SERVER STARTED: " + DateTime.Now);
+            Api.GetLogger().LogInformation($"Telnet server started on {TelnetServer.GetIPEndPoint()}");
         }
         /// <summary>
         /// Stop the server
@@ -65,7 +68,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         public void Stop()
         {
             TelnetServer.Stop();
-            Console.WriteLine("TELNET SERVER STOPPED: " + DateTime.Now);
+            Api.GetLogger().LogInformation($"Telnet sever stopped");
         }
         /// <summary>
         /// Assign new telnet client an environment terminal and send greeting
@@ -73,7 +76,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="telnetClient"></param>
         private void ClientConnected(TelnetClient telnetClient)
         {
-            telnetClient.SetTerminal(Api.GetTerminalManager().RequestTerminal());
+            telnetClient.SetTerminal(Api.GetTerminalManager().RequestTerminal("Telnet", telnetClient.GetRemoteAddress()));
             telnetClient.GetTerminal().DataBag["step"] = "connected";
             TelnetServer.ClearClientScreen(telnetClient);
             TelnetServer.SendMessageToClient(telnetClient, 
@@ -308,8 +311,15 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
             else if (telnetClient.GetTerminal().DataBag["step"] == "login_password")
             {
-                if (telnetClient.GetTerminal().Authenticate(telnetClient.GetTerminal().DataBag["login_name"], message))
+                var loginRequest = new LoginRequest()
                 {
+                    Email = telnetClient.GetTerminal().DataBag["login_name"],
+                    Password = message
+                };
+                LoginResponse loginResponse = (LoginResponse)telnetClient.GetTerminal().SendToApi(loginRequest);
+                if (loginResponse.IsSuccess())
+                {
+                    telnetClient.GetTerminal().Authenticate(loginResponse.AccountId.Value);
                     telnetClient.GetTerminal().OnMessageToTerminal += MessageFromTerminal;
                     Clients[telnetClient.GetTerminal().Id] = telnetClient;
                     telnetClient.GetTerminal().DataBag["step"] = "authenticated";

@@ -17,7 +17,6 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Telnet's default port.
         /// </summary>
         private const int PORT = 23;
-
         /// <summary>
         /// Server's main socket.
         /// </summary>
@@ -377,6 +376,14 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     clientSocket.BeginReceive(data, 0, dataSize, SocketFlags.None, new AsyncCallback(ReceiveData), clientSocket);
             }
             catch(ObjectDisposedException) { }
+        }
+        /// <summary>
+        /// Get IPEndPoint of telnet server
+        /// </summary>
+        /// <returns></returns>
+        public IPEndPoint GetIPEndPoint()
+        {
+            return new IPEndPoint(ip, PORT);
         }
     }
 }

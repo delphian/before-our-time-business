@@ -16,6 +16,8 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
 using BeforeOurTime.Models.Messages.Requests.Login;
+using System.Net;
+using Microsoft.Extensions.Logging;
 
 namespace BeforeOurTime.Business.Apis.Terminals
 {
@@ -24,6 +26,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
     /// </summary>
     public class TerminalManager : ITerminalManager
     {
+        private ILogger Logger { set; get; }
         private IAccountManager AccountManager { set; get; }
         /// <summary>
         /// List of all active terminals
@@ -56,20 +59,21 @@ namespace BeforeOurTime.Business.Apis.Terminals
         {
             var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
             AccountManager = scopedProvider.GetService<IAccountManager>();
+            Logger = serviceProvider.GetService<ILogger>();
         }
         /// <summary>
         /// Create a new terminal
         /// </summary>
+        /// <param name="serverName">Name of server module</param>
+        /// <param name="address">IPAddress of connection</param>
         /// <returns></returns>
-        public Terminal RequestTerminal()
+        public Terminal RequestTerminal(string serverName, IPEndPoint address)
         {
-            var terminal = new Terminal(this);
+            var terminal = new Terminal(this, Logger);
             terminal.Status = TerminalStatus.Guest;
             Terminals.Add(terminal);
-            if (OnTerminalCreated != null)
-            {
-                OnTerminalCreated(terminal);
-            }
+            Logger.LogInformation($"Terminal ({terminal.Id}) granted {terminal.Status} status for {address.ToString()} through {serverName}");
+            OnTerminalCreated?.Invoke(terminal);
             return terminal;
         }
         /// <summary>
@@ -79,10 +83,8 @@ namespace BeforeOurTime.Business.Apis.Terminals
         public TerminalManager DestroyTerminal(Terminal terminal)
         {
             Terminals.Remove(terminal);
-            if (OnTerminalDestroyed != null)
-            {
-                OnTerminalDestroyed((Terminal)terminal.Clone());
-            }
+            Logger.LogInformation($"Terminal ({terminal.Id}) removed");
+            OnTerminalDestroyed?.Invoke((Terminal)terminal.Clone());
             terminal = null;
             return this;
         }

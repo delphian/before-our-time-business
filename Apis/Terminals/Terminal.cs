@@ -11,6 +11,7 @@ using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Repository.Models.Items.Attributes;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// Central manager of all client connections regardless of protocol (telnet, websocket, etc)
         /// </summary>
         protected TerminalManager TerminalManager { set; get; }
+        private ILogger Logger { set; get; }
         /// <summary>
         /// Unique terminal identifier
         /// </summary>
@@ -81,31 +83,24 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// Constructor
         /// </summary>
         /// <param name="terminalManager">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
-        public Terminal(TerminalManager terminalManager)
+        public Terminal(
+            TerminalManager terminalManager, 
+            ILogger logger)
         {
-            TerminalManager = terminalManager;
             Id = Guid.NewGuid();
+            TerminalManager = terminalManager;
+            Logger = logger;
         }
         /// <summary>
         /// Authenticate to use an account
         /// </summary>
         /// <param name="name">User name</param>
-        /// <param name="password">User password</param>
         /// <returns></returns>
-        public bool Authenticate(string name, string password)
+        public void Authenticate(Guid accountId)
         {
-            var response = SendToApi(new LoginRequest()
-            {
-                Email = name,
-                Password = password
-            });
-            if (response.IsSuccess())
-            {
-                var loginResponse = response.GetMessageAsType<LoginResponse>();
-                AccountId = loginResponse.AccountId.Value;
-                Status = TerminalStatus.Authenticated;
-            }
-            return (response.IsSuccess());
+            AccountId = accountId;
+            Status = TerminalStatus.Authenticated;
+            Logger.LogInformation($"Terminal ({Id}) granted {Status} status as account {AccountId}");
         }
         /// <summary>
         /// Attach to environment item as avatar

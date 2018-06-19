@@ -4,6 +4,7 @@ using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Terminals
@@ -13,8 +14,10 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <summary>
         /// Create a new terminal
         /// </summary>
+        /// <param name="serverName">Name of server module</param>
+        /// <param name="address">IPAddress of connection</param>
         /// <returns></returns>
-        Terminal RequestTerminal();
+        Terminal RequestTerminal(string serverName, IPEndPoint address);
         /// <summary>
         /// Send a message to a specific terminal
         /// </summary>

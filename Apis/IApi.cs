@@ -6,6 +6,7 @@ using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Repository.Models.Items;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,6 +18,7 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public interface IApi
     {
+        ILogger GetLogger();
         IMessageManager GetMessageManager();
         IAccountManager GetAccountManager();
         IScriptManager GetScriptManager();

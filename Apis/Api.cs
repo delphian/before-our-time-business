@@ -12,6 +12,7 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Terminals;
+using Microsoft.Extensions.Logging;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -21,6 +22,7 @@ namespace BeforeOurTime.Business.Apis
     public partial class Api : IApi
     {
         private Dictionary<Type, IAttributeManager> AttributeManagerList = new Dictionary<Type, IAttributeManager>();
+        private ILogger Logger { set; get; }
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
@@ -33,6 +35,7 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="itemRepo"></param>
         /// <param name="messageRepo"></param>
         public Api(
+            ILogger logger,
             IMessageManager messageManager,
             IAccountManager accountManager,
             IScriptManager scriptManager,
@@ -45,6 +48,7 @@ namespace BeforeOurTime.Business.Apis
             IAttributePhysicalManager attributePhysicalManager,
             IAttributeExitManager attributeExitManager)
         {
+            Logger = logger;
             MessageManager = messageManager;
             AccountManager = accountManager;
             ScriptManager = scriptManager;
@@ -80,6 +84,10 @@ namespace BeforeOurTime.Business.Apis
         public ITerminalManager GetTerminalManager()
         {
             return TerminalManager;
+        }
+        public ILogger GetLogger()
+        { 
+            return Logger;
         }
         /// <summary>
         /// Get item detail manager based on detail manager type

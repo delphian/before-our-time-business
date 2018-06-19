@@ -6,13 +6,13 @@ using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Business.Logs;
 using BeforeOurTime.Business.Servers;
 using BeforeOurTime.Models.Messages.Events.Ticks;
 using BeforeOurTime.Models.Messages.Requests;
@@ -68,14 +68,16 @@ namespace BeforeOurTime.Business
             var tickTimer = new System.Threading.Timer(Tick, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Tick"]));
             var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Delivery"]));
             // Start servers
+            ServiceProvider.GetService<ILogger>().LogInformation($"Starting servers...");
             Servers = BuildServerList(ServiceProvider.GetService<IApi>());
             Servers.ForEach(delegate (IServer server)
             {
                 server.Start();
             });
+            ServiceProvider.GetService<ILogger>().LogInformation($"All servers started");
             ListenToTerminals(ServiceProvider);
             // Wait for user input
-            Console.WriteLine("Hit 'q' and enter to abort\n");
+            Console.WriteLine("Ready! (Hit 'q' and enter to abort console)");
             string clientInput = Console.ReadLine();
             while (clientInput != "q")
             {
@@ -202,10 +204,8 @@ namespace BeforeOurTime.Business
                 // Deliver message to each recipient
                 foreach (SavedMessage message in messages)
                 {
-#if !DEBUG
                     try
                     {
-#endif
                         var item = api.GetItemManager().Read(message.RecipientId);
                         List<IAttributeManager> attributeManagers = api.GetAttributeManagers(item);
                         // Hand off message deliver to each item's manager code
@@ -215,13 +215,11 @@ namespace BeforeOurTime.Business
                             // and then execute the script once instead of each manager executing the script
                             attributeManager.DeliverMessage(message, item, jsFunctionManager);
                         });
-#if !DEBUG
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError("script failed: " + message.ToId + " " + ex.Message);
+                        logger.LogError("script failed: " + ex.Message);
                     }
-#endif
                 }
             }
         }
