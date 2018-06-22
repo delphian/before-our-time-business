@@ -23,13 +23,13 @@ namespace BeforeOurTime.Business.Servers.WebSocket
     public class WebSocketClient
     {
         /// <summary>
-        /// Unique WebSocket client identifier
-        /// </summary>
-        private Guid Id { set; get; }
-        /// <summary>
         /// Before Our Time API
         /// </summary>
         private IApi Api { set; get; }
+        /// <summary>
+        /// Unique WebSocket client identifier
+        /// </summary>
+        private Guid Id { set; get; }
         /// <summary>
         /// Single generic connection used by the environment to communicate with clients
         /// </summary>
@@ -68,6 +68,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <returns></returns>
         public async Task HandleWebSocket()
         {
+            Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
             var buffer = new byte[1024 * 4];
             WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             while (!result.CloseStatus.HasValue)
@@ -76,20 +77,29 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 string responseJson;
                 try
                 {
-                    var message = JsonConvert.DeserializeObject<Message>(Encoding.UTF8.GetString(buffer, 0, buffer.Length));
-                    var request = (IRequest)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(buffer, 0, buffer.Length),
+                    var messageJson = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                    Api.GetLogger().LogInformation($"Client {Id} Request: {messageJson}");
+                    var message = JsonConvert.DeserializeObject<Message>(messageJson);
+                    var request = (IRequest)JsonConvert.DeserializeObject(messageJson,
                         Message.GetMessageTypeDictionary()[message.GetMessageId()]);
                     if (Terminal.Status == TerminalStatus.Guest)
                     {
                         response = HandleMessageFromGuest(request);
-                    } else
+                    }
+                    else if (Terminal.Status == TerminalStatus.Authenticated)
                     {
+                        response = HandleMessageFromAuthenticated(request);
+                    }
+                    else {
                         response = Terminal.SendToApi(request);
                     }
-                    responseJson = JsonConvert.SerializeObject(Terminal.SendToApi(request));
-                } catch(Exception e)
+                    responseJson = JsonConvert.SerializeObject(response);
+                    Api.GetLogger().LogInformation($"Client {Id} Response: {responseJson}");
+                }
+                catch (Exception e)
                 {
                     responseJson = e.Message;
+                    Api.GetLogger().LogError($"Client {Id}: {responseJson}");
                 }
                 Encoding.UTF8.GetBytes(responseJson, 0, responseJson.Length, buffer, 0);
                 await WebSocket.SendAsync(
@@ -110,6 +120,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <returns></returns>
         public async Task CloseAsync()
         {
+            Api.GetLogger().LogInformation($"Client {Id} Closing");
             await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Goodbye", CancellationToken.None);
         }
         /// <summary>
@@ -128,6 +139,27 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 if (loginResponse.IsSuccess())
                 {
                     Terminal.Authenticate(loginResponse.AccountId.Value);
+                }
+            }
+            return response;
+        }
+        /// <summary>
+        /// Handle all messages from terminals with authenticated status
+        /// </summary>
+        /// <param name="request"></param>
+        public IResponse HandleMessageFromAuthenticated(IRequest request)
+        {
+            IResponse response = new Response()
+            {
+                ResponseSuccess = false
+            };
+            if (request.IsMessageType<LogoutRequest>())
+            {
+                response = Terminal.SendToApi(request);
+                var logoutResponse = response.GetMessageAsType<LogoutResponse>();
+                if (logoutResponse.IsSuccess())
+                {
+                    Terminal.Guest();
                 }
             }
             return response;

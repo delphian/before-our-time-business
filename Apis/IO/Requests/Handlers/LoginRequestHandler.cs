@@ -32,7 +32,8 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         {
             return new List<Guid>()
             {
-                LoginRequest._Id
+                LoginRequest._Id,
+                LogoutRequest._Id
             };
         }
         /// <summary>
@@ -54,6 +55,13 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     AccountId = account?.Id
                 };
             }
+            if (request.IsMessageType<LogoutRequest>())
+            {
+                response = new LogoutResponse()
+                {
+                    ResponseSuccess = true
+                };
+            };
             return response;
         }
     }

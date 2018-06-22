@@ -48,7 +48,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// </summary>
         [JsonProperty(PropertyName = "accountId")]
         [JsonConverter(typeof(GuidJsonConverter))]
-        public Guid AccountId { set; get; }
+        public Guid? AccountId { set; get; }
         /// <summary>
         /// Player attribute currently attached to as terminal's avatar (in system representation)
         /// </summary>
@@ -92,6 +92,15 @@ namespace BeforeOurTime.Business.Apis.Terminals
             Logger = logger;
         }
         /// <summary>
+        /// 
+        /// </summary>
+        public void Guest()
+        {
+            AccountId = null;
+            Status = TerminalStatus.Guest;
+            Logger.LogInformation($"Terminal ({Id}) reduced to {Status} status");
+        }
+        /// <summary>
         /// Authenticate to use an account
         /// </summary>
         /// <param name="name">User name</param>
@@ -122,7 +131,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
             var accountCharacters = new List<Item>();
             var request = new ListAccountCharactersRequest()
             {
-                AccountId = AccountId
+                AccountId = AccountId.Value
             };
             var response = SendToApi(request);
             if (response.IsSuccess())

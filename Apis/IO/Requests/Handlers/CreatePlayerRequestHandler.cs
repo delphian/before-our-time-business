@@ -47,7 +47,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var createPlayerRequest = request.GetMessageAsType<CreatePlayerRequest>();
                 var player = api.GetAttributeManager<IAttributePlayerManager>().Create(
                     createPlayerRequest.Name,
-                    terminal.AccountId,
+                    terminal.AccountId.Value,
                     new AttributePhysical()
                     {
                         Name = createPlayerRequest.Name,
