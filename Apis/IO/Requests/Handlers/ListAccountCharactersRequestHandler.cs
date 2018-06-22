@@ -48,10 +48,20 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     .Where(x => x.AccountId == listAccountCharactersRequest.AccountId)
                     .Select(x => x.ItemId)
                     .ToList();
+                var items = api.GetItemManager().Read(itemIds);
+                var itemDTOs = new List<Models.Items.Item>();
+                items.ForEach((item) => {
+                    itemDTOs.Add(new Models.Items.Item()
+                    {
+                        Id = item.Id,
+                        Name = item.GetAttribute<AttributePhysical>().Name,
+                        Description = item.GetAttribute<AttributePhysical>().Description
+                    });
+                });
                 var listAccountCharactersResponse = new ListAccountCharactersResponse()
                 {
                     ResponseSuccess = true,
-                    AccountCharacters = api.GetItemManager().Read(itemIds).Select(x => x.GetDTO()).ToList()
+                    AccountCharacters = itemDTOs
                 };
                 response = listAccountCharactersResponse;
             }

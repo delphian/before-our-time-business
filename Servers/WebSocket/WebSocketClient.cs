@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using BeforeOurTime.Models.Messages.Requests.List;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -172,6 +173,10 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 {
                     Terminal.Guest();
                 }
+            }
+            if (request.IsMessageType<ListAccountCharactersRequest>())
+            {
+                response = Terminal.SendToApi(request);
             }
             return response;
         }
