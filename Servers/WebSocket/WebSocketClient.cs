@@ -43,6 +43,10 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// </summary>
         private System.Net.WebSockets.WebSocket WebSocket { set; get; }
         /// <summary>
+        /// Cancelation token for recieving loop
+        /// </summary>
+        private CancellationTokenSource Cts { set; get; }
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="api">Before Our Time API</param>
@@ -58,6 +62,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             Terminal = terminal;
             Context = context;
             WebSocket = webSocket;
+            Cts = new CancellationTokenSource();
         }
         /// <summary>
         /// Handle a websocket request
@@ -70,8 +75,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
             var buffer = new byte[1024 * 4];
-            WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            while (!result.CloseStatus.HasValue)
+            WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), Cts.Token);
+            while (!result.CloseStatus.HasValue && !Cts.Token.IsCancellationRequested)
             {
                 IResponse response;
                 string responseJson;
@@ -93,26 +98,29 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     else {
                         response = Terminal.SendToApi(request);
                     }
+                    // Send response
                     responseJson = JsonConvert.SerializeObject(response);
                     Api.GetLogger().LogInformation($"Client {Id} Response: {responseJson}");
+                    Array.Clear(buffer, 0, buffer.Length);
+                    Encoding.UTF8.GetBytes(responseJson, 0, responseJson.Length, buffer, 0);
+                    await WebSocket.SendAsync(
+                        new ArraySegment<byte>(buffer, 0, responseJson.Length),
+                        result.MessageType,
+                        result.EndOfMessage,
+                        Cts.Token);
+                    // Wait for next incoming message
+                    Array.Clear(buffer, 0, buffer.Length);
+                    result = await WebSocket.ReceiveAsync(
+                        new ArraySegment<byte>(buffer),
+                        Cts.Token);
                 }
                 catch (Exception e)
                 {
                     responseJson = e.Message;
                     Api.GetLogger().LogError($"Client {Id}: {responseJson}");
                 }
-                Encoding.UTF8.GetBytes(responseJson, 0, responseJson.Length, buffer, 0);
-                await WebSocket.SendAsync(
-                    new ArraySegment<byte>(buffer, 0, responseJson.Length),
-                    result.MessageType,
-                    result.EndOfMessage,
-                    CancellationToken.None);
-                result = await WebSocket.ReceiveAsync(
-                    new ArraySegment<byte>(buffer),
-                    CancellationToken.None);
             }
-            await WebSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-            Api.GetTerminalManager().DestroyTerminal(Terminal);
+            Api.GetLogger().LogWarning($"Client {Id} handler aborted");
         }
         /// <summary>
         /// Close the websocket connection
@@ -120,8 +128,11 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <returns></returns>
         public async Task CloseAsync()
         {
-            Api.GetLogger().LogInformation($"Client {Id} Closing");
+            Api.GetLogger().LogInformation($"Client {Id} closing connection...");
+            Cts.Cancel();
             await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Goodbye", CancellationToken.None);
+            Api.GetLogger().LogInformation($"Client {Id} connection closed");
+            Api.GetTerminalManager().DestroyTerminal(Terminal);
         }
         /// <summary>
         /// Handle all messages from terminals with guest status
