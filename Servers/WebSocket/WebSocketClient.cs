@@ -77,12 +77,12 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
             var buffer = new byte[1024 * 4];
             WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), Cts.Token);
-            while (!result.CloseStatus.HasValue && !Cts.Token.IsCancellationRequested)
+            try
             {
-                IResponse response;
-                string responseJson;
-                try
+                while (!result.CloseStatus.HasValue && !Cts.Token.IsCancellationRequested)
                 {
+                    IResponse response;
+                    string responseJson;
                     var messageJson = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
                     Api.GetLogger().LogInformation($"Client {Id} Request: {messageJson}");
                     var message = JsonConvert.DeserializeObject<Message>(messageJson);
@@ -96,7 +96,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     {
                         response = HandleMessageFromAuthenticated(request);
                     }
-                    else {
+                    else
+                    {
                         response = Terminal.SendToApi(request);
                     }
                     // Send response
@@ -115,11 +116,14 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                         new ArraySegment<byte>(buffer),
                         Cts.Token);
                 }
-                catch (Exception e)
+            }
+            catch (WebSocketException e)
+            {
+                Api.GetLogger().LogError($"Client {Id}: {e.Message}");
+                try
                 {
-                    responseJson = e.Message;
-                    Api.GetLogger().LogError($"Client {Id}: {responseJson}");
-                }
+                    await CloseAsync();
+                } catch(Exception) { }
             }
             Api.GetLogger().LogWarning($"Client {Id} handler aborted");
         }
