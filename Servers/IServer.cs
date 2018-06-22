@@ -20,5 +20,10 @@ namespace BeforeOurTime.Business.Servers
         /// Stop the server
         /// </summary>
         void Stop();
+        /// <summary>
+        /// Get unique identifiers of all open clients
+        /// </summary>
+        /// <returns></returns>
+        List<Guid> GetClientIds();
     }
 }

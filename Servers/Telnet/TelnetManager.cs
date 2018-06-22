@@ -140,6 +140,14 @@ namespace BeforeOurTime.Business.Servers.Telnet
             return messageHandlersByType;
         }
         /// <summary>
+        /// Get unique identifiers of all open clients
+        /// </summary>
+        /// <returns></returns>
+        public List<Guid> GetClientIds()
+        {
+            throw new NotImplementedException();
+        }
+        /// <summary>
         /// Process a message from the terminal to the telnet client
         /// </summary>
         /// <param name="terminal"></param>

@@ -23,6 +23,10 @@ namespace BeforeOurTime.Business.Servers.WebSocket
     public class WebSocketClient
     {
         /// <summary>
+        /// Unique WebSocket client identifier
+        /// </summary>
+        private Guid Id { set; get; }
+        /// <summary>
         /// Before Our Time API
         /// </summary>
         private IApi Api { set; get; }
@@ -49,6 +53,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             HttpContext context,
             System.Net.WebSockets.WebSocket webSocket)
         {
+            Id = Guid.NewGuid();
             Api = api;
             Terminal = terminal;
             Context = context;
@@ -100,6 +105,14 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             Api.GetTerminalManager().DestroyTerminal(Terminal);
         }
         /// <summary>
+        /// Close the websocket connection
+        /// </summary>
+        /// <returns></returns>
+        public async Task CloseAsync()
+        {
+            await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Goodbye", CancellationToken.None);
+        }
+        /// <summary>
         /// Handle all messages from terminals with guest status
         /// </summary>
         /// <param name="request"></param>
@@ -118,6 +131,14 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 }
             }
             return response;
+        }
+        /// <summary>
+        /// Get unique client identifier
+        /// </summary>
+        /// <returns></returns>
+        public Guid GetId()
+        {
+            return Id;
         }
     }
 }

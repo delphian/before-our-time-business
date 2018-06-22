@@ -23,7 +23,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
-    public class WebSocketManager : IServer
+    public class WebSocketManager : IWebSocketManager
     {
         /// <summary>
         /// Before Our Time API
@@ -33,6 +33,10 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// Web socket server
         /// </summary>
         public IWebHost WebSocketServer { set; get; }
+        /// <summary>
+        /// All open WebSocket clients
+        /// </summary>
+        private List<WebSocketClient> WebSocketClients { set; get; }
         /// <summary>
         /// Classes which will handle a message from terminal
         /// </summary>
@@ -47,6 +51,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <param name="serviceProvider"></param>
         public WebSocketManager(IApi api)
         {
+            WebSocketClients = new List<WebSocketClient>();
             Api = api;
             // MessageHandlers = BuildMessageHandlers();
             // MessageHandlersByType = BuildMessageHandlersByType(MessageHandlers);
@@ -55,7 +60,10 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 {
                     options.ListenAnyIP(5000);
                 })
-                .ConfigureServices(services => { services.AddSingleton<IApi>(Api); })
+                .ConfigureServices(services => {
+                    services.AddSingleton<IApi>(Api);
+                    services.AddSingleton<IWebSocketManager>(this);
+                })
                 .SuppressStatusMessages(true)
                 .UseStartup<WebSocketStartup>()
                 .Build();
@@ -74,8 +82,29 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// </summary>
         public void Stop()
         {
+            Api.GetLogger().LogInformation($"Websocket server stopping all clients...");
+            WebSocketClients.ForEach(async delegate (WebSocketClient client)
+            {
+                await client.CloseAsync();
+            });
             WebSocketServer.StopAsync();
             Api.GetLogger().LogInformation($"Websocket server stopped");
+        }
+        /// <summary>
+        /// Get all open WebSocket clients
+        /// </summary>
+        /// <returns></returns>
+        public List<WebSocketClient> GetWebSocketClients()
+        {
+            return WebSocketClients;
+        }
+        /// <summary>
+        /// Get unique identifiers of all open clients
+        /// </summary>
+        /// <returns></returns>
+        public List<Guid> GetClientIds()
+        {
+            return WebSocketClients.Select(x => x.GetId()).ToList();
         }
     }
     /// <summary>
@@ -86,6 +115,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         public void Configure(IApplicationBuilder app)
         {
             var api = app.ApplicationServices.GetService<IApi>();
+            var webSocketManager = app.ApplicationServices.GetService<IWebSocketManager>();
             app.UseWebSockets();
             app.Use(async (context, next) =>
             {
@@ -98,6 +128,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                             "WebSocket", 
                             new IPEndPoint(context.Connection.RemoteIpAddress, context.Connection.RemotePort));
                         var webSocketClient = new WebSocketClient(api, terminal, context, webSocket);
+                        webSocketManager.GetWebSocketClients().Add(webSocketClient);
                         await webSocketClient.HandleWebSocket();
                     }
                     else
