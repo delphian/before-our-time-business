@@ -50,7 +50,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         [JsonConverter(typeof(GuidJsonConverter))]
         public Guid? AccountId { set; get; }
         /// <summary>
-        /// Player attribute currently attached to as terminal's avatar (in system representation)
+        /// Unique identifier of character item currently attached to terminal
         /// </summary>
         [JsonProperty(PropertyName = "playerId")]
         public Guid PlayerId { set; get; }
@@ -136,7 +136,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
             var response = SendToApi(request);
             if (response.IsSuccess())
             {
-                var listAccountCharactersResponse = (ListAccountCharactersResponse)response.GetMessageAsType<ListAccountCharactersResponse>();
+                var listAccountCharactersResponse = response.GetMessageAsType<ListAccountCharactersResponse>();
                 accountCharacters = listAccountCharactersResponse.AccountCharacters;
             }
             return accountCharacters;

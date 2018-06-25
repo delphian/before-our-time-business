@@ -15,6 +15,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Messages.Requests.List;
+using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Repository.Models.Items.Attributes;
+using System.Linq;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -181,6 +184,25 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             if (request.IsMessageType<ListAccountCharactersRequest>())
             {
                 response = Terminal.SendToApi(request);
+            }
+            if (request.IsMessageType<LoginAccountCharacterRequest>())
+            {
+                var loginAccountCharacterRequest = request.GetMessageAsType<LoginAccountCharacterRequest>();
+                var character = Terminal.GetAttachable().Where(x => x.Id == loginAccountCharacterRequest.ItemId).FirstOrDefault();
+                if (character != null && Terminal.Attach(character.Id))
+                {
+                    Terminal.Attach(character.Id);
+                    response = new LoginAccountCharacterResponse()
+                    {
+                        ResponseSuccess = true
+                    };
+                } else
+                {
+                    response = new LoginAccountCharacterResponse()
+                    {
+                        ResponseSuccess = false
+                    };
+                }
             }
             return response;
         }
