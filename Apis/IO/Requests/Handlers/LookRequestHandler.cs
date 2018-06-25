@@ -47,6 +47,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
                 var ioLocationUpdate = new ListLocationResponse()
                 {
+                    ResponseSuccess = true,
                     ItemId = location.Id,
                     Name = location.GetAttribute<AttributeLocation>().Name,
                     Description = location.GetAttribute<AttributeLocation>().Description,
@@ -60,6 +61,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                         var attribute = item.GetAttribute<AttributeExit>();
                         ioLocationUpdate.Exits.Add(new ListExitResponse()
                         {
+                            ResponseSuccess = true,
                             ItemId = attribute.ItemId,
                             Name = attribute.Name,
                             Description = attribute.Description
