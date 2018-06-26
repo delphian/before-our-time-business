@@ -97,7 +97,7 @@ namespace BeforeOurTime.Business.Apis.Messages
             }
             SendMessageToLocation(new ArrivalEvent()
                 {
-                    ItemId = item.Id,
+                    Item = item,
                     Name = name
                 }
                 , location, actorId);
@@ -117,8 +117,8 @@ namespace BeforeOurTime.Business.Apis.Messages
             }
             SendMessageToLocation(new DepartureEvent()
                 {
-                    ItemId = item.Id,
-                    Name = name
+                    Name = name,
+                    Item = item
                 }
                 , location, actorId);
         }

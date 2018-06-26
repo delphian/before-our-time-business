@@ -49,7 +49,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
                 api.GetMessageManager().SendMessageToLocation(new EmoteEvent()
                     {
-                        ItemId = player.Id,
+                        Item = player,
                         Name = player.GetAttribute<AttributePlayer>().Name,
                         Type = emoteRequest.Type
                     }, location, player.Id);
