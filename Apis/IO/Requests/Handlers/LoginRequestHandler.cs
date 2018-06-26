@@ -10,7 +10,6 @@ using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
-using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

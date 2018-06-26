@@ -1,6 +1,5 @@
-﻿using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
-using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
+﻿using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Items.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -6,12 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Business.Apis.Scripts;
-using BeforeOurTime.Repository.Models.Scripts.Delegates;
 using System.Linq;
-using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Repository.Models.Messages.Data;
-using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Scripts.Delegates;
 
 namespace BeforeOurTime.Business.Apis.Items
 {

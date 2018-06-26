@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Scripts.Delegates;
+﻿using BeforeOurTime.Models.Scripts.Delegates;
 using System;
 using System.Collections.Generic;
 using System.Text;

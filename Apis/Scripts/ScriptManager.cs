@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using BeforeOurTime.Business.Apis.Scripts.Delegates;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Scripts.Delegates;
-using Jint.Parser;
+using BeforeOurTime.Models.Scripts.Delegates;
 
 namespace BeforeOurTime.Business.Apis.Scripts
 {

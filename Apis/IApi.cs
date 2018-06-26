@@ -5,7 +5,7 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Repository.Models.Items;
+using BeforeOurTime.Models.Items;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

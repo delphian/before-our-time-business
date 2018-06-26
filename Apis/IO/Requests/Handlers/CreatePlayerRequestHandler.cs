@@ -2,6 +2,7 @@
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Terminals;
+using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Messages.Events.Created;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Create;
@@ -9,7 +10,6 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.Create;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
-using BeforeOurTime.Repository.Models.Items.Attributes.Exits;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

@@ -3,9 +3,10 @@ using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
+using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
-using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
@@ -37,14 +38,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
-        }
-        /// <summary>
-        /// Get the item type that the manager is responsible for providing detail management for
-        /// </summary>
-        /// <returns></returns>
-        public ItemType GetItemType()
-        {
-            return ItemType.Location;
         }
         /// <summary>
         /// Deliver a message to an item

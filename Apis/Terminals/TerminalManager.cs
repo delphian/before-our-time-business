@@ -9,7 +9,6 @@ using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
-using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Models.Messages;

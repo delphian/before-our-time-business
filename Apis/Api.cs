@@ -9,10 +9,10 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
-using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Terminals;
 using Microsoft.Extensions.Logging;
+using BeforeOurTime.Models.Items;
 
 namespace BeforeOurTime.Business.Apis
 {

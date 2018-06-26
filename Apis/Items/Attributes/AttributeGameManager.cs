@@ -1,12 +1,11 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
-using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
+using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
-using BeforeOurTime.Repository.Models.Items.Attributes.Repos;
-using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
@@ -43,14 +42,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             ItemManager = itemManager;
         }
         /// <summary>
-        /// Get the item type that the manager is responsible for providing detail management for
-        /// </summary>
-        /// <returns></returns>
-        public ItemType GetItemType()
-        {
-            return ItemType.Game;
-        }
-        /// <summary>
         /// Get the default game
         /// </summary>
         /// <remarks>
@@ -69,7 +60,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                     {
                         Name = "Game",
                         Description = "Game item created by GetDefaultGame()",
-                        Type = ItemType.Game,
                         UuidType = Guid.NewGuid(),
                         Data = "{}",
                         Script = ""
@@ -89,7 +79,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                         {
                             Name = "Default Location",
                             Description = "Default location item created by GetDefaultGame()",
-                            Type = ItemType.Location,
                             UuidType = Guid.NewGuid(),
                             Data = "{}",
                             Script = ""

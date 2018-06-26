@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Scripts.Delegates;
+﻿using BeforeOurTime.Models.Scripts.Delegates;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

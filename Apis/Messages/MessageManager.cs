@@ -1,10 +1,10 @@
 ﻿using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Events.Arrivals;
 using BeforeOurTime.Models.Messages.Events.Departures;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;

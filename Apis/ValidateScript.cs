@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Repository.Models.Items;
+﻿using BeforeOurTime.Models.Items;
 using System;
 using System.Collections.Generic;
 using System.Text;
