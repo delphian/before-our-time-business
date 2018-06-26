@@ -4,7 +4,6 @@ using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Requests.Login;
-using BeforeOurTime.Models.Messages.Requests.Look;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;

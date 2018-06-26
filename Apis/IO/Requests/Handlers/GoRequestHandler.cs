@@ -4,7 +4,7 @@ using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Go;
-using BeforeOurTime.Models.Messages.Requests.Look;
+using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Repository.Models.Items;
 using Newtonsoft.Json;
@@ -49,7 +49,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var location = api.GetItemManager().Read(locationAttribute.ItemId);
                 api.GetItemManager().Move(player, location, exit);
                 var lookRequestHandler = new LookRequestHandler();
-                response = lookRequestHandler.HandleRequest(api, terminal, new LookRequest()
+                response = lookRequestHandler.HandleRequest(api, terminal, new ListLocationRequest()
                 {
 
                 }, response);

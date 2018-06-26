@@ -4,7 +4,7 @@ using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Messages.Requests;
-using BeforeOurTime.Models.Messages.Requests.Look;
+using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Repository.Models.Items;
@@ -30,7 +30,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         {
             return new List<Guid>()
             {
-                LookRequest._Id
+                ListLocationRequest._Id
             };
         }
         /// <summary>
@@ -42,7 +42,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// <param name="response"></param>
         public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
         {
-            if (request.GetType() == typeof(LookRequest))
+            if (request.GetType() == typeof(ListLocationRequest))
             {
                 var player = api.GetItemManager().Read(terminal.PlayerId);
                 var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
