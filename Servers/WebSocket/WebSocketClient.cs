@@ -67,6 +67,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             Context = context;
             WebSocket = webSocket;
             Cts = new CancellationTokenSource();
+            Terminal.OnMessageToTerminal += OnMessageFromServer;
         }
         /// <summary>
         /// Handle a websocket request
@@ -85,7 +86,6 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 while (!result.CloseStatus.HasValue && !Cts.Token.IsCancellationRequested)
                 {
                     IResponse response;
-                    string responseJson;
                     var messageJson = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
                     Api.GetLogger().LogInformation($"Client {Id} Request: {messageJson}");
                     var message = JsonConvert.DeserializeObject<Message>(messageJson);
@@ -104,15 +104,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                         response = Terminal.SendToApi(request);
                     }
                     // Send response
-                    responseJson = JsonConvert.SerializeObject(response);
-                    Api.GetLogger().LogInformation($"Client {Id} Response: {responseJson}");
-                    Array.Clear(buffer, 0, buffer.Length);
-                    Encoding.UTF8.GetBytes(responseJson, 0, responseJson.Length, buffer, 0);
-                    await WebSocket.SendAsync(
-                        new ArraySegment<byte>(buffer, 0, responseJson.Length),
-                        result.MessageType,
-                        result.EndOfMessage,
-                        Cts.Token);
+                    await SendAsync(response, Cts.Token);
                     // Wait for next incoming message
                     Array.Clear(buffer, 0, buffer.Length);
                     result = await WebSocket.ReceiveAsync(
@@ -141,6 +133,33 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Goodbye", CancellationToken.None);
             Api.GetLogger().LogInformation($"Client {Id} connection closed");
             Api.GetTerminalManager().DestroyTerminal(Terminal);
+        }
+        /// <summary>
+        /// Send a message
+        /// </summary>
+        /// <param name="message">All intra-item, environment and terminal communications are in the form of Message</param>
+        /// <param name="cancelToken">Notify method that operation should be canceled</param>
+        /// <returns></returns>
+        public async Task SendAsync(IMessage message, CancellationToken cancelToken)
+        {
+            var buffer = new byte[1024 * 4];
+            var messageJson = JsonConvert.SerializeObject(message);
+            Api.GetLogger().LogInformation($"Client {Id} To client: {messageJson}");
+            Encoding.UTF8.GetBytes(messageJson, 0, messageJson.Length, buffer, 0);
+            await WebSocket.SendAsync(
+                new ArraySegment<byte>(buffer, 0, messageJson.Length),
+                WebSocketMessageType.Text,
+                true,
+                cancelToken);
+        }
+        /// <summary>
+        /// Listen to incoming messages from server
+        /// </summary>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
+        /// <param name="message">All intra-item, environment and terminal communications are in the form of Message</param>
+        public async void OnMessageFromServer(Terminal terminal, IMessage message)
+        {
+            await SendAsync(message, CancellationToken.None);
         }
         /// <summary>
         /// Handle all messages from terminals with guest status
