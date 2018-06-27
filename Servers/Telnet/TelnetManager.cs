@@ -246,7 +246,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
             {
                 var response = telnetClient.GetTerminal().SendToApi(new GoRequest()
                     {
-                        ItemId = exitResponse.ItemId
+                        ItemId = exitResponse.Item.Id
                     });
                 telnetClient.GetTerminal().SendToClient(response);
             } else
