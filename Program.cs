@@ -142,7 +142,7 @@ namespace BeforeOurTime.Business
             serverList = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (IServer)Activator.CreateInstance(x, api))
+                .Select(x => (IServer)Activator.CreateInstance(x, api, Configuration))
                 .ToList();
             return serverList;
         }

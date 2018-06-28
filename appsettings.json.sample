@@ -1,8 +1,21 @@
 ﻿{
     "ConnectionStrings": {
-        "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=BeforeOurTime;Trusted_Connection=True;"
+        "DefaultConnection": "Server=localhost;Database=BeforeOurTime;User Id=sa;Password=Password123"
     },
-    "Setup": "Setups",
+    "Servers": {
+        "Telnet": {
+            "Listen": {
+                "Address": "localhost",
+                "Port": 2023
+            }
+        },
+        "WebSocket": {
+            "Listen": {
+                "Address": "localhost",
+                "Port": 2024
+            }
+        }
+    },
     "Timing": {
         "Tick": 30000,
         "Delivery": 1000

@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using BeforeOurTime.Models.Messages.Requests;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -29,6 +30,14 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// Before Our Time API
         /// </summary>
         public IApi Api { set; get; }
+        /// <summary>
+        /// IP address to listen on
+        /// </summary>
+        public IPAddress Address { set; get; }
+        /// <summary>
+        /// Port to listen on
+        /// </summary>
+        public int Port { set; get; }
         /// <summary>
         /// Web socket server
         /// </summary>
@@ -49,16 +58,18 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// Constructor
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public WebSocketManager(IApi api)
+        public WebSocketManager(IApi api, IConfigurationRoot configuration)
         {
             WebSocketClients = new List<WebSocketClient>();
             Api = api;
+            Address = IPAddress.Parse(configuration.GetSection("Servers").GetSection("WebSocket").GetSection("Listen").GetValue<string>("Address"));
+            Port = configuration.GetSection("Servers").GetSection("WebSocket").GetSection("Listen").GetValue<int>("Port");
             // MessageHandlers = BuildMessageHandlers();
             // MessageHandlersByType = BuildMessageHandlersByType(MessageHandlers);
             WebSocketServer = new WebHostBuilder()
                 .UseKestrel(options =>
                 {
-                    options.ListenAnyIP(5000);
+                    options.ListenAnyIP(Port);
                 })
                 .ConfigureServices(services => {
                     services.AddSingleton<IApi>(Api);

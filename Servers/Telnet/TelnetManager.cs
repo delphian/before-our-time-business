@@ -19,6 +19,7 @@ using BeforeOurTime.Models.Messages.Requests.Login;
 using BeforeOurTime.Models.Messages.Responses.Login;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Messages.Requests.List;
+using Microsoft.Extensions.Configuration;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -28,6 +29,14 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Before Our Time API
         /// </summary>
         public IApi Api { set; get; }
+        /// <summary>
+        /// IP address to listen on
+        /// </summary>
+        public IPAddress Address { set; get; }
+        /// <summary>
+        /// Port to listen on
+        /// </summary>
+        public int Port { set; get; }
         public TelnetServer TelnetServer { set; get; }
         public Dictionary<uint, string> UserName = new Dictionary<uint, string>();
         public Dictionary<Guid, TelnetClient> Clients = new Dictionary<Guid, TelnetClient>();
@@ -43,10 +52,12 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Constructor
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public TelnetManager(IApi api)
+        public TelnetManager(IApi api, IConfigurationRoot configuration)
         {
             Api = api;
-            TelnetServer = new TelnetServer(IPAddress.Any);
+            Address = IPAddress.Parse(configuration.GetSection("Servers").GetSection("Telnet").GetSection("Listen").GetValue<string>("Address"));
+            Port = configuration.GetSection("Servers").GetSection("Telnet").GetSection("Listen").GetValue<int>("Port");
+            TelnetServer = new TelnetServer(Address);
             TelnetServer.ClientConnected += ClientConnected;
             TelnetServer.ClientDisconnected += ClientDisconnected;
             TelnetServer.ConnectionBlocked += ClientBlocked;
@@ -59,7 +70,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         public void Start()
         {
-            TelnetServer.start();
+            TelnetServer.Start(Address, Port);
             Api.GetLogger().LogInformation($"Telnet server started on {TelnetServer.GetIPEndPoint()}");
         }
         /// <summary>
