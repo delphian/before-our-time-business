@@ -50,8 +50,6 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 {
                     ResponseSuccess = true,
                     Item = location,
-                    Name = location.GetAttribute<AttributeLocation>().Name,
-                    Description = location.GetAttribute<AttributeLocation>().Description,
                     Exits = new List<ListExitResponse>()
                 };
                 // Add exits
