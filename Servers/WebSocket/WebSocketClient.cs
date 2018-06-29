@@ -80,47 +80,61 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
             var buffer = new byte[1024 * 4];
-            WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), Cts.Token);
-            try
+            WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            await Task.Factory.StartNew(async () =>
             {
-                while (!result.CloseStatus.HasValue && !Cts.Token.IsCancellationRequested)
+                while (WebSocket.State == WebSocketState.Open)
                 {
-                    IResponse response;
-                    var messageJson = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                    Api.GetLogger().LogInformation($"Client {Id} Request: {messageJson}");
-                    var message = JsonConvert.DeserializeObject<Message>(messageJson);
-                    var request = (IRequest)JsonConvert.DeserializeObject(messageJson,
-                        Message.GetMessageTypeDictionary()[message.GetMessageId()]);
-                    if (Terminal.Status == TerminalStatus.Guest)
+                    if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        response = HandleMessageFromGuest(request);
+                        await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, CancellationToken.None);
                     }
-                    else if (Terminal.Status == TerminalStatus.Authenticated)
+                    else if (result.MessageType == WebSocketMessageType.Binary)
                     {
-                        response = HandleMessageFromAuthenticated(request);
+                        await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Cannot accept binary frame", CancellationToken.None);
                     }
                     else
                     {
-                        response = Terminal.SendToApi(request);
+                        IResponse response;
+                        var messageJson = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                        Api.GetLogger().LogInformation($"Client {Id} Request: {messageJson}");
+                        var message = JsonConvert.DeserializeObject<Message>(messageJson);
+                        var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
+                        if (Terminal.Status == TerminalStatus.Guest)
+                        {
+                            response = HandleMessageFromGuest(request);
+                        }
+                        else if (Terminal.Status == TerminalStatus.Authenticated)
+                        {
+                            response = HandleMessageFromAuthenticated(request);
+                        }
+                        else
+                        {
+                            response = Terminal.SendToApi(request);
+                        }
+                        // Send response
+                        await SendAsync(response, CancellationToken.None);
                     }
-                    // Send response
-                    await SendAsync(response, Cts.Token);
                     // Wait for next incoming message
                     Array.Clear(buffer, 0, buffer.Length);
-                    result = await WebSocket.ReceiveAsync(
-                        new ArraySegment<byte>(buffer),
-                        Cts.Token);
+                    result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), Cts.Token);
                 }
-            }
-            catch (WebSocketException e)
+            }, Cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            await Task.Run(async () =>
             {
-                Api.GetLogger().LogError($"Client {Id}: {e.Message}");
+                WaitHandle.WaitAny(new[] { Cts.Token.WaitHandle });
                 try
                 {
-                    await CloseAsync();
-                } catch(Exception) { }
-            }
-            Api.GetLogger().LogWarning($"Client {Id} handler aborted");
+                    await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                }
+                catch (WebSocketException e)
+                {
+                    Api.GetLogger().LogInformation($"Client {Id} Failed to close connection: {e.Message}");
+                }
+                Api.GetTerminalManager().DestroyTerminal(Terminal);
+                WebSocket.Dispose();
+                Cts.Dispose();
+            });
         }
         /// <summary>
         /// Close the websocket connection
@@ -130,9 +144,11 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             Api.GetLogger().LogInformation($"Client {Id} closing connection...");
             Cts.Cancel();
-            await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Goodbye", CancellationToken.None);
+            while (WebSocket != null && WebSocket.State == WebSocketState.Open || WebSocket.State == WebSocketState.CloseSent)
+            {
+                await Task.Delay(100);
+            }
             Api.GetLogger().LogInformation($"Client {Id} connection closed");
-            Api.GetTerminalManager().DestroyTerminal(Terminal);
         }
         /// <summary>
         /// Send a message
