@@ -18,6 +18,7 @@ using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using System.Linq;
+using BeforeOurTime.Models.Messages.Systems.Ping;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -81,6 +82,23 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
             var buffer = new byte[1024 * 4];
             WebSocketReceiveResult result;
+            // Monitor websocket health
+            await Task.Factory.StartNew(async () =>
+            {
+                while (WebSocket.State == WebSocketState.Open)
+                {
+                    await Task.Delay(30000);
+                    Api.GetLogger().LogDebug($"Client {Id} websocket state: {WebSocket.State.ToString()}");
+                    var timeoutTask = Task.Delay(10000);
+                    var pingTask = SendAsync(new PingSystemMessage() { }, Cts.Token);
+                    if (await Task.WhenAny(pingTask, timeoutTask) == timeoutTask || pingTask.Status == TaskStatus.Faulted)
+                    {
+                        Api.GetLogger().LogWarning($"Client {Id} remote client is not responding!");
+                        await CloseAsync();
+                    }
+                }
+            }, Cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            // Listen to websocket
             await Task.Factory.StartNew(async () =>
             {
                 while (WebSocket.State == WebSocketState.Open)
@@ -129,20 +147,22 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             Api.GetLogger().LogInformation($"Client {Id} closing connection...");
             var disconnectTask = WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-            var timeoutTask = Task.Delay(8000);
-            if (await Task.WhenAny(disconnectTask, timeoutTask) == timeoutTask)
+            var timeoutTask = Task.Delay(10000);
+            if (await Task.WhenAny(disconnectTask, timeoutTask) == timeoutTask || disconnectTask.Status == TaskStatus.Faulted)
             {
-                Api.GetLogger().LogWarning($"Client {Id} Killing websocket!");
+                Api.GetLogger().LogWarning($"Client {Id} killing websocket!");
                 Cts.Cancel();
+                while (WebSocket.State == WebSocketState.Open)
+                {
+                    await Task.Delay(5000);
+                    Api.GetLogger().LogInformation($"Client {Id} waiting for websocket to die...");
+                }
             }
-            Api.GetTerminalManager().DestroyTerminal(Terminal);
-            while (WebSocket != null && WebSocket.State == WebSocketState.Open)
-            {
-                await Task.Delay(100);
-            }
+            Cts.Cancel();
             WebSocket.Dispose();
             Cts.Dispose();
             Api.GetLogger().LogInformation($"Client {Id} connection closed");
+            Api.GetTerminalManager().DestroyTerminal(Terminal);
         }
         /// <summary>
         /// Send a message
@@ -154,7 +174,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             var buffer = new byte[1024 * 4];
             var messageJson = JsonConvert.SerializeObject(message);
-            Api.GetLogger().LogInformation($"Client {Id} To client: {messageJson}");
+            Api.GetLogger().LogInformation($"Client {Id} to client: {messageJson}");
             Encoding.UTF8.GetBytes(messageJson, 0, messageJson.Length, buffer, 0);
             await WebSocket.SendAsync(
                 new ArraySegment<byte>(buffer, 0, messageJson.Length),
