@@ -80,18 +80,21 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
             var buffer = new byte[1024 * 4];
-            WebSocketReceiveResult result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            WebSocketReceiveResult result;
             await Task.Factory.StartNew(async () =>
             {
                 while (WebSocket.State == WebSocketState.Open)
                 {
+                    // Wait for next incoming message
+                    Array.Clear(buffer, 0, buffer.Length);
+                    result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), Cts.Token);
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, CancellationToken.None);
+                        await CloseAsync();
                     }
                     else if (result.MessageType == WebSocketMessageType.Binary)
                     {
-                        await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Cannot accept binary frame", CancellationToken.None);
+                        await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Cannot accept binary frame", Cts.Token);
                     }
                     else
                     {
@@ -113,28 +116,10 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                             response = Terminal.SendToApi(request);
                         }
                         // Send response
-                        await SendAsync(response, CancellationToken.None);
+                        await SendAsync(response, Cts.Token);
                     }
-                    // Wait for next incoming message
-                    Array.Clear(buffer, 0, buffer.Length);
-                    result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), Cts.Token);
                 }
             }, Cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-            await Task.Run(async () =>
-            {
-                WaitHandle.WaitAny(new[] { Cts.Token.WaitHandle });
-                try
-                {
-                    await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-                }
-                catch (WebSocketException e)
-                {
-                    Api.GetLogger().LogInformation($"Client {Id} Failed to close connection: {e.Message}");
-                }
-                Api.GetTerminalManager().DestroyTerminal(Terminal);
-                WebSocket.Dispose();
-                Cts.Dispose();
-            });
         }
         /// <summary>
         /// Close the websocket connection
@@ -143,11 +128,20 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         public async Task CloseAsync()
         {
             Api.GetLogger().LogInformation($"Client {Id} closing connection...");
-            Cts.Cancel();
-            while (WebSocket != null && WebSocket.State == WebSocketState.Open || WebSocket.State == WebSocketState.CloseSent)
+            var disconnectTask = WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+            var timeoutTask = Task.Delay(8000);
+            if (await Task.WhenAny(disconnectTask, timeoutTask) == timeoutTask)
+            {
+                Api.GetLogger().LogWarning($"Client {Id} Killing websocket!");
+                Cts.Cancel();
+            }
+            Api.GetTerminalManager().DestroyTerminal(Terminal);
+            while (WebSocket != null && WebSocket.State == WebSocketState.Open)
             {
                 await Task.Delay(100);
             }
+            WebSocket.Dispose();
+            Cts.Dispose();
             Api.GetLogger().LogInformation($"Client {Id} connection closed");
         }
         /// <summary>
