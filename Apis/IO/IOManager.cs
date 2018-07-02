@@ -60,7 +60,7 @@ namespace BeforeOurTime.Business.Apis.IO
                 var requestGuids = requestHandler.RegisterForRequests();
                 requestGuids.ForEach(delegate (Guid requestGuid)
                 {
-                    var requestHandlersForType = requestHandlersForTypes.GetValueOrDefault(requestGuid);
+                    var requestHandlersForType = requestHandlersForTypes?.GetValueOrDefault(requestGuid);
                     if (requestHandlersForType == null)
                     {
                         requestHandlersForType = new List<IRequestHandler>()

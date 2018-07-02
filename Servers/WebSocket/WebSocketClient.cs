@@ -80,32 +80,30 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         public async Task HandleWebSocket()
         {
             Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
-            var buffer = new byte[1024 * 4];
-            WebSocketReceiveResult result;
-            // Monitor websocket health
-            await Task.Factory.StartNew(async () =>
-            {
-                while (WebSocket.State == WebSocketState.Open)
-                {
-                    await Task.Delay(30000);
-                    Api.GetLogger().LogDebug($"Client {Id} websocket state: {WebSocket.State.ToString()}");
-                    var timeoutTask = Task.Delay(10000);
-                    var pingTask = SendAsync(new PingSystemMessage() { }, Cts.Token);
-                    if (await Task.WhenAny(pingTask, timeoutTask) == timeoutTask || pingTask.Status == TaskStatus.Faulted)
-                    {
-                        Api.GetLogger().LogWarning($"Client {Id} remote client is not responding!");
-                        await CloseAsync();
-                    }
-                }
-            }, Cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            var buffer = new ArraySegment<Byte>(new Byte[1024 * 4]);
+            WebSocketReceiveResult result = null;
             // Listen to websocket
             await Task.Factory.StartNew(async () =>
             {
                 while (WebSocket.State == WebSocketState.Open)
                 {
                     // Wait for next incoming message
-                    Array.Clear(buffer, 0, buffer.Length);
-                    result = await WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), Cts.Token);
+                    try
+                    {
+                        result = await WebSocket.ReceiveAsync(buffer, Cts.Token);
+                    }
+                    catch (Exception e)
+                    {
+                        Exception traverse = e;
+                        string message = "";
+                        while (traverse != null)
+                        {
+                            message += $"({traverse.Message})";
+                            traverse = traverse.InnerException;
+                        }
+                        Api.GetLogger().LogError($"Client {Id} while recieving data: {message}");
+                        await CloseAsync();
+                    }
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
                         await CloseAsync();
@@ -117,7 +115,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     else
                     {
                         IResponse response;
-                        var messageJson = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                        byte[] payloadData = buffer.Array.Where(b => b != 0).ToArray();
+                        var messageJson = Encoding.UTF8.GetString(payloadData, 0, payloadData.Length);
                         Api.GetLogger().LogInformation($"Client {Id} Request: {messageJson}");
                         var message = JsonConvert.DeserializeObject<Message>(messageJson);
                         var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
@@ -135,6 +134,29 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                         }
                         // Send response
                         await SendAsync(response, Cts.Token);
+                    }
+                }
+            }, Cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            // Monitor websocket health
+            await Task.Factory.StartNew(async () =>
+            {
+                while (WebSocket.State == WebSocketState.Open)
+                {
+                    await Task.Delay(60000);
+                    var timeoutTask = Task.Delay(10000);
+                    var pingTask = SendAsync(new PingSystemMessage() { }, Cts.Token);
+                    Api.GetLogger().LogDebug($"Client {Id} websocket: {WebSocket.State.ToString()}");
+                    if (await Task.WhenAny(pingTask, timeoutTask) == timeoutTask || pingTask.Status == TaskStatus.Faulted)
+                    {
+                        if (pingTask.Exception?.InnerException != null)
+                        {
+                            Api.GetLogger().LogWarning($"Client {Id} {pingTask.Exception.InnerException.Message}");
+                        }
+                        else
+                        {
+                            Api.GetLogger().LogWarning($"Client {Id} remote client is not responding!");
+                        }
+                        await CloseAsync();
                     }
                 }
             }, Cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
