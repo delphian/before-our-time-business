@@ -71,73 +71,11 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             Terminal.OnMessageToTerminal += OnMessageFromServer;
         }
         /// <summary>
-        /// Handle a websocket request
+        /// Monitor websocket health
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="webSocket"></param>
-        /// <param name="api"></param>
         /// <returns></returns>
-        public async Task HandleWebSocket()
+        public async Task MonitorAsync()
         {
-            Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
-            var buffer = new ArraySegment<Byte>(new Byte[1024 * 4]);
-            WebSocketReceiveResult result = null;
-            // Listen to websocket
-            await Task.Factory.StartNew(async () =>
-            {
-                while (WebSocket.State == WebSocketState.Open)
-                {
-                    // Wait for next incoming message
-                    try
-                    {
-                        result = await WebSocket.ReceiveAsync(buffer, Cts.Token);
-                    }
-                    catch (Exception e)
-                    {
-                        Exception traverse = e;
-                        string message = "";
-                        while (traverse != null)
-                        {
-                            message += $"({traverse.Message})";
-                            traverse = traverse.InnerException;
-                        }
-                        Api.GetLogger().LogError($"Client {Id} while recieving data: {message}");
-                        await CloseAsync();
-                    }
-                    if (result.MessageType == WebSocketMessageType.Close)
-                    {
-                        await CloseAsync();
-                    }
-                    else if (result.MessageType == WebSocketMessageType.Binary)
-                    {
-                        await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Cannot accept binary frame", Cts.Token);
-                    }
-                    else
-                    {
-                        IResponse response;
-                        byte[] payloadData = buffer.Array.Where(b => b != 0).ToArray();
-                        var messageJson = Encoding.UTF8.GetString(payloadData, 0, payloadData.Length);
-                        Api.GetLogger().LogInformation($"Client {Id} Request: {messageJson}");
-                        var message = JsonConvert.DeserializeObject<Message>(messageJson);
-                        var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
-                        if (Terminal.Status == TerminalStatus.Guest)
-                        {
-                            response = HandleMessageFromGuest(request);
-                        }
-                        else if (Terminal.Status == TerminalStatus.Authenticated)
-                        {
-                            response = HandleMessageFromAuthenticated(request);
-                        }
-                        else
-                        {
-                            response = Terminal.SendToApi(request);
-                        }
-                        // Send response
-                        await SendAsync(response, Cts.Token);
-                    }
-                }
-            }, Cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-            // Monitor websocket health
             await Task.Factory.StartNew(async () =>
             {
                 while (WebSocket.State == WebSocketState.Open)
@@ -160,6 +98,68 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     }
                 }
             }, Cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
+        /// <summary>
+        /// Listen to websocket
+        /// </summary>
+        /// <returns></returns>
+        public async Task ListenAsync()
+        {
+            Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
+            var buffer = new Byte[1024 * 4];
+            WebSocketReceiveResult result = null;
+            // Listen to websocket
+            while (WebSocket.State == WebSocketState.Open)
+            {
+                try
+                {
+                    // Wait for next incoming message
+                    Array.Clear(buffer, 0, buffer.Length);
+                    result = await WebSocket.ReceiveAsync(buffer, Cts.Token);
+                    if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        await CloseAsync();
+                    }
+                    else if (result.MessageType == WebSocketMessageType.Binary)
+                    {
+                        await CloseAsync();
+                    }
+                    else
+                    {
+                        IResponse response;
+                        var messageJson = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                        Api.GetLogger().LogInformation($"Client {Id} request: {messageJson}");
+                        var message = JsonConvert.DeserializeObject<Message>(messageJson);
+                        var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
+                        if (Terminal.Status == TerminalStatus.Guest)
+                        {
+                            response = HandleMessageFromGuest(request);
+                        }
+                        else if (Terminal.Status == TerminalStatus.Authenticated)
+                        {
+                            response = HandleMessageFromAuthenticated(request);
+                        }
+                        else
+                        {
+                            response = Terminal.SendToApi(request);
+                        }
+                        // Send response
+                        await SendAsync(response, Cts.Token);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Exception traverse = e;
+                    string message = "";
+                    while (traverse != null)
+                    {
+                        message += $"({traverse.Message})";
+                        traverse = traverse.InnerException;
+                    }
+                    Api.GetLogger().LogError($"Client {Id} while recieving data: {message}");
+                    await CloseAsync();
+                }
+            }
         }
         /// <summary>
         /// Close the websocket connection

@@ -140,7 +140,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                             new IPEndPoint(context.Connection.RemoteIpAddress, context.Connection.RemotePort));
                         var webSocketClient = new WebSocketClient(api, terminal, context, webSocket);
                         webSocketManager.GetWebSocketClients().Add(webSocketClient);
-                        await webSocketClient.HandleWebSocket();
+                        await webSocketClient.MonitorAsync();
+                        await webSocketClient.ListenAsync();
                     }
                     else
                     {
