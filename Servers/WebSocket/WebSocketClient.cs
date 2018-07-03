@@ -167,24 +167,28 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <returns></returns>
         public async Task CloseAsync()
         {
-            Api.GetLogger().LogInformation($"Client {Id} closing connection...");
-            var disconnectTask = WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-            var timeoutTask = Task.Delay(10000);
-            if (await Task.WhenAny(disconnectTask, timeoutTask) == timeoutTask || disconnectTask.Status == TaskStatus.Faulted)
+            if (WebSocket != null)
             {
-                Api.GetLogger().LogWarning($"Client {Id} killing websocket!");
-                Cts.Cancel();
-                while (WebSocket.State == WebSocketState.Open)
+                Api.GetLogger().LogInformation($"Client {Id} closing connection...");
+                var disconnectTask = WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                var timeoutTask = Task.Delay(10000);
+                if (await Task.WhenAny(disconnectTask, timeoutTask) == timeoutTask || disconnectTask.Status == TaskStatus.Faulted)
                 {
-                    await Task.Delay(5000);
-                    Api.GetLogger().LogInformation($"Client {Id} waiting for websocket to die...");
+                    Api.GetLogger().LogWarning($"Client {Id} killing websocket!");
+                    Cts.Cancel();
+                    while (WebSocket.State == WebSocketState.Open)
+                    {
+                        await Task.Delay(5000);
+                        Api.GetLogger().LogInformation($"Client {Id} waiting for websocket to die...");
+                    }
                 }
+                Cts.Cancel();
+                WebSocket.Dispose();
+                WebSocket = null;
+                Cts.Dispose();
+                Api.GetLogger().LogInformation($"Client {Id} connection closed");
+                Api.GetTerminalManager().DestroyTerminal(Terminal);
             }
-            Cts.Cancel();
-            WebSocket.Dispose();
-            Cts.Dispose();
-            Api.GetLogger().LogInformation($"Client {Id} connection closed");
-            Api.GetTerminalManager().DestroyTerminal(Terminal);
         }
         /// <summary>
         /// Send a message

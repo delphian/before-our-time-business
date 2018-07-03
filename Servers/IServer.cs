@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BeforeOurTime.Business.Servers
 {
@@ -20,7 +21,7 @@ namespace BeforeOurTime.Business.Servers
         /// <summary>
         /// Stop the server
         /// </summary>
-        void Stop();
+        Task Stop();
         /// <summary>
         /// Get unique identifiers of all open clients
         /// </summary>

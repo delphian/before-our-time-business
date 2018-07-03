@@ -20,6 +20,7 @@ using BeforeOurTime.Models.Messages.Responses.Login;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Messages.Requests.List;
 using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -76,10 +77,13 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <summary>
         /// Stop the server
         /// </summary>
-        public void Stop()
+        public async Task Stop()
         {
-            TelnetServer.Stop();
-            Api.GetLogger().LogInformation($"Telnet sever stopped");
+            await Task.Run(() =>
+            {
+                TelnetServer.Stop();
+                Api.GetLogger().LogInformation($"Telnet sever stopped");
+            });
         }
         /// <summary>
         /// Assign new telnet client an environment terminal and send greeting

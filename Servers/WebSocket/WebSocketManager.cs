@@ -91,14 +91,14 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <summary>
         /// Stop the server
         /// </summary>
-        public void Stop()
+        public async Task Stop()
         {
             Api.GetLogger().LogInformation($"Websocket server stopping all clients...");
             WebSocketClients.ForEach(async delegate (WebSocketClient client)
             {
                 await client.CloseAsync();
             });
-            WebSocketServer.StopAsync();
+            await WebSocketServer.StopAsync();
             Api.GetLogger().LogInformation($"Websocket server stopped");
         }
         /// <summary>
