@@ -75,7 +75,7 @@ namespace BeforeOurTime.Business
                 server.Start();
             });
             ServiceProvider.GetService<ILogger>().LogInformation($"All servers started");
-            ListenToTerminals(ServiceProvider);
+            ListenToTerminals();
             // Wait for user input
             Console.WriteLine("Ready! (Hit 'q' and enter to abort console)");
             string clientInput = Console.ReadLine();
@@ -153,12 +153,10 @@ namespace BeforeOurTime.Business
         /// <summary>
         /// Monitor terminal connections and forward messages
         /// </summary>
-        /// <param name="serviceProvider"></param>
-        private static void ListenToTerminals(IServiceProvider serviceProvider)
+        private static void ListenToTerminals()
         {
-            var terminalManager = serviceProvider.GetService<ITerminalManager>();
-            var api = serviceProvider.GetService<IApi>();
-            ((TerminalManager)terminalManager).OnTerminalCreated += delegate (Terminal terminal)
+            var api = ServiceProvider.GetService<IApi>();
+            ((TerminalManager)ServiceProvider.GetService<ITerminalManager>()).OnTerminalCreated += delegate (Terminal terminal)
             {
                 terminal.OnMessageToServer += delegate (Terminal xterminal, IRequest request)
                 {
