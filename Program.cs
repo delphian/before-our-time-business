@@ -83,6 +83,8 @@ namespace BeforeOurTime.Business
             {
                 clientInput = Console.ReadLine();
             }
+            // Shutdown everything
+            masterCts.Cancel();
             // Stop servers
             Servers.ForEach(delegate (IServer server)
             {

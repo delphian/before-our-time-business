@@ -26,6 +26,7 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
+        private object lockObject;
         private Dictionary<Type, IAttributeManager> AttributeManagerList = new Dictionary<Type, IAttributeManager>();
         private ILogger Logger { set; get; }
         private IMessageManager MessageManager { set; get; }
@@ -127,10 +128,13 @@ namespace BeforeOurTime.Business.Apis
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(delayMs);
-                var tickEvent = new TickEvent() { };
-                var itemRecipientIds = ItemManager.GetDelegateImplementerIds(onTickDelegate);
-                var itemRecipients = ItemManager.Read(itemRecipientIds);
-                MessageManager.SendMessage(tickEvent, itemRecipients, game.Id);
+                lock (lockObject)
+                {
+                    var tickEvent = new TickEvent() { };
+                    var itemRecipientIds = ItemManager.GetDelegateImplementerIds(onTickDelegate);
+                    var itemRecipients = ItemManager.Read(itemRecipientIds);
+                    MessageManager.SendMessage(tickEvent, itemRecipients, game.Id);
+                }
             }
         }
         /// <summary>
@@ -143,28 +147,31 @@ namespace BeforeOurTime.Business.Apis
             while (!ct.IsCancellationRequested)
             {
                 await Task.Delay(delayMs);
-                // Create script global functions
-                var jsFunctionManager = new JsFunctionManager(config, serviceProvider);
-                // Get messages
-                List<SavedMessage> messages = MessageManager.CullAllMessages();
-                // Deliver message to each recipient
-                foreach (SavedMessage message in messages)
+                lock (lockObject)
                 {
-                    try
+                    // Create script global functions
+                    var jsFunctionManager = new JsFunctionManager(config, serviceProvider);
+                    // Get messages
+                    List<SavedMessage> messages = MessageManager.CullAllMessages();
+                    // Deliver message to each recipient
+                    foreach (SavedMessage message in messages)
                     {
-                        var item = ItemManager.Read(message.RecipientId);
-                        List<IAttributeManager> attributeManagers = GetAttributeManagers(item);
-                        // Hand off message deliver to each item's manager code
-                        attributeManagers.ForEach(delegate (IAttributeManager attributeManager)
+                        try
                         {
-                            // TODO : This should probably just add items to jsFunctionManager
-                            // and then execute the script once instead of each manager executing the script
-                            attributeManager.DeliverMessage(message, item, jsFunctionManager);
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError("script failed: " + ex.Message);
+                            var item = ItemManager.Read(message.RecipientId);
+                            List<IAttributeManager> attributeManagers = GetAttributeManagers(item);
+                            // Hand off message deliver to each item's manager code
+                            attributeManagers.ForEach(delegate (IAttributeManager attributeManager)
+                            {
+                                // TODO : This should probably just add items to jsFunctionManager
+                                // and then execute the script once instead of each manager executing the script
+                                attributeManager.DeliverMessage(message, item, jsFunctionManager);
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("script failed: " + ex.Message);
+                        }
                     }
                 }
             }
