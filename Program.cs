@@ -51,7 +51,7 @@ namespace BeforeOurTime.Business
         public static IServiceProvider ServiceProvider { set; get; }
         public static List<IServer> Servers { set; get; }
         public static Object thisLock = new Object();
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             // Setup configuration
             Configuration = new ConfigurationBuilder()
@@ -62,9 +62,11 @@ namespace BeforeOurTime.Business
             IServiceCollection services = new ServiceCollection();
             ConfigureServices(Configuration, services);
             ServiceProvider = services.BuildServiceProvider();
+            var api = ServiceProvider.GetService<IApi>();
             // Setup automatic message deliver and Tick counter for items
-            var tickTimer = new System.Threading.Timer(Tick, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Tick"]));
-            var deliverTimer = new System.Threading.Timer(DeliverMessages, null, 0, Int32.Parse(Configuration.GetSection("Timing")["Delivery"]));
+            var masterCts = new CancellationTokenSource();
+            var tickTask = api.TickAsync(Convert.ToInt32(Configuration.GetSection("Timing")["Tick"]), masterCts.Token);
+            var deliverTask = api.DeliverMessagesAsync(Int32.Parse(Configuration.GetSection("Timing")["Delivery"]), masterCts.Token, Configuration, ServiceProvider);
             // Start servers
             ServiceProvider.GetService<ILogger>().LogInformation($"Starting servers...");
             Servers = BuildServerList(ServiceProvider.GetService<IApi>());
@@ -165,61 +167,6 @@ namespace BeforeOurTime.Business
                     }
                 };
             };
-        }
-        /// <summary>
-        /// Execute all item scripts that desire a regular periodic event
-        /// </summary>
-        /// <param name="o"></param>
-        private static void Tick(object o)
-        {
-            lock(thisLock)
-            {
-                var api = ServiceProvider.GetService<IApi>();
-                var game = api.GetAttributeManager<IAttributeGameManager>().GetDefaultGame();
-                var onTickDelegate = api.GetScriptManager().GetDelegateDefinition("onTick");
-                var itemRecipientIds = api.GetItemManager().GetDelegateImplementerIds(onTickDelegate);
-                var itemRecipients = api.GetItemManager().Read(itemRecipientIds);
-                var tickEvent = new TickEvent() { };
-                api.GetMessageManager().SendMessage(tickEvent, itemRecipients, game.Id);
-            }
-        }
-        /// <summary>
-        /// Deliver messages to their recipient items and execute each item script
-        /// </summary>
-        /// <param name="o"></param>
-        public static void DeliverMessages(object o)
-        {
-            lock (thisLock)
-            {
-                var logger = ServiceProvider.GetService<ILogger>();
-                var messageRepo = ServiceProvider.GetService<IMessageRepo>();
-                var api = ServiceProvider.GetService<IApi>();
-                // Create script global functions
-                var jsFunctionManager = new JsFunctionManager(Configuration, ServiceProvider);
-                // Get messages
-                List<SavedMessage> messages = messageRepo.Read();
-                messageRepo.Delete();
-                // Deliver message to each recipient
-                foreach (SavedMessage message in messages)
-                {
-                    try
-                    {
-                        var item = api.GetItemManager().Read(message.RecipientId);
-                        List<IAttributeManager> attributeManagers = api.GetAttributeManagers(item);
-                        // Hand off message deliver to each item's manager code
-                        attributeManagers.ForEach(delegate (IAttributeManager attributeManager)
-                        {
-                            // TODO : This should probably just add items to jsFunctionManager
-                            // and then execute the script once instead of each manager executing the script
-                            attributeManager.DeliverMessage(message, item, jsFunctionManager);
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError("script failed: " + ex.Message);
-                    }
-                }
-            }
         }
     }
 }

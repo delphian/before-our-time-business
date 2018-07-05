@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Messages
 {
@@ -121,6 +120,16 @@ namespace BeforeOurTime.Business.Apis.Messages
                     Item = item
                 }
                 , location, actorId);
+        }
+        /// <summary>
+        /// Get all messages awaiting deliver and prompty delete from data store
+        /// </summary>
+        /// <returns></returns>
+        public List<SavedMessage> CullAllMessages()
+        {
+            List<SavedMessage> messages = MessageRepo.Read();
+            MessageRepo.Delete();
+            return messages;
         }
     }
 }

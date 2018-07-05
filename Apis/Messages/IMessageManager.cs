@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Repository.Models.Messages.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -39,5 +40,10 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// <param name="location">Location item, including children, where the item has departed</param>
         /// <param name="actorId">Initiator of the movement</param>
         void SendDepartureEvent(Item item, Item location, Guid actorId);
+        /// <summary>
+        /// Get all messages awaiting deliver and prompty delete from data store
+        /// </summary>
+        /// <returns></returns>
+        List<SavedMessage> CullAllMessages();
     }
 }
