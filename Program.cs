@@ -114,6 +114,7 @@ namespace BeforeOurTime.Business
                 // Repositories (Items)
                 .AddScoped<IItemRepo, ItemRepo>()
                 .AddScoped<IAttributePlayerRepo, AttributePlayerRepo>()
+                .AddScoped<ICharacterAttributeRepo, CharacterAttributeRepo>()
                 .AddScoped<IAttributeGameRepo, AttributeGameRepo>()
                 .AddScoped<IAttributeLocationRepo, AttributeLocationRepo>()
                 .AddScoped<IAttributePhysicalRepo, AttributePhysicalRepo>()
@@ -130,6 +131,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IAttributeGameManager, AttributeGameManager>()
                 .AddScoped<IAttributeLocationManager, AttributeLocationManager>()
                 .AddScoped<IAttributePlayerManager, AttributePlayerManager>()
+                .AddScoped<ICharacterAttributeManager, CharacterAttributeManager>()
                 .AddScoped<IAttributePhysicalManager, AttributePhysicalManager>()
                 .AddScoped<IAttributeExitManager, AttributeExitManager>()
                 .AddScoped<IApi, Api>();

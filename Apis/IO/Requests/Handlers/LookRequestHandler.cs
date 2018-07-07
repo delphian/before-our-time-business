@@ -3,6 +3,7 @@ using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Characters;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
@@ -68,19 +69,21 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     });
                 // Add physical items
                 location.Children
-                    .Where(x => x.HasAttribute(typeof(AttributePhysical))).ToList()
+                    .Where(x => x.HasAttribute<AttributePhysical>() && !x.HasAttribute<CharacterAttribute>()).ToList()
                     .ForEach(delegate (Item item)
                     {
                         var attribute = item.GetAttribute<AttributePhysical>();
                         ioLocationUpdate.Adendums.Add($"A {attribute.Name} is here");
+                        ioLocationUpdate.Objects.Add(item);
                     });
-                // Add player items
+                // Add character items
                 location.Children
-                    .Where(x => x.HasAttribute(typeof(AttributePlayer))).ToList()
+                    .Where(x => x.HasAttribute<CharacterAttribute>() || x.HasAttribute<AttributePlayer>()).ToList()
                     .ForEach(delegate (Item item)
                     {
                         var attribute = item.GetAttribute<AttributePlayer>();
                         ioLocationUpdate.Adendums.Add($"{attribute.Name} is standing here");
+                        ioLocationUpdate.Characters.Add(item);
                     });
                 response = ioLocationUpdate;
             }
