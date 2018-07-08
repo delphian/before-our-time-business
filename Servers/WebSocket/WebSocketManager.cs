@@ -127,7 +127,9 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             var api = app.ApplicationServices.GetService<IApi>();
             var webSocketManager = app.ApplicationServices.GetService<IWebSocketManager>();
-            app.UseWebSockets();
+            app.UseWebSockets(new WebSocketOptions() {
+                ReceiveBufferSize = 1024 * 8
+            });
             app.Use(async (context, next) =>
             {
                 if (context.Request.Path == "/ws")

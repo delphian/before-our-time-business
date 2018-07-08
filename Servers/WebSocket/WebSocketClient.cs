@@ -106,7 +106,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         public async Task ListenAsync()
         {
             Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
-            var buffer = new Byte[1024 * 4];
+            var buffer = new Byte[1024 * 16];
             WebSocketReceiveResult result = null;
             // Listen to websocket
             while (WebSocket.State == WebSocketState.Open)
@@ -127,7 +127,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     else
                     {
                         IResponse response;
-                        var messageJson = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                        var messageJson = Encoding.UTF8.GetString(buffer, 0, Array.IndexOf<byte>(buffer, 0));
                         Api.GetLogger().LogInformation($"Client {Id} request: {messageJson}");
                         var message = JsonConvert.DeserializeObject<Message>(messageJson);
                         var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
@@ -198,7 +198,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <returns></returns>
         public async Task SendAsync(IMessage message, CancellationToken cancelToken)
         {
-            var buffer = new byte[1024 * 4];
+            var buffer = new byte[1024 * 16];
             var messageJson = JsonConvert.SerializeObject(message);
             Api.GetLogger().LogInformation($"Client {Id} to client: {messageJson}");
             Encoding.UTF8.GetBytes(messageJson, 0, messageJson.Length, buffer, 0);
