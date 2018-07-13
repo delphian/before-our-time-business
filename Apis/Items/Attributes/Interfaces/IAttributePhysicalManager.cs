@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Primitives.Images;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -54,6 +55,15 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         AttributePhysical UpdateDescription(
             Guid id, 
             string description);
+        /// <summary>
+        /// Update the physical attribute's image icon
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="image">Wrapper for image that allows meta data</param>
+        /// <returns></returns>
+        AttributePhysical UpdateImageIcon(
+            Guid id,
+            Image image);
         /// <summary>
         /// Update the physical volume
         /// </summary>

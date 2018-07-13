@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Logs
 {
-    class FileLogger : ILogger
+    public class FileLogger : ILogger
     {
         private string pathToFile = Directory.GetCurrentDirectory() + "/logs.txt";
 

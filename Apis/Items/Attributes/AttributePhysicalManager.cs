@@ -4,6 +4,7 @@ using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Primitives.Images;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
@@ -151,6 +152,18 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         {
             var physicalAttribute = Read(id);
             physicalAttribute.Description = description;
+            return Update(physicalAttribute);
+        }
+        /// <summary>
+        /// Update the physical attribute's image icon
+        /// </summary>
+        /// <param name="id">Unique phsyical attribute identifier</param>
+        /// <param name="image">Wrapper for image that allows meta data</param>
+        /// <returns></returns>
+        public AttributePhysical UpdateImageIcon(Guid id, Image image)
+        {
+            var physicalAttribute = Read(id);
+            physicalAttribute.ImageIcon = image;
             return Update(physicalAttribute);
         }
         /// <summary>
