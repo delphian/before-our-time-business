@@ -133,7 +133,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                         var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
                         if (Terminal.Status == TerminalStatus.Guest)
                         {
-                            response = HandleMessageFromGuest(request);
+                            response = Terminal.SendToApi(request);
                         }
                         else if (Terminal.Status == TerminalStatus.Authenticated)
                         {
@@ -216,26 +216,6 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         public async void OnMessageFromServer(Terminal terminal, IMessage message)
         {
             await SendAsync(message, CancellationToken.None);
-        }
-        /// <summary>
-        /// Handle all messages from terminals with guest status
-        /// </summary>
-        /// <param name="request"></param>
-        public IResponse HandleMessageFromGuest(IRequest request)
-        {
-            IResponse response = new Response()
-            {
-                ResponseSuccess = false
-            };
-            if (request.IsMessageType<LoginRequest>()) {
-                response = Terminal.SendToApi(request);
-                var loginResponse = response.GetMessageAsType<LoginResponse>();
-                if (loginResponse.IsSuccess())
-                {
-                    Terminal.Authenticate(loginResponse.AccountId.Value);
-                }
-            }
-            return response;
         }
         /// <summary>
         /// Handle all messages from terminals with authenticated status

@@ -21,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Messages.Requests.List;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using BeforeOurTime.Models.Messages.Requests.Create;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -374,10 +375,12 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
             else if (telnetClient.GetTerminal().DataBag["step"] == "create_password")
             {
-                if (telnetClient.GetTerminal().CreateAccount(
-                    telnetClient.GetTerminal().DataBag["create_name"],
-                    telnetClient.GetTerminal().DataBag["create_email"],
-                    message))
+                var createAccountResponse = telnetClient.GetTerminal().SendToApi(new CreateAccountRequest()
+                {
+                    Email = telnetClient.GetTerminal().DataBag["create_email"],
+                    Password = message
+                });
+                if (createAccountResponse.IsSuccess())
                 {
                     telnetClient.GetTerminal().OnMessageToTerminal += MessageFromTerminal;
                     Clients[telnetClient.GetTerminal().Id] = telnetClient;

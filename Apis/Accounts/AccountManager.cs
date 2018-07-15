@@ -2,9 +2,10 @@
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Accounts;
 using System.Linq;
-using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
-using BeforeOurTime.Repository.Models.Accounts.Authentication;
 using System;
+using BeforeOurTime.Models.Accounts.Authentication.Providers;
+using BeforeOurTime.Models.Accounts;
+using BeforeOurTime.Models.Accounts.Authentication;
 
 namespace BeforeOurTime.Business.Apis.Accounts
 {

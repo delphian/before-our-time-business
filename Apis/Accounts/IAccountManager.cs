@@ -1,5 +1,5 @@
-﻿using BeforeOurTime.Repository.Models.Accounts;
-using BeforeOurTime.Repository.Models.Accounts.Authentication.Providers;
+﻿using BeforeOurTime.Models.Accounts;
+using BeforeOurTime.Models.Accounts.Authentication.Providers;
 using System;
 using System.Collections.Generic;
 using System.Text;

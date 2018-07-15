@@ -142,23 +142,6 @@ namespace BeforeOurTime.Business.Apis.Terminals
             return accountCharacters;
         }
         /// <summary>
-        /// Create a new account and local authentication credentials. Authenticate on new account
-        /// </summary>
-        /// <param name="name">Friendly account name</param>
-        /// <param name="email">Login email address for account</param>
-        /// <param name="password">Password for account</param>
-        /// <returns></returns>
-        public bool CreateAccount(string name, string email, string password)
-        {
-            var account = TerminalManager.CreateAccount(this, name, email, password);
-            if (account != null)
-            {
-                AccountId = account.Id;
-                Status = TerminalStatus.Authenticated;
-            }
-            return (account != null);
-        }
-        /// <summary>
         /// Create a new character and attach
         /// </summary>
         /// <param name="name">Friendly name of character</param>
@@ -184,22 +167,38 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <param name="message"></param>
         public void SendToClient(IMessage message)
         {
-            if (OnMessageToTerminal != null)
-            {
-                OnMessageToTerminal(this, message);
-            }
+            OnMessageToTerminal?.Invoke(this, message);
         }
         /// <summary>
         /// Send a message to the environment
         /// </summary>
-        /// <param name="terminalRequest"></param>
-        public IResponse SendToApi(IRequest terminalRequest)
+        /// <param name="request"></param>
+        public IResponse SendToApi(IRequest request)
         {
-            if (OnMessageToServer == null)
+            IResponse response = new Response()
             {
-                throw new Exception("Environment is not listening");
+                ResponseSuccess = false
+            };
+            if (Status == TerminalStatus.Guest)
+            {
+                if (request.IsMessageType<CreateAccountRequest>() ||
+                    request.IsMessageType<LoginRequest>())
+                {
+                    response = OnMessageToServer?.Invoke(this, request);
+                    if (response.IsSuccess())
+                    {
+                        Guid? accountId;
+                        accountId = response.GetMessageAsType<LoginResponse>()?.AccountId;
+                        accountId = (accountId == null) ? response.GetMessageAsType<CreateAccountResponse>()?.CreatedAccountEvent?.AccountId : accountId;
+                        Authenticate(accountId.Value);
+                    }
+                }
             }
-            return OnMessageToServer(this, terminalRequest);
+            else
+            {
+                response = OnMessageToServer?.Invoke(this, request);
+            }
+            return response;
         }
         /// <summary>
         /// Get the terminal status

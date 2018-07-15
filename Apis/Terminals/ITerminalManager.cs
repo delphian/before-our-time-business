@@ -34,14 +34,5 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// </summary>
         /// <returns></returns>
         List<Terminal> GetTerminals();
-        /// <summary>
-        /// Create a new account and local authentication credentials
-        /// </summary>
-        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        /// <param name="name">Friendly account name</param>
-        /// <param name="email">Login email address for account</param>
-        /// <param name="password">Password for account</param>
-        /// <returns></returns>
-        Account CreateAccount(Terminal terminal, string name, string email, string password);
     }
 }
