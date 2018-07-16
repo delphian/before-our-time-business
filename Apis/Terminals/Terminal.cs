@@ -53,7 +53,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// Unique identifier of character item currently attached to terminal
         /// </summary>
         [JsonProperty(PropertyName = "playerId")]
-        public Guid PlayerId { set; get; }
+        public Guid? PlayerId { set; get; }
         /// <summary>
         /// General purpose databag at the disposal of the client server
         /// </summary>
@@ -97,6 +97,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         public void Guest()
         {
             AccountId = null;
+            PlayerId = null;
             Status = TerminalStatus.Guest;
             Logger.LogInformation($"Terminal ({Id}) reduced to {Status} status");
         }
@@ -108,6 +109,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         public void Authenticate(Guid accountId)
         {
             AccountId = accountId;
+            PlayerId = null;
             Status = TerminalStatus.Authenticated;
             Logger.LogInformation($"Terminal ({Id}) granted {Status} status as account {AccountId}");
         }
@@ -116,11 +118,11 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// </summary>
         /// <param name="itemId">Unique item identifier to use as terminal's avatar</param>
         /// <returns></returns>
-        public bool Attach(Guid itemId)
+        public void Attach(Guid itemId)
         {
             PlayerId = itemId;
             Status = TerminalStatus.Attached;
-            return true;
+            Logger.LogInformation($"Terminal ({Id}) granted {Status} status as character {itemId}");
         }
         /// <summary>
         /// Get available characters for terminal attachment
@@ -148,15 +150,15 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <returns></returns>
         public bool CreatePlayer(string name)
         {
-            var createPlayerRequest = new CreatePlayerRequest()
+            var createPlayerRequest = new CreateAccountCharacterRequest()
             {
                 Name = name
             };
             var response = SendToApi(createPlayerRequest);
             if (response.IsSuccess())
             {
-                var createPlayerResponse = response.GetMessageAsType<CreatePlayerResponse>();
-                PlayerId = createPlayerResponse.CreatedPlayerEvent.ItemId;
+                var createPlayerResponse = response.GetMessageAsType<CreateAccountCharacterResponse>();
+                PlayerId = createPlayerResponse.CreatedAccountCharacterEvent.ItemId;
                 Status = TerminalStatus.Attached;
             }
             return (response.IsSuccess());
@@ -196,7 +198,24 @@ namespace BeforeOurTime.Business.Apis.Terminals
             }
             else
             {
-                response = OnMessageToServer?.Invoke(this, request);
+                if (request.IsMessageType<LoginAccountCharacterRequest>())
+                {
+                    var playCharacterRequest = request.GetMessageAsType<LoginAccountCharacterRequest>();
+                    Attach(playCharacterRequest.ItemId);
+                    response = new LoginAccountCharacterResponse() { ResponseSuccess = true };
+                }
+                else if (request.IsMessageType<LogoutRequest>())
+                {
+                    response = OnMessageToServer?.Invoke(this, request);
+                    if (response.IsSuccess())
+                    {
+                        Guest();
+                    }
+                }
+                else
+                {
+                    response = OnMessageToServer?.Invoke(this, request);
+                }
             }
             return response;
         }

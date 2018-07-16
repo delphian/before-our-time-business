@@ -31,7 +31,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         {
             return new List<Guid>()
             {
-                CreatePlayerRequest._Id
+                CreateAccountCharacterRequest._Id
             };
         }
         /// <summary>
@@ -42,9 +42,9 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         /// <param name="terminalRequest"></param>
         public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
         {
-            if (request.IsMessageType<CreatePlayerRequest>())
+            if (request.IsMessageType<CreateAccountCharacterRequest>())
             {
-                var createPlayerRequest = request.GetMessageAsType<CreatePlayerRequest>();
+                var createPlayerRequest = request.GetMessageAsType<CreateAccountCharacterRequest>();
                 var player = api.GetAttributeManager<IAttributePlayerManager>().Create(
                     createPlayerRequest.Name,
                     terminal.AccountId.Value,
@@ -55,10 +55,10 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                         Weight = 100
                     },
                     api.GetAttributeManager<IAttributeGameManager>().GetDefaultLocation());
-                var createPlayerResponse = new CreatePlayerResponse()
+                var createPlayerResponse = new CreateAccountCharacterResponse()
                 {
                     ResponseSuccess = true,
-                    CreatedPlayerEvent = new CreatedPlayerEvent()
+                    CreatedAccountCharacterEvent = new CreatedAccountCharacterEvent()
                     {
                         ItemId = player.ItemId,
                         Name = player.Name

@@ -49,19 +49,10 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     .Select(x => x.ItemId)
                     .ToList();
                 var items = api.GetItemManager().Read(itemIds);
-                var itemDTOs = new List<Models.Items.Item>();
-                items.ForEach((item) => {
-                    itemDTOs.Add(new Models.Items.Item()
-                    {
-                        Id = item.Id,
-                        Name = item.GetAttribute<AttributePhysical>().Name,
-                        Description = item.GetAttribute<AttributePhysical>().Description
-                    });
-                });
                 var listAccountCharactersResponse = new ListAccountCharactersResponse()
                 {
                     ResponseSuccess = true,
-                    AccountCharacters = itemDTOs
+                    AccountCharacters = items
                 };
                 response = listAccountCharactersResponse;
             }

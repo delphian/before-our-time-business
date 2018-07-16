@@ -45,7 +45,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
         {
             if (request.GetType() == typeof(ListLocationRequest))
             {
-                var player = api.GetItemManager().Read(terminal.PlayerId);
+                var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
                 var ioLocationUpdate = new ListLocationResponse()
                 {

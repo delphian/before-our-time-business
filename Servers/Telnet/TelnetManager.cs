@@ -454,13 +454,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         {
                             if (player.Name.ToLower() == name)
                             {
-                                if (telnetClient.GetTerminal().Attach(player.Id))
-                                {
-                                    telnetClient.GetTerminal().DataBag["step"] = "attached";
-                                    TelnetServer.SendMessageToClient(telnetClient, "\r\n"
-                                        + "Terminal attached to avatar. Play!\r\n\r\n"
-                                        + "> ");
-                                }
+                                telnetClient.GetTerminal().Attach(player.Id);
+                                telnetClient.GetTerminal().DataBag["step"] = "attached";
+                                TelnetServer.SendMessageToClient(telnetClient, "\r\n"
+                                    + "Terminal attached to avatar. Play!\r\n\r\n"
+                                    + "> ");
                             }
                         });
                         if (telnetClient.GetTerminal().Status != TerminalStatus.Attached)

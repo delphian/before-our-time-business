@@ -45,7 +45,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
             if (request.IsMessageType<EmoteRequest>())
             {
                 var emoteRequest = request.GetMessageAsType<EmoteRequest>();
-                var player = api.GetItemManager().Read(terminal.PlayerId);
+                var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
                 api.GetMessageManager().SendMessageToLocation(new EmoteEvent()
                     {

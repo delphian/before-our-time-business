@@ -90,7 +90,7 @@ namespace BeforeOurTime.Business.Apis.IO
                 .Where(x => x.Key == requestGuid)
                 .Select(x => x.Value)
                 .FirstOrDefault();
-            requestHandlersForType.ForEach(delegate (IRequestHandler requestHandler)
+            requestHandlersForType?.ForEach(delegate (IRequestHandler requestHandler)
             {
                 response = requestHandler.HandleRequest(api, terminal, request, response);
             });

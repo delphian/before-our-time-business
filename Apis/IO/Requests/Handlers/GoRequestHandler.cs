@@ -43,7 +43,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
             {
                 var goRequest = request.GetMessageAsType<GoRequest>();
                 var exit = api.GetItemManager().Read(goRequest.ItemId);
-                var player = api.GetItemManager().Read(terminal.PlayerId);
+                var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 var locationAttribute = api.GetAttributeManager<IAttributeLocationManager>()
                     .Read(exit.GetAttribute<AttributeExit>().DestinationLocationId);
                 var location = api.GetItemManager().Read(locationAttribute.ItemId);

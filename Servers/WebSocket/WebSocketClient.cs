@@ -131,18 +131,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                         Api.GetLogger().LogInformation($"Client {Id} request: {messageJson}");
                         var message = JsonConvert.DeserializeObject<Message>(messageJson);
                         var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
-                        if (Terminal.Status == TerminalStatus.Guest)
-                        {
-                            response = Terminal.SendToApi(request);
-                        }
-                        else if (Terminal.Status == TerminalStatus.Authenticated)
-                        {
-                            response = HandleMessageFromAuthenticated(request);
-                        }
-                        else
-                        {
-                            response = Terminal.SendToApi(request);
-                        }
+                        response = Terminal.SendToApi(request);
                         // Send response
                         await SendAsync(response, Cts.Token);
                     }
@@ -216,50 +205,6 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         public async void OnMessageFromServer(Terminal terminal, IMessage message)
         {
             await SendAsync(message, CancellationToken.None);
-        }
-        /// <summary>
-        /// Handle all messages from terminals with authenticated status
-        /// </summary>
-        /// <param name="request"></param>
-        public IResponse HandleMessageFromAuthenticated(IRequest request)
-        {
-            IResponse response = new Response()
-            {
-                ResponseSuccess = false
-            };
-            if (request.IsMessageType<LogoutRequest>())
-            {
-                response = Terminal.SendToApi(request);
-                var logoutResponse = response.GetMessageAsType<LogoutResponse>();
-                if (logoutResponse.IsSuccess())
-                {
-                    Terminal.Guest();
-                }
-            }
-            if (request.IsMessageType<ListAccountCharactersRequest>())
-            {
-                response = Terminal.SendToApi(request);
-            }
-            if (request.IsMessageType<LoginAccountCharacterRequest>())
-            {
-                var loginAccountCharacterRequest = request.GetMessageAsType<LoginAccountCharacterRequest>();
-                var character = Terminal.GetAttachable().Where(x => x.Id == loginAccountCharacterRequest.ItemId).FirstOrDefault();
-                if (character != null && Terminal.Attach(character.Id))
-                {
-                    Terminal.Attach(character.Id);
-                    response = new LoginAccountCharacterResponse()
-                    {
-                        ResponseSuccess = true
-                    };
-                } else
-                {
-                    response = new LoginAccountCharacterResponse()
-                    {
-                        ResponseSuccess = false
-                    };
-                }
-            }
-            return response;
         }
         /// <summary>
         /// Get unique client identifier
