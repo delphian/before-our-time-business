@@ -1,7 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Players;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Events.Arrivals;
 using BeforeOurTime.Models.Messages.Events.Departures;
@@ -50,7 +50,7 @@ namespace BeforeOurTime.Business.Apis.Messages
             };
             recipients.ForEach(delegate (Item recipient)
             {
-                var playerAttribute = recipient.GetAttribute<AttributePlayer>();
+                var playerAttribute = recipient.GetAttribute<PlayerAttribute>();
                 if (playerAttribute != null)
                 {
                     var terminalId = TerminalManager.GetTerminals()
@@ -90,9 +90,9 @@ namespace BeforeOurTime.Business.Apis.Messages
         public void SendArrivalEvent(Item item, Item location, Guid actorId)
         {
             var name = item.Name;
-            if (item.HasAttribute<AttributePlayer>())
+            if (item.HasAttribute<PlayerAttribute>())
             {
-                name = item.GetAttribute<AttributePlayer>().Name;
+                name = item.GetAttribute<PlayerAttribute>().Name;
             }
             SendMessageToLocation(new ArrivalEvent()
                 {
@@ -110,9 +110,9 @@ namespace BeforeOurTime.Business.Apis.Messages
         public void SendDepartureEvent(Item item, Item location, Guid actorId)
         {
             var name = item.Name;
-            if (item.HasAttribute<AttributePlayer>())
+            if (item.HasAttribute<PlayerAttribute>())
             {
-                name = item.GetAttribute<AttributePlayer>().Name;
+                name = item.GetAttribute<PlayerAttribute>().Name;
             }
             SendMessageToLocation(new DepartureEvent()
                 {

@@ -4,6 +4,7 @@ using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Items.Attributes.Characters;
+using BeforeOurTime.Models.Items.Attributes.Players;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
@@ -78,10 +79,10 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                     });
                 // Add character items
                 location.Children
-                    .Where(x => x.HasAttribute<CharacterAttribute>() || x.HasAttribute<AttributePlayer>()).ToList()
+                    .Where(x => x.HasAttribute<CharacterAttribute>() || x.HasAttribute<PlayerAttribute>()).ToList()
                     .ForEach(delegate (Item item)
                     {
-                        var attribute = item.GetAttribute<AttributePlayer>();
+                        var attribute = item.GetAttribute<PlayerAttribute>();
                         ioLocationUpdate.Adendums.Add($"{attribute.Name} is standing here");
                         ioLocationUpdate.Characters.Add(item);
                     });

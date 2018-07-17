@@ -1,7 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Players;
 using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Emote;
@@ -50,7 +50,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 api.GetMessageManager().SendMessageToLocation(new EmoteEvent()
                     {
                         Item = player,
-                        Name = player.GetAttribute<AttributePlayer>().Name,
+                        Name = player.GetAttribute<PlayerAttribute>().Name,
                         Type = emoteRequest.Type
                     }, location, player.Id);
                 response = new Response() { ResponseSuccess = true };

@@ -50,7 +50,7 @@ namespace BeforeOurTime.Business.Apis
             IItemManager itemManager,
             ITerminalManager terminalManager,
             IAttributeGameManager attributeGameManager,
-            IAttributePlayerManager attributePlayerManager,
+            IPlayerAttributeManager attributePlayerManager,
             ICharacterAttributeManager characterAttributeManager,
             IAttributeLocationManager attributeLocationManager,
             IAttributePhysicalManager attributePhysicalManager,
@@ -64,7 +64,7 @@ namespace BeforeOurTime.Business.Apis
             ItemManager = itemManager;
             TerminalManager = terminalManager;
             AttributeManagerList.Add(typeof(IAttributeGameManager), attributeGameManager);
-            AttributeManagerList.Add(typeof(IAttributePlayerManager), attributePlayerManager);
+            AttributeManagerList.Add(typeof(IPlayerAttributeManager), attributePlayerManager);
             AttributeManagerList.Add(typeof(ICharacterAttributeManager), characterAttributeManager);
             AttributeManagerList.Add(typeof(IAttributeLocationManager), attributeLocationManager);
             AttributeManagerList.Add(typeof(IAttributePhysicalManager), attributePhysicalManager);

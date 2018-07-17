@@ -3,7 +3,7 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Players;
 using BeforeOurTime.Models.Items.Attributes.Characters;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
@@ -14,10 +14,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BeforeOurTime.Models.Items.Attributes;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
-    public class AttributePlayerManager : AttributeManager<AttributePlayer>, IAttributePlayerManager
+    public class PlayerAttributeManager : AttributeManager<PlayerAttribute>, IPlayerAttributeManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
@@ -28,14 +29,14 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <summary>
         /// Constructor
         /// </summary>
-        public AttributePlayerManager(
+        public PlayerAttributeManager(
             IItemRepo itemRepo,
-            IAttributePlayerRepo attributePlayerRepo,
+            IPlayerAttributeRepo playerAttributeRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
             IItemManager itemManager,
             IAttributePhysicalManager attributePhysicalManager,
-            ICharacterAttributeManager characterAttributeManager) : base(attributePlayerRepo)
+            ICharacterAttributeManager characterAttributeManager) : base(playerAttributeRepo)
         {
             ItemRepo = itemRepo;
             ScriptEngine = scriptEngine;
@@ -51,7 +52,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="accountId">Account to which this player belongs</param>
         /// <param name="physical">Physical attributes</param>
         /// <param name="initialLocation">Location of new player</param>
-        public AttributePlayer Create(
+        public PlayerAttribute Create(
             string name,
             Guid accountId,
             AttributePhysical physical,
@@ -66,7 +67,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                 Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
             });
             // Create player attributes
-            var player = new AttributePlayer()
+            var player = new PlayerAttribute()
             {
                 Name = name,
                 AccountId = accountId,

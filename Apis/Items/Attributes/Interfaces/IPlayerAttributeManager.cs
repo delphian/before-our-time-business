@@ -1,11 +1,12 @@
 ﻿using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Players;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
 {
-    public interface IAttributePlayerManager : IAttributeManager<AttributePlayer>, IAttributeManager
+    public interface IPlayerAttributeManager : IAttributeManager<PlayerAttribute>, IAttributeManager
     {
         /// <summary>
         /// Create a new player
@@ -17,7 +18,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="accountId">Account to which this player belongs</param>
         /// <param name="physical">Physical attributes</param>
         /// <param name="initialLocation">Location of new player</param>
-        AttributePlayer Create(
+        PlayerAttribute Create(
             string name, 
             Guid accountId, 
             AttributePhysical physical,

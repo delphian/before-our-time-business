@@ -43,7 +43,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
             if (request.IsMessageType<ListAccountCharactersRequest>())
             {
                 var listAccountCharactersRequest = request.GetMessageAsType<ListAccountCharactersRequest>();
-                var itemIds = api.GetAttributeManager<IAttributePlayerManager>()
+                var itemIds = api.GetAttributeManager<IPlayerAttributeManager>()
                     .Read()
                     .Where(x => x.AccountId == listAccountCharactersRequest.AccountId)
                     .Select(x => x.ItemId)
