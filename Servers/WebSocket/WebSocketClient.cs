@@ -187,15 +187,33 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <returns></returns>
         public async Task SendAsync(IMessage message, CancellationToken cancelToken)
         {
-            var buffer = new byte[1024 * 64];
-            var messageJson = JsonConvert.SerializeObject(message);
-            Api.GetLogger().LogInformation($"Client {Id} to client: {messageJson}");
-            Encoding.UTF8.GetBytes(messageJson, 0, messageJson.Length, buffer, 0);
-            await WebSocket.SendAsync(
-                new ArraySegment<byte>(buffer, 0, messageJson.Length),
-                WebSocketMessageType.Text,
-                true,
-                cancelToken);
+            try
+            {
+                var messageJson = JsonConvert.SerializeObject(message);
+                var byteMessage = new UTF8Encoding(false, true).GetBytes(messageJson);
+                var offset = 0;
+                var endOfMessage = false;
+                Api.GetLogger().LogInformation($"Client {Id} to client: {messageJson}");
+                do
+                {
+                    var remainingBytes = byteMessage.Count() - (offset * 1024);
+                    var sendBytes = Math.Min(1024, remainingBytes);
+                    var segment = new ArraySegment<byte>(byteMessage, (offset++ * 1024), sendBytes);
+                    endOfMessage = remainingBytes == sendBytes;
+                    await WebSocket.SendAsync(segment, WebSocketMessageType.Text, endOfMessage, cancelToken);
+                } while (!endOfMessage);
+            }
+            catch (Exception e)
+            {
+                Exception traverse = e;
+                string error = "";
+                while (traverse != null)
+                {
+                    error += $"({traverse.Message})";
+                    traverse = traverse.InnerException;
+                }
+                Api.GetLogger().LogInformation($"Client {Id} while sending data: {message.GetMessageName()}: {error}");
+            }
         }
         /// <summary>
         /// Listen to incoming messages from server
