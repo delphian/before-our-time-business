@@ -2,6 +2,7 @@
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Repository.Dbs.EF;
+using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using System;
@@ -22,29 +23,50 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             AttributeRepo = attributeRepo;
         }
 
-        public List<T> Create(List<T> models)
+        /// <summary>
+        /// Create models
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns></returns>
+        public List<T> Create(List<T> models, TransactionOptions options = null)
         {
-            return AttributeRepo.Create(models);
+            return AttributeRepo.Create(models, options);
         }
-
-        public T Create(T model)
+        /// <summary>
+        /// Create model
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns></returns>
+        public T Create(T model, TransactionOptions options = null)
         {
-            return AttributeRepo.Create(model);
+            return Create(new List<T>() { model }, options).FirstOrDefault();
         }
-
-        public List<T> Read(List<Guid> ids)
+        /// <summary>
+        /// Create models
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns></returns>
+        public List<T> Read(List<Guid> ids, TransactionOptions options = null)
         {
-            return AttributeRepo.Read(ids);
+            return AttributeRepo.Read(ids, options);
         }
-
-        public T Read(Guid id)
+        /// <summary>
+        /// Read model
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns></returns>
+        public T Read(Guid id, TransactionOptions options = null)
         {
             return Read(new List<Guid>() { id }).FirstOrDefault();
         }
 
-        public List<T> Read(int? offset = null, int? limit = null)
+        public List<T> Read(int? offset = null, int? limit = null, TransactionOptions options = null)
         {
-            return AttributeRepo.Read(offset, limit);
+            return AttributeRepo.Read(offset, limit, options);
         }
 
         public T Read(Item item)
