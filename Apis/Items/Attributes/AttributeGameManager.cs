@@ -17,7 +17,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
     public class AttributeGameManager : AttributeManager<AttributeGame>, IAttributeGameManager
     {
-        private IItemRepo ItemRepo { set; get; }
         private IAttributeGameRepo DetailGameRepo { set; get; }
         private IAttributeLocationRepo DetailLocationRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
@@ -32,9 +31,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             IAttributeLocationRepo detailLocationRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(detailGameRepo)
+            IItemManager itemManager) : base(itemRepo, detailGameRepo)
         {
-            ItemRepo = itemRepo;
             DetailGameRepo = detailGameRepo;
             DetailLocationRepo = detailLocationRepo;
             ScriptEngine = scriptEngine;
@@ -86,7 +84,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                     }
                 });
             }
-            return ItemRepo.Read(defaultGame.ItemId);
+            var defaultGameItem = ItemRepo.Read(defaultGame.ItemId);
+            return defaultGameItem;
         }
         /// <summary>
         /// Get the default location of the default game

@@ -20,7 +20,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
     public class PlayerAttributeManager : AttributeManager<PlayerAttribute>, IPlayerAttributeManager
     {
-        private IItemRepo ItemRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
@@ -36,9 +35,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             IScriptManager scriptManager,
             IItemManager itemManager,
             IAttributePhysicalManager attributePhysicalManager,
-            ICharacterAttributeManager characterAttributeManager) : base(playerAttributeRepo)
+            ICharacterAttributeManager characterAttributeManager) : base(itemRepo, playerAttributeRepo)
         {
-            ItemRepo = itemRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;

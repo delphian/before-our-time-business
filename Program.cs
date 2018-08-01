@@ -42,6 +42,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 
 namespace BeforeOurTime.Business
 {
@@ -129,7 +130,7 @@ namespace BeforeOurTime.Business
                 // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IAttributeGameManager, AttributeGameManager>()
-                .AddScoped<IAttributeLocationManager, AttributeLocationManager>()
+                .AddScoped<ILocationAttributeManager, LocationAttributeManager>()
                 .AddScoped<IPlayerAttributeManager, PlayerAttributeManager>()
                 .AddScoped<ICharacterAttributeManager, CharacterAttributeManager>()
                 .AddScoped<IAttributePhysicalManager, AttributePhysicalManager>()

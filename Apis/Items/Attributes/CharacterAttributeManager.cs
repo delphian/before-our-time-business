@@ -19,7 +19,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
     public class CharacterAttributeManager : AttributeManager<CharacterAttribute>, ICharacterAttributeManager
     {
-        private IItemRepo ItemRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
@@ -31,9 +30,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             ICharacterAttributeRepo characterAttributeRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(characterAttributeRepo)
+            IItemManager itemManager) : base(itemRepo, characterAttributeRepo)
         {
-            ItemRepo = itemRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;

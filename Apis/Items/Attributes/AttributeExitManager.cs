@@ -17,7 +17,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
     public class AttributeExitManager : AttributeManager<AttributeExit>, IAttributeExitManager
     {
-        private IItemRepo ItemRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
@@ -29,9 +28,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             IAttributeExitRepo attributeExitRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(attributeExitRepo)
+            IItemManager itemManager) : base(itemRepo, attributeExitRepo)
         {
-            ItemRepo = itemRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;

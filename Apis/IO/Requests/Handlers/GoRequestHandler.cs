@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
-using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
+using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
+using BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Messages.Requests;
@@ -44,11 +45,11 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var goRequest = request.GetMessageAsType<GoRequest>();
                 var exit = api.GetItemManager().Read(goRequest.ItemId);
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
-                var locationAttribute = api.GetAttributeManager<IAttributeLocationManager>()
+                var locationAttribute = api.GetAttributeManager<ILocationAttributeManager>()
                     .Read(exit.GetAttribute<AttributeExit>().DestinationLocationId);
                 var location = api.GetItemManager().Read(locationAttribute.ItemId);
                 api.GetItemManager().Move(player, location, exit);
-                var lookRequestHandler = new LookRequestHandler();
+                var lookRequestHandler = new ExamineLocationEndpoint();
                 response = lookRequestHandler.HandleRequest(api, terminal, new ListLocationRequest()
                 {
 

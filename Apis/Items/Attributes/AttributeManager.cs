@@ -17,84 +17,154 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
     /// </summary>
     public class AttributeManager<T> : IAttributeManager<T> where T : ItemAttribute
     {
+        protected IItemRepo ItemRepo { set; get; }
         protected IAttributeRepository<T> AttributeRepo { set; get; }
-        public AttributeManager(IAttributeRepository<T> attributeRepo)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="itemRepo"></param>
+        /// <param name="attributeRepo"></param>
+        public AttributeManager(
+            IItemRepo itemRepo,
+            IAttributeRepository<T> attributeRepo)
         {
+            ItemRepo = itemRepo;
             AttributeRepo = attributeRepo;
         }
-
         /// <summary>
-        /// Create models
+        /// Create multiple attributes
         /// </summary>
-        /// <param name="models"></param>
+        /// <param name="attributes">List of attributes to create</param>
         /// <param name="options">Options to customize how data is transacted from datastore</param>
-        /// <returns></returns>
-        public List<T> Create(List<T> models, TransactionOptions options = null)
+        /// <returns>List of attributes created</returns>
+        public List<T> Create(List<T> attributes, TransactionOptions options = null)
         {
-            return AttributeRepo.Create(models, options);
+            return AttributeRepo.Create(attributes, options);
         }
         /// <summary>
-        /// Create model
+        /// Create multiple attributes with base items
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="attributes">List of attributes to create</param>
+        /// <param name="parentId">Create the base items as children of this parent item</param>
         /// <param name="options">Options to customize how data is transacted from datastore</param>
-        /// <returns></returns>
-        public T Create(T model, TransactionOptions options = null)
+        /// <returns>List of items created</returns>
+        public List<Item> Create(List<T> attributes, Guid parentId, TransactionOptions options = null)
         {
-            return Create(new List<T>() { model }, options).FirstOrDefault();
+            attributes.ForEach((attribute) =>
+            {
+                attribute.ItemId = ItemRepo.Create(new Item()
+                {
+                    ParentId = parentId
+                }).Id;
+            });
+            Create(attributes, options);
+            return ItemRepo.Read(attributes.Select(x => x.ItemId).ToList());
         }
         /// <summary>
-        /// Create models
+        /// Create single attribute
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="attribute">Attribute to create</param>
         /// <param name="options">Options to customize how data is transacted from datastore</param>
-        /// <returns></returns>
+        /// <returns>Attribute created</returns>
+        public T Create(T attribute, TransactionOptions options = null)
+        {
+            return Create(new List<T>() { attribute }, options).FirstOrDefault();
+        }
+        /// <summary>
+        /// Create single attribute with base item
+        /// </summary>
+        /// <param name="attribute">Attribute to create</param>
+        /// <param name="parentId">Create the base item as a child of this parent item</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns>Item created</returns>
+        public Item Create(T attribute, Guid parentId, TransactionOptions options = null)
+        {
+            return Create(new List<T> { attribute }, parentId, options).FirstOrDefault();
+        }
+        /// <summary>
+        /// Read multiple attributes
+        /// </summary>
+        /// <param name="ids">List of unique attribute identifiers</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns>List of attributes</returns>
         public List<T> Read(List<Guid> ids, TransactionOptions options = null)
         {
             return AttributeRepo.Read(ids, options);
         }
         /// <summary>
-        /// Read model
+        /// Read single attribute
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">Unique attribute identifier</param>
         /// <param name="options">Options to customize how data is transacted from datastore</param>
-        /// <returns></returns>
+        /// <returns>Attribute</returns>
         public T Read(Guid id, TransactionOptions options = null)
         {
-            return Read(new List<Guid>() { id }).FirstOrDefault();
+            return Read(new List<Guid>() { id }, options).FirstOrDefault();
         }
 
         public List<T> Read(int? offset = null, int? limit = null, TransactionOptions options = null)
         {
             return AttributeRepo.Read(offset, limit, options);
         }
-
-        public T Read(Item item)
+        /// <summary>
+        /// Read attribute associated with item
+        /// </summary>
+        /// <param name="item">Item to read attribute of</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns>Attribute associated with item</returns>
+        public T Read(Item item, TransactionOptions options = null)
         {
-            return AttributeRepo.Read(item);
+            return AttributeRepo.Read(item, options);
         }
-
-        public List<T> Update(List<T> models)
+        /// <summary>
+        /// Update multiple attributes
+        /// </summary>
+        /// <remarks>
+        /// All other forms of update should call this one.
+        /// </remarks>
+        /// <param name="attributes">List of attributes to update</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns>List of updated attributes</returns>
+        public List<T> Update(List<T> attributes, TransactionOptions options = null)
         {
-            return AttributeRepo.Update(models);
+            return AttributeRepo.Update(attributes, options);
         }
-
-        public T Update(T model)
+        /// <summary>
+        /// Update single attribute
+        /// </summary>
+        /// <param name="model">Attributes to update</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns>Updated attribute</returns>
+        public T Update(T attribute, TransactionOptions options = null)
         {
-            return Update(new List<T>() { model }).FirstOrDefault();
+            return Update(new List<T>() { attribute }, options).FirstOrDefault();
         }
-
-        public void Delete(List<T> models)
+        /// <summary>
+        /// Delete multiple attributes
+        /// </summary>
+        /// <remarks>
+        /// All other forms of delete should call this one
+        /// </remarks>
+        /// <param name="attributes">Attributes to delete</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        public void Delete(List<T> attributes, TransactionOptions options = null)
         {
-            AttributeRepo.Delete(models);
+            AttributeRepo.Delete(attributes, options);
         }
-
-        public void Delete(T model)
+        /// <summary>
+        /// Delete single attribute
+        /// </summary>
+        /// <param name="attribute">Attribute to delete</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        public void Delete(T model, TransactionOptions options = null)
         {
-            Delete(new List<T>() { model });
+            Delete(new List<T>() { model }, options);
         }
-
-        public void Delete()
+        /// <summary>
+        /// Delete all attributes
+        /// </summary>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        public void Delete(TransactionOptions options = null)
         {
             AttributeRepo.Delete();
         }

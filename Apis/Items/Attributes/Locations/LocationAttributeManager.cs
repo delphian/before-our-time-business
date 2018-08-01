@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
@@ -14,30 +15,34 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
 {
-    public class AttributeLocationManager : AttributeManager<AttributeLocation>, IAttributeLocationManager
+    public class LocationAttributeManager : AttributeManager<AttributeLocation>, ILocationAttributeManager
     {
-        private IItemRepo ItemRepo { set; get; }
         private IAttributeLocationRepo DetailLocationRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
+        private IAttributeGameManager GameAttributeManager { set; get; }
+        private IAttributeExitManager ExitAttributeManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public AttributeLocationManager(
+        public LocationAttributeManager(
             IItemRepo itemRepo,
             IAttributeLocationRepo detailLocationRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(detailLocationRepo)
+            IItemManager itemManager,
+            IAttributeGameManager gameAttributeMangaer,
+            IAttributeExitManager exitAttributeManager) : base(itemRepo, detailLocationRepo)
         {
-            ItemRepo = itemRepo;
             DetailLocationRepo = detailLocationRepo;
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
+            GameAttributeManager = gameAttributeMangaer;
+            ExitAttributeManager = exitAttributeManager;
         }
         /// <summary>
         /// Deliver a message to an item
@@ -65,6 +70,37 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                 item.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
                 ItemManager.Update(item);
             }
+        }
+        /// <summary>
+        /// Create an empty new location and connecting exits from a provided location
+        /// </summary>
+        /// <param name="currentLocationItemId">Existing location item to link to new location with exits</param>
+        /// <returns></returns>
+        public Item CreateFromHere(Guid currentLocationItemId)
+        {
+            var currentLocation = ItemRepo.Read(currentLocationItemId);
+            var locationAttribute = new AttributeLocation()
+            {
+                Name = "A New Location",
+                Description = "The relatively new construction of this place is apparant everywhere you look. In several places the c# substrate seems to be leaking from above, while behind you a small puddle of sql statements have coalesced into a small puddle. Ew..."
+            };
+            var defaultGameItemId = GameAttributeManager.GetDefaultGame().Id;
+            var locationItem = Create(locationAttribute, defaultGameItemId);
+            var toExitAttribute = new AttributeExit()
+            {
+                Name = "A New Exit",
+                Description = "The paint is still wet on this sign!",
+                DestinationLocationId = locationAttribute.Id
+            };
+            ExitAttributeManager.Create(toExitAttribute, currentLocationItemId);
+            var froExitAttribute = new AttributeExit()
+            {
+                Name = "A Return Path",
+                Description = "Escape back to the real world",
+                DestinationLocationId = currentLocation.GetAttribute<AttributeLocation>().Id
+            };
+            ExitAttributeManager.Create(froExitAttribute, locationItem.Id);
+            return locationItem;
         }
         /// <summary>
         /// Read item's detailed location

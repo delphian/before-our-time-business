@@ -19,6 +19,7 @@ using BeforeOurTime.Models.Messages.Events.Ticks;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -52,7 +53,7 @@ namespace BeforeOurTime.Business.Apis
             IAttributeGameManager attributeGameManager,
             IPlayerAttributeManager attributePlayerManager,
             ICharacterAttributeManager characterAttributeManager,
-            IAttributeLocationManager attributeLocationManager,
+            ILocationAttributeManager attributeLocationManager,
             IAttributePhysicalManager attributePhysicalManager,
             IAttributeExitManager attributeExitManager)
         {
@@ -66,7 +67,7 @@ namespace BeforeOurTime.Business.Apis
             AttributeManagerList.Add(typeof(IAttributeGameManager), attributeGameManager);
             AttributeManagerList.Add(typeof(IPlayerAttributeManager), attributePlayerManager);
             AttributeManagerList.Add(typeof(ICharacterAttributeManager), characterAttributeManager);
-            AttributeManagerList.Add(typeof(IAttributeLocationManager), attributeLocationManager);
+            AttributeManagerList.Add(typeof(ILocationAttributeManager), attributeLocationManager);
             AttributeManagerList.Add(typeof(IAttributePhysicalManager), attributePhysicalManager);
             AttributeManagerList.Add(typeof(IAttributeExitManager), attributeExitManager);
         }
@@ -105,7 +106,7 @@ namespace BeforeOurTime.Business.Apis
         /// <returns></returns>
         public T GetAttributeManager<T>() where T : IAttributeManager
         {
-            return (T)AttributeManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).First();
+            return (T)AttributeManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).FirstOrDefault();
         }
         /// <summary>
         /// Get all attribute managers for an item
