@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,8 +18,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         /// traversed until one is found
         /// </remarks>
         /// <param name="item">Item that has attached detail location data</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>The Item's detailed location data. Null if none found</returns>
-        new AttributeLocation Read(Item item);
+        new AttributeLocation Read(Item item, TransactionOptions options = null);
         /// <summary>
         /// Create an empty new location and connecting exits from a provided location
         /// </summary>

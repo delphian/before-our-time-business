@@ -6,6 +6,7 @@ using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Items;
 using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
@@ -110,18 +111,19 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         /// traversed until one is found
         /// </remarks>
         /// <param name="item">Item that has attached detail location data</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>The Item's detailed location data. Null if none found</returns>
-        new public AttributeLocation Read(Item item)
+        new public AttributeLocation Read(Item item, TransactionOptions options = null)
         {
             AttributeLocation location = null;
             Item traverseItem = item;
             while (traverseItem.ParentId != null && !IsManaging(traverseItem))
             {
-                traverseItem = ItemRepo.Read(traverseItem.ParentId.Value);
+                traverseItem = ItemRepo.Read(traverseItem.ParentId.Value, options);
             }
             if (IsManaging(traverseItem))
             {
-                location = DetailLocationRepo.Read(traverseItem);
+                location = DetailLocationRepo.Read(traverseItem, options);
             }
             return location;
         }

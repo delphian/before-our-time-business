@@ -28,7 +28,7 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
-        private object lockObject;
+        private object lockObject = null;
         private Dictionary<Type, IAttributeManager> AttributeManagerList = new Dictionary<Type, IAttributeManager>();
         private ILogger Logger { set; get; }
         private IMessageManager MessageManager { set; get; }
