@@ -51,6 +51,29 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
             var defaultGame = DetailGameRepo.Read().FirstOrDefault();
             if (defaultGame == null)
             {
+                var locationItem = ItemManager.Create(new Item()
+                {
+                    Name = "Default Location",
+                    Description = "Default location item created by GetDefaultGame()",
+                    UuidType = Guid.NewGuid(),
+                    Data = "{}",
+                    Script = "",
+                    Attributes = new List<ItemAttribute>()
+                    {
+                        new AttributeLocation()
+                        {
+                            Name = "A Dark Void",
+                            Description = "Cool mists and dark shadows shroud "
+                                + "everything in this place. Straining your eyes does little to resolve the "
+                                + "amorphous blobs that are circulating about. The oppresive silence is occationaly "
+                                + "puncuated by a distressed weeping or soft sob. A chill runs through your blood "
+                                + "when you realise these forms may have once been human. The smell of rain "
+                                + "and rotting wood pains your nose while the occational drip of water tickles "
+                                + "the top of skulls both real and imagined. Any attempt to navigate in this damp "
+                                + "cavern causes disorientation.",
+                        }
+                    }
+                });
                 defaultGame = Create(new AttributeGame()
                 {
                     Name = "Brave New World",
@@ -62,26 +85,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                         Data = "{}",
                         Script = ""
                     },
-                    DefaultLocation = new AttributeLocation()
-                    {
-                        Name = "A Dark Void",
-                        Description = "Cool mists and dark shadows shroud "
-                                + "everything in this place. Straining your eyes does little to resolve the "
-                                + "amorphous blobs that are circulating about. The oppresive silence is occationaly "
-                                + "puncuated by a distressed weeping or soft sob. A chill runs through your blood "
-                                + "when you realise these forms may have once been human. The smell of rain "
-                                + "and rotting wood pains your nose while the occational drip of water tickles "
-                                + "the top of skulls both real and imagined. Any attempt to navigate in this damp "
-                                + "cavern causes disorientation.",
-                        Item = ItemManager.Create(new Item()
-                        {
-                            Name = "Default Location",
-                            Description = "Default location item created by GetDefaultGame()",
-                            UuidType = Guid.NewGuid(),
-                            Data = "{}",
-                            Script = ""
-                        })
-                    }
+                    DefaultLocationId = locationItem.GetAttribute<AttributeLocation>().Id
                 });
             }
             var defaultGameItem = ItemRepo.Read(defaultGame.ItemId);
@@ -97,8 +101,13 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <returns></returns>
         public AttributeLocation GetDefaultLocation()
         {
+            AttributeLocation locationAttribute = null;
             var game = GetDefaultGame();
-            return DetailLocationRepo.Read(game.GetAttribute<AttributeGame>().DefaultLocationId);
+            if (game.GetAttribute<AttributeGame>().DefaultLocationId != null)
+            {
+                locationAttribute = DetailLocationRepo.Read(game.GetAttribute<AttributeGame>().DefaultLocationId.Value);
+            }
+            return locationAttribute;
         }
         /// <summary>
         /// Deliver a message to an item
