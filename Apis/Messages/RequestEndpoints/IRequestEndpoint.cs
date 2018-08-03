@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
+namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
 {
     /// <summary>
     /// Handle one or more terminal requests
     /// </summary>
-    public interface IRequestHandler
+    public interface IRequestEndpoint
     {
         /// <summary>
         /// Register to handle a specific set of IO requests

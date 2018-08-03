@@ -1,5 +1,8 @@
-﻿using BeforeOurTime.Models.Items;
+﻿using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using System;
 using System.Collections.Generic;
@@ -45,5 +48,13 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// </summary>
         /// <returns></returns>
         List<SavedMessage> CullAllMessages();
+        /// <summary>
+        /// Forward message requests to the appropriate endpoints
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
+        /// <param name="request">A request from a terminal</param>
+        /// <param name="response">A response to the terminal</param>
+        IResponse HandleRequest(IApi api, Terminal terminal, IRequest request);
     }
 }

@@ -1,6 +1,6 @@
-﻿using BeforeOurTime.Business.Apis.IO.Requests.Handlers;
-using BeforeOurTime.Business.Apis.Items.Attributes;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
+using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
@@ -21,7 +21,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
-    public class CreateItemEndpoint : IRequestHandler
+    public class CreateItemEndpoint : IRequestEndpoint
     {
         public CreateItemEndpoint()
         {

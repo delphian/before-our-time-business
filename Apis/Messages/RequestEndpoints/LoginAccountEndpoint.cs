@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages.Requests;
@@ -13,11 +14,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
+namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
 {
-    public class LoginRequestHandler : IRequestHandler
+    public class LoginAccountEndpoint : IRequestEndpoint
     {
-        public LoginRequestHandler()
+        public LoginAccountEndpoint()
         {
         }
         /// <summary>

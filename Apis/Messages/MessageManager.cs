@@ -1,10 +1,13 @@
-﻿using BeforeOurTime.Business.Apis.Scripts;
+﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
+using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes.Players;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Events.Arrivals;
 using BeforeOurTime.Models.Messages.Events.Departures;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
@@ -22,6 +25,14 @@ namespace BeforeOurTime.Business.Apis.Messages
         private IScriptManager ScriptManager { set; get; }
         private ITerminalManager TerminalManager { set; get; }
         /// <summary>
+        /// List of endpoints to process message requests
+        /// </summary>
+        private List<IRequestEndpoint> RequestEndpoints = new List<IRequestEndpoint>();
+        /// <summary>
+        /// List of endpoints to process message requests keyed by request type
+        /// </summary>
+        private Dictionary<Guid, List<IRequestEndpoint>> RequestEndpointsForTypes = new Dictionary<Guid, List<IRequestEndpoint>>();
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="messageRepo"></param>
@@ -33,6 +44,8 @@ namespace BeforeOurTime.Business.Apis.Messages
             MessageRepo = messageRepo;
             ScriptManager = scriptManager;
             TerminalManager = terminalManager;
+            RequestEndpoints = BuildRequestEndpoints();
+            RequestEndpointsForTypes = BuildRequestEndpointsForTypes(RequestEndpoints);
         }
         /// <summary>
         /// Send a message to multiple recipient items
@@ -130,6 +143,72 @@ namespace BeforeOurTime.Business.Apis.Messages
             List<SavedMessage> messages = MessageRepo.Read();
             MessageRepo.Delete();
             return messages;
+        }
+        /// <summary>
+        /// Use reflection to register all classes which desire to handle message requests
+        /// </summary>
+        /// <returns></returns>
+        private List<IRequestEndpoint> BuildRequestEndpoints()
+        {
+            var requestEndpoints = new List<IRequestEndpoint>();
+            var interfaceType = typeof(IRequestEndpoint);
+            requestEndpoints = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => (IRequestEndpoint)Activator.CreateInstance(x))
+                .ToList();
+            return requestEndpoints;
+        }
+        /// <summary>
+        /// Sort registered endpoints by message request type
+        /// </summary>
+        /// <param name="requestEndpoints">List of registered endpoints</param>
+        /// <returns></returns>
+        private Dictionary<Guid, List<IRequestEndpoint>> BuildRequestEndpointsForTypes(
+            List<IRequestEndpoint> requestEndpoints)
+        {
+            var requestEndpointsForTypes = new Dictionary<Guid, List<IRequestEndpoint>>();
+            requestEndpoints.ForEach(delegate (IRequestEndpoint requestHandler)
+            {
+                var requestGuids = requestHandler.RegisterForRequests();
+                requestGuids.ForEach(delegate (Guid requestGuid)
+                {
+                    var requestEndpointsForType = requestEndpointsForTypes?.GetValueOrDefault(requestGuid);
+                    if (requestEndpointsForType == null)
+                    {
+                        requestEndpointsForType = new List<IRequestEndpoint>()
+                        {
+                            requestHandler
+                        };
+                    }
+                    else
+                    {
+                        requestEndpointsForType.Add(requestHandler);
+                    }
+                    requestEndpointsForTypes[requestGuid] = requestEndpointsForType;
+                });
+            });
+            return requestEndpointsForTypes;
+        }
+        /// <summary>
+        /// Forward message requests to the appropriate endpoints
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
+        /// <param name="terminalRequest">A request from a terminal</param>
+        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request)
+        {
+            IResponse response = new Response() { ResponseSuccess = false };
+            var requestGuid = request.GetMessageId();
+            var requestEndpointsForType = RequestEndpointsForTypes
+                .Where(x => x.Key == requestGuid)
+                .Select(x => x.Value)
+                .FirstOrDefault();
+            requestEndpointsForType?.ForEach(delegate (IRequestEndpoint requestEndpoint)
+            {
+                response = requestEndpoint.HandleRequest(api, terminal, request, response);
+            });
+            return response;
         }
     }
 }

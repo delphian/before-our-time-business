@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.IO.Requests.Handlers;
 using BeforeOurTime.Business.Apis.Items.Attributes.Games;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Players;
@@ -18,10 +17,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Items.Attributes.Physicals;
+using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 
 namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
 {
-    public class CreatePlayerEndpoint : IRequestHandler
+    public class CreatePlayerEndpoint : IRequestEndpoint
     {
         public CreatePlayerEndpoint()
         {

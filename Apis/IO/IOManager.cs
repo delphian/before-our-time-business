@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Business.Apis.IO.Requests.Handlers;
+﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
@@ -18,11 +18,11 @@ namespace BeforeOurTime.Business.Apis.IO
         /// <summary>
         /// List of handlers to process terminal input requests
         /// </summary>
-        private List<IRequestHandler> RequestHandlers = new List<IRequestHandler>();
+        private List<IRequestEndpoint> RequestHandlers = new List<IRequestEndpoint>();
         /// <summary>
         /// List of handlers to process terminal input requests keyed by request type
         /// </summary>
-        private Dictionary<Guid, List<IRequestHandler>> RequestHandlersForTypes = new Dictionary<Guid, List<IRequestHandler>>();
+        private Dictionary<Guid, List<IRequestEndpoint>> RequestHandlersForTypes = new Dictionary<Guid, List<IRequestEndpoint>>();
         /// <summary>
         /// Constructor
         /// </summary>
@@ -35,14 +35,14 @@ namespace BeforeOurTime.Business.Apis.IO
         /// Use reflection to register all classes which will handle a terminal request
         /// </summary>
         /// <returns></returns>
-        private List<IRequestHandler> BuildRequestHandlers()
+        private List<IRequestEndpoint> BuildRequestHandlers()
         {
-            var requestHandlers = new List<IRequestHandler>();
-            var interfaceType = typeof(IRequestHandler);
+            var requestHandlers = new List<IRequestEndpoint>();
+            var interfaceType = typeof(IRequestEndpoint);
             requestHandlers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (IRequestHandler) Activator.CreateInstance(x))
+                .Select(x => (IRequestEndpoint) Activator.CreateInstance(x))
                 .ToList();
             return requestHandlers;
         }
@@ -51,11 +51,11 @@ namespace BeforeOurTime.Business.Apis.IO
         /// </summary>
         /// <param name="requestHandlers">List of handlers to process terminal input requests</param>
         /// <returns></returns>
-        private Dictionary<Guid, List<IRequestHandler>> BuildRequestHandlersForTypes(
-            List<IRequestHandler> requestHandlers)
+        private Dictionary<Guid, List<IRequestEndpoint>> BuildRequestHandlersForTypes(
+            List<IRequestEndpoint> requestHandlers)
         {
-            var requestHandlersForTypes = new Dictionary<Guid, List<IRequestHandler>>();
-            requestHandlers.ForEach(delegate (IRequestHandler requestHandler)
+            var requestHandlersForTypes = new Dictionary<Guid, List<IRequestEndpoint>>();
+            requestHandlers.ForEach(delegate (IRequestEndpoint requestHandler)
             {
                 var requestGuids = requestHandler.RegisterForRequests();
                 requestGuids.ForEach(delegate (Guid requestGuid)
@@ -63,7 +63,7 @@ namespace BeforeOurTime.Business.Apis.IO
                     var requestHandlersForType = requestHandlersForTypes?.GetValueOrDefault(requestGuid);
                     if (requestHandlersForType == null)
                     {
-                        requestHandlersForType = new List<IRequestHandler>()
+                        requestHandlersForType = new List<IRequestEndpoint>()
                         {
                             requestHandler
                         };
@@ -90,7 +90,7 @@ namespace BeforeOurTime.Business.Apis.IO
                 .Where(x => x.Key == requestGuid)
                 .Select(x => x.Value)
                 .FirstOrDefault();
-            requestHandlersForType?.ForEach(delegate (IRequestHandler requestHandler)
+            requestHandlersForType?.ForEach(delegate (IRequestEndpoint requestHandler)
             {
                 response = requestHandler.HandleRequest(api, terminal, request, response);
             });

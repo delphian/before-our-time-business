@@ -1,6 +1,6 @@
-﻿using BeforeOurTime.Business.Apis.IO.Requests.Handlers;
-using BeforeOurTime.Business.Apis.Items.Attributes;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Players;
+using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items.Attributes;
@@ -16,7 +16,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Players.RequestEndpoints
 {
-    public class ReadAccountPlayersEndpoint : IRequestHandler
+    public class ReadAccountPlayersEndpoint : IRequestEndpoint
     {
         public ReadAccountPlayersEndpoint()
         {
