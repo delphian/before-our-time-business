@@ -15,8 +15,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Messages.Requests.List;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using System.Linq;
 using BeforeOurTime.Models.Messages.Systems.Ping;
 

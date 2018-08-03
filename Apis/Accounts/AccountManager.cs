@@ -6,6 +6,7 @@ using System;
 using BeforeOurTime.Models.Accounts.Authentication.Providers;
 using BeforeOurTime.Models.Accounts;
 using BeforeOurTime.Models.Accounts.Authentication;
+using BeforeOurTime.Models;
 
 namespace BeforeOurTime.Business.Apis.Accounts
 {

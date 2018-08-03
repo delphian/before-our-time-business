@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages.Requests;
@@ -7,8 +7,6 @@ using BeforeOurTime.Models.Messages.Requests.Login;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

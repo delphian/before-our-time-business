@@ -1,10 +1,9 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Models;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +17,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
     public class AttributeManager<T> : IAttributeManager<T> where T : ItemAttribute
     {
         protected IItemRepo ItemRepo { set; get; }
-        protected IAttributeRepository<T> AttributeRepo { set; get; }
+        protected IAttributeRepo<T> AttributeRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -26,7 +25,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="attributeRepo"></param>
         public AttributeManager(
             IItemRepo itemRepo,
-            IAttributeRepository<T> attributeRepo)
+            IAttributeRepo<T> attributeRepo)
         {
             ItemRepo = itemRepo;
             AttributeRepo = attributeRepo;

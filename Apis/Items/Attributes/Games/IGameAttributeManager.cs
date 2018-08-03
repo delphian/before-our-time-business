@@ -1,12 +1,15 @@
-﻿using BeforeOurTime.Models.Items;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Games;
+using BeforeOurTime.Models.Items.Attributes.Locations;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
 {
-    public interface IAttributeGameManager : IAttributeManager<AttributeGame>, IAttributeManager
+    public interface IGameAttributeManager : IAttributeManager<GameAttribute>, IAttributeManager
     {
         /// <summary>
         /// Get the default game
@@ -24,20 +27,20 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// not specified
         /// </remarks>
         /// <returns></returns>
-        AttributeLocation GetDefaultLocation();
+        LocationAttribute GetDefaultLocation();
         /// <summary>
         /// Update games's name
         /// </summary>
         /// <param name="id">Unique game attribute identifier</param>
         /// <param name="name">Game's new name</param>
         /// <returns></returns>
-        AttributeGame UpdateName(Guid id, string name);
+        GameAttribute UpdateName(Guid id, string name);
         /// <summary>
         /// Update games's default location
         /// </summary>
         /// <param name="id">Unique game attribute identifier</param>
         /// <param name="locationId">Game's new default location</param>
         /// <returns></returns>
-        AttributeGame UpdateDefaultLocation(Guid id, Guid locationId);
+        GameAttribute UpdateDefaultLocation(Guid id, Guid locationId);
     }
 }

@@ -1,4 +1,4 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items.Attributes.Players;
@@ -6,8 +6,6 @@ using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Emote;
 using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
 using Newtonsoft.Json;
 using System;

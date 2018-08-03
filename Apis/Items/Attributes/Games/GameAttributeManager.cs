@@ -1,11 +1,10 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
-using BeforeOurTime.Business.Apis.Scripts;
+﻿using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Games;
+using BeforeOurTime.Models.Items.Attributes.Locations;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
@@ -13,9 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
 {
-    public class AttributeGameManager : AttributeManager<AttributeGame>, IAttributeGameManager
+    public class GameAttributeManager : AttributeManager<GameAttribute>, IGameAttributeManager
     {
         private IAttributeGameRepo DetailGameRepo { set; get; }
         private IAttributeLocationRepo DetailLocationRepo { set; get; }
@@ -25,7 +24,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <summary>
         /// Constructor
         /// </summary>
-        public AttributeGameManager(
+        public GameAttributeManager(
             IItemRepo itemRepo,
             IAttributeGameRepo detailGameRepo,
             IAttributeLocationRepo detailLocationRepo,
@@ -60,7 +59,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                     Script = "",
                     Attributes = new List<ItemAttribute>()
                     {
-                        new AttributeLocation()
+                        new LocationAttribute()
                         {
                             Name = "A Dark Void",
                             Description = "Cool mists and dark shadows shroud "
@@ -74,7 +73,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                         }
                     }
                 });
-                defaultGame = Create(new AttributeGame()
+                defaultGame = Create(new GameAttribute()
                 {
                     Name = "Brave New World",
                     Item = new Item()
@@ -85,7 +84,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
                         Data = "{}",
                         Script = ""
                     },
-                    DefaultLocationId = locationItem.GetAttribute<AttributeLocation>().Id
+                    DefaultLocationId = locationItem.GetAttribute<LocationAttribute>().Id
                 });
             }
             var defaultGameItem = ItemRepo.Read(defaultGame.ItemId);
@@ -99,13 +98,13 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// not specified
         /// </remarks>
         /// <returns></returns>
-        public AttributeLocation GetDefaultLocation()
+        public LocationAttribute GetDefaultLocation()
         {
-            AttributeLocation locationAttribute = null;
+            LocationAttribute locationAttribute = null;
             var game = GetDefaultGame();
-            if (game.GetAttribute<AttributeGame>().DefaultLocationId != null)
+            if (game.GetAttribute<GameAttribute>().DefaultLocationId != null)
             {
-                locationAttribute = DetailLocationRepo.Read(game.GetAttribute<AttributeGame>().DefaultLocationId.Value);
+                locationAttribute = DetailLocationRepo.Read(game.GetAttribute<GameAttribute>().DefaultLocationId.Value);
             }
             return locationAttribute;
         }
@@ -155,7 +154,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique game attribute identifier</param>
         /// <param name="name">Game's new name</param>
         /// <returns></returns>
-        public AttributeGame UpdateName(Guid id, string name)
+        public GameAttribute UpdateName(Guid id, string name)
         {
             var gameAttribute = Read(id);
             gameAttribute.Name = name;
@@ -167,7 +166,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique game attribute identifier</param>
         /// <param name="locationId">Game's new default location</param>
         /// <returns></returns>
-        public AttributeGame UpdateDefaultLocation(Guid id, Guid locationId)
+        public GameAttribute UpdateDefaultLocation(Guid id, Guid locationId)
         {
             var gameAttribute = Read(id);
             gameAttribute.DefaultLocationId = locationId;

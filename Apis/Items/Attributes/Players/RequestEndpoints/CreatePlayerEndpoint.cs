@@ -1,4 +1,8 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.IO.Requests.Handlers;
+using BeforeOurTime.Business.Apis.Items.Attributes.Games;
+using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Business.Apis.Items.Attributes.Players;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Terminals;
@@ -8,19 +12,18 @@ using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Create;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.Create;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BeforeOurTime.Models.Items.Attributes.Physicals;
 
-namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
+namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
 {
-    public class CreatePlayerRequestHandler : IRequestHandler
+    public class CreatePlayerEndpoint : IRequestHandler
     {
-        public CreatePlayerRequestHandler()
+        public CreatePlayerEndpoint()
         {
         }
         /// <summary>
@@ -48,13 +51,13 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var player = api.GetAttributeManager<IPlayerAttributeManager>().Create(
                     createPlayerRequest.Name,
                     terminal.AccountId.Value,
-                    new AttributePhysical()
+                    new PhysicalAttribute()
                     {
                         Name = createPlayerRequest.Name,
                         Description = "A player",
                         Weight = 100
                     },
-                    api.GetAttributeManager<IAttributeGameManager>().GetDefaultLocation());
+                    api.GetAttributeManager<IGameAttributeManager>().GetDefaultLocation());
                 var createPlayerResponse = new CreateAccountCharacterResponse()
                 {
                     ResponseSuccess = true,

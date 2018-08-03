@@ -1,12 +1,11 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Physicals;
 using BeforeOurTime.Models.Primitives.Images;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
@@ -15,9 +14,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Physicals
 {
-    public class AttributePhysicalManager : AttributeManager<AttributePhysical>, IAttributePhysicalManager
+    public class PhysicalAttributeManager : AttributeManager<PhysicalAttribute>, IPhysicalAttributeManager
     {
         private IAttributePhysicalRepo DetailPhysicalRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
@@ -26,7 +25,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <summary>
         /// Constructor
         /// </summary>
-        public AttributePhysicalManager(
+        public PhysicalAttributeManager(
             IItemRepo itemRepo,
             IAttributePhysicalRepo detailPhysicalRepo,
             IScriptEngine scriptEngine,
@@ -46,14 +45,14 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="description">A long description of the item. Include many sensory experiences</param>
         /// <param name="height">Height</param>
         /// <param name="weight">Weight</param>
-        public AttributePhysical Attach(
+        public PhysicalAttribute Attach(
             Item item,
             string name,
             string description,
             int height,
             int weight)
         {
-            var physicalAttributes = new AttributePhysical()
+            var physicalAttributes = new PhysicalAttribute()
             {
                 Name = name,
                 Description = description,
@@ -72,7 +71,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="description">A long description of the item. Include many sensory experiences</param>
         /// <param name="volume">Volume</param>
         /// <param name="weight">Weight</param>
-        public AttributePhysical Create(
+        public PhysicalAttribute Create(
             Item parent,
             string name,
             string description,
@@ -134,7 +133,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="description">New name of the physical</param>
         /// <returns></returns>
-        public AttributePhysical UpdateName(Guid id, string name)
+        public PhysicalAttribute UpdateName(Guid id, string name)
         {
             var physicalAttribute = Read(id);
             physicalAttribute.Name = name;
@@ -146,7 +145,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="description">New description of the physical</param>
         /// <returns></returns>
-        public AttributePhysical UpdateDescription(Guid id, string description)
+        public PhysicalAttribute UpdateDescription(Guid id, string description)
         {
             var physicalAttribute = Read(id);
             physicalAttribute.Description = description;
@@ -158,7 +157,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="image">Wrapper for image that allows meta data</param>
         /// <returns></returns>
-        public AttributePhysical UpdateImageIcon(Guid id, Image image)
+        public PhysicalAttribute UpdateImageIcon(Guid id, Image image)
         {
             var physicalAttribute = Read(id);
             physicalAttribute.ImageIcon = image;
@@ -170,7 +169,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="volume">New height of the physical</param>
         /// <returns></returns>
-        public AttributePhysical UpdateHeight(Guid id, int height)
+        public PhysicalAttribute UpdateHeight(Guid id, int height)
         {
             var physicalAttribute = Read(id);
             physicalAttribute.Height = height;
@@ -182,7 +181,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="weight">New weight of the physical</param>
         /// <returns></returns>
-        public AttributePhysical UpdateWeight(Guid id, int weight)
+        public PhysicalAttribute UpdateWeight(Guid id, int weight)
         {
             var physicalAttribute = Read(id);
             physicalAttribute.Weight = weight;

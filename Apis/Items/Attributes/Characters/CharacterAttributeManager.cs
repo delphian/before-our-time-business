@@ -1,12 +1,10 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Items.Attributes.Characters;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
@@ -14,74 +12,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Models.Items.Attributes;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Characters
 {
-    public class PlayerAttributeManager : AttributeManager<PlayerAttribute>, IPlayerAttributeManager
+    public class CharacterAttributeManager : AttributeManager<CharacterAttribute>, ICharacterAttributeManager
     {
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
-        private IAttributePhysicalManager AttributePhysicalManager { set; get; }
-        private ICharacterAttributeManager CharacterAttributeManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public PlayerAttributeManager(
+        public CharacterAttributeManager(
             IItemRepo itemRepo,
-            IPlayerAttributeRepo playerAttributeRepo,
+            ICharacterAttributeRepo characterAttributeRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager,
-            IAttributePhysicalManager attributePhysicalManager,
-            ICharacterAttributeManager characterAttributeManager) : base(itemRepo, playerAttributeRepo)
+            IItemManager itemManager) : base(itemRepo, characterAttributeRepo)
         {
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
             ItemManager = itemManager;
-            AttributePhysicalManager = attributePhysicalManager;
-            CharacterAttributeManager = characterAttributeManager;
-        }
-        /// <summary>
-        /// Create a new player
-        /// </summary>
-        /// <param name="name">Public name of the player</param>
-        /// <param name="accountId">Account to which this player belongs</param>
-        /// <param name="physical">Physical attributes</param>
-        /// <param name="initialLocation">Location of new player</param>
-        public PlayerAttribute Create(
-            string name,
-            Guid accountId,
-            AttributePhysical physical,
-            AttributeLocation initialLocation)
-        {
-            // Create item
-            var item = ItemManager.Create(new Item()
-            {
-                UuidType = Guid.NewGuid(),
-                ParentId = initialLocation.ItemId,
-                Data = "{}",
-                Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
-            });
-            // Create player attributes
-            var player = new PlayerAttribute()
-            {
-                Name = name,
-                AccountId = accountId,
-            };
-            // Attach all attributes
-            Attach(player, item);
-            CharacterAttributeManager.Attach(new CharacterAttribute()
-            {
-                Health = new CharacterHealth()
-                {
-                    Max = 25,
-                    Value = 25
-                }
-            }, item);
-            AttributePhysicalManager.Attach(physical, item);
-            return player;
         }
         /// <summary>
         /// Deliver a message to an item

@@ -1,10 +1,13 @@
-﻿using BeforeOurTime.Models.Items.Attributes;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Locations;
+using BeforeOurTime.Models.Items.Attributes.Physicals;
 using BeforeOurTime.Models.Items.Attributes.Players;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Players
 {
     public interface IPlayerAttributeManager : IAttributeManager<PlayerAttribute>, IAttributeManager
     {
@@ -21,7 +24,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         PlayerAttribute Create(
             string name, 
             Guid accountId, 
-            AttributePhysical physical,
-            AttributeLocation initialLocation);
+            PhysicalAttribute physical,
+            LocationAttribute initialLocation);
     }
 }

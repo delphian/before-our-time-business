@@ -1,7 +1,5 @@
 ﻿using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Repository.Models.Accounts;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Net;

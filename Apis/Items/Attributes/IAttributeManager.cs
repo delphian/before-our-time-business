@@ -1,16 +1,15 @@
 ﻿using BeforeOurTime.Business.Apis.Scripts.Libraries;
+using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
+namespace BeforeOurTime.Business.Apis.Items.Attributes
 {
     public interface IAttributeManager
     {
@@ -31,7 +30,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
     /// <summary>
     /// Manage details of an item's extended data
     /// </summary>
-    public interface IAttributeManager<T> : IAttributeRepository<T> where T: ItemAttribute
+    public interface IAttributeManager<T> : IAttributeRepo<T> where T: ItemAttribute
     {
         /// <summary>
         /// Create many models with base item

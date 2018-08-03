@@ -4,16 +4,12 @@ using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Items;
-using BeforeOurTime.Business.Apis.Items.Attributes;
-using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
 using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
-using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Servers;
-using BeforeOurTime.Models.Messages.Events.Ticks;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Dbs.EF.Items;
@@ -22,8 +18,6 @@ using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Models.Accounts.Authentication.Providers;
 using BeforeOurTime.Models.Accounts.Authorization;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using BeforeOurTime.Repository.Models.Scripts.Interfaces;
@@ -40,9 +34,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
+using BeforeOurTime.Business.Apis.Items.Attributes.Players;
+using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
+using BeforeOurTime.Business.Apis.Items.Attributes.Games;
+using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
+using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
+using BeforeOurTime.Models.Items.Attributes.Exits;
+using BeforeOurTime.Models.Items.Attributes.Physicals;
+using BeforeOurTime.Models.Items.Attributes.Locations;
+using BeforeOurTime.Models.Items.Attributes.Games;
+using BeforeOurTime.Models.Items.Attributes.Characters;
+using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models;
 
 namespace BeforeOurTime.Business
 {
@@ -129,12 +134,12 @@ namespace BeforeOurTime.Business
                 .AddScoped<ITerminalManager, TerminalManager>()
                 // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
-                .AddScoped<IAttributeGameManager, AttributeGameManager>()
+                .AddScoped<IGameAttributeManager, GameAttributeManager>()
                 .AddScoped<ILocationAttributeManager, LocationAttributeManager>()
                 .AddScoped<IPlayerAttributeManager, PlayerAttributeManager>()
                 .AddScoped<ICharacterAttributeManager, CharacterAttributeManager>()
-                .AddScoped<IAttributePhysicalManager, AttributePhysicalManager>()
-                .AddScoped<IAttributeExitManager, AttributeExitManager>()
+                .AddScoped<IPhysicalAttributeManager, PhysicalAttributeManager>()
+                .AddScoped<IExitAttributeManager, ExitAttributeManager>()
                 .AddScoped<IApi, Api>();
         }
         /// <summary>

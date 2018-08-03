@@ -1,13 +1,15 @@
-﻿using BeforeOurTime.Models.Items;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Physicals;
 using BeforeOurTime.Models.Primitives.Images;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Physicals
 {
-    public interface IAttributePhysicalManager : IAttributeManager<AttributePhysical>, IAttributeManager
+    public interface IPhysicalAttributeManager : IAttributeManager<PhysicalAttribute>, IAttributeManager
     {
         /// <summary>
         /// Attach new physical attributes to an existing item
@@ -17,7 +19,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="description">A long description of the item. Include many sensory experiences</param>
         /// <param name="height">Volume</param>
         /// <param name="weight">Weight</param>
-        AttributePhysical Attach(
+        PhysicalAttribute Attach(
             Item item,
             string name,
             string description,
@@ -31,7 +33,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="description">A long description of the item. Include many sensory experiences</param>
         /// <param name="volume">Volume</param>
         /// <param name="weight">Weight</param>
-        AttributePhysical Create(
+        PhysicalAttribute Create(
             Item parent,
             string name,
             string description,
@@ -43,7 +45,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="description">New name of the physical</param>
         /// <returns></returns>
-        AttributePhysical UpdateName(
+        PhysicalAttribute UpdateName(
             Guid id, 
             string name);
         /// <summary>
@@ -52,7 +54,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="description">New description of the physical</param>
         /// <returns></returns>
-        AttributePhysical UpdateDescription(
+        PhysicalAttribute UpdateDescription(
             Guid id, 
             string description);
         /// <summary>
@@ -61,7 +63,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="image">Wrapper for image that allows meta data</param>
         /// <returns></returns>
-        AttributePhysical UpdateImageIcon(
+        PhysicalAttribute UpdateImageIcon(
             Guid id,
             Image image);
         /// <summary>
@@ -70,7 +72,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="height">New height of the physical</param>
         /// <returns></returns>
-        AttributePhysical UpdateHeight(
+        PhysicalAttribute UpdateHeight(
             Guid id, 
             int height);
         /// <summary>
@@ -79,7 +81,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="id">Unique phsyical attribute identifier</param>
         /// <param name="weight">New weight of the physical</param>
         /// <returns></returns>
-        AttributePhysical UpdateWeight(
+        PhysicalAttribute UpdateWeight(
             Guid id,
             int weight);
     }

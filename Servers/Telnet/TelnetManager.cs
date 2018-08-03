@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Text;
 using System.Linq;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
 using BeforeOurTime.Repository.Models.Messages;

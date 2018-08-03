@@ -1,6 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages.Responses.List;
-using BeforeOurTime.Repository.Models.Items;
 using System;
 using System.Collections.Generic;
 using System.Net;

@@ -1,5 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.IO.Requests.Handlers;
-using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;

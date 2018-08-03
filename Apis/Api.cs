@@ -8,7 +8,7 @@ using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Terminals;
 using Microsoft.Extensions.Logging;
@@ -20,6 +20,11 @@ using BeforeOurTime.Repository.Models.Messages.Data;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
+using BeforeOurTime.Business.Apis.Items.Attributes.Players;
+using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
+using BeforeOurTime.Business.Apis.Items.Attributes.Games;
+using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
+using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -50,12 +55,12 @@ namespace BeforeOurTime.Business.Apis
             IIOManager ioManager,
             IItemManager itemManager,
             ITerminalManager terminalManager,
-            IAttributeGameManager attributeGameManager,
+            IGameAttributeManager attributeGameManager,
             IPlayerAttributeManager attributePlayerManager,
             ICharacterAttributeManager characterAttributeManager,
             ILocationAttributeManager attributeLocationManager,
-            IAttributePhysicalManager attributePhysicalManager,
-            IAttributeExitManager attributeExitManager)
+            IPhysicalAttributeManager attributePhysicalManager,
+            IExitAttributeManager attributeExitManager)
         {
             Logger = logger;
             MessageManager = messageManager;
@@ -64,12 +69,12 @@ namespace BeforeOurTime.Business.Apis
             IOManager = ioManager;
             ItemManager = itemManager;
             TerminalManager = terminalManager;
-            AttributeManagerList.Add(typeof(IAttributeGameManager), attributeGameManager);
+            AttributeManagerList.Add(typeof(IGameAttributeManager), attributeGameManager);
             AttributeManagerList.Add(typeof(IPlayerAttributeManager), attributePlayerManager);
             AttributeManagerList.Add(typeof(ICharacterAttributeManager), characterAttributeManager);
             AttributeManagerList.Add(typeof(ILocationAttributeManager), attributeLocationManager);
-            AttributeManagerList.Add(typeof(IAttributePhysicalManager), attributePhysicalManager);
-            AttributeManagerList.Add(typeof(IAttributeExitManager), attributeExitManager);
+            AttributeManagerList.Add(typeof(IPhysicalAttributeManager), attributePhysicalManager);
+            AttributeManagerList.Add(typeof(IExitAttributeManager), attributeExitManager);
         }
         public IMessageManager GetMessageManager()
         {
@@ -127,7 +132,7 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="ct">Cancelation token for ticks</param>
         public async Task TickAsync(int delayMs, CancellationToken ct)
         {
-            var game = GetAttributeManager<IAttributeGameManager>().GetDefaultGame();
+            var game = GetAttributeManager<IGameAttributeManager>().GetDefaultGame();
             var onTickDelegate = ScriptManager.GetDelegateDefinition("onTick");
             while (!ct.IsCancellationRequested)
             {

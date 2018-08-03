@@ -1,24 +1,25 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.IO.Requests.Handlers;
+using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Exits;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Go;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Repository.Models.Items;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits.RequestEndpoints
 {
-    public class GoRequestHandler : IRequestHandler
+    public class UseExitEndpoint : IRequestHandler
     {
-        public GoRequestHandler()
+        public UseExitEndpoint()
         {
         }
         /// <summary>
@@ -46,7 +47,7 @@ namespace BeforeOurTime.Business.Apis.IO.Requests.Handlers
                 var exit = api.GetItemManager().Read(goRequest.ItemId);
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 var locationAttribute = api.GetAttributeManager<ILocationAttributeManager>()
-                    .Read(exit.GetAttribute<AttributeExit>().DestinationLocationId);
+                    .Read(exit.GetAttribute<ExitAttribute>().DestinationLocationId);
                 var location = api.GetItemManager().Read(locationAttribute.ItemId);
                 api.GetItemManager().Move(player, location, exit);
                 var lookRequestHandler = new ExamineLocationEndpoint();

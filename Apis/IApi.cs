@@ -1,7 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Items;
-using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Terminals;

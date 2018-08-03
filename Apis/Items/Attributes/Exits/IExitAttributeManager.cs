@@ -1,12 +1,14 @@
-﻿using BeforeOurTime.Models.Items;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Exits;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits
 {
-    public interface IAttributeExitManager : IAttributeManager<AttributeExit>, IAttributeManager
+    public interface IExitAttributeManager : IAttributeManager<ExitAttribute>, IAttributeManager
     {
         /// <summary>
         /// Update the attribute name
@@ -14,21 +16,21 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Interfaces
         /// <param name="id">Unique attribute identifier</param>
         /// <param name="name">New name of the attribute</param>
         /// <returns></returns>
-        AttributeExit UpdateName(Guid id, string name);
+        ExitAttribute UpdateName(Guid id, string name);
         /// <summary>
         /// Update the attribute description
         /// </summary>
         /// <param name="id">Unique attribute identifier</param>
         /// <param name="description">New description of the attribute</param>
         /// <returns></returns>
-        AttributeExit UpdateDescription(Guid id, string description);
+        ExitAttribute UpdateDescription(Guid id, string description);
         /// <summary>
         /// Update the destination location
         /// </summary>
         /// <param name="id">Unique exit attribute identifier</param>
         /// <param name="destinationLocationId">New location id of the exit destination</param>
         /// <returns></returns>
-        AttributeExit UpdateDestination(
+        ExitAttribute UpdateDestination(
             Guid id, 
             Guid destinationLocationId);
     }

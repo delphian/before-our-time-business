@@ -1,6 +1,8 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Locations;
 using BeforeOurTime.Repository.Models;
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
 {
-    public interface ILocationAttributeManager : IAttributeManager<AttributeLocation>, IAttributeManager
+    public interface ILocationAttributeManager : IAttributeManager<LocationAttribute>, IAttributeManager
     {
         /// <summary>
         /// Read item's detailed location
@@ -20,7 +22,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         /// <param name="item">Item that has attached detail location data</param>
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>The Item's detailed location data. Null if none found</returns>
-        new AttributeLocation Read(Item item, TransactionOptions options = null);
+        new LocationAttribute Read(Item item, TransactionOptions options = null);
         /// <summary>
         /// Create an empty new location and connecting exits from a provided location
         /// </summary>
@@ -33,13 +35,13 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         /// <param name="id">Unique attribute identifier</param>
         /// <param name="name">Attribute's new name</param>
         /// <returns></returns>
-        AttributeLocation UpdateName(Guid id, string name);
+        LocationAttribute UpdateName(Guid id, string name);
         /// <summary>
         /// Update attribute's description
         /// </summary>
         /// <param name="id">Unique attribute identifier</param>
         /// <param name="description">Attribute's new description</param>
         /// <returns></returns>
-        AttributeLocation UpdateDescription(Guid id, string description);
+        LocationAttribute UpdateDescription(Guid id, string description);
     }
 }

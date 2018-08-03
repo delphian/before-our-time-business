@@ -10,7 +10,6 @@ using BeforeOurTime.Models.Messages.Responses.Create;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
 using BeforeOurTime.Repository.Models.Accounts;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;

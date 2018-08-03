@@ -1,11 +1,10 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Exits;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
@@ -13,9 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes
+namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits
 {
-    public class AttributeExitManager : AttributeManager<AttributeExit>, IAttributeExitManager
+    public class ExitAttributeManager : AttributeManager<ExitAttribute>, IExitAttributeManager
     {
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
@@ -23,7 +22,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <summary>
         /// Constructor
         /// </summary>
-        public AttributeExitManager(
+        public ExitAttributeManager(
             IItemRepo itemRepo,
             IAttributeExitRepo attributeExitRepo,
             IScriptEngine scriptEngine,
@@ -79,7 +78,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique attribute identifier</param>
         /// <param name="name">New name of the attribute</param>
         /// <returns></returns>
-        public AttributeExit UpdateName(Guid id, string name)
+        public ExitAttribute UpdateName(Guid id, string name)
         {
             var attribute = Read(id);
             attribute.Name = name;
@@ -91,7 +90,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique attribute identifier</param>
         /// <param name="description">New description of the attribute</param>
         /// <returns></returns>
-        public AttributeExit UpdateDescription(Guid id, string description)
+        public ExitAttribute UpdateDescription(Guid id, string description)
         {
             var attribute = Read(id);
             attribute.Description = description;
@@ -103,7 +102,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="id">Unique exit attribute identifier</param>
         /// <param name="destinationLocationId">New location id of the exit destination</param>
         /// <returns></returns>
-        public AttributeExit UpdateDestination(Guid id, Guid destinationLocationId)
+        public ExitAttribute UpdateDestination(Guid id, Guid destinationLocationId)
         {
             var exitAttribute = Read(id);
             exitAttribute.DestinationLocationId = destinationLocationId;

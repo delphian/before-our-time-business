@@ -1,4 +1,6 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes.Interfaces;
+﻿using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
+using BeforeOurTime.Business.Apis.Items.Attributes.Games;
+using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Scripts;
@@ -7,25 +9,26 @@ using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models;
-using BeforeOurTime.Repository.Models.Items;
-using BeforeOurTime.Repository.Models.Items.Attributes;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using BeforeOurTime.Models.Items.Attributes.Exits;
+using BeforeOurTime.Models.Items.Attributes.Locations;
+using BeforeOurTime.Models;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
 {
-    public class LocationAttributeManager : AttributeManager<AttributeLocation>, ILocationAttributeManager
+    public class LocationAttributeManager : AttributeManager<LocationAttribute>, ILocationAttributeManager
     {
         private IAttributeLocationRepo DetailLocationRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
-        private IAttributeGameManager GameAttributeManager { set; get; }
-        private IAttributeExitManager ExitAttributeManager { set; get; }
+        private IGameAttributeManager GameAttributeManager { set; get; }
+        private IExitAttributeManager ExitAttributeManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -35,8 +38,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
             IItemManager itemManager,
-            IAttributeGameManager gameAttributeMangaer,
-            IAttributeExitManager exitAttributeManager) : base(itemRepo, detailLocationRepo)
+            IGameAttributeManager gameAttributeMangaer,
+            IExitAttributeManager exitAttributeManager) : base(itemRepo, detailLocationRepo)
         {
             DetailLocationRepo = detailLocationRepo;
             ScriptEngine = scriptEngine;
@@ -80,25 +83,25 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         public Item CreateFromHere(Guid currentLocationItemId)
         {
             var currentLocation = ItemRepo.Read(currentLocationItemId);
-            var locationAttribute = new AttributeLocation()
+            var locationAttribute = new LocationAttribute()
             {
                 Name = "A New Location",
                 Description = "The relatively new construction of this place is apparant everywhere you look. In several places the c# substrate seems to be leaking from above, while behind you a small puddle of sql statements have coalesced into a small puddle. Ew..."
             };
             var defaultGameItemId = GameAttributeManager.GetDefaultGame().Id;
             var locationItem = Create(locationAttribute, defaultGameItemId);
-            var toExitAttribute = new AttributeExit()
+            var toExitAttribute = new ExitAttribute()
             {
                 Name = "A New Exit",
                 Description = "The paint is still wet on this sign!",
                 DestinationLocationId = locationAttribute.Id
             };
             ExitAttributeManager.Create(toExitAttribute, currentLocationItemId);
-            var froExitAttribute = new AttributeExit()
+            var froExitAttribute = new ExitAttribute()
             {
                 Name = "A Return Path",
                 Description = "Escape back to the real world",
-                DestinationLocationId = currentLocation.GetAttribute<AttributeLocation>().Id
+                DestinationLocationId = currentLocation.GetAttribute<LocationAttribute>().Id
             };
             ExitAttributeManager.Create(froExitAttribute, locationItem.Id);
             return locationItem;
@@ -113,9 +116,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         /// <param name="item">Item that has attached detail location data</param>
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>The Item's detailed location data. Null if none found</returns>
-        new public AttributeLocation Read(Item item, TransactionOptions options = null)
+        new public LocationAttribute Read(Item item, TransactionOptions options = null)
         {
-            AttributeLocation location = null;
+            LocationAttribute location = null;
             Item traverseItem = item;
             while (traverseItem.ParentId != null && !IsManaging(traverseItem))
             {
@@ -146,7 +149,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         /// <param name="id">Unique attribute identifier</param>
         /// <param name="name">Attribute's new name</param>
         /// <returns></returns>
-        public AttributeLocation UpdateName(Guid id, string name)
+        public LocationAttribute UpdateName(Guid id, string name)
         {
             var locationAttribute = Read(id);
             locationAttribute.Name = name;
@@ -158,7 +161,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         /// <param name="id">Unique attribute identifier</param>
         /// <param name="description">Attribute's new description</param>
         /// <returns></returns>
-        public AttributeLocation UpdateDescription(Guid id, string description)
+        public LocationAttribute UpdateDescription(Guid id, string description)
         {
             var locationAttribute = Read(id);
             locationAttribute.Description = description;
