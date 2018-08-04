@@ -198,7 +198,10 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// <param name="terminalRequest">A request from a terminal</param>
         public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request)
         {
-            IResponse response = new Response() { ResponseSuccess = false };
+            IResponse response = new Response() {
+                _requestInstanceId = request.GetRequestInstanceId(),
+                ResponseSuccess = false
+            };
             var requestGuid = request.GetMessageId();
             var requestEndpointsForType = RequestEndpointsForTypes
                 .Where(x => x.Key == requestGuid)

@@ -60,6 +60,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                     api.GetAttributeManager<IGameAttributeManager>().GetDefaultLocation());
                 var createPlayerResponse = new CreateAccountCharacterResponse()
                 {
+                    _requestInstanceId = request.GetRequestInstanceId(),
                     ResponseSuccess = true,
                     CreatedAccountCharacterEvent = new CreatedAccountCharacterEvent()
                     {

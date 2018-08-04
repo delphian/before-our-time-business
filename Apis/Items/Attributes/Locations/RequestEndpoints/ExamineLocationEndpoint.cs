@@ -51,6 +51,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
                 var ioLocationUpdate = new ListLocationResponse()
                 {
+                    _requestInstanceId = request.GetRequestInstanceId(),
                     ResponseSuccess = true,
                     Item = location,
                     Exits = new List<ListExitResponse>()
@@ -63,6 +64,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                         var attribute = item.GetAttribute<ExitAttribute>();
                         ioLocationUpdate.Exits.Add(new ListExitResponse()
                         {
+                            _requestInstanceId = request.GetRequestInstanceId(),
                             ResponseSuccess = true,
                             Item = item,
                             Name = attribute.Name,

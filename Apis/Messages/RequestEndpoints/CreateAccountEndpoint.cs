@@ -50,6 +50,7 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
                     createAccountRequest.Password);
                 var createAccountResponse = new CreateAccountResponse()
                 {
+                    _requestInstanceId = request.GetRequestInstanceId(),
                     ResponseSuccess = true,
                     CreatedAccountEvent = new CreatedAccountEvent()
                     {

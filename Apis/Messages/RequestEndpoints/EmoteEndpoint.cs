@@ -52,7 +52,10 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
                         Name = player.GetAttribute<PlayerAttribute>().Name,
                         Type = emoteRequest.Type
                     }, location, player.Id);
-                response = new Response() { ResponseSuccess = true };
+                response = new Response() {
+                    _requestInstanceId = request.GetRequestInstanceId(),
+                    ResponseSuccess = true
+                };
             }
             return response;
         }

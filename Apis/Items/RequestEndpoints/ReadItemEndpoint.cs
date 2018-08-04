@@ -53,6 +53,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 response = new ReadItemResponse()
                 {
+                    _requestInstanceId = request.GetRequestInstanceId(),
                     ResponseSuccess = true,
                     ReadItemEvent = new ReadItemEvent()
                     {

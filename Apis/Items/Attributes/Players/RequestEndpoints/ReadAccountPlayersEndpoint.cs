@@ -51,6 +51,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Players.RequestEndpoints
                 var items = api.GetItemManager().Read(itemIds);
                 var listAccountCharactersResponse = new ListAccountCharactersResponse()
                 {
+                    _requestInstanceId = request.GetRequestInstanceId(),
                     ResponseSuccess = true,
                     AccountCharacters = items
                 };

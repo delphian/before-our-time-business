@@ -178,6 +178,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         {
             IResponse response = new Response()
             {
+                _requestInstanceId = request.GetRequestInstanceId(),
                 ResponseSuccess = false
             };
             if (Status == TerminalStatus.Guest)
@@ -201,7 +202,10 @@ namespace BeforeOurTime.Business.Apis.Terminals
                 {
                     var playCharacterRequest = request.GetMessageAsType<LoginAccountCharacterRequest>();
                     Attach(playCharacterRequest.ItemId);
-                    response = new LoginAccountCharacterResponse() { ResponseSuccess = true };
+                    response = new LoginAccountCharacterResponse() {
+                        _requestInstanceId = request.GetRequestInstanceId(),
+                        ResponseSuccess = true
+                    };
                 }
                 else if (request.IsMessageType<LogoutRequest>())
                 {

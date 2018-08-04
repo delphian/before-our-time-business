@@ -48,6 +48,7 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
                 var account = api.GetAccountManager().Authenticate(loginRequest.Email, loginRequest.Password);
                 response = new LoginResponse()
                 {
+                    _requestInstanceId = request.GetRequestInstanceId(),
                     ResponseSuccess = (account != null),
                     AccountId = account?.Id
                 };
@@ -56,6 +57,7 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
             {
                 response = new LogoutResponse()
                 {
+                    _requestInstanceId = request.GetRequestInstanceId(),
                     ResponseSuccess = true
                 };
             };
