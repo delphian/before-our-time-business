@@ -2,7 +2,6 @@
 
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Accounts;
-using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Apis.Messages;
@@ -130,7 +129,6 @@ namespace BeforeOurTime.Business
                 .AddScoped<IAccountManager, AccountManager>()
                 .AddScoped<IScriptManager, ScriptManager>()
                 .AddScoped<IMessageManager, MessageManager>()
-                .AddScoped<IIOManager, IOManager>()
                 .AddScoped<ITerminalManager, TerminalManager>()
                 // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
@@ -170,7 +168,7 @@ namespace BeforeOurTime.Business
                 {
                     lock (thisLock)
                     {
-                        var response = api.GetIOManager().HandleRequest(api, terminal, request);
+                        var response = api.GetMessageManager().HandleRequest(api, terminal, request);
                         return response;
                     }
                 };

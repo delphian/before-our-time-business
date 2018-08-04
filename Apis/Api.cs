@@ -9,7 +9,6 @@ using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Items.Attributes;
-using BeforeOurTime.Business.Apis.IO;
 using BeforeOurTime.Business.Apis.Terminals;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Items;
@@ -39,7 +38,6 @@ namespace BeforeOurTime.Business.Apis
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
-        private IIOManager IOManager { set; get; }
         private IItemManager ItemManager { set; get; }
         private ITerminalManager TerminalManager { set; get; }
         /// <summary>
@@ -52,7 +50,6 @@ namespace BeforeOurTime.Business.Apis
             IMessageManager messageManager,
             IAccountManager accountManager,
             IScriptManager scriptManager,
-            IIOManager ioManager,
             IItemManager itemManager,
             ITerminalManager terminalManager,
             IGameAttributeManager attributeGameManager,
@@ -66,7 +63,6 @@ namespace BeforeOurTime.Business.Apis
             MessageManager = messageManager;
             AccountManager = accountManager;
             ScriptManager = scriptManager;
-            IOManager = ioManager;
             ItemManager = itemManager;
             TerminalManager = terminalManager;
             AttributeManagerList.Add(typeof(IGameAttributeManager), attributeGameManager);
@@ -87,10 +83,6 @@ namespace BeforeOurTime.Business.Apis
         public IScriptManager GetScriptManager()
         {
             return ScriptManager;
-        }
-        public IIOManager GetIOManager()
-        {
-            return IOManager;
         }
         public IItemManager GetItemManager()
         {
