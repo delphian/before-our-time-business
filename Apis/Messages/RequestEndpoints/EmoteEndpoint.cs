@@ -54,7 +54,7 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
                     }, location, player.Id);
                 response = new Response() {
                     _requestInstanceId = request.GetRequestInstanceId(),
-                    ResponseSuccess = true
+                    _responseSuccess = true
                 };
             }
             return response;

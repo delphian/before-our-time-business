@@ -61,7 +61,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                 var createPlayerResponse = new CreateAccountCharacterResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
-                    ResponseSuccess = true,
+                    _responseSuccess = true,
                     CreatedAccountCharacterEvent = new CreatedAccountCharacterEvent()
                     {
                         ItemId = player.ItemId,

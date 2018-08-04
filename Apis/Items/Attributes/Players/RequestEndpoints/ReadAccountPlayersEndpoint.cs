@@ -52,7 +52,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Players.RequestEndpoints
                 var listAccountCharactersResponse = new ListAccountCharactersResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
-                    ResponseSuccess = true,
+                    _responseSuccess = true,
                     AccountCharacters = items
                 };
                 response = listAccountCharactersResponse;

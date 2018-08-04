@@ -200,7 +200,7 @@ namespace BeforeOurTime.Business.Apis.Messages
         {
             IResponse response = new Response() {
                 _requestInstanceId = request.GetRequestInstanceId(),
-                ResponseSuccess = false
+                _responseSuccess = false
             };
             var requestGuid = request.GetMessageId();
             var requestEndpointsForType = RequestEndpointsForTypes

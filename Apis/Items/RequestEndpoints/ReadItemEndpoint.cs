@@ -54,7 +54,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 response = new ReadItemResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
-                    ResponseSuccess = true,
+                    _responseSuccess = true,
                     ReadItemEvent = new ReadItemEvent()
                     {
                         Item = api.GetItemManager().Read(readItemRequest.ItemId)

@@ -52,7 +52,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var ioLocationUpdate = new ListLocationResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
-                    ResponseSuccess = true,
+                    _responseSuccess = true,
                     Item = location,
                     Exits = new List<ListExitResponse>()
                 };
@@ -65,7 +65,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                         ioLocationUpdate.Exits.Add(new ListExitResponse()
                         {
                             _requestInstanceId = request.GetRequestInstanceId(),
-                            ResponseSuccess = true,
+                            _responseSuccess = true,
                             Item = item,
                             Name = attribute.Name,
                             Description = attribute.Description

@@ -51,7 +51,7 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
                 var createAccountResponse = new CreateAccountResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
-                    ResponseSuccess = true,
+                    _responseSuccess = true,
                     CreatedAccountEvent = new CreatedAccountEvent()
                     {
                         AccountId = account.Id
