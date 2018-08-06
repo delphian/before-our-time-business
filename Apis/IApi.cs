@@ -34,6 +34,12 @@ namespace BeforeOurTime.Business.Apis
         /// <returns></returns>
         T GetAttributeManager<T>() where T : IAttributeManager;
         /// <summary>
+        /// Get item attribute manager based on class name of attribute type
+        /// </summary>
+        /// <param name="attributeTypeName"></param>
+        /// <returns></returns>
+        IAttributeManager GetAttributeManagerOfType(string attributeTypeName);
+        /// <summary>
         /// Get all attribute managers for an item
         /// </summary>
         /// <param name="item">Item to determine managers for</param>

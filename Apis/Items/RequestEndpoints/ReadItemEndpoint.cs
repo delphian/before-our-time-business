@@ -51,13 +51,23 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
             {
                 var readItemRequest = request.GetMessageAsType<ReadItemRequest>();
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
+                var items = new List<Item>();
+                if (readItemRequest.ItemIds.Count > 0)
+                {
+                    items = api.GetItemManager().Read(readItemRequest.ItemIds);
+                }
+                if (readItemRequest.ItemAttributeTypes.Count > 0)
+                {
+                    var attributeManager = api.GetAttributeManagerOfType(readItemRequest.ItemAttributeTypes.First());
+                    items = attributeManager.ReadItem();
+                }
                 response = new ReadItemResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
                     _responseSuccess = true,
                     ReadItemEvent = new ReadItemEvent()
                     {
-                        Item = api.GetItemManager().Read(readItemRequest.ItemId)
+                        Items = items
                     }
                 };
             }

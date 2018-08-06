@@ -24,6 +24,7 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
 using BeforeOurTime.Business.Apis.Items.Attributes.Games;
 using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
 using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
+using BeforeOurTime.Models.Exceptions;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -97,13 +98,35 @@ namespace BeforeOurTime.Business.Apis
             return Logger;
         }
         /// <summary>
-        /// Get item detail manager based on detail manager type
+        /// Get item attribute manager based on attribute manager type
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public T GetAttributeManager<T>() where T : IAttributeManager
         {
             return (T)AttributeManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).FirstOrDefault();
+        }
+        /// <summary>
+        /// Get item attribute manager based on class name of attribute type
+        /// </summary>
+        /// <param name="attributeTypeName"></param>
+        /// <returns></returns>
+        public IAttributeManager GetAttributeManagerOfType(string attributeTypeName)
+        {
+            Type attributeType;
+            try
+            {
+                attributeType = Type.GetType(attributeTypeName);
+            }
+            catch (Exception)
+            {
+                throw new InvalidAttributeTypeException(attributeTypeName);
+            }
+            var manager = (IAttributeManager)AttributeManagerList
+                .Where(x => x.Value.IsManaging(attributeType))
+                .Select(x => x.Value)
+                .FirstOrDefault();
+            return manager;
         }
         /// <summary>
         /// Get all attribute managers for an item

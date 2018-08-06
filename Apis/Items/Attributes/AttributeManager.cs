@@ -100,10 +100,29 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         {
             return Read(new List<Guid>() { id }, options).FirstOrDefault();
         }
-
+        /// <summary>
+        /// Read all attribute records, or specify an offset and limit
+        /// </summary>
+        /// <param name="offset">Number of attribute records to skip</param>
+        /// <param name="limit">Maximum number of attribute records to return</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns>List of attributes</returns>
         public List<T> Read(int? offset = null, int? limit = null, TransactionOptions options = null)
         {
             return AttributeRepo.Read(offset, limit, options);
+        }
+        /// <summary>
+        /// Read all items containing attribute record, or specify an offset and limit
+        /// </summary>
+        /// <param name="offset">Number of items to skip</param>
+        /// <param name="limit">Maximum number of items to return</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns>List of items</returns>
+        public List<Item> ReadItem(int? offset = null, int? limit = null, TransactionOptions options = null)
+        {
+            return Read(offset, limit, options)
+                .Select(x => x.Item)
+                .ToList();
         }
         /// <summary>
         /// Read attribute associated with item
@@ -166,6 +185,15 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         public void Delete(TransactionOptions options = null)
         {
             AttributeRepo.Delete();
+        }
+        /// <summary>
+        /// Determine if an attribute type should be managed by this manager
+        /// </summary>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
+        public bool IsManaging(Type attributeType)
+        {
+            return attributeType == typeof(T);
         }
         /// <summary>
         /// Attach new attributes to an existing item
