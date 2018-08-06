@@ -16,21 +16,17 @@ namespace BeforeOurTime.Business.Apis.Accounts
     public class AccountManager : IAccountManager
     {
         protected IRepository<AuthenticationBotMeta> AuthenBotMetaRepo { set; get; }
-        protected IAuthorGroupRepo AuthorGroupRepo { set; get; }
         protected IAccountRepo AccountRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="authenBotMetaRepo"></param>
-        /// <param name="authorGroupRepo"></param>
         /// <param name="accountRepo"></param>
         public AccountManager(
             IAccountRepo accountRepo,
-            IAuthorGroupRepo authorGroupRepo,
             IRepository<AuthenticationBotMeta> authenBotMetaRepo)
         {
             AuthenBotMetaRepo = authenBotMetaRepo;
-            AuthorGroupRepo = authorGroupRepo;
             AccountRepo = accountRepo;
         }
         /// <summary>

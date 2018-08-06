@@ -16,7 +16,6 @@ using BeforeOurTime.Repository.Dbs.EF.Items.Attributes;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOurTime.Models.Accounts.Authentication.Providers;
-using BeforeOurTime.Models.Accounts.Authorization;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using BeforeOurTime.Repository.Models.Scripts.Interfaces;
@@ -110,10 +109,6 @@ namespace BeforeOurTime.Business
                 // Repositories
                 .AddScoped<IAccountRepo, AccountRepo>()
                 .AddScoped<IMessageRepo, MessageRepo>()
-                .AddScoped<IRepository<AuthorizationRole>, Repository<AuthorizationRole>>()
-                .AddScoped<IAuthorGroupRepo, AuthorGroupRepo>()
-                .AddScoped<IRepository<AuthorizationGroupRole>, Repository<AuthorizationGroupRole>>()
-                .AddScoped<IRepository<AuthorizationAccountGroup>, Repository<AuthorizationAccountGroup>>()
                 .AddScoped<IRepository<AuthenticationBotMeta>, Repository<AuthenticationBotMeta>>()
                 .AddScoped<IScriptInterfaceRepo, ScriptInterfaceRepo>()
                 // Repositories (Items)
