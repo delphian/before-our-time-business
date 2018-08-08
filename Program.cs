@@ -51,7 +51,7 @@ namespace BeforeOurTime.Business
 {
     class Program
     {
-        public static IConfigurationRoot Configuration { set; get; }
+        public static IConfiguration Configuration { set; get; }
         public static IServiceProvider ServiceProvider { set; get; }
         public static List<IServer> Servers { set; get; }
         public static Object thisLock = new Object();
@@ -98,12 +98,13 @@ namespace BeforeOurTime.Business
         /// <summary>
         /// Setup services
         /// </summary>
-        private static void ConfigureServices(IConfigurationRoot configuration, IServiceCollection services)
+        private static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
         {
             // Setup services
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services
-                .AddSingleton<ILogger>(new FileLogger())
+                .AddSingleton<ILogger>(new FileLogger(configuration))
+                .AddSingleton<IConfiguration>(configuration)
                 .AddDbContext<BaseContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped)
                 .AddLogging()
                 // Repositories

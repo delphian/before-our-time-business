@@ -29,6 +29,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// Before Our Time API
         /// </summary>
         private IApi Api { set; get; }
+        private int LogLevel { set; get; }
         /// <summary>
         /// Unique WebSocket client identifier
         /// </summary>
@@ -62,6 +63,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             Id = Guid.NewGuid();
             Api = api;
+            LogLevel = Convert.ToInt32(Api.GetConfiguration().GetSection("Servers").GetSection("WebSocket")["LogLevel"]);
             Terminal = terminal;
             Context = context;
             WebSocket = webSocket;
@@ -126,8 +128,9 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     {
                         IResponse response;
                         var messageJson = Encoding.UTF8.GetString(buffer, 0, Array.IndexOf<byte>(buffer, 0));
-                        Api.GetLogger().LogInformation($"Client {Id} request: {messageJson}");
+                        Api.GetLogger().LogDebug($"Client {Id} request: {messageJson}");
                         var message = JsonConvert.DeserializeObject<Message>(messageJson);
+                        Api.GetLogger().LogInformation($"Client {Id} request: {message.GetMessageName()}");
                         var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
                         response = Terminal.SendToApi(request);
                         // Send response
@@ -191,7 +194,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 var byteMessage = new UTF8Encoding(false, true).GetBytes(messageJson);
                 var offset = 0;
                 var endOfMessage = false;
-                Api.GetLogger().LogInformation($"Client {Id} to client: {messageJson}");
+                Api.GetLogger().LogDebug($"Client {Id} to client: {messageJson}");
+                Api.GetLogger().LogInformation($"Client {Id} to client: {message.GetMessageName()}");
                 do
                 {
                     var remainingBytes = byteMessage.Count() - (offset * 1024);
@@ -210,7 +214,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     error += $"({traverse.Message})";
                     traverse = traverse.InnerException;
                 }
-                Api.GetLogger().LogInformation($"Client {Id} while sending data: {message.GetMessageName()}: {error}");
+                Api.GetLogger().LogError($"Client {Id} while sending data: {message.GetMessageName()}: {error}");
             }
         }
         /// <summary>

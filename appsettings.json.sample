@@ -7,13 +7,14 @@
     "Servers": {
         "Telnet": {
             "Listen": {
-                "Address": "localhost",
+                "Address": "0.0.0.0",
                 "Port": 2023
             }
         },
         "WebSocket": {
+            "LogLevel":  2,
             "Listen": {
-                "Address": "localhost",
+                "Address": "0.0.0.0",
                 "Port": 2024
             }
         }

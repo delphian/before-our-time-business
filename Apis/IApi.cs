@@ -22,6 +22,7 @@ namespace BeforeOurTime.Business.Apis
     public interface IApi
     {
         ILogger GetLogger();
+        IConfiguration GetConfiguration();
         IMessageManager GetMessageManager();
         IAccountManager GetAccountManager();
         IScriptManager GetScriptManager();
@@ -59,7 +60,7 @@ namespace BeforeOurTime.Business.Apis
         Task DeliverMessagesAsync(
             int delayMs,
             CancellationToken ct,
-            IConfigurationRoot config,
+            IConfiguration config,
             IServiceProvider serviceProvider);
     }
 }

@@ -12,7 +12,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
 {
     public class JsFunctionManager
     {
-        protected IConfigurationRoot Configuration { set; get; }
+        protected IConfiguration Configuration { set; get; }
         protected IServiceProvider ServiceProvider { set; get; }
         protected IApi Api { set; get; }
         /// <summary>
@@ -22,7 +22,7 @@ namespace BeforeOurTime.Business.Apis.Scripts.Libraries
         /// <param name="serviceProvider"></param>
         /// <param name="api"></aparam>
         public JsFunctionManager(
-            IConfigurationRoot configuration,
+            IConfiguration configuration,
             IServiceProvider serviceProvider)
         {
             Configuration = configuration;

@@ -120,9 +120,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <returns>List of items</returns>
         public List<Item> ReadItem(int? offset = null, int? limit = null, TransactionOptions options = null)
         {
-            return Read(offset, limit, options)
-                .Select(x => x.Item)
+            var itemIds = Read(offset, limit, options)
+                .Select(x => x.ItemId)
                 .ToList();
+            return ItemRepo.Read(itemIds, options);
         }
         /// <summary>
         /// Read attribute associated with item

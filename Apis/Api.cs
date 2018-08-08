@@ -36,6 +36,7 @@ namespace BeforeOurTime.Business.Apis
         private object lockObject = null;
         private Dictionary<Type, IAttributeManager> AttributeManagerList = new Dictionary<Type, IAttributeManager>();
         private ILogger Logger { set; get; }
+        private IConfiguration Configuration { set; get; }
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
         private IScriptManager ScriptManager { set; get; }
@@ -48,6 +49,7 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="messageRepo"></param>
         public Api(
             ILogger logger,
+            IConfiguration configuration,
             IMessageManager messageManager,
             IAccountManager accountManager,
             IScriptManager scriptManager,
@@ -61,6 +63,7 @@ namespace BeforeOurTime.Business.Apis
             IExitAttributeManager attributeExitManager)
         {
             Logger = logger;
+            Configuration = configuration;
             MessageManager = messageManager;
             AccountManager = accountManager;
             ScriptManager = scriptManager;
@@ -97,6 +100,10 @@ namespace BeforeOurTime.Business.Apis
         { 
             return Logger;
         }
+        public IConfiguration GetConfiguration()
+        {
+            return Configuration;
+        }
         /// <summary>
         /// Get item attribute manager based on attribute manager type
         /// </summary>
@@ -116,7 +123,11 @@ namespace BeforeOurTime.Business.Apis
             Type attributeType;
             try
             {
-                attributeType = Type.GetType(attributeTypeName);
+                attributeType = Type.GetType(attributeTypeName + ", BeforeOurTime.Models");
+                if (attributeType == null)
+                {
+                    throw new Exception();
+                }
             }
             catch (Exception)
             {
@@ -166,7 +177,7 @@ namespace BeforeOurTime.Business.Apis
         /// </summary>
         /// <param name="delayMs">Interval between ticks</param>
         /// <param name="ct">Cancelation token for ticks</param>
-        public async Task DeliverMessagesAsync(int delayMs, CancellationToken ct, IConfigurationRoot config, IServiceProvider serviceProvider)
+        public async Task DeliverMessagesAsync(int delayMs, CancellationToken ct, IConfiguration config, IServiceProvider serviceProvider)
         {
             while (!ct.IsCancellationRequested)
             {

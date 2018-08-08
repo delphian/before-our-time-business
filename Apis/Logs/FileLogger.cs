@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,9 +10,11 @@ namespace BeforeOurTime.Business.Apis.Logs
     public class FileLogger : ILogger
     {
         private string pathToFile = Directory.GetCurrentDirectory() + "/logs.txt";
+        private LogLevel LogLevel { set; get; }
 
-        public FileLogger()
+        public FileLogger(IConfiguration configuration)
         {
+            LogLevel = (LogLevel)Convert.ToInt32(configuration.GetSection("Servers").GetSection("WebSocket")["LogLevel"]);
             if (!File.Exists(pathToFile))
             {
                 // Create a file to write to.
@@ -41,10 +44,13 @@ namespace BeforeOurTime.Business.Apis.Logs
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            using (StreamWriter outputFile = File.AppendText(pathToFile))
+            if (logLevel >= LogLevel)
             {
-                Console.WriteLine($"{DateTime.Now.ToString()} {logLevel.ToString()}: {state.ToString()}");
-                outputFile.WriteLine(logLevel.ToString() + ": " + DateTime.Now.ToString() + ": " + state.ToString());
+                using (StreamWriter outputFile = File.AppendText(pathToFile))
+                {
+                    Console.WriteLine($"{DateTime.Now.ToString()} {logLevel.ToString()}: {state.ToString()}");
+                    outputFile.WriteLine(logLevel.ToString() + ": " + DateTime.Now.ToString() + ": " + state.ToString());
+                }
             }
         }
     }
