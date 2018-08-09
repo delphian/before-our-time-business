@@ -46,6 +46,15 @@ namespace BeforeOurTime.Business.Apis.Items
             return item;
         }
         /// <summary>
+        /// Read multiple models derived from Item
+        /// </summary>
+        /// <param name="itemIds">List of unique item identifiers</param>
+        /// <returns></returns>
+        public List<Item> Read(List<Guid> itemIds)
+        {
+            return ItemRepo.Read(itemIds);
+        }
+        /// <summary>
         /// Read single model of a type derived from Item
         /// </summary>
         /// <param name="itemIds">Unique item identifier</param>
@@ -53,15 +62,6 @@ namespace BeforeOurTime.Business.Apis.Items
         public Item Read(Guid itemId)
         {
             return Read(new List<Guid>() { itemId }).FirstOrDefault();
-        }
-        /// <summary>
-        /// Read multiple models derived from Item
-        /// </summary>
-        /// <param name="itemIds">List of unique item identifiers</param>
-        /// <returns></returns>
-        public List<Item> Read(List <Guid> itemIds)
-        {
-            return ItemRepo.Read(itemIds);
         }
         /// <summary>
         /// Read all models derived from Item, or specify an offset and limit
@@ -101,6 +101,15 @@ namespace BeforeOurTime.Business.Apis.Items
             return ItemRepo.GetChildrenIds(itemId);
         }
         /// <summary>
+        /// Update multiple models derived from Item
+        /// </summary>
+        /// <param name="itemIds">List of unique item identifiers</param>
+        /// <returns></returns>
+        public List<Item> Update(List<Item> items)
+        {
+            return ItemRepo.Update(items);
+        }
+        /// <summary>
         /// Update any model that is derived from Item
         /// </summary>
         /// <param name="item">Item to be updated</param>
@@ -108,7 +117,7 @@ namespace BeforeOurTime.Business.Apis.Items
         public Item Update(Item item)
         {
             item.DelegateLinks = UpdateScriptDelegateLinks(item);
-            return ItemRepo.Update(new List<Item>() { item }).FirstOrDefault();
+            return Update(new List<Item>() { item }).FirstOrDefault();
         }
         /// <summary>
         /// Generate delegate links by parsing an item's script delegate declarations

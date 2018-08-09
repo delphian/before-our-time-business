@@ -58,6 +58,12 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <returns></returns>
         List<Guid> GetChildrenIds(Guid itemId);
         /// <summary>
+        /// Update multiple models derived from Item
+        /// </summary>
+        /// <param name="itemIds">List of unique item identifiers</param>
+        /// <returns></returns>
+        List<Item> Update(List<Item> items);
+        /// <summary>
         /// Update any model that is derived from type Item
         /// </summary>
         /// <param name="item">Item to be updated</param>
