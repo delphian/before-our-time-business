@@ -56,6 +56,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 response = new UpdateItemResponse()
                 {
                     _responseSuccess = true,
+                    _requestInstanceId = request.GetRequestInstanceId(),
                     UpdateItemEvent = new UpdateItemEvent()
                     {
                         Items = updateItemRequest.Items

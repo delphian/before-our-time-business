@@ -117,7 +117,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IPlayerAttributeRepo, PlayerAttributeRepo>()
                 .AddScoped<ICharacterAttributeRepo, CharacterAttributeRepo>()
                 .AddScoped<IAttributeGameRepo, AttributeGameRepo>()
-                .AddScoped<IAttributeLocationRepo, AttributeLocationRepo>()
+                .AddScoped<IAttributeLocationRepo, LocationAttributeRepo>()
                 .AddScoped<IAttributePhysicalRepo, AttributePhysicalRepo>()
                 .AddScoped<IAttributeExitRepo, AttributeExitRepo>()
                 // Main environment interface API
