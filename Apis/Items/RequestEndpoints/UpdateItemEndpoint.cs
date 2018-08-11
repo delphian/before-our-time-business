@@ -53,6 +53,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var updateItemRequest = request.GetMessageAsType<UpdateItemRequest>();
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 api.GetItemManager().Update(updateItemRequest.Items);
+                api.GetMessageManager().SendMessageToLocation(new UpdateItemEvent()
+                {
+                    Items = updateItemRequest.Items
+                }, player.Parent, player.Id);
                 response = new UpdateItemResponse()
                 {
                     _responseSuccess = true,
