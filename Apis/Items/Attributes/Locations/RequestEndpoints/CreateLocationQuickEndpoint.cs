@@ -48,7 +48,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
             if (request.GetType() == typeof(CreateLocationQuickRequest))
             {
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
-                var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
+                var location = api.GetItemManager().Read(player.ParentId.Value);
                 api.GetAttributeManager<ILocationAttributeManager>().CreateFromHere(player.ParentId.Value);
                 response = new ExamineLocationEndpoint()
                     .HandleRequest(api, terminal, request, response);

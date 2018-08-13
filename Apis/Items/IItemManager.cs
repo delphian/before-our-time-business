@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Models.Items;
+﻿using BeforeOurTime.Models;
+using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Scripts.Delegates;
 using System;
 using System.Collections.Generic;
@@ -20,14 +21,16 @@ namespace BeforeOurTime.Business.Apis.Items
         /// Read single model of a type derived from Item
         /// </summary>
         /// <param name="itemIds">Unique item identifier</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
-        Item Read(Guid itemId);
+        Item Read(Guid itemId, TransactionOptions options = null);
         /// <summary>
         /// Read multiple models of a type derived from Item
         /// </summary>
         /// <param name="itemIds">List of unique item identifiers</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
-        List<Item> Read(List<Guid> itemIds);
+        List<Item> Read(List<Guid> itemIds, TransactionOptions options = null);
         /// <summary>
         /// Read all models of a type derived from Item, or specify an offset and limit
         /// </summary>
@@ -37,20 +40,15 @@ namespace BeforeOurTime.Business.Apis.Items
         /// </remarks>
         /// <param name="offset">Number of model records to skip</param>
         /// <param name="limit">Maximum number of model records to return</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
-        List<Item> Read(int? offset = null, int? limit = null);
+        List<Item> Read(int? offset = null, int? limit = null, TransactionOptions options = null);
         /// <summary>
         /// Get all item ids that implement a script delegate
         /// </summary>
         /// <param name="scriptDelegate">A script function name, it's argument type, and return type</param>
         /// <returns></returns>
         List<Guid> GetDelegateImplementerIds(IDelegate scriptDelegate);
-        /// <summary>
-        /// Read item and fully load all immediate children
-        /// </summary>
-        /// <param name="itemId">Unique item identifier</param>
-        /// <returns></returns>
-        Item ReadWithChildren(Guid itemId);
         /// <summary>
         /// Get the item identifiers of all item's children
         /// </summary>
@@ -89,9 +87,9 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <remarks>
         /// All children will be re-homed to the item parent unless otherwise specified
         /// </remarks>
-        /// <param name="item">Item to delete</param>
+        /// <param name="item">List of items to delete</param>
         /// <param name="deleteChildren">Also delete all children</param>
-        void Delete(Item item, bool? deleteChildren = false);
+        void Delete(List<Item> items, bool? deleteChildren = false);
         /// <summary>
         /// Relocate an item
         /// </summary>

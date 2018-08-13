@@ -9,6 +9,7 @@ using System.Linq;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Scripts.Delegates;
+using BeforeOurTime.Models;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
@@ -49,29 +50,32 @@ namespace BeforeOurTime.Business.Apis.Items
         /// Read multiple models derived from Item
         /// </summary>
         /// <param name="itemIds">List of unique item identifiers</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
-        public List<Item> Read(List<Guid> itemIds)
+        public List<Item> Read(List<Guid> itemIds, TransactionOptions options = null)
         {
-            return ItemRepo.Read(itemIds);
+            return ItemRepo.Read(itemIds, options);
         }
         /// <summary>
         /// Read single model of a type derived from Item
         /// </summary>
         /// <param name="itemIds">Unique item identifier</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
-        public Item Read(Guid itemId)
+        public Item Read(Guid itemId, TransactionOptions options = null)
         {
-            return Read(new List<Guid>() { itemId }).FirstOrDefault();
+            return Read(new List<Guid>() { itemId }, options).FirstOrDefault();
         }
         /// <summary>
         /// Read all models derived from Item, or specify an offset and limit
         /// </summary>
         /// <param name="offset">Number of model records to skip</param>
         /// <param name="limit">Maximum number of model records to return</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
-        public List<Item> Read(int? offset = null, int? limit = null)
+        public List<Item> Read(int? offset = null, int? limit = null, TransactionOptions options = null)
         {
-            return ItemRepo.Read(offset, limit);
+            return ItemRepo.Read(offset, limit, options);
         }
         /// <summary>
         /// Get all item ids that implement a script delegate
@@ -81,15 +85,6 @@ namespace BeforeOurTime.Business.Apis.Items
         public List<Guid> GetDelegateImplementerIds(IDelegate scriptDelegate)
         {
             return ItemRepo.GetDelegateImplementerIds(scriptDelegate);
-        }
-        /// <summary>
-        /// Read item and fully load all immediate children
-        /// </summary>
-        /// <param name="itemId">Unique item identifier</param>
-        /// <returns></returns>
-        public Item ReadWithChildren(Guid itemId)
-        {
-            return ItemRepo.ReadWithChildren(itemId);
         }
         /// <summary>
         /// Get the item identifiers of all item's children
@@ -178,17 +173,33 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <remarks>
         /// All children will be re-homed to the item parent unless otherwise specified
         /// </remarks>
-        /// <param name="item">Item to delete</param>
+        /// <param name="items">List of items to delete</param>
         /// <param name="deleteChildren">Also delete all children</param>
-        public void Delete(Item item, bool? deleteChildren = false)
+        public void Delete(List<Item> items, bool? deleteChildren = false)
         {
-            // Move the item
-            var oldParent = item.Parent;
-            item.Children.ForEach(delegate (Item child)
+            // Move item children
+            items.ForEach((item) =>
             {
-                Move(child, oldParent, item);
+                if (deleteChildren == true)
+                {
+                    if (item.Children?.Count > 0)
+                    {
+                        Delete(item.Children, deleteChildren);
+                    }
+                }
+                else
+                {
+                    var oldParent = item.Parent;
+                    if (oldParent != null)
+                    {
+                        item.Children?.ForEach((child) =>
+                        {
+                            Move(child, oldParent, item);
+                        });
+                    }
+                }
             });
-            ItemRepo.Delete(new List<Item>() { item });
+            ItemRepo.Delete(items);
         }
         /// <summary>
         /// Relocate an item
@@ -199,22 +210,14 @@ namespace BeforeOurTime.Business.Apis.Items
         public Item Move(Item item, Item newParent, Item source = null)
         {
             // Send departure message
-            var oldLocation = ItemRepo.ReadWithChildren(item.ParentId.Value);
+            var oldLocation = ItemRepo.Read(item.ParentId.Value);
             MessageManager.SendDepartureEvent(item, oldLocation, source.Id);
-            // Remove from old parent
-            var oldParent = item.Parent;
-            oldParent?.Children.Remove(item);
-            // Append to new parent
-            newParent.Children.Add(item);
+            // Update item's location
             item.Parent = newParent;
-            var updateItems = new List<Item>() { newParent, item };
-            if (oldParent != null)
-            {
-                updateItems.Add(oldParent);
-            }
-            ItemRepo.Update(updateItems);
+            item.ParentId = newParent.Id;
+            ItemRepo.Update(item);
             // Send arrival message
-            var newLocation = ItemRepo.ReadWithChildren(newParent.Id);
+            var newLocation = ItemRepo.Read(newParent.Id);
             MessageManager.SendArrivalEvent(item, newLocation, source.Id);
             return item;
         }

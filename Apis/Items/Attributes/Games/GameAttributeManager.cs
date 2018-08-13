@@ -87,7 +87,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
                     DefaultLocationId = locationItem.GetAttribute<LocationAttribute>().Id
                 });
             }
-            var defaultGameItem = ItemRepo.Read(defaultGame.ItemId);
+            var defaultGameItem = ItemRepo.Read(
+                defaultGame.ItemId, 
+                new Models.TransactionOptions() { NoTracking = true });
             return defaultGameItem;
         }
         /// <summary>
@@ -104,7 +106,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
             var game = GetDefaultGame();
             if (game.GetAttribute<GameAttribute>().DefaultLocationId != null)
             {
-                locationAttribute = DetailLocationRepo.Read(game.GetAttribute<GameAttribute>().DefaultLocationId.Value);
+                locationAttribute = DetailLocationRepo.Read(
+                    game.GetAttribute<GameAttribute>().DefaultLocationId.Value,
+                    new Models.TransactionOptions() { NoTracking = true });
             }
             return locationAttribute;
         }

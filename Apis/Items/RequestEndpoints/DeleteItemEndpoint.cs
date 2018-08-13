@@ -3,11 +3,13 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Items.Attributes.Characters;
 using BeforeOurTime.Models.Items.Attributes.Players;
 using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
+using BeforeOurTime.Models.Messages.CRUD.Items.DeleteItem;
 using BeforeOurTime.Models.Messages.CRUD.Items.ReadItem;
 using BeforeOurTime.Models.Messages.CRUD.Items.UpdateItem;
 using BeforeOurTime.Models.Messages.Requests;
@@ -24,9 +26,9 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
-    public class UpdateItemEndpoint : IRequestEndpoint
+    public class DeleteItemEndpoint : IRequestEndpoint
     {
-        public UpdateItemEndpoint()
+        public DeleteItemEndpoint()
         {
         }
         /// <summary>
@@ -37,7 +39,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             return new List<Guid>()
             {
-                UpdateItemRequest._Id
+                DeleteItemRequest._Id
             };
         }
         /// <summary>
@@ -49,35 +51,36 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="response"></param>
         public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
         {
-            if (request.GetType() == typeof(UpdateItemRequest))
+            if (request.GetType() == typeof(DeleteItemRequest))
             {
-                response = new UpdateItemResponse()
+                response = new DeleteItemResponse()
                 {
                     _responseSuccess = false,
                     _requestInstanceId = request.GetRequestInstanceId()
                 };
                 try
                 {
-                    var updateItemRequest = request.GetMessageAsType<UpdateItemRequest>();
+                    var deleteItemRequest = request.GetMessageAsType<DeleteItemRequest>();
                     var player = api.GetItemManager().Read(terminal.PlayerId.Value);
-                    api.GetItemManager().Update(updateItemRequest.Items);
-                    var updateItemEvent = new UpdateItemEvent()
-                    {
-                        Items = updateItemRequest.Items
-                    };
-                    api.GetMessageManager().SendMessageToLocation(updateItemEvent, player.Parent, player.Id);
-                    ((UpdateItemResponse)response).UpdateItemEvent = updateItemEvent;
-                    ((UpdateItemResponse)response)._responseSuccess = true;
+                    var items = api.GetItemManager().Read(deleteItemRequest.ItemIds);
+                    api.GetItemManager().Delete(items, true);
+                    var deleteItemEvent = new DeleteItemEvent()
+                        {
+                            Items = items
+                        };
+                    api.GetMessageManager().SendMessageToLocation(deleteItemEvent, player.Parent, player.Id);
+                    ((DeleteItemResponse)response).DeleteItemEvent = deleteItemEvent;
+                    ((DeleteItemResponse)response)._responseSuccess = true;
                 }
                 catch (Exception e)
                 {
                     var traverseExceptions = e;
-                    while (traverseExceptions != null)
+                    while(traverseExceptions != null)
                     {
-                        ((UpdateItemResponse)response)._responseMessage += traverseExceptions.Message + ". ";
+                        ((DeleteItemResponse)response)._responseMessage += traverseExceptions.Message + ". ";
                         traverseExceptions = traverseExceptions.InnerException;
                     }
-                    api.GetLogger().Log(LogLevel.Error, ((UpdateItemResponse)response)._responseMessage);
+                    api.GetLogger().Log(LogLevel.Error, ((DeleteItemResponse)response)._responseMessage);
                 }
             }
             return response;

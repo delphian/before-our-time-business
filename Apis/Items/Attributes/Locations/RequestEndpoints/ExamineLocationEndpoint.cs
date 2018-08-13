@@ -2,6 +2,7 @@
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Items.Attributes.Characters;
@@ -47,8 +48,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             if (request.GetType() == typeof(ListLocationRequest))
             {
-                var player = api.GetItemManager().Read(terminal.PlayerId.Value);
-                var location = api.GetItemManager().ReadWithChildren(player.ParentId.Value);
+                var player = api.GetItemManager().Read(
+                    terminal.PlayerId.Value,
+                    new TransactionOptions() { NoTracking = true });
+                var location = api.GetItemManager().Read(
+                    player.ParentId.Value,
+                    new TransactionOptions() { NoTracking = true });
                 var ioLocationUpdate = new ListLocationResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
