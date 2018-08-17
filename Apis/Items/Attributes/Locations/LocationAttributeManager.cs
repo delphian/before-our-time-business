@@ -23,7 +23,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
 {
     public class LocationAttributeManager : AttributeManager<LocationAttribute>, ILocationAttributeManager
     {
-        private IAttributeLocationRepo DetailLocationRepo { set; get; }
+        private ILocationAttributeRepo DetailLocationRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
@@ -34,7 +34,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         /// </summary>
         public LocationAttributeManager(
             IItemRepo itemRepo,
-            IAttributeLocationRepo detailLocationRepo,
+            ILocationAttributeRepo detailLocationRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
             IItemManager itemManager,

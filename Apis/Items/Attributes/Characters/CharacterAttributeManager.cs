@@ -15,6 +15,9 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Characters
 {
+    /// <summary>
+    /// Properties generally understood to denote a state of being alive
+    /// </summary>
     public class CharacterAttributeManager : AttributeManager<CharacterAttribute>, ICharacterAttributeManager
     {
         private IScriptEngine ScriptEngine { set; get; }

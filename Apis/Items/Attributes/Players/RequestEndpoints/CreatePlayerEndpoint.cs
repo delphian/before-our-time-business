@@ -18,6 +18,8 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Items.Attributes.Physicals;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
+using BeforeOurTime.Models.Items.Attributes.Characters;
+using BeforeOurTime.Models.Items.Attributes.Players;
 
 namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
 {
@@ -48,14 +50,25 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
             if (request.IsMessageType<CreateAccountCharacterRequest>())
             {
                 var createPlayerRequest = request.GetMessageAsType<CreateAccountCharacterRequest>();
-                var player = api.GetAttributeManager<IPlayerAttributeManager>().Create(
-                    createPlayerRequest.Name,
-                    terminal.AccountId.Value,
+                var playerItem = api.GetAttributeManager<IPlayerAttributeManager>().Create(
+                    new CharacterAttribute()
+                    {
+                        Health = new CharacterHealth()
+                        {
+                            Max = 25,
+                            Value = 25
+                        }
+                    },
                     new PhysicalAttribute()
                     {
                         Name = createPlayerRequest.Name,
                         Description = "A player",
                         Weight = 100
+                    },
+                    new PlayerAttribute()
+                    {
+                        Name = createPlayerRequest.Name,
+                        AccountId = terminal.AccountId.Value
                     },
                     api.GetAttributeManager<IGameAttributeManager>().GetDefaultLocation());
                 var createPlayerResponse = new CreateAccountCharacterResponse()
@@ -64,8 +77,8 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                     _responseSuccess = true,
                     CreatedAccountCharacterEvent = new CreatedAccountCharacterEvent()
                     {
-                        ItemId = player.ItemId,
-                        Name = player.Name
+                        ItemId = playerItem.Id,
+                        Name = playerItem.Name
                     }
                 };
                 response = createPlayerResponse;

@@ -18,7 +18,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Physicals
 {
     public class PhysicalAttributeManager : AttributeManager<PhysicalAttribute>, IPhysicalAttributeManager
     {
-        private IAttributePhysicalRepo DetailPhysicalRepo { set; get; }
+        private IPhysicalAttributeRepo DetailPhysicalRepo { set; get; }
         private IScriptEngine ScriptEngine { set; get; }
         private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
@@ -27,7 +27,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Physicals
         /// </summary>
         public PhysicalAttributeManager(
             IItemRepo itemRepo,
-            IAttributePhysicalRepo detailPhysicalRepo,
+            IPhysicalAttributeRepo detailPhysicalRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
             IItemManager itemManager) : base(itemRepo, detailPhysicalRepo)

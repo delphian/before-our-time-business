@@ -1,5 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.Items.Attributes.Characters;
 using BeforeOurTime.Models.Items.Attributes.Locations;
 using BeforeOurTime.Models.Items.Attributes.Physicals;
 using BeforeOurTime.Models.Items.Attributes.Players;
@@ -14,17 +16,14 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Players
         /// <summary>
         /// Create a new player
         /// </summary>
-        /// <remarks>
-        /// Creates new item and attaches all attributes
-        /// </remarks>
-        /// <param name="name">Public name of the player</param>
-        /// <param name="accountId">Account to which this player belongs</param>
+        /// <param name="characer">Properties generally understood to denote a state of being alive</param>
         /// <param name="physical">Physical attributes</param>
+        /// <param name="player">Player attributes</param>
         /// <param name="initialLocation">Location of new player</param>
-        PlayerAttribute Create(
-            string name, 
-            Guid accountId, 
+        Item Create(
+            CharacterAttribute character,
             PhysicalAttribute physical,
+            PlayerAttribute player,
             LocationAttribute initialLocation);
     }
 }

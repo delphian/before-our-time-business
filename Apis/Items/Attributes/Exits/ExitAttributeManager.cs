@@ -24,7 +24,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits
         /// </summary>
         public ExitAttributeManager(
             IItemRepo itemRepo,
-            IAttributeExitRepo attributeExitRepo,
+            IExitAttributeRepo attributeExitRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
             IItemManager itemManager) : base(itemRepo, attributeExitRepo)

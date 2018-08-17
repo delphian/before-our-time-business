@@ -48,14 +48,14 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Players
         /// <summary>
         /// Create a new player
         /// </summary>
-        /// <param name="name">Public name of the player</param>
-        /// <param name="accountId">Account to which this player belongs</param>
+        /// <param name="characer">Properties generally understood to denote a state of being alive</param>
         /// <param name="physical">Physical attributes</param>
+        /// <param name="player">Player attributes</param>
         /// <param name="initialLocation">Location of new player</param>
-        public PlayerAttribute Create(
-            string name,
-            Guid accountId,
+        public Item Create(
+            CharacterAttribute character,
             PhysicalAttribute physical,
+            PlayerAttribute player,
             LocationAttribute initialLocation)
         {
             // Create item
@@ -64,26 +64,15 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Players
                 UuidType = Guid.NewGuid(),
                 ParentId = initialLocation.ItemId,
                 Data = "{}",
-                Script = "function onTick(e) {}; function onTerminalOutput(e) { terminalMessage(e.terminal.id, e.raw); }; function onItemMove(e) { };"
-            });
-            // Create player attributes
-            var player = new PlayerAttribute()
-            {
-                Name = name,
-                AccountId = accountId,
-            };
-            // Attach all attributes
-            Attach(player, item);
-            CharacterAttributeManager.Attach(new CharacterAttribute()
-            {
-                Health = new CharacterHealth()
+                Script = "",
+                Attributes = new List<ItemAttribute>()
                 {
-                    Max = 25,
-                    Value = 25
+                    physical,
+                    player,
+                    character
                 }
-            }, item);
-            AttributePhysicalManager.Attach(physical, item);
-            return player;
+            });
+            return item;
         }
         /// <summary>
         /// Deliver a message to an item
