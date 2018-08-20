@@ -7,9 +7,10 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Items.Attributes.Characters;
 using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.Messages.Locations.CreateLocation;
+using BeforeOurTime.Models.Messages.Locations.Locations.CreateLocation;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
-using BeforeOurTime.Models.Messages.Requests.LocationAttributes;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.List;
 using Newtonsoft.Json;
@@ -49,9 +50,17 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
             {
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 var location = api.GetItemManager().Read(player.ParentId.Value);
-                api.GetAttributeManager<ILocationAttributeManager>().CreateFromHere(player.ParentId.Value);
-                response = new ExamineLocationEndpoint()
-                    .HandleRequest(api, terminal, request, response);
+                var newLocationItem = api.GetAttributeManager<ILocationAttributeManager>()
+                    .CreateFromHere(player.ParentId.Value);
+                response = new CreateLocationQuickResponse()
+                {
+                    _requestInstanceId = request.GetRequestInstanceId(),
+                    _responseSuccess = true,
+                    CreateLocationEvent = new CreateLocationEvent()
+                    {
+                        Item = newLocationItem
+                    }
+                };
             }
             return response;
         }

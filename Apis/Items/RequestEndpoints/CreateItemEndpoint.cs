@@ -10,7 +10,6 @@ using BeforeOurTime.Models.Items.Attributes.Players;
 using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
-using BeforeOurTime.Models.Messages.Requests.LocationAttributes;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.List;
 using Newtonsoft.Json;
