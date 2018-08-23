@@ -76,9 +76,9 @@ namespace BeforeOurTime.Business.Apis.Messages
                     }
                 } else
                 {
-                    var messageCopy = (SavedMessage)savedMessage.Clone();
-                    messageCopy.RecipientId = recipient.Id;
-                    MessageRepo.Create(messageCopy);
+                    //var messageCopy = (SavedMessage)savedMessage.Clone();
+                    //messageCopy.RecipientId = recipient.Id;
+                    //MessageRepo.Create(messageCopy);
                 }
             });
         }
