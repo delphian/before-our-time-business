@@ -116,6 +116,13 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     // Wait for next incoming message
                     Array.Clear(buffer, 0, buffer.Length);
                     result = await WebSocket.ReceiveAsync(buffer, Cts.Token);
+                    var messageJson = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    while (!result.EndOfMessage)
+                    {
+                        Array.Clear(buffer, 0, buffer.Length);
+                        result = await WebSocket.ReceiveAsync(buffer, Cts.Token);
+                        messageJson += Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    }
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
                         await CloseAsync();
@@ -127,7 +134,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     else
                     {
                         IResponse response;
-                        var messageJson = Encoding.UTF8.GetString(buffer, 0, Array.IndexOf<byte>(buffer, 0));
+                        // var messageJson = Encoding.UTF8.GetString(buffer, 0, Array.IndexOf<byte>(buffer, 0));
                         Api.GetLogger().LogDebug($"Client {Id} request: {messageJson}");
                         var message = JsonConvert.DeserializeObject<Message>(messageJson);
                         Api.GetLogger().LogInformation($"Client {Id} request: {message.GetMessageName()}");
