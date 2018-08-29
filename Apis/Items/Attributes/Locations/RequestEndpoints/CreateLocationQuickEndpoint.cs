@@ -48,10 +48,13 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             if (request.GetType() == typeof(CreateLocationQuickRequest))
             {
+                var createLocationQuickRequest = request.GetMessageAsType<CreateLocationQuickRequest>();
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 var location = api.GetItemManager().Read(player.ParentId.Value);
+                var createFromLocationItemId = createLocationQuickRequest.FromLocationItemId ??
+                                               player.ParentId.Value;
                 var newLocationItem = api.GetAttributeManager<ILocationAttributeManager>()
-                    .CreateFromHere(player.ParentId.Value);
+                    .CreateFromHere(createFromLocationItemId);
                 response = new CreateLocationQuickResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
