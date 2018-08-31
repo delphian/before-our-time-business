@@ -67,6 +67,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var exits = api.GetAttributeManager<IExitAttributeManager>()
                     .GetLocationExits(location);
                 api.GetItemManager().Delete(exits, true);
+                location = api.GetItemManager().Read(deleteLocationRequest.LocationItemId);
                 api.GetItemManager().Delete(new List<Item>() { location });
                 var deletedItems = exits ?? new List<Item>();
                 deletedItems.Add(location);
