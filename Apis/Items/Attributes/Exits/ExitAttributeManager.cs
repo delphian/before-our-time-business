@@ -2,9 +2,11 @@
 using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Scripts.Libraries;
+using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Items.Attributes.Exits;
+using BeforeOurTime.Models.Items.Attributes.Locations;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
@@ -24,10 +26,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits
         /// </summary>
         public ExitAttributeManager(
             IItemRepo itemRepo,
-            IExitAttributeRepo attributeExitRepo,
+            IExitAttributeRepo exitAttributeRepo,
             IScriptEngine scriptEngine,
             IScriptManager scriptManager,
-            IItemManager itemManager) : base(itemRepo, attributeExitRepo)
+            IItemManager itemManager) : base(itemRepo, exitAttributeRepo)
         {
             ScriptEngine = scriptEngine;
             ScriptManager = scriptManager;
@@ -107,6 +109,33 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits
             var exitAttribute = Read(id);
             exitAttribute.DestinationLocationId = destinationLocationId;
             return Update(exitAttribute);
+        }
+        /// <summary>
+        /// Get all inbound and outbound exits that link to and from a location
+        /// </summary>
+        /// <param name="location">Location item</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns></returns>
+        public List<Item> GetLocationExits(Item location, TransactionOptions options = null)
+        {
+            var items = location.Children.Where(x => x.HasAttribute<ExitAttribute>()).ToList() ??
+                        new List<Item>();
+            items.AddRange(GetLocationInboundExits(location, options));
+            return items;
+        }
+        /// <summary>
+        /// Get all inbound exits that link to a location
+        /// </summary>
+        /// <param name="location">Location item</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns></returns>
+        public List<Item> GetLocationInboundExits(Item location, TransactionOptions options = null)
+        {
+            var locationAttribute = location.GetAttribute<LocationAttribute>();
+            var exitAttributes = ((IExitAttributeRepo)AttributeRepo)
+                .ReadWithDestination(locationAttribute, options);
+            var exitItems = ItemManager.Read(exitAttributes.Select(x => x.ItemId).ToList(), options);
+            return exitItems;
         }
     }
 }

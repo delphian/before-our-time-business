@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
+using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Items.Attributes.Exits;
@@ -33,5 +34,19 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits
         ExitAttribute UpdateDestination(
             Guid id, 
             Guid destinationLocationId);
+        /// <summary>
+        /// Get all inbound and outbound exits that link to and from a location
+        /// </summary>
+        /// <param name="location">Location item</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns></returns>
+        List<Item> GetLocationExits(Item location, TransactionOptions options = null);
+        /// <summary>
+        /// Get all inbound exits that link to a location
+        /// </summary>
+        /// <param name="location">Location item</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        /// <returns></returns>
+        List<Item> GetLocationInboundExits(Item location, TransactionOptions options = null);
     }
 }

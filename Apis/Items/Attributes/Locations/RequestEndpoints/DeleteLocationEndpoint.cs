@@ -8,6 +8,7 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Attributes;
 using BeforeOurTime.Models.Items.Attributes.Characters;
 using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.Messages.CRUD.Items.DeleteItem;
 using BeforeOurTime.Models.Messages.Locations.CreateLocation;
 using BeforeOurTime.Models.Messages.Locations.DeleteLocation;
 using BeforeOurTime.Models.Messages.Locations.Locations.CreateLocation;
@@ -63,9 +64,18 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var deleteLocationRequest = request.GetMessageAsType<DeleteLocationRequest>();
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 var location = api.GetItemManager().Read(deleteLocationRequest.LocationItemId);
-//               var exitItemIds = api.GetAttributeManager<IExitAttributeManager>().GetLocationExits();
-                // delete exits
-                // delete location
+                var exits = api.GetAttributeManager<IExitAttributeManager>()
+                    .GetLocationExits(location);
+                api.GetItemManager().Delete(exits, true);
+                api.GetItemManager().Delete(new List<Item>() { location });
+                var deletedItems = exits ?? new List<Item>();
+                deletedItems.Add(location);
+                var deleteItemEvent = new DeleteItemEvent()
+                {
+                    Items = deletedItems
+                };
+                ((DeleteLocationResponse)response).DeleteItemEvent = deleteItemEvent;
+                ((DeleteLocationResponse)response)._responseSuccess = true;
             }
             catch (Exception e)
             {
