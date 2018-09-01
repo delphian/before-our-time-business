@@ -58,35 +58,35 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     _responseSuccess = false,
                     _requestInstanceId = request.GetRequestInstanceId()
                 };
-            }
-            try
-            {
-                var deleteLocationRequest = request.GetMessageAsType<DeleteLocationRequest>();
-                var player = api.GetItemManager().Read(terminal.PlayerId.Value);
-                var location = api.GetItemManager().Read(deleteLocationRequest.LocationItemId);
-                var exits = api.GetAttributeManager<IExitAttributeManager>()
-                    .GetLocationExits(location);
-                api.GetItemManager().Delete(exits, true);
-                location = api.GetItemManager().Read(deleteLocationRequest.LocationItemId);
-                api.GetItemManager().Delete(new List<Item>() { location });
-                var deletedItems = exits ?? new List<Item>();
-                deletedItems.Add(location);
-                var deleteItemEvent = new DeleteItemEvent()
+                try
                 {
-                    Items = deletedItems
-                };
-                ((DeleteLocationResponse)response).DeleteItemEvent = deleteItemEvent;
-                ((DeleteLocationResponse)response)._responseSuccess = true;
-            }
-            catch (Exception e)
-            {
-                var traverseExceptions = e;
-                while (traverseExceptions != null)
-                {
-                    ((DeleteLocationResponse)response)._responseMessage += traverseExceptions.Message + ". ";
-                    traverseExceptions = traverseExceptions.InnerException;
+                    var deleteLocationRequest = request.GetMessageAsType<DeleteLocationRequest>();
+                    var player = api.GetItemManager().Read(terminal.PlayerId.Value);
+                    var location = api.GetItemManager().Read(deleteLocationRequest.LocationItemId);
+                    var exits = api.GetAttributeManager<IExitAttributeManager>()
+                        .GetLocationExits(location);
+                    api.GetItemManager().Delete(exits, true);
+                    location = api.GetItemManager().Read(deleteLocationRequest.LocationItemId);
+                    api.GetItemManager().Delete(new List<Item>() { location });
+                    var deletedItems = exits ?? new List<Item>();
+                    deletedItems.Add(location);
+                    var deleteItemEvent = new DeleteItemEvent()
+                    {
+                        Items = deletedItems
+                    };
+                    ((DeleteLocationResponse)response).DeleteItemEvent = deleteItemEvent;
+                    ((DeleteLocationResponse)response)._responseSuccess = true;
                 }
-                api.GetLogger().Log(LogLevel.Error, ((DeleteLocationResponse)response)._responseMessage);
+                catch (Exception e)
+                {
+                    var traverseExceptions = e;
+                    while (traverseExceptions != null)
+                    {
+                        ((DeleteLocationResponse)response)._responseMessage += traverseExceptions.Message + ". ";
+                        traverseExceptions = traverseExceptions.InnerException;
+                    }
+                    api.GetLogger().Log(LogLevel.Error, ((DeleteLocationResponse)response)._responseMessage);
+                }
             }
             return response;
         }

@@ -20,6 +20,7 @@ using BeforeOurTime.Models.Items.Attributes.Physicals;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Models.Items.Attributes.Characters;
 using BeforeOurTime.Models.Items.Attributes.Players;
+using Microsoft.Extensions.Logging;
 
 namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
 {
@@ -49,39 +50,52 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
         {
             if (request.IsMessageType<CreateAccountCharacterRequest>())
             {
-                var createPlayerRequest = request.GetMessageAsType<CreateAccountCharacterRequest>();
-                var playerItem = api.GetAttributeManager<IPlayerAttributeManager>().Create(
-                    new CharacterAttribute()
-                    {
-                        Health = new CharacterHealth()
-                        {
-                            Max = 25,
-                            Value = 25
-                        }
-                    },
-                    new PhysicalAttribute()
-                    {
-                        Name = createPlayerRequest.Name,
-                        Description = "A player",
-                        Weight = 100
-                    },
-                    new PlayerAttribute()
-                    {
-                        Name = createPlayerRequest.Name,
-                        AccountId = terminal.AccountId.Value
-                    },
-                    api.GetAttributeManager<IGameAttributeManager>().GetDefaultLocation());
-                var createPlayerResponse = new CreateAccountCharacterResponse()
+                response = new CreateAccountCharacterResponse()
                 {
-                    _requestInstanceId = request.GetRequestInstanceId(),
-                    _responseSuccess = true,
-                    CreatedAccountCharacterEvent = new CreatedAccountCharacterEvent()
+                    _responseSuccess = false,
+                    _requestInstanceId = request.GetRequestInstanceId()
+                };
+                try
+                {
+                    var createPlayerRequest = request.GetMessageAsType<CreateAccountCharacterRequest>();
+                    var playerItem = api.GetAttributeManager<IPlayerAttributeManager>().Create(
+                        new CharacterAttribute()
+                        {
+                            Health = new CharacterHealth()
+                            {
+                                Max = 25,
+                                Value = 25
+                            }
+                        },
+                        new PhysicalAttribute()
+                        {
+                            Name = createPlayerRequest.Name,
+                            Description = "A player",
+                            Weight = 100
+                        },
+                        new PlayerAttribute()
+                        {
+                            Name = createPlayerRequest.Name,
+                            AccountId = terminal.AccountId.Value
+                        },
+                        api.GetAttributeManager<IGameAttributeManager>().GetDefaultLocation());
+                    ((CreateAccountCharacterResponse)response)._responseSuccess = true;
+                    ((CreateAccountCharacterResponse)response).CreatedAccountCharacterEvent = new CreatedAccountCharacterEvent()
                     {
                         ItemId = playerItem.Id,
                         Name = playerItem.Name
+                    };
+                }
+                catch (Exception e)
+                {
+                    var traverseExceptions = e;
+                    while (traverseExceptions != null)
+                    {
+                        ((CreateAccountCharacterResponse)response)._responseMessage += traverseExceptions.Message + ". ";
+                        traverseExceptions = traverseExceptions.InnerException;
                     }
-                };
-                response = createPlayerResponse;
+                    api.GetLogger().Log(LogLevel.Error, ((CreateAccountCharacterResponse)response)._responseMessage);
+                }
             }
             return response;
         }
