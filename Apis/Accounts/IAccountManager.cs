@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Models.Accounts;
-using BeforeOurTime.Models.Accounts.Authentication.Providers;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,19 +34,6 @@ namespace BeforeOurTime.Business.Apis.Accounts
         /// <param name="password"></param>
         /// <returns>User account if authenticated, otherwise null</returns>
         Account Authenticate(string email, string password);
-        /// <summary>
-        /// Read a local authentication credential
-        /// </summary>
-        /// <param name="accountId"></param>
-        /// <returns></returns>
-        AuthenticationBotMeta ReadCredential(Guid accountId);
-        /// <summary>
-        /// Update a credential's password
-        /// </summary>
-        /// <param name="credential">Local authentication credential</param>
-        /// <param name="password">New password</param>
-        /// <returns></returns>
-        AuthenticationBotMeta UpdateCredentialPassword(AuthenticationBotMeta credential, string password);
         /// <summary>
         /// Delete a single account
         /// </summary>

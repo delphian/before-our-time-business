@@ -47,13 +47,29 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
         /// <returns></returns>
         public Item GetDefaultGame()
         {
-            var defaultGame = DetailGameRepo.Read().FirstOrDefault();
-            if (defaultGame == null)
+            var defaultGameAttribute = DetailGameRepo.Read().FirstOrDefault();
+            if (defaultGameAttribute == null)
             {
+                var gameItem = ItemManager.Create(new Item()
+                {
+                    ParentId = null,
+                    UuidType = Guid.NewGuid(),
+                    Data = "{}",
+                    Script = "",
+                    Attributes = new List<ItemAttribute>()
+                    {
+                        new GameAttribute()
+                        {
+                            Name = "Brave New World",
+                            DefaultLocationId = null
+                        }
+                    }
+                });
                 var locationItem = ItemManager.Create(new Item()
                 {
                     Name = "Default Location",
                     Description = "Default location item created by GetDefaultGame()",
+                    ParentId = gameItem.Id,
                     UuidType = Guid.NewGuid(),
                     Data = "{}",
                     Script = "",
@@ -73,22 +89,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
                         }
                     }
                 });
-                defaultGame = Create(new GameAttribute()
-                {
-                    Name = "Brave New World",
-                    Item = new Item()
-                    {
-                        Name = "Game",
-                        Description = "Game item created by GetDefaultGame()",
-                        UuidType = Guid.NewGuid(),
-                        Data = "{}",
-                        Script = ""
-                    },
-                    DefaultLocationId = locationItem.GetAttribute<LocationAttribute>().Id
-                });
+                defaultGameAttribute = gameItem.GetAttribute<GameAttribute>();
+                defaultGameAttribute.DefaultLocationId = locationItem.GetAttribute<LocationAttribute>().Id;
+                Update(defaultGameAttribute);
             }
             var defaultGameItem = ItemRepo.Read(
-                defaultGame.ItemId, 
+                defaultGameAttribute.ItemId, 
                 new Models.TransactionOptions() { NoTracking = true });
             return defaultGameItem;
         }

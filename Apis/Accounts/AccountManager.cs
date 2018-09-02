@@ -3,7 +3,6 @@ using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Accounts;
 using System.Linq;
 using System;
-using BeforeOurTime.Models.Accounts.Authentication.Providers;
 using BeforeOurTime.Models.Accounts;
 using BeforeOurTime.Models.Accounts.Authentication;
 using BeforeOurTime.Models;
@@ -15,18 +14,14 @@ namespace BeforeOurTime.Business.Apis.Accounts
     /// </summary>
     public class AccountManager : IAccountManager
     {
-        protected IRepository<AuthenticationBotMeta> AuthenBotMetaRepo { set; get; }
         protected IAccountRepo AccountRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="authenBotMetaRepo"></param>
         /// <param name="accountRepo"></param>
         public AccountManager(
-            IAccountRepo accountRepo,
-            IRepository<AuthenticationBotMeta> authenBotMetaRepo)
+            IAccountRepo accountRepo)
         {
-            AuthenBotMetaRepo = authenBotMetaRepo;
             AccountRepo = accountRepo;
         }
         /// <summary>
@@ -41,16 +36,9 @@ namespace BeforeOurTime.Business.Apis.Accounts
             {
                 new Account()
                 {
-                    Name = name
-                }
-            }).FirstOrDefault();
-            var credentials = AuthenBotMetaRepo.Create(new List<AuthenticationBotMeta>()
-            {
-                new AuthenticationBotMeta()
-                {
+                    Name = name,
                     Email = email,
-                    Password = BCrypt.Net.BCrypt.HashPassword(password),
-                    AccountId = account.Id
+                    Password = BCrypt.Net.BCrypt.HashPassword(password)
                 }
             }).FirstOrDefault();
             return account;
@@ -89,26 +77,6 @@ namespace BeforeOurTime.Business.Apis.Accounts
             };
             var account = AccountRepo.Read(authenRequest).FirstOrDefault();
             return account;
-        }
-        /// <summary>
-        /// Read a local authentication credential
-        /// </summary>
-        /// <param name="accountId"></param>
-        /// <returns></returns>
-        public AuthenticationBotMeta ReadCredential(Guid accountId)
-        {
-            return AuthenBotMetaRepo.Read().Where(x => x.AccountId == accountId).FirstOrDefault();
-        }
-        /// <summary>
-        /// Update a credential's password
-        /// </summary>
-        /// <param name="credential">Local authentication credential</param>
-        /// <param name="password">New password</param>
-        /// <returns></returns>
-        public AuthenticationBotMeta UpdateCredentialPassword(AuthenticationBotMeta credential, string password)
-        {
-            credential.Password = BCrypt.Net.BCrypt.HashPassword(password);
-            return AuthenBotMetaRepo.Update(new List<AuthenticationBotMeta>() { credential }).FirstOrDefault();
         }
         /// <summary>
         /// Delete a single account
