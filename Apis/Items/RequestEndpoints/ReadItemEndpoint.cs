@@ -51,14 +51,22 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var readItemRequest = request.GetMessageAsType<ReadItemRequest>();
                 var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                 var items = new List<Item>();
+                // Read enumerated list of items
                 if (readItemRequest.ItemIds?.FirstOrDefault() != null)
                 {
                     items = api.GetItemManager().Read(readItemRequest.ItemIds);
                 }
+                // Read items of type
                 if (readItemRequest.ItemAttributeTypes?.FirstOrDefault() != null)
                 {
                     var attributeManager = api.GetAttributeManagerOfType(readItemRequest.ItemAttributeTypes.First());
                     items = attributeManager.ReadItem();
+                }
+                // Read all items
+                if (readItemRequest.ItemIds?.FirstOrDefault() == null &&
+                    readItemRequest.ItemAttributeTypes?.FirstOrDefault() == null)
+                {
+                    items = api.GetItemManager().Read();
                 }
                 response = new ReadItemResponse()
                 {
