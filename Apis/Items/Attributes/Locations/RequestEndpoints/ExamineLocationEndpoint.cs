@@ -9,6 +9,7 @@ using BeforeOurTime.Models.Items.Attributes.Characters;
 using BeforeOurTime.Models.Items.Attributes.Exits;
 using BeforeOurTime.Models.Items.Attributes.Physicals;
 using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.Messages.Locations.ReadLocationSummary;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
@@ -54,7 +55,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var location = api.GetItemManager().Read(
                     player.ParentId.Value,
                     new TransactionOptions() { NoTracking = true });
-                var ioLocationUpdate = new ListLocationResponse()
+                var ioLocationUpdate = new ReadLocationSummaryResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
                     _responseSuccess = true,
@@ -83,7 +84,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     {
                         var attribute = item.GetAttribute<PhysicalAttribute>();
                         ioLocationUpdate.Adendums.Add($"A {attribute.Name} is here");
-                        ioLocationUpdate.Objects.Add(item);
                     });
                 // Add character items
                 location.Children
