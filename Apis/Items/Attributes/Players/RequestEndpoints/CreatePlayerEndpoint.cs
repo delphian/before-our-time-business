@@ -2,10 +2,9 @@
 using BeforeOurTime.Business.Apis.Items.Attributes.Games;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Players;
-using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Terminals;
-using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.Messages.Events.Created;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Create;
@@ -16,10 +15,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Models.Items.Attributes.Physicals;
+using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Models.Items.Attributes.Characters;
-using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.ItemAttributes.Characters;
+using BeforeOurTime.Models.ItemAttributes.Players;
 using Microsoft.Extensions.Logging;
 
 namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
@@ -83,7 +82,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                     ((CreateAccountCharacterResponse)response).CreatedAccountCharacterEvent = new CreatedAccountCharacterEvent()
                     {
                         ItemId = playerItem.Id,
-                        Name = playerItem.Name
+                        Name = playerItem.Visible.Name
                     };
                 }
                 catch (Exception e)

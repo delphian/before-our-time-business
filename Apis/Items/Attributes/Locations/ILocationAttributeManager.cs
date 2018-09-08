@@ -1,8 +1,9 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
-using BeforeOurTime.Models.Items.Attributes.Locations;
+using BeforeOurTime.Models.ItemAttributes;
+using BeforeOurTime.Models.ItemAttributes.Locations;
+using BeforeOurTime.Models.Items.Locations;
 using BeforeOurTime.Repository.Models;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         /// </summary>
         /// <param name="currentLocationItemId">Existing location item to link to new location with exits</param>
         /// <returns></returns>
-        Item CreateFromHere(Guid currentLocationItemId);
+        LocationItem CreateFromHere(Guid currentLocationItemId);
         /// <summary>
         /// Update attribute's name
         /// </summary>

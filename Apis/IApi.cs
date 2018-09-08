@@ -2,7 +2,6 @@
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
 using Microsoft.Extensions.Configuration;
@@ -25,7 +24,6 @@ namespace BeforeOurTime.Business.Apis
         IConfiguration GetConfiguration();
         IMessageManager GetMessageManager();
         IAccountManager GetAccountManager();
-        IScriptManager GetScriptManager();
         IItemManager GetItemManager();
         ITerminalManager GetTerminalManager();
         /// <summary>
@@ -51,16 +49,16 @@ namespace BeforeOurTime.Business.Apis
         /// </summary>
         /// <param name="delayMs">Interval between ticks</param>
         /// <param name="ct">Cancelation token for ticks</param>
-        Task TickAsync(int delayMs, CancellationToken ct);
+//        Task TickAsync(int delayMs, CancellationToken ct);
         /// <summary>
         /// Deliver messages to their recipient items and execute each item script
         /// </summary>
         /// <param name="delayMs">Interval between ticks</param>
         /// <param name="ct">Cancelation token for ticks</param>
-        Task DeliverMessagesAsync(
-            int delayMs,
-            CancellationToken ct,
-            IConfiguration config,
-            IServiceProvider serviceProvider);
+        //Task DeliverMessagesAsync(
+        //    int delayMs,
+        //    CancellationToken ct,
+        //    IConfiguration config,
+        //    IServiceProvider serviceProvider);
     }
 }

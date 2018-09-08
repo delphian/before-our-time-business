@@ -21,6 +21,7 @@ using BeforeOurTime.Models.Messages.Requests.List;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using BeforeOurTime.Models.Messages.Requests.Create;
+using BeforeOurTime.Models.Items.Characters;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -433,10 +434,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     case "list":
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n\r\n");
                         var characters = telnetClient.GetTerminal().GetAttachable();
-                        characters.ForEach(delegate (Item player)
+                        characters.ForEach(delegate (CharacterItem player)
                         {
                             TelnetServer.SendMessageToClient(telnetClient, "  " + 
-                                player.Name + 
+                                player.Visible.Name + 
                                 " (" + player.Id + ")\r\n");
                         });
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n");
@@ -449,9 +450,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         break;
                     case "play":
                         var name = message.Split(' ').Last().ToLower();
-                        telnetClient.GetTerminal().GetAttachable().ForEach(delegate (Item player)
+                        telnetClient.GetTerminal().GetAttachable().ForEach(delegate (CharacterItem player)
                         {
-                            if (player.Name.ToLower() == name)
+                            if (player.Visible.Name.ToLower() == name)
                             {
                                 telnetClient.GetTerminal().Attach(player.Id);
                                 telnetClient.GetTerminal().DataBag["step"] = "attached";

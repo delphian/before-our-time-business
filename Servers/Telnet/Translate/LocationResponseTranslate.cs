@@ -43,8 +43,8 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             telnetClient.ItemExits.Clear();
             // Send location name and description
             telnetServer.SendMessageToClient(telnetClient, "\r\n\r\n" 
-                + $"{AnsiColors.greenB}{locationResponse.Item.Name}{AnsiColors.reset}\r\n"
-                + locationResponse.Item.Description + "\r\n");
+                + $"{AnsiColors.greenB}{locationResponse.Item.Visible.Name}{AnsiColors.reset}\r\n"
+                + locationResponse.Item.Visible.Description + "\r\n");
             locationResponse.Adendums.ForEach(delegate (string adendum)
             {
                 telnetServer.SendMessageToClient(telnetClient, " - " + adendum + "\r\n");

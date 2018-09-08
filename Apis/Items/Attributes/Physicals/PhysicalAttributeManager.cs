@@ -1,10 +1,7 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
-using BeforeOurTime.Business.Apis.Scripts;
-using BeforeOurTime.Business.Apis.Scripts.Engines;
-using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
-using BeforeOurTime.Models.Items.Attributes.Physicals;
+using BeforeOurTime.Models.ItemAttributes;
+using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.Primitives.Images;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
@@ -19,8 +16,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Physicals
     public class PhysicalAttributeManager : AttributeManager<PhysicalAttribute>, IPhysicalAttributeManager
     {
         private IPhysicalAttributeRepo DetailPhysicalRepo { set; get; }
-        private IScriptEngine ScriptEngine { set; get; }
-        private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
@@ -28,13 +23,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Physicals
         public PhysicalAttributeManager(
             IItemRepo itemRepo,
             IPhysicalAttributeRepo detailPhysicalRepo,
-            IScriptEngine scriptEngine,
-            IScriptManager scriptManager,
             IItemManager itemManager) : base(itemRepo, detailPhysicalRepo)
         {
             DetailPhysicalRepo = detailPhysicalRepo;
-            ScriptEngine = scriptEngine;
-            ScriptManager = scriptManager;
             ItemManager = itemManager;
         }
         /// <summary>
@@ -80,40 +71,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Physicals
         {
             var item = ItemManager.Create(new Item()
             {
-                UuidType = Guid.NewGuid(),
                 ParentId = parent.Id,
-                Data = "{}",
-                Script = ""
             });
             var physical = Attach(item, name, description, volume, weight);
             return physical;
-        }
-        /// <summary>
-        /// Deliver a message to an item
-        /// </summary>
-        /// <remarks>
-        /// Often results in the item's script executing and parsing the message package
-        /// </remarks>
-        /// <param name="item"></param>
-        public void DeliverMessage(SavedMessage message, Item item, JsFunctionManager jsFunctionManager)
-        {
-            var functionDefinition = ScriptManager.GetDelegateDefinition(message.DelegateId);
-            if (ScriptEngine.GetFunctionDeclarations(item.Script.Trim()).Contains(functionDefinition.GetFunctionName()))
-            {
-                jsFunctionManager.AddJsFunctions(ScriptEngine);
-                ScriptEngine
-                    .SetValue("me", item)
-                    .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(item.Data)))
-                    .Execute("var data = JSON.parse(_data);")
-                    .Execute(item.Script)
-                    .Invoke(
-                        functionDefinition.GetFunctionName(),
-                        JsonConvert.DeserializeObject(message.Package, functionDefinition.GetArgumentType())
-                    );
-                // Save changes to item data
-                item.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
-                ItemManager.Update(item);
-            }
         }
         /// <summary>
         /// Determine if an item has attributes that may be managed

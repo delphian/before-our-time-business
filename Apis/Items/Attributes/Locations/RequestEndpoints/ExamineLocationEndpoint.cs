@@ -1,14 +1,16 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
-using BeforeOurTime.Models.Items.Attributes.Characters;
-using BeforeOurTime.Models.Items.Attributes.Exits;
-using BeforeOurTime.Models.Items.Attributes.Physicals;
-using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.ItemAttributes;
+using BeforeOurTime.Models.ItemAttributes.Characters;
+using BeforeOurTime.Models.ItemAttributes.Exits;
+using BeforeOurTime.Models.ItemAttributes.Physicals;
+using BeforeOurTime.Models.ItemAttributes.Players;
+using BeforeOurTime.Models.Items.Characters;
+using BeforeOurTime.Models.Items.Exits;
+using BeforeOurTime.Models.Items.Locations;
 using BeforeOurTime.Models.Messages.Locations.ReadLocationSummary;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
@@ -52,9 +54,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var player = api.GetItemManager().Read(
                     terminal.PlayerId.Value,
                     new TransactionOptions() { NoTracking = true });
-                var location = api.GetItemManager().Read(
-                    player.ParentId.Value,
-                    new TransactionOptions() { NoTracking = true });
+                var location = api.GetItemManager().Read(player.ParentId.Value).GetAsItem<LocationItem>();
                 var ioLocationUpdate = new ReadLocationSummaryResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
@@ -64,8 +64,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 };
                 // Add exits
                 location.Children
-                    .Where(x => x.HasAttribute(typeof(ExitAttribute))).ToList()
-                    .ForEach(delegate (Item item)
+                    .Where(x => x.HasAttribute(typeof(ExitAttribute)))
+                    .Select(x => x.GetAsItem<ExitItem>())
+                    .ToList()
+                    .ForEach(delegate (ExitItem item)
                     {
                         var attribute = item.GetAttribute<ExitAttribute>();
                         ioLocationUpdate.Exits.Add(new ListExitResponse()
@@ -87,8 +89,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     });
                 // Add character items
                 location.Children
-                    .Where(x => x.HasAttribute<CharacterAttribute>() || x.HasAttribute<PlayerAttribute>()).ToList()
-                    .ForEach(delegate (Item item)
+                    .Where(x => x.HasAttribute<CharacterAttribute>() || 
+                                x.HasAttribute<PlayerAttribute>())
+                    .Select(x => x.GetAsItem<CharacterItem>())
+                    .ToList()
+                    .ForEach(delegate (CharacterItem item)
                     {
                         var attribute = item.GetAttribute<PlayerAttribute>();
                         ioLocationUpdate.Adendums.Add($"{attribute.Name} is standing here");

@@ -1,8 +1,8 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
-using BeforeOurTime.Models.Items.Attributes.Games;
-using BeforeOurTime.Models.Items.Attributes.Locations;
+using BeforeOurTime.Models.ItemAttributes;
+using BeforeOurTime.Models.ItemAttributes.Games;
+using BeforeOurTime.Models.ItemAttributes.Locations;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -1,10 +1,9 @@
-﻿using BeforeOurTime.Business.Apis.Scripts;
-using BeforeOurTime.Business.Apis.Scripts.Engines;
-using BeforeOurTime.Business.Apis.Scripts.Libraries;
-using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
-using BeforeOurTime.Models.Items.Attributes.Games;
-using BeforeOurTime.Models.Items.Attributes.Locations;
+﻿using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.ItemAttributes;
+using BeforeOurTime.Models.ItemAttributes.Games;
+using BeforeOurTime.Models.ItemAttributes.Locations;
+using BeforeOurTime.Models.Items.Games;
+using BeforeOurTime.Models.Items.Locations;
 using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
@@ -18,8 +17,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
     {
         private IGameAttributeRepo DetailGameRepo { set; get; }
         private ILocationAttributeRepo DetailLocationRepo { set; get; }
-        private IScriptEngine ScriptEngine { set; get; }
-        private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         /// <summary>
         /// Constructor
@@ -28,14 +25,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
             IItemRepo itemRepo,
             IGameAttributeRepo detailGameRepo,
             ILocationAttributeRepo detailLocationRepo,
-            IScriptEngine scriptEngine,
-            IScriptManager scriptManager,
             IItemManager itemManager) : base(itemRepo, detailGameRepo)
         {
             DetailGameRepo = detailGameRepo;
             DetailLocationRepo = detailLocationRepo;
-            ScriptEngine = scriptEngine;
-            ScriptManager = scriptManager;
             ItemManager = itemManager;
         }
         /// <summary>
@@ -50,12 +43,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
             var defaultGameAttribute = DetailGameRepo.Read().FirstOrDefault();
             if (defaultGameAttribute == null)
             {
-                var gameItem = ItemManager.Create(new Item()
+                var gameItem = ItemManager.Create(new GameItem()
                 {
                     ParentId = null,
-                    UuidType = Guid.NewGuid(),
-                    Data = "{}",
-                    Script = "",
                     Attributes = new List<ItemAttribute>()
                     {
                         new GameAttribute()
@@ -65,14 +55,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
                         }
                     }
                 });
-                var locationItem = ItemManager.Create(new Item()
+                var locationItem = ItemManager.Create(new LocationItem()
                 {
-                    Name = "Default Location",
-                    Description = "Default location item created by GetDefaultGame()",
                     ParentId = gameItem.Id,
-                    UuidType = Guid.NewGuid(),
-                    Data = "{}",
-                    Script = "",
                     Attributes = new List<ItemAttribute>()
                     {
                         new LocationAttribute()
@@ -117,33 +102,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
                     new Models.TransactionOptions() { NoTracking = true });
             }
             return locationAttribute;
-        }
-        /// <summary>
-        /// Deliver a message to an item
-        /// </summary>
-        /// <remarks>
-        /// Often results in the item's script executing and parsing the message package
-        /// </remarks>
-        /// <param name="item"></param>
-        public void DeliverMessage(SavedMessage message, Item item, JsFunctionManager jsFunctionManager)
-        {
-            var functionDefinition = ScriptManager.GetDelegateDefinition(message.DelegateId);
-            if (ScriptEngine.GetFunctionDeclarations(item.Script.Trim()).Contains(functionDefinition.GetFunctionName()))
-            {
-                jsFunctionManager.AddJsFunctions(ScriptEngine);
-                ScriptEngine
-                    .SetValue("me", item)
-                    .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(item.Data)))
-                    .Execute("var data = JSON.parse(_data);")
-                    .Execute(item.Script)
-                    .Invoke(
-                        functionDefinition.GetFunctionName(),
-                        JsonConvert.DeserializeObject(message.Package, functionDefinition.GetArgumentType())
-                    );
-                // Save changes to item data
-                item.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
-                ItemManager.Update(item);
-            }
         }
         /// <summary>
         /// Determine if an item has attributes that may be managed

@@ -3,11 +3,8 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Games;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Scripts;
-using BeforeOurTime.Business.Apis.Scripts.Engines;
-using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
@@ -15,17 +12,16 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using BeforeOurTime.Models.Items.Attributes.Exits;
-using BeforeOurTime.Models.Items.Attributes.Locations;
+using BeforeOurTime.Models.ItemAttributes.Exits;
+using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Models;
+using BeforeOurTime.Models.Items.Locations;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
 {
     public class LocationAttributeManager : AttributeManager<LocationAttribute>, ILocationAttributeManager
     {
         private ILocationAttributeRepo DetailLocationRepo { set; get; }
-        private IScriptEngine ScriptEngine { set; get; }
-        private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         private IGameAttributeManager GameAttributeManager { set; get; }
         private IExitAttributeManager ExitAttributeManager { set; get; }
@@ -35,52 +31,21 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
         public LocationAttributeManager(
             IItemRepo itemRepo,
             ILocationAttributeRepo detailLocationRepo,
-            IScriptEngine scriptEngine,
-            IScriptManager scriptManager,
             IItemManager itemManager,
             IGameAttributeManager gameAttributeMangaer,
             IExitAttributeManager exitAttributeManager) : base(itemRepo, detailLocationRepo)
         {
             DetailLocationRepo = detailLocationRepo;
-            ScriptEngine = scriptEngine;
-            ScriptManager = scriptManager;
             ItemManager = itemManager;
             GameAttributeManager = gameAttributeMangaer;
             ExitAttributeManager = exitAttributeManager;
-        }
-        /// <summary>
-        /// Deliver a message to an item
-        /// </summary>
-        /// <remarks>
-        /// Often results in the item's script executing and parsing the message package
-        /// </remarks>
-        /// <param name="item"></param>
-        public void DeliverMessage(SavedMessage message, Item item, JsFunctionManager jsFunctionManager)
-        {
-            var functionDefinition = ScriptManager.GetDelegateDefinition(message.DelegateId);
-            if (ScriptEngine.GetFunctionDeclarations(item.Script.Trim()).Contains(functionDefinition.GetFunctionName()))
-            {
-                jsFunctionManager.AddJsFunctions(ScriptEngine);
-                ScriptEngine
-                    .SetValue("me", item)
-                    .SetValue("_data", JsonConvert.SerializeObject(JsonConvert.DeserializeObject(item.Data)))
-                    .Execute("var data = JSON.parse(_data);")
-                    .Execute(item.Script)
-                    .Invoke(
-                        functionDefinition.GetFunctionName(),
-                        JsonConvert.DeserializeObject(message.Package, functionDefinition.GetArgumentType())
-                    );
-                // Save changes to item data
-                item.Data = JsonConvert.SerializeObject(ScriptEngine.GetValue("data"));
-                ItemManager.Update(item);
-            }
         }
         /// <summary>
         /// Create an empty new location and connecting exits from a provided location
         /// </summary>
         /// <param name="currentLocationItemId">Existing location item to link to new location with exits</param>
         /// <returns></returns>
-        public Item CreateFromHere(Guid currentLocationItemId)
+        public LocationItem CreateFromHere(Guid currentLocationItemId)
         {
             var currentLocation = ItemRepo.Read(currentLocationItemId);
             var locationAttribute = new LocationAttribute()
@@ -89,7 +54,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
                 Description = "The relatively new construction of this place is apparant everywhere you look. In several places the c# substrate seems to be leaking from above, while behind you a small puddle of sql statements have coalesced into a small puddle. Ew..."
             };
             var defaultGameItemId = GameAttributeManager.GetDefaultGame().Id;
-            var locationItem = Create(locationAttribute, defaultGameItemId);
+            var locationItem = Create(locationAttribute, defaultGameItemId).GetAsItem<LocationItem>();
             var toExitAttribute = new ExitAttribute()
             {
                 Name = "A New Exit",

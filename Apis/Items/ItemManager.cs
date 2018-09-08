@@ -4,7 +4,6 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
-using BeforeOurTime.Business.Apis.Scripts;
 using System.Linq;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Models.Items;
@@ -20,7 +19,6 @@ namespace BeforeOurTime.Business.Apis.Items
     {
         private IItemRepo ItemRepo { set; get; }
         private IMessageManager MessageManager { set; get; }
-        private IScriptManager ScriptManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -29,12 +27,10 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="messageManager"></param>
         public ItemManager(
             IItemRepo itemRepo,
-            IMessageManager messageManager,
-            IScriptManager scriptManager)
+            IMessageManager messageManager)
         {
             ItemRepo = itemRepo;
             MessageManager = messageManager;
-            ScriptManager = scriptManager;
         }
         /// <summary>
         /// Create a new item
@@ -42,7 +38,6 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="item">Item which is new and being created</param>
         public Item Create(Item item)
         {
-            item.DelegateLinks = UpdateScriptDelegateLinks(item);
             ItemRepo.Create(new List<Item>() { item });
             return item;
         }
@@ -78,15 +73,6 @@ namespace BeforeOurTime.Business.Apis.Items
             return ItemRepo.Read(offset, limit, options);
         }
         /// <summary>
-        /// Get all item ids that implement a script delegate
-        /// </summary>
-        /// <param name="scriptDelegate">A script function name, it's argument type, and return type</param>
-        /// <returns></returns>
-        public List<Guid> GetDelegateImplementerIds(IDelegate scriptDelegate)
-        {
-            return ItemRepo.GetDelegateImplementerIds(scriptDelegate);
-        }
-        /// <summary>
         /// Get the item identifiers of all item's children
         /// </summary>
         /// <param name="itemId">Unique item identifier of potential parent</param>
@@ -111,61 +97,7 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <returns></returns>
         public Item Update(Item item)
         {
-            item.DelegateLinks = UpdateScriptDelegateLinks(item);
             return Update(new List<Item>() { item }).FirstOrDefault();
-        }
-        /// <summary>
-        /// Generate delegate links by parsing an item's script delegate declarations
-        /// </summary>
-        /// <param name="item">Item to generate delegate links for</param>
-        /// <returns></returns>
-        protected List<ScriptDelegateItemLink> UpdateScriptDelegateLinks(Item item)
-        {
-            var delegateLinks = new List<ScriptDelegateItemLink>();
-            var invalidDelegates = ScriptManager.GetScriptInvalidDelegates(item.Script);
-            if (invalidDelegates.Count > 0)
-            {
-                var delegateStrs = "";
-                invalidDelegates.ForEach(delegate (IDelegate invalidDelegate)
-                {
-                    delegateStrs += (delegateStrs.Length == 0) ? invalidDelegate.GetFunctionName() :
-                                                               ", " + invalidDelegate.GetFunctionName();
-                });
-                throw new Exception("Improperly declared script delegates: " + delegateStrs);
-            }
-            ScriptManager.GetScriptValidDelegates(item.Script).ForEach(delegate (IDelegate scriptDelegate)
-            {
-                delegateLinks.Add(new ScriptDelegateItemLink()
-                {
-                    Item = item,
-                    DelegateId = scriptDelegate.GetId()
-                });
-            });
-           return delegateLinks;
-        }
-        /// <summary>
-        /// Update the item name
-        /// </summary>
-        /// <param name="id">Unique item identifier</param>
-        /// <param name="name">New name of the item</param>
-        /// <returns></returns>
-        public Item UpdateName(Guid id, string name)
-        {
-            var item = Read(id);
-            item.Name = name;
-            return Update(item);
-        }
-        /// <summary>
-        /// Update the item description
-        /// </summary>
-        /// <param name="id">Unique item identifier</param>
-        /// <param name="description">New description of the item</param>
-        /// <returns></returns>
-        public Item UpdateDescription(Guid id, string description)
-        {
-            var item = Read(id);
-            item.Description = description;
-            return Update(item);
         }
         /// <summary>
         /// Permenantly delete an item and remove from data store

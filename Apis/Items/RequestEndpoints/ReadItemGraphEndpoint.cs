@@ -2,12 +2,13 @@
 using BeforeOurTime.Business.Apis.Items.Attributes.Games;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
-using BeforeOurTime.Models.Items.Attributes.Characters;
-using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.ItemAttributes;
+using BeforeOurTime.Models.ItemAttributes.Characters;
+using BeforeOurTime.Models.ItemAttributes.Players;
+using BeforeOurTime.Models.Items.Games;
+using BeforeOurTime.Models.ItemProperties.Visible;
 using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
 using BeforeOurTime.Models.Messages.CRUD.Items.ReadItem;
 using BeforeOurTime.Models.Messages.CRUD.Items.ReadItemGraph;
@@ -61,11 +62,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                     var itemId = readItemGraphRequest.ItemId ??
                                  api.GetAttributeManager<IGameAttributeManager>().GetDefaultGame().Id;
-                    var item = api.GetItemManager().Read(itemId);
+                    var item = api.GetItemManager().Read(itemId).GetAsItem<GameItem>();
                     var itemGraph = new ItemGraph()
                     {
                         Id = item.Id,
-                        Name = item.Name
+                        Name = item.Visible.Name
                     };
                     BuildItemGraph(api.GetItemManager(), itemGraph);
                     ((ReadItemGraphResponse)response)._responseSuccess = true;
@@ -101,7 +102,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var childGraph = new ItemGraph()
                 {
                     Id = itemId,
-                    Name = item.Name
+                    Name = item.GetProperty<VisibleProperty>("Visible")?.Name
                 };
                 BuildItemGraph(itemManager, childGraph);
                 itemGraph.Children.Add(childGraph);

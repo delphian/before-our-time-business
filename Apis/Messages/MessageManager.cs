@@ -1,8 +1,8 @@
 ﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.ItemAttributes.Players;
+using BeforeOurTime.Models.ItemProperties.Visible;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Events.Arrivals;
 using BeforeOurTime.Models.Messages.Events.Departures;
@@ -22,7 +22,6 @@ namespace BeforeOurTime.Business.Apis.Messages
     public class MessageManager : IMessageManager
     {
         private IMessageRepo MessageRepo { set; get; }
-        private IScriptManager ScriptManager { set; get; }
         private ITerminalManager TerminalManager { set; get; }
         /// <summary>
         /// List of endpoints to process message requests
@@ -38,11 +37,9 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// <param name="messageRepo"></param>
         public MessageManager(
             IMessageRepo messageRepo,
-            IScriptManager scriptManager,
             ITerminalManager terminalManager)
         {
             MessageRepo = messageRepo;
-            ScriptManager = scriptManager;
             TerminalManager = terminalManager;
             RequestEndpoints = BuildRequestEndpoints();
             RequestEndpointsForTypes = BuildRequestEndpointsForTypes(RequestEndpoints);
@@ -58,7 +55,7 @@ namespace BeforeOurTime.Business.Apis.Messages
             var savedMessage = new SavedMessage()
             {
                 SenderId = senderId,
-                DelegateId = ScriptManager.GetDelegateDefinition("onArrival").GetId(),
+//                DelegateId = ScriptManager.GetDelegateDefinition("onArrival").GetId(),
                 Package = JsonConvert.SerializeObject(message)
             };
             recipients.ForEach(delegate (Item recipient)
@@ -102,7 +99,7 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// <param name="actorId">Initiator of the movement</param>
         public void SendArrivalEvent(Item item, Item location, Guid actorId)
         {
-            var name = item.Name;
+            var name = item.GetProperty<VisibleProperty>("Visible")?.Name;
             if (item.HasAttribute<PlayerAttribute>())
             {
                 name = item.GetAttribute<PlayerAttribute>().Name;
@@ -122,7 +119,7 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// <param name="actorId">Initiator of the movement</param>
         public void SendDepartureEvent(Item item, Item location, Guid actorId)
         {
-            var name = item.Name;
+            var name = item.GetProperty<VisibleProperty>("Visible")?.Name;
             if (item.HasAttribute<PlayerAttribute>())
             {
                 name = item.GetAttribute<PlayerAttribute>().Name;

@@ -44,12 +44,6 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <returns></returns>
         List<Item> Read(int? offset = null, int? limit = null, TransactionOptions options = null);
         /// <summary>
-        /// Get all item ids that implement a script delegate
-        /// </summary>
-        /// <param name="scriptDelegate">A script function name, it's argument type, and return type</param>
-        /// <returns></returns>
-        List<Guid> GetDelegateImplementerIds(IDelegate scriptDelegate);
-        /// <summary>
         /// Get the item identifiers of all item's children
         /// </summary>
         /// <param name="itemId">Unique item identifier of potential parent</param>
@@ -67,20 +61,6 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="item">Item to be updated</param>
         /// <returns></returns>
         Item Update(Item item);
-        /// <summary>
-        /// Update the item name
-        /// </summary>
-        /// <param name="id">Unique item identifier</param>
-        /// <param name="name">New name of the item</param>
-        /// <returns></returns>
-        Item UpdateName(Guid id, string name);
-        /// <summary>
-        /// Update the item description
-        /// </summary>
-        /// <param name="id">Unique item identifier</param>
-        /// <param name="description">New description of the item</param>
-        /// <returns></returns>
-        Item UpdateDescription(Guid id, string description);
         /// <summary>
         /// Permenantly delete an item and remove from data store
         /// </summary>

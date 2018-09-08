@@ -1,10 +1,10 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Players;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Scripts.Delegates.OnTerminalInput;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models;
-using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.ItemAttributes;
+using BeforeOurTime.Models.Items.Characters;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
@@ -49,14 +49,16 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Players.RequestEndpoints
                     .Where(x => x.AccountId == listAccountCharactersRequest.AccountId)
                     .Select(x => x.ItemId)
                     .ToList();
-                var items = api.GetItemManager().Read(
-                    itemIds, 
-                    new TransactionOptions() { NoTracking = true });
+                var items = api.GetItemManager()
+                    .Read(itemIds);
+                var characterItems = items
+                    .Select(x => x.GetAsItem<CharacterItem>())
+                    .ToList();
                 var listAccountCharactersResponse = new ListAccountCharactersResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
                     _responseSuccess = true,
-                    AccountCharacters = items
+                    AccountCharacters = characterItems
                 };
                 response = listAccountCharactersResponse;
             }

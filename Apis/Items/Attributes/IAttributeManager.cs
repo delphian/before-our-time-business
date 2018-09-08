@@ -1,7 +1,6 @@
-﻿using BeforeOurTime.Business.Apis.Scripts.Libraries;
-using BeforeOurTime.Models;
+﻿using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Attributes;
+using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Repository.Models.Messages.Data;
@@ -21,14 +20,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>List of items</returns>
         List<Item> ReadItem(int? offset = null, int? limit = null, TransactionOptions options = null);
-        /// <summary>
-        /// Deliver a message to an item
-        /// </summary>
-        /// <remarks>
-        /// Often results in the item's script executing and parsing the message package
-        /// </remarks>
-        /// <param name="item"></param>
-        void DeliverMessage(SavedMessage message, Item item, JsFunctionManager jsFunctionManager);
         /// <summary>
         /// Determine if an item has attributes that may be managed
         /// </summary>

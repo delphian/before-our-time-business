@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Items.Characters;
 using BeforeOurTime.Models.Json;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
@@ -127,9 +128,9 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// Get available characters for terminal attachment
         /// </summary>
         /// <returns>Detached items</returns>
-        public List<Item> GetAttachable()
+        public List<CharacterItem> GetAttachable()
         {
-            var accountCharacters = new List<Item>();
+            var accountCharacters = new List<CharacterItem>();
             var request = new ListAccountCharactersRequest()
             {
                 AccountId = AccountId.Value

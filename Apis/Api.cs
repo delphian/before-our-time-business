@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using BeforeOurTime.Business.Apis.Accounts;
-using BeforeOurTime.Business.Apis.Scripts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Items.Attributes;
@@ -16,7 +15,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using BeforeOurTime.Models.Messages.Events.Ticks;
 using BeforeOurTime.Repository.Models.Messages.Data;
-using BeforeOurTime.Business.Apis.Scripts.Libraries;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Items.Attributes.Players;
@@ -39,7 +37,6 @@ namespace BeforeOurTime.Business.Apis
         private IConfiguration Configuration { set; get; }
         private IMessageManager MessageManager { set; get; }
         private IAccountManager AccountManager { set; get; }
-        private IScriptManager ScriptManager { set; get; }
         private IItemManager ItemManager { set; get; }
         private ITerminalManager TerminalManager { set; get; }
         /// <summary>
@@ -52,7 +49,6 @@ namespace BeforeOurTime.Business.Apis
             IConfiguration configuration,
             IMessageManager messageManager,
             IAccountManager accountManager,
-            IScriptManager scriptManager,
             IItemManager itemManager,
             ITerminalManager terminalManager,
             IGameAttributeManager attributeGameManager,
@@ -66,7 +62,6 @@ namespace BeforeOurTime.Business.Apis
             Configuration = configuration;
             MessageManager = messageManager;
             AccountManager = accountManager;
-            ScriptManager = scriptManager;
             ItemManager = itemManager;
             TerminalManager = terminalManager;
             AttributeManagerList.Add(typeof(IGameAttributeManager), attributeGameManager);
@@ -83,10 +78,6 @@ namespace BeforeOurTime.Business.Apis
         public IAccountManager GetAccountManager()
         {
             return AccountManager;
-        }
-        public IScriptManager GetScriptManager()
-        {
-            return ScriptManager;
         }
         public IItemManager GetItemManager()
         {
@@ -156,60 +147,60 @@ namespace BeforeOurTime.Business.Apis
         /// </summary>
         /// <param name="delayMs">Interval between ticks</param>
         /// <param name="ct">Cancelation token for ticks</param>
-        public async Task TickAsync(int delayMs, CancellationToken ct)
-        {
-            var game = GetAttributeManager<IGameAttributeManager>().GetDefaultGame();
-            var onTickDelegate = ScriptManager.GetDelegateDefinition("onTick");
-            while (!ct.IsCancellationRequested)
-            {
-                await Task.Delay(delayMs);
-                lock (lockObject)
-                {
-                    var tickEvent = new TickEvent() { };
-                    var itemRecipientIds = ItemManager.GetDelegateImplementerIds(onTickDelegate);
-                    var itemRecipients = ItemManager.Read(itemRecipientIds);
-                    MessageManager.SendMessage(tickEvent, itemRecipients, game.Id);
-                }
-            }
-        }
+        //public async Task TickAsync(int delayMs, CancellationToken ct)
+        //{
+        //    var game = GetAttributeManager<IGameAttributeManager>().GetDefaultGame();
+        //    var onTickDelegate = ScriptManager.GetDelegateDefinition("onTick");
+        //    while (!ct.IsCancellationRequested)
+        //    {
+        //        await Task.Delay(delayMs);
+        //        lock (lockObject)
+        //        {
+        //            var tickEvent = new TickEvent() { };
+        //            //var itemRecipientIds = ItemManager.GetDelegateImplementerIds(onTickDelegate);
+        //            //var itemRecipients = ItemManager.Read(itemRecipientIds);
+        //            //MessageManager.SendMessage(tickEvent, itemRecipients, game.Id);
+        //        }
+        //    }
+        //}
         /// <summary>
         /// Deliver messages to their recipient items and execute each item script
         /// </summary>
         /// <param name="delayMs">Interval between ticks</param>
         /// <param name="ct">Cancelation token for ticks</param>
-        public async Task DeliverMessagesAsync(int delayMs, CancellationToken ct, IConfiguration config, IServiceProvider serviceProvider)
-        {
-            while (!ct.IsCancellationRequested)
-            {
-                await Task.Delay(delayMs);
-                lock (lockObject)
-                {
-                    // Create script global functions
-                    var jsFunctionManager = new JsFunctionManager(config, serviceProvider);
-                    // Get messages
-                    List<SavedMessage> messages = MessageManager.CullAllMessages();
-                    // Deliver message to each recipient
-                    foreach (SavedMessage message in messages)
-                    {
-                        try
-                        {
-                            var item = ItemManager.Read(message.RecipientId);
-                            List<IAttributeManager> attributeManagers = GetAttributeManagers(item);
-                            // Hand off message deliver to each item's manager code
-                            attributeManagers.ForEach(delegate (IAttributeManager attributeManager)
-                            {
-                                // TODO : This should probably just add items to jsFunctionManager
-                                // and then execute the script once instead of each manager executing the script
-                                attributeManager.DeliverMessage(message, item, jsFunctionManager);
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.LogError("script failed: " + ex.Message);
-                        }
-                    }
-                }
-            }
-        }
+        //public async Task DeliverMessagesAsync(int delayMs, CancellationToken ct, IConfiguration config, IServiceProvider serviceProvider)
+        //{
+        //    while (!ct.IsCancellationRequested)
+        //    {
+        //        await Task.Delay(delayMs);
+        //        lock (lockObject)
+        //        {
+        //            // Create script global functions
+        //            var jsFunctionManager = new JsFunctionManager(config, serviceProvider);
+        //            // Get messages
+        //            List<SavedMessage> messages = MessageManager.CullAllMessages();
+        //            // Deliver message to each recipient
+        //            foreach (SavedMessage message in messages)
+        //            {
+        //                try
+        //                {
+        //                    var item = ItemManager.Read(message.RecipientId);
+        //                    List<IAttributeManager> attributeManagers = GetAttributeManagers(item);
+        //                    // Hand off message deliver to each item's manager code
+        //                    attributeManagers.ForEach(delegate (IAttributeManager attributeManager)
+        //                    {
+        //                        // TODO : This should probably just add items to jsFunctionManager
+        //                        // and then execute the script once instead of each manager executing the script
+        //                        attributeManager.DeliverMessage(message, item, jsFunctionManager);
+        //                    });
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    Logger.LogError("script failed: " + ex.Message);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

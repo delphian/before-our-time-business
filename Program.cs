@@ -5,8 +5,6 @@ using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Scripts;
-using BeforeOurTime.Business.Apis.Scripts.Engines;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Servers;
 using BeforeOurTime.Models.Messages.Requests;
@@ -37,12 +35,12 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
 using BeforeOurTime.Business.Apis.Items.Attributes.Games;
 using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
 using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
-using BeforeOurTime.Models.Items.Attributes.Exits;
-using BeforeOurTime.Models.Items.Attributes.Physicals;
-using BeforeOurTime.Models.Items.Attributes.Locations;
-using BeforeOurTime.Models.Items.Attributes.Games;
-using BeforeOurTime.Models.Items.Attributes.Characters;
-using BeforeOurTime.Models.Items.Attributes.Players;
+using BeforeOurTime.Models.ItemAttributes.Exits;
+using BeforeOurTime.Models.ItemAttributes.Physicals;
+using BeforeOurTime.Models.ItemAttributes.Locations;
+using BeforeOurTime.Models.ItemAttributes.Games;
+using BeforeOurTime.Models.ItemAttributes.Characters;
+using BeforeOurTime.Models.ItemAttributes.Players;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models;
 
@@ -68,8 +66,8 @@ namespace BeforeOurTime.Business
             var api = ServiceProvider.GetService<IApi>();
             // Setup automatic message deliver and Tick counter for items
             var masterCts = new CancellationTokenSource();
-            var tickTask = api.TickAsync(Convert.ToInt32(Configuration.GetSection("Timing")["Tick"]), masterCts.Token);
-            var deliverTask = api.DeliverMessagesAsync(Int32.Parse(Configuration.GetSection("Timing")["Delivery"]), masterCts.Token, Configuration, ServiceProvider);
+//            var tickTask = api.TickAsync(Convert.ToInt32(Configuration.GetSection("Timing")["Tick"]), masterCts.Token);
+//            var deliverTask = api.DeliverMessagesAsync(Int32.Parse(Configuration.GetSection("Timing")["Delivery"]), masterCts.Token, Configuration, ServiceProvider);
             // Start servers
             ServiceProvider.GetService<ILogger>().LogInformation($"Starting servers...");
             Servers = BuildServerList(ServiceProvider.GetService<IApi>());
@@ -119,9 +117,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<IPhysicalAttributeRepo, PhysicalAttributeRepo>()
                 .AddScoped<IExitAttributeRepo, ExitAttributeRepo>()
                 // Main environment interface API
-                .AddScoped<IScriptEngine, JsScriptEngine>()
                 .AddScoped<IAccountManager, AccountManager>()
-                .AddScoped<IScriptManager, ScriptManager>()
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<ITerminalManager, TerminalManager>()
                 // Items and item attributes
