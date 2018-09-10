@@ -51,6 +51,7 @@ namespace BeforeOurTime.Business.Apis
             IAccountManager accountManager,
             IItemManager itemManager,
             ITerminalManager terminalManager,
+            IVisibleAttributeManager visibleAttributeManager,
             IGameAttributeManager attributeGameManager,
             IPlayerAttributeManager attributePlayerManager,
             ICharacterAttributeManager characterAttributeManager,
@@ -64,6 +65,7 @@ namespace BeforeOurTime.Business.Apis
             AccountManager = accountManager;
             ItemManager = itemManager;
             TerminalManager = terminalManager;
+            AttributeManagerList.Add(typeof(IVisibleAttributeManager), visibleAttributeManager);
             AttributeManagerList.Add(typeof(IGameAttributeManager), attributeGameManager);
             AttributeManagerList.Add(typeof(IPlayerAttributeManager), attributePlayerManager);
             AttributeManagerList.Add(typeof(ICharacterAttributeManager), characterAttributeManager);

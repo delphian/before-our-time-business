@@ -43,6 +43,7 @@ using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models;
+using BeforeOurTime.Models.ItemAttributes.Visibles;
 
 namespace BeforeOurTime.Business
 {
@@ -110,9 +111,10 @@ namespace BeforeOurTime.Business
                 .AddScoped<IScriptInterfaceRepo, ScriptInterfaceRepo>()
                 // Repositories (Items)
                 .AddScoped<IItemRepo, ItemRepo>()
+                .AddScoped<IVisibleAttributeRepo, VisibleAttributeRepo>()
                 .AddScoped<IPlayerAttributeRepo, PlayerAttributeRepo>()
                 .AddScoped<ICharacterAttributeRepo, CharacterAttributeRepo>()
-                .AddScoped<IGameAttributeRepo, GameAttributeRepo>()
+                .AddScoped<IGameAttributeRepo, GameDataRepo>()
                 .AddScoped<ILocationAttributeRepo, LocationAttributeRepo>()
                 .AddScoped<IPhysicalAttributeRepo, PhysicalAttributeRepo>()
                 .AddScoped<IExitAttributeRepo, ExitAttributeRepo>()
@@ -122,6 +124,7 @@ namespace BeforeOurTime.Business
                 .AddScoped<ITerminalManager, TerminalManager>()
                 // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
+                .AddScoped<IVisibleAttributeManager, VisibleAttributeManager>()
                 .AddScoped<IGameAttributeManager, GameAttributeManager>()
                 .AddScoped<ILocationAttributeManager, LocationAttributeManager>()
                 .AddScoped<IPlayerAttributeManager, PlayerAttributeManager>()

@@ -20,6 +20,7 @@ using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using Microsoft.Extensions.Logging;
+using BeforeOurTime.Models.ItemAttributes.Visibles;
 
 namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
 {
@@ -58,6 +59,11 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                 {
                     var createPlayerRequest = request.GetMessageAsType<CreateAccountCharacterRequest>();
                     var playerItem = api.GetAttributeManager<IPlayerAttributeManager>().Create(
+                        new VisibleAttribute()
+                        {
+                            Name = createPlayerRequest.Name,
+                            Description = "A bold new player"
+                        },
                         new CharacterAttribute()
                         {
                             Health = new CharacterHealth()

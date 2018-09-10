@@ -15,6 +15,7 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.Items.Players;
+using BeforeOurTime.Models.ItemAttributes.Visibles;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Players
 {
@@ -40,22 +41,24 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Players
         /// <summary>
         /// Create a new player
         /// </summary>
+        /// <param name="character">Attributes describing how an item looks or is percieved</param>
         /// <param name="characer">Properties generally understood to denote a state of being alive</param>
         /// <param name="physical">Physical attributes</param>
         /// <param name="player">Player attributes</param>
         /// <param name="initialLocation">Location of new player</param>
         public PlayerItem Create(
+            VisibleAttribute visible,
             CharacterAttribute character,
             PhysicalAttribute physical,
             PlayerAttribute player,
             LocationAttribute initialLocation)
         {
-            // Create item
             var item = ItemManager.Create(new Item()
             {
                 ParentId = initialLocation.ItemId,
                 Attributes = new List<ItemAttribute>()
                 {
+                    visible,
                     physical,
                     player,
                     character
