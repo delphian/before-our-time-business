@@ -98,7 +98,7 @@ namespace BeforeOurTime.Business.Apis.Modules.Games.Data.EF
             };
             var resultSet = Db.GetDbSet<GameData>()
                 .Where(x => ids.Contains(x.Id));
-            resultSet = (options?.NoTracking == true) ? resultSet.AsNoTracking() : resultSet;
+            resultSet = (options?.NoTracking == true) ? resultSet.AsNoTracking() : resultSet.AsTracking();
             return resultSet.ToList();
         }
         /// <summary>
@@ -144,10 +144,6 @@ namespace BeforeOurTime.Business.Apis.Modules.Games.Data.EF
         /// <returns>List of models updated</returns>
         public virtual List<GameData> Update(List<GameData> models, TransactionOptions options = null)
         {
-            options = options ?? new TransactionOptions()
-            {
-                NoTracking = true
-            };
             models.ForEach((model) =>
             {
                 var trackedModel = Read(model.Id, new TransactionOptions() { NoTracking = false });

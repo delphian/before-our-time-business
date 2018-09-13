@@ -129,7 +129,7 @@ namespace BeforeOurTime.Business.Apis.Modules.Game
                     }
                 });
                 defaultGameData = gameItem.GetData<GameData>();
-                defaultGameData.DefaultLocationId = locationItem.GetAttribute<LocationAttribute>().Id;
+                defaultGameData.DefaultLocationId = locationItem.GetAttribute<LocationAttribute>().ItemId;
                 GameDataRepo.Update(defaultGameData);
             }
             var defaultGameItem = ItemRepo.Read(defaultGameData.DataItemId);
@@ -143,9 +143,9 @@ namespace BeforeOurTime.Business.Apis.Modules.Game
         {
             Item defaultLocationItem = null;
             var game = GetDefaultGame();
-            if (game.GetAttribute<GameData>().DefaultLocationId != null)
+            if (game.GetData<GameData>().DefaultLocationId != null)
             {
-                defaultLocationItem = ItemRepo.Read(game.GetAttribute<GameData>().DefaultLocationId.Value);
+                defaultLocationItem = ItemRepo.Read(game.GetData<GameData>().DefaultLocationId.Value);
             }
             return defaultLocationItem;
         }
@@ -156,9 +156,9 @@ namespace BeforeOurTime.Business.Apis.Modules.Game
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemCreate(Item item, TransactionOptions options = null)
         {
-            if (item.HasAttribute<GameData>())
+            if (item.HasData<GameData>())
             {
-                var data = item.GetAttribute<GameData>();
+                var data = item.GetData<GameData>();
                 data.DataItemId = item.Id;
                 GameDataRepo.Create(data, options);
             }
@@ -183,9 +183,9 @@ namespace BeforeOurTime.Business.Apis.Modules.Game
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemUpdate(Item item, TransactionOptions options = null)
         {
-            if (item.HasAttribute<GameData>())
+            if (item.HasData<GameData>())
             {
-                var data = item.GetAttribute<GameData>();
+                var data = item.GetData<GameData>();
                 GameDataRepo.Update(data, options);
             }
         }
@@ -198,7 +198,7 @@ namespace BeforeOurTime.Business.Apis.Modules.Game
         {
             if (item.HasAttribute<GameData>())
             {
-                var data = item.GetAttribute<GameData>();
+                var data = item.GetData<GameData>();
                 GameDataRepo.Delete(data, options);
             }
         }
