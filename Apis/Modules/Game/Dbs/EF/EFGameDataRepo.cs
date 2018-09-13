@@ -42,8 +42,8 @@ namespace BeforeOurTime.Business.Apis.Modules.Games.Data.EF
         /// <returns></returns>
         public GameData Read(Item item, TransactionOptions options = null)
         {
-            var attributeId = Set.Where(x => x.DataItemId == item.Id).Select(x => x.Id).FirstOrDefault();
-            return Read(attributeId, options);
+            var dataId = Set.Where(x => x.DataItemId == item.Id).Select(x => x.Id).FirstOrDefault();
+            return Read(dataId, options);
         }
         /// <summary>
         /// Create multiple models

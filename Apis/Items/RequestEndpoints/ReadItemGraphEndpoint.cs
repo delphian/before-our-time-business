@@ -67,7 +67,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     var itemGraph = new ItemGraph()
                     {
                         Id = item.Id,
-                        Name = item.Visible.Name
+                        Name = item.Visible?.Name ?? "N/A"
                     };
                     BuildItemGraph(api.GetItemManager(), itemGraph);
                     ((ReadItemGraphResponse)response)._responseSuccess = true;
@@ -100,10 +100,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
             parentItem.ChildrenIds?.ForEach((itemId) =>
             {
                 var item = itemManager.Read(itemId);
+                var name = item.GetProperty<VisibleProperty>("Visible")?.Name ?? "N/A";
                 var childGraph = new ItemGraph()
                 {
                     Id = itemId,
-                    Name = item.GetProperty<VisibleProperty>("Visible")?.Name
+                    Name = name
                 };
                 BuildItemGraph(itemManager, childGraph);
                 itemGraph.Children.Add(childGraph);

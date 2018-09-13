@@ -38,10 +38,6 @@ namespace BeforeOurTime.Business.Apis.Modules.Game
         /// </summary>
         private IGameDataRepo GameDataRepo { set; get; }
         /// <summary>
-        /// Access to Location Data in the data store
-        /// </summary>
-//        private ILocationDataRepo LocationDataRepo { set; get; }
-        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="itemRepo">Access to items in the data store</param>
@@ -80,7 +76,6 @@ namespace BeforeOurTime.Business.Apis.Modules.Game
         public void Initialize(List<ICrudDataRepository> repositories)
         {
             GameDataRepo = (IGameDataRepo)repositories.Where(x => x is IGameDataRepo).FirstOrDefault();
-//            LocationDataRepo = (ILocationDataRepo)repositories.Where(x => x is ILocationDataRepo).FirstOrDefault();
         }
 
         // CAN WE 'PROVIDE' GAMEdATArEPO ISNTEAD OF REQUIRING IT?
