@@ -21,6 +21,8 @@ using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
+using BeforeOurTime.Business.Apis.Modules.Game;
+using BeforeOurTime.Models.ItemAttributes.Locations;
 
 namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
 {
@@ -57,6 +59,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                 };
                 try
                 {
+                    var defaultLocationId = api.GetModuleManager().GetModule<IGameModule>().GetDefaultLocation().Id;
                     var createPlayerRequest = request.GetMessageAsType<CreateAccountCharacterRequest>();
                     var playerItem = api.GetAttributeManager<IPlayerAttributeManager>().Create(
                         new VisibleAttribute()
@@ -83,7 +86,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                             Name = createPlayerRequest.Name,
                             AccountId = terminal.AccountId.Value
                         },
-                        api.GetAttributeManager<IGameAttributeManager>().GetDefaultLocation());
+                        defaultLocationId);
                     ((CreateAccountCharacterResponse)response)._responseSuccess = true;
                     ((CreateAccountCharacterResponse)response).CreatedAccountCharacterEvent = new CreatedAccountCharacterEvent()
                     {

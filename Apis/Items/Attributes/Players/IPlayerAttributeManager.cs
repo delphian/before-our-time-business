@@ -28,6 +28,6 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Players
             CharacterAttribute character,
             PhysicalAttribute physical,
             PlayerAttribute player,
-            LocationAttribute initialLocation);
+            Guid defaultLocationId);
     }
 }

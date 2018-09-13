@@ -23,6 +23,9 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Games;
 using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
 using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 using BeforeOurTime.Models.Exceptions;
+using BeforeOurTime.Business.Apis.Modules;
+using BeforeOurTime.Models;
+using BeforeOurTime.Business.Apis.Modules.Game.Managers;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -39,6 +42,7 @@ namespace BeforeOurTime.Business.Apis
         private IAccountManager AccountManager { set; get; }
         private IItemManager ItemManager { set; get; }
         private ITerminalManager TerminalManager { set; get; }
+        private IModuleManager ModuleManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -52,12 +56,12 @@ namespace BeforeOurTime.Business.Apis
             IItemManager itemManager,
             ITerminalManager terminalManager,
             IVisibleAttributeManager visibleAttributeManager,
-            IGameAttributeManager attributeGameManager,
             IPlayerAttributeManager attributePlayerManager,
             ICharacterAttributeManager characterAttributeManager,
             ILocationAttributeManager attributeLocationManager,
             IPhysicalAttributeManager attributePhysicalManager,
-            IExitAttributeManager attributeExitManager)
+            IExitAttributeManager attributeExitManager,
+            IModuleManager moduleManager)
         {
             Logger = logger;
             Configuration = configuration;
@@ -65,8 +69,8 @@ namespace BeforeOurTime.Business.Apis
             AccountManager = accountManager;
             ItemManager = itemManager;
             TerminalManager = terminalManager;
+            ModuleManager = moduleManager;
             AttributeManagerList.Add(typeof(IVisibleAttributeManager), visibleAttributeManager);
-            AttributeManagerList.Add(typeof(IGameAttributeManager), attributeGameManager);
             AttributeManagerList.Add(typeof(IPlayerAttributeManager), attributePlayerManager);
             AttributeManagerList.Add(typeof(ICharacterAttributeManager), characterAttributeManager);
             AttributeManagerList.Add(typeof(ILocationAttributeManager), attributeLocationManager);
@@ -96,6 +100,10 @@ namespace BeforeOurTime.Business.Apis
         public IConfiguration GetConfiguration()
         {
             return Configuration;
+        }
+        public IModuleManager GetModuleManager()
+        {
+            return ModuleManager;
         }
         /// <summary>
         /// Get item attribute manager based on attribute manager type

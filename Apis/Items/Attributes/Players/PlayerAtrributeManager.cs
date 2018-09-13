@@ -51,11 +51,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Players
             CharacterAttribute character,
             PhysicalAttribute physical,
             PlayerAttribute player,
-            LocationAttribute initialLocation)
+            Guid defaultLocationId)
         {
             var item = ItemManager.Create(new Item()
             {
-                ParentId = initialLocation.ItemId,
+                ParentId = defaultLocationId,
                 Attributes = new List<ItemAttribute>()
                 {
                     visible,

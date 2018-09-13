@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BeforeOurTime.Business.Apis.Modules.Game;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -61,7 +62,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     var readItemGraphRequest = request.GetMessageAsType<ReadItemGraphRequest>();
                     var player = api.GetItemManager().Read(terminal.PlayerId.Value);
                     var itemId = readItemGraphRequest.ItemId ??
-                                 api.GetAttributeManager<IGameAttributeManager>().GetDefaultGame().Id;
+                        api.GetModuleManager().GetModule<IGameModule>().GetDefaultGame().Id;
                     var item = api.GetItemManager().Read(itemId).GetAsItem<GameItem>();
                     var itemGraph = new ItemGraph()
                     {

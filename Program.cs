@@ -38,12 +38,17 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.ItemAttributes.Locations;
-using BeforeOurTime.Models.ItemAttributes.Games;
 using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
+using BeforeOurTime.Business.Apis.Modules;
+using BeforeOurTime.Business.Apis.Modules.Games.Data;
+using BeforeOurTime.Business.Apis.Modules.Games.Data.EF;
+using BeforeOurTime.Business.Dbs;
+using BeforeOurTime.Business.Dbs.EF;
+using BeforeOurTime.Business.Apis.Modules.Game.Managers;
 
 namespace BeforeOurTime.Business
 {
@@ -114,7 +119,6 @@ namespace BeforeOurTime.Business
                 .AddScoped<IVisibleAttributeRepo, VisibleAttributeRepo>()
                 .AddScoped<IPlayerAttributeRepo, PlayerAttributeRepo>()
                 .AddScoped<ICharacterAttributeRepo, CharacterAttributeRepo>()
-                .AddScoped<IGameAttributeRepo, GameDataRepo>()
                 .AddScoped<ILocationAttributeRepo, LocationAttributeRepo>()
                 .AddScoped<IPhysicalAttributeRepo, PhysicalAttributeRepo>()
                 .AddScoped<IExitAttributeRepo, ExitAttributeRepo>()
@@ -122,10 +126,10 @@ namespace BeforeOurTime.Business
                 .AddScoped<IAccountManager, AccountManager>()
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<ITerminalManager, TerminalManager>()
+                .AddScoped<IModuleManager, ModuleManager>()
                 // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IVisibleAttributeManager, VisibleAttributeManager>()
-                .AddScoped<IGameAttributeManager, GameAttributeManager>()
                 .AddScoped<ILocationAttributeManager, LocationAttributeManager>()
                 .AddScoped<IPlayerAttributeManager, PlayerAttributeManager>()
                 .AddScoped<ICharacterAttributeManager, CharacterAttributeManager>()
