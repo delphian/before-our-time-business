@@ -36,7 +36,6 @@
 
   <ItemGroup>
     <Folder Include="Apis\Items\Attributes\Characters\RequestEndpoints\" />
-    <Folder Include="Apis\Items\Attributes\Games\RequestEndpoints\" />
     <Folder Include="Apis\Items\Attributes\Physicals\RequestEndpoints\" />
     <Folder Include="Apis\Modules\Game\Endpoints\" />
     <Folder Include="Dbs\EF\" />
