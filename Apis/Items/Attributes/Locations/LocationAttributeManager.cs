@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
-using BeforeOurTime.Business.Apis.Items.Attributes.Games;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Messages;
@@ -16,9 +15,8 @@ using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items.Locations;
-using BeforeOurTime.Business.Apis.Modules;
-using BeforeOurTime.Business.Apis.Modules.Game;
-using BeforeOurTime.Business.Apis.Modules.Game.Managers;
+using BeforeOurTime.Business.Modules;
+using BeforeOurTime.Business.Modules.Core;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
 {
@@ -56,7 +54,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
                 Name = "A New Location",
                 Description = "The relatively new construction of this place is apparant everywhere you look. In several places the c# substrate seems to be leaking from above, while behind you a small puddle of sql statements have coalesced into a small puddle. Ew..."
             };
-            var defaultGameItemId = ModuleManager.GetModule<IGameModule>().GetDefaultGame().Id;
+            var defaultGameItemId = ModuleManager.GetModule<ICoreModule>().GetDefaultGame().Id;
             var locationItem = Create(locationAttribute, defaultGameItemId).GetAsItem<LocationItem>();
             var toExitAttribute = new ExitAttribute()
             {

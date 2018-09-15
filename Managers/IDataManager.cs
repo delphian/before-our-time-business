@@ -33,7 +33,7 @@ namespace BeforeOurTime.Business.Managers
     /// <summary>
     /// Manage details of an item's extended data
     /// </summary>
-    public interface IDataManager<T> : ICrudDataRepository<T> where T : Data
+    public interface IDataManager<T> : ICrudDataRepository<T> where T : ItemData
     {
         /// <summary>
         /// Create many models with base item

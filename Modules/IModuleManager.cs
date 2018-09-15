@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Modules
+namespace BeforeOurTime.Business.Modules
 {
     /// <summary>
     /// Register through reflection and manage all modules

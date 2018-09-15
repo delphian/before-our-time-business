@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using BeforeOurTime.Business.Apis.Modules.Game.Models;
 using BeforeOurTime.Business.Managers;
+using BeforeOurTime.Business.Modules.Core.Models.Data;
 
-namespace BeforeOurTime.Business.Apis.Modules.Game.Managers
+namespace BeforeOurTime.Business.Modules.Core.Managers
 {
     public interface IGameDataManager : IDataManager, IDataManager<GameData>
     {

@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.Items.Attributes.Games;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Players;
 using BeforeOurTime.Business.Apis.Terminals;
@@ -21,8 +20,8 @@ using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
-using BeforeOurTime.Business.Apis.Modules.Game;
 using BeforeOurTime.Models.ItemAttributes.Locations;
+using BeforeOurTime.Business.Modules.Core;
 
 namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
 {
@@ -59,7 +58,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                 };
                 try
                 {
-                    var defaultLocationId = api.GetModuleManager().GetModule<IGameModule>().GetDefaultLocation().Id;
+                    var defaultLocationId = api.GetModuleManager().GetModule<ICoreModule>().GetDefaultLocation().Id;
                     var createPlayerRequest = request.GetMessageAsType<CreateAccountCharacterRequest>();
                     var playerItem = api.GetAttributeManager<IPlayerAttributeManager>().Create(
                         new VisibleAttribute()

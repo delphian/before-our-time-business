@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Business.Apis.Modules.Games.Data;
-using BeforeOurTime.Business.Apis.Modules.Game.Models;
-using BeforeOurTime.Business.Apis.Modules.Game.Managers;
 using BeforeOurTime.Business.Managers;
+using BeforeOurTime.Business.Modules.Core.Models.Data;
+using BeforeOurTime.Business.Modules.Core.Dbs;
+using BeforeOurTime.Business.Apis.Items;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes.Games
+namespace BeforeOurTime.Business.Modules.Core.Managers
 {
     public class GameDataManager : DataManager<GameData>, IGameDataManager
     {

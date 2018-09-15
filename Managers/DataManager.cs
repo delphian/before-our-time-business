@@ -16,7 +16,7 @@ namespace BeforeOurTime.Business.Managers
     /// <summary>
     /// Manage details of an item's extended attributes
     /// </summary>
-    public abstract class DataManager<T> : IDataManager<T> where T : Data
+    public abstract class DataManager<T> : IDataManager<T> where T : ItemData
     {
         protected IItemRepo ItemRepo { set; get; }
         protected ICrudDataRepository<T> CrudDataRepository { set; get; }

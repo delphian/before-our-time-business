@@ -7,12 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Modules.Game.Models
+namespace BeforeOurTime.Business.Modules.Core.Models.Data
 {
     /// <summary>
     /// A game environmnent containing users, locations, items, and unique rules
     /// </summary>
-    public class GameData : Data, IData
+    public class GameData : ItemData, IItemData
     {
         /// <summary>
         /// Name of the game

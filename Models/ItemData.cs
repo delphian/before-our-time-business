@@ -14,7 +14,7 @@ namespace BeforeOurTime.Business.Models
     /// <summary>
     /// Additional information wrapping, but based on an item's type
     /// </summary>
-    public abstract class Data : Model
+    public abstract class ItemData : Model
     {
         /// <summary>
         /// Structure that subscriber must implement to recieve property updates

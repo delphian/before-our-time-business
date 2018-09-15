@@ -3,12 +3,10 @@ using BeforeOurTime.Models.Items;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using BeforeOurTime.Repository.Dbs.EF;
-using BeforeOurTime.Business.Dbs.EF;
-using BeforeOurTime.Business.Apis.Modules.Game.Models;
 using System;
+using BeforeOurTime.Business.Modules.Core.Models.Data;
 
-namespace BeforeOurTime.Business.Apis.Modules.Games.Data.EF
+namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
 {
     /// <summary>
     /// Access to Game Data in the data store
@@ -18,7 +16,7 @@ namespace BeforeOurTime.Business.Apis.Modules.Games.Data.EF
         /// <summary>
         /// Date store context
         /// </summary>
-        private EFGameModuleContext Db { set; get; }
+        private EFCoreModuleContext Db { set; get; }
         /// <summary>
         /// Single data set (table)
         /// </summary>
@@ -28,7 +26,7 @@ namespace BeforeOurTime.Business.Apis.Modules.Games.Data.EF
         /// </summary>
         /// <param name="db">Entity framework database context</param>
         public EFGameDataRepo(
-            EFGameModuleContext db,
+            EFCoreModuleContext db,
             IItemRepo itemRepo)
         {
             Db = db;

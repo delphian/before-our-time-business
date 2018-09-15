@@ -1,6 +1,4 @@
-﻿using BeforeOurTime.Business.Apis.Modules.Games.Data;
-using BeforeOurTime.Business.Dbs;
-using BeforeOurTime.Business.Dbs.EF;
+﻿using BeforeOurTime.Business.Dbs;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Modules
+namespace BeforeOurTime.Business.Modules
 {
     /// <summary>
     /// Register through reflection and manage all modules

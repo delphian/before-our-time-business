@@ -1,9 +1,8 @@
-﻿using BeforeOurTime.Business.Apis.Modules.Game.Models;
-using BeforeOurTime.Business.Apis.Modules.Games.Data;
-using BeforeOurTime.Business.Apis.Modules.Games.Data.EF;
-using BeforeOurTime.Business.Dbs;
-using BeforeOurTime.Business.Dbs.EF;
+﻿using BeforeOurTime.Business.Dbs;
 using BeforeOurTime.Business.Models;
+using BeforeOurTime.Business.Modules.Core.Dbs;
+using BeforeOurTime.Business.Modules.Core.Dbs.EF;
+using BeforeOurTime.Business.Modules.Core.Models.Data;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Locations;
@@ -17,14 +16,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Modules.Game
+namespace BeforeOurTime.Business.Modules.Core
 {
-    public class GameModule : IGameModule
+    public class CoreModule : ICoreModule
     {
         /// <summary>
         /// Entity framework database context
         /// </summary>
-        private EFGameModuleContext Db { set; get; }
+        private EFCoreModuleContext Db { set; get; }
         /// <summary>
         /// System configuration
         /// </summary>
@@ -41,15 +40,15 @@ namespace BeforeOurTime.Business.Apis.Modules.Game
         /// Constructor
         /// </summary>
         /// <param name="itemRepo">Access to items in the data store</param>
-        public GameModule(
+        public CoreModule(
             IConfiguration configuration,
             IItemRepo itemRepo)
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
-            var dbOptions = new DbContextOptionsBuilder<EFGameModuleContext>();
+            var dbOptions = new DbContextOptionsBuilder<EFCoreModuleContext>();
                 dbOptions.UseSqlServer(connectionString);
                 dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            Db = new EFGameModuleContext(dbOptions.Options);
+            Db = new EFCoreModuleContext(dbOptions.Options);
             ItemRepo = itemRepo;
             ItemRepo.OnItemCreate += OnItemCreate;
             ItemRepo.OnItemRead += OnItemRead;
@@ -95,7 +94,7 @@ namespace BeforeOurTime.Business.Apis.Modules.Game
                 var gameItem = ItemRepo.Create(new GameItem()
                 {
                     ParentId = null,
-                    Data = new List<IData>()
+                    Data = new List<IItemData>()
                     {
                         new GameData()
                         {

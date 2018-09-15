@@ -2,8 +2,8 @@
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Modules;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Business.Modules;
 using BeforeOurTime.Models.Items;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Modules.Game
+namespace BeforeOurTime.Business.Modules.Core
 {
-    public interface IGameModule : IModule
+    public interface ICoreModule : IModule
     {
         /// <summary>
         /// Get the default game

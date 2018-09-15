@@ -2,22 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using BeforeOutTime.Repository.Dbs.EF;
 using BeforeOurTime.Models;
-using BeforeOurTime.Business.Apis.Modules.Game.Models;
 using Microsoft.Extensions.Configuration;
 using BeforeOurTime.Models.Items;
+using BeforeOurTime.Business.Modules.Core.Models.Data;
 
-namespace BeforeOurTime.Business.Dbs.EF
+namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
 {
     /// <summary>
     /// Entity framework database context
     /// </summary>
-    public class EFGameModuleContext : DbContext
+    public class EFCoreModuleContext : DbContext
     {
         public DbSet<GameData> Games { set; get; }
-        public EFGameModuleContext() : base() { }
-        public EFGameModuleContext(DbContextOptions<EFGameModuleContext> options) : base(options) { }
+        public EFCoreModuleContext() : base() { }
+        public EFCoreModuleContext(DbContextOptions<EFCoreModuleContext> options) : base(options) { }
         /// <summary>
         /// Used when called from dotnet shell commands
         /// </summary>

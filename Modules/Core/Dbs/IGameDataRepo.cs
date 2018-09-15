@@ -1,12 +1,12 @@
-﻿using BeforeOurTime.Business.Apis.Modules.Game.Models;
-using BeforeOurTime.Business.Dbs;
+﻿using BeforeOurTime.Business.Dbs;
+using BeforeOurTime.Business.Modules.Core.Models.Data;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Modules.Games.Data
+namespace BeforeOurTime.Business.Modules.Core.Dbs
 {
     /// <summary>
     /// Central data repository for all game items
