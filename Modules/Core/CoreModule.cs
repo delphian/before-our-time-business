@@ -1,4 +1,6 @@
-﻿using BeforeOurTime.Business.Dbs;
+﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Business.Dbs;
 using BeforeOurTime.Business.Models;
 using BeforeOurTime.Business.Modules.Core.Dbs;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
@@ -9,6 +11,10 @@ using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Games;
 using BeforeOurTime.Models.Items.Locations;
+using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -69,6 +75,17 @@ namespace BeforeOurTime.Business.Modules.Core
             return repositories;
         }
         /// <summary>
+        /// Get message identifiers of messages handled by module
+        /// </summary>
+        /// <returns></returns>
+        public List<Guid> RegisterForMessages()
+        {
+            return new List<Guid>()
+            {
+                CreateItemRequest._Id
+            };
+        }
+        /// <summary>
         /// Initialize module
         /// </summary>
         /// <param name="repositories"></param>
@@ -76,9 +93,20 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             GameDataRepo = (IGameDataRepo)repositories.Where(x => x is IGameDataRepo).FirstOrDefault();
         }
+        /// <summary>
+        /// Handle a message
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="message"></param>
+        /// <param name="terminal"></param>
+        /// <param name="response"></param>
+        public void HandleMessage(IMessage message, IApi api, Terminal terminal, IResponse response)
+        {
+            if (message.GetMessageId() == CreateItemRequest._Id)
+            {
 
-        // CAN WE 'PROVIDE' GAMEdATArEPO ISNTEAD OF REQUIRING IT?
-        // CAN WE REQUEST A LIST OF DATA REPOS THAT WE REQUIRE?
+            }
+        }
         /// <summary>
         /// Get the default game
         /// </summary>

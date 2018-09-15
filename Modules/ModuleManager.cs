@@ -1,6 +1,10 @@
-﻿using BeforeOurTime.Business.Dbs;
+﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Business.Dbs;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.Responses;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -31,6 +35,10 @@ namespace BeforeOurTime.Business.Modules
         /// </summary>
         private List<ICrudDataRepository> Repositories { set; get; } = new List<ICrudDataRepository>();
         /// <summary>
+        /// Record which modules have registered for specific messages
+        /// </summary>
+        private Dictionary<Guid, List<IModule>> MessageHandlers { set; get; } = new Dictionary<Guid, List<IModule>>();
+        /// <summary>
         /// Constructor
         /// </summary>
         public ModuleManager(
@@ -55,6 +63,17 @@ namespace BeforeOurTime.Business.Modules
             Modules.ForEach((module) =>
             {
                 Repositories.AddRange(module.GetRepositories());
+                module.RegisterForMessages().ForEach(messageId =>
+                {
+                    if (MessageHandlers.ContainsKey(messageId))
+                    {
+                        MessageHandlers[messageId].Add(module);
+                    }
+                    else
+                    {
+                        MessageHandlers.Add(messageId, new List<IModule>() { module });
+                    }
+                });
             });
             Modules.ForEach((module) =>
             {
@@ -80,6 +99,35 @@ namespace BeforeOurTime.Business.Modules
         {
             var repository = Repositories.Where(x => x is T).Select(x => x).FirstOrDefault();
             return (T)repository;
+        }
+        /// <summary>
+        /// Get all modules that have registered handle a message
+        /// </summary>
+        /// <param name="messageId">Unique message identifier</param>
+        /// <returns></returns>
+        public List<IModule> GetModulesForMessage(Guid messageId)
+        {
+            var modules = new List<IModule>();
+            if (MessageHandlers.ContainsKey(messageId))
+            {
+                modules = MessageHandlers[messageId];
+            }
+            return modules;
+        }
+        /// <summary>
+        /// Handle a message
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="message"></param>
+        /// <param name="terminal"></param>
+        /// <param name="response"></param>
+        public void HandleMessage(IMessage message, IApi api, Terminal terminal, IResponse response)
+        {
+            var modules = GetModulesForMessage(message.GetMessageId());
+            modules.ForEach(module =>
+            {
+                module.HandleMessage(message, api, terminal, response);
+            });
         }
     }
 }
