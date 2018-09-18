@@ -108,53 +108,6 @@ namespace BeforeOurTime.Business.Modules.Core
             GameDataRepo = (IGameDataRepo)repositories.Where(x => x is IGameDataRepo).FirstOrDefault();
         }
         /// <summary>
-        /// Handle a message
-        /// </summary>
-        /// <param name="api"></param>
-        /// <param name="message"></param>
-        /// <param name="terminal"></param>
-        /// <param name="response"></param>
-        public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
-        {
-            if (message.GetMessageId() == CoreReadItemJsonRequest._Id)
-            {
-                var request = message.GetMessageAsType<CoreReadItemJsonRequest>();
-                response = new CoreReadItemJsonResponse()
-                {
-                    _requestInstanceId = request.GetRequestInstanceId(),
-                };
-                try
-                {
-                    var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
-                    var coreItemsJson = new List<CoreItemJson>();
-                    // Read enumerated list of items
-                    if (request.ItemIds != null)
-                    {
-                        var items = api.GetItemManager().Read(request.ItemIds);
-                        items.ForEach(item =>
-                        {
-                            coreItemsJson.Add(new CoreItemJson()
-                            {
-                                Id = item.Id.ToString(),
-                                JSON = JsonConvert.SerializeObject(item, Formatting.Indented)
-                            });
-                        });
-                    }
-                    ((CoreReadItemJsonResponse)response)._responseSuccess = true;
-                    ((CoreReadItemJsonResponse)response).CoreReadItemJsonEvent = new CoreReadItemJsonEvent()
-                    {
-                        ItemsJson = coreItemsJson
-                    };
-                }
-                catch (Exception e)
-                {
-                    ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
-                    ((CoreReadItemJsonResponse)response)._responseMessage = e.Message;
-                }
-            }
-            return response;
-        }
-        /// <summary>
         /// Get the default game
         /// </summary>
         /// <remarks>
@@ -218,6 +171,7 @@ namespace BeforeOurTime.Business.Modules.Core
             }
             return defaultLocationItem;
         }
+        #region On Item Hooks
         /// <summary>
         /// Create attribute, if present, after item is created
         /// </summary>
@@ -271,5 +225,67 @@ namespace BeforeOurTime.Business.Modules.Core
                 GameDataRepo.Delete(data, options);
             }
         }
+        #endregion
+        #region Message Handlers
+        /// <summary>
+        /// Handle a message
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="message"></param>
+        /// <param name="terminal"></param>
+        /// <param name="response"></param>
+        public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        {
+            if (message.GetMessageId() == CoreReadItemJsonRequest._Id)
+            {
+                response = HandleCoreReadItemJsonRequest(message, api, terminal, response);
+            }
+            return response;
+        }
+        /// <summary>
+        /// Handle a message
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="message"></param>
+        /// <param name="terminal"></param>
+        /// <param name="response"></param>
+        private IResponse HandleCoreReadItemJsonRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        {
+            var request = message.GetMessageAsType<CoreReadItemJsonRequest>();
+            response = new CoreReadItemJsonResponse()
+            {
+                _requestInstanceId = request.GetRequestInstanceId(),
+            };
+            try
+            {
+                var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
+                var coreItemsJson = new List<CoreItemJson>();
+                // Read enumerated list of items
+                if (request.ItemIds != null)
+                {
+                    var items = api.GetItemManager().Read(request.ItemIds);
+                    items.ForEach(item =>
+                    {
+                        coreItemsJson.Add(new CoreItemJson()
+                        {
+                            Id = item.Id.ToString(),
+                            JSON = JsonConvert.SerializeObject(item, Formatting.Indented)
+                        });
+                    });
+                }
+                ((CoreReadItemJsonResponse)response)._responseSuccess = true;
+                ((CoreReadItemJsonResponse)response).CoreReadItemJsonEvent = new CoreReadItemJsonEvent()
+                {
+                    ItemsJson = coreItemsJson
+                };
+            }
+            catch (Exception e)
+            {
+                ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
+                ((CoreReadItemJsonResponse)response)._responseMessage = e.Message;
+            }
+            return response;
+        }
+        #endregion
     }
 }
