@@ -10,6 +10,7 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.Create;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
+using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Repository.Models.Accounts;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -23,7 +24,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
     /// <summary>
     /// Single generic connection used by the environment to communicate with clients
     /// </summary>
-    public class Terminal
+    public class Terminal : ITerminal
     {
         /// <summary>
         /// Central manager of all client connections regardless of protocol (telnet, websocket, etc)
@@ -64,13 +65,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// </summary>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        public delegate IResponse messageToEnvironment(Terminal terminal, IRequest terminalRequest);
-        /// <summary>
-        /// Define delgate that environment can use to update terminal
-        /// </summary>
-        /// <param name="terminal"></param>
-        /// <param name="terminalUpdate"></param>
-        public delegate void messageToTerminal(Terminal terminal, IMessage terminalUpdate);
+        public delegate IResponse messageToEnvironment(ITerminal terminal, IRequest terminalRequest);
         /// <summary>
         /// Terminals may attach to this event to receive updates from the environment
         /// </summary>
@@ -90,6 +85,65 @@ namespace BeforeOurTime.Business.Apis.Terminals
             Id = Guid.NewGuid();
             TerminalManager = terminalManager;
             Logger = logger;
+        }
+        /// <summary>
+        /// Get unique terminal identifier
+        /// </summary>
+        /// <returns></returns>
+        public Guid GetId()
+        {
+            return Id;
+        }
+        /// <summary>
+        /// Get current status of terminal
+        /// </summary>
+        /// <returns></returns>
+        public TerminalStatus GetStatus()
+        {
+            return Status;
+        }
+        /// <summary>
+        /// Set terminal status
+        /// </summary>
+        /// <returns></returns>
+        public ITerminal SetStatus(TerminalStatus status)
+        {
+            Status = status;
+            return this;
+        }
+        /// <summary>
+        /// Get unique player identifier
+        /// </summary>
+        /// <returns></returns>
+        public Guid? GetPlayerId()
+        {
+            return PlayerId;
+        }
+        /// <summary>
+        /// Get unique account identifier of player
+        /// </summary>
+        /// <returns></returns>
+        public Guid? GetAccountId()
+        {
+            return AccountId;
+        }
+        /// <summary>
+        /// Get the terminal data bag
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, string> GetDataBag()
+        {
+            return DataBag;
+        }
+        /// <summary>
+        /// Subscribe to messages sent to terminals
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public ITerminal SubscribeMessageToTerminal(messageToTerminal callback)
+        {
+            OnMessageToTerminal += callback;
+            return this;
         }
         /// <summary>
         /// 
@@ -235,9 +289,9 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// Clone the terminal
         /// </summary>
         /// <returns></returns>
-        public object Clone()
+        public ITerminal Clone()
         {
-            return this.MemberwiseClone();
+            return (ITerminal)this.MemberwiseClone();
         }
     }
 }

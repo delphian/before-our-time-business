@@ -22,6 +22,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BeforeOurTime.Business.Modules.Core;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -48,7 +51,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="terminal"></param>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
             if (request.GetType() == typeof(ReadItemGraphRequest))
             {
@@ -59,7 +62,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 try
                 {
                     var readItemGraphRequest = request.GetMessageAsType<ReadItemGraphRequest>();
-                    var player = api.GetItemManager().Read(terminal.PlayerId.Value);
+                    var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                     var itemId = readItemGraphRequest.ItemId ??
                         api.GetModuleManager().GetModule<ICoreModule>().GetDefaultGame().Id;
                     var item = api.GetItemManager().Read(itemId).GetAsItem<GameItem>();

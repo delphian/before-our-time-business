@@ -6,7 +6,6 @@ using System.Text;
 using System.Linq;
 using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
-using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Models.Messages;
@@ -22,6 +21,8 @@ using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using BeforeOurTime.Models.Messages.Requests.Create;
 using BeforeOurTime.Models.Items.Characters;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Terminals;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -93,10 +94,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
         private void ClientConnected(TelnetClient telnetClient)
         {
             telnetClient.SetTerminal(Api.GetTerminalManager().RequestTerminal("Telnet", telnetClient.GetRemoteAddress()));
-            telnetClient.GetTerminal().DataBag["step"] = "connected";
+            telnetClient.GetTerminal().GetDataBag()["step"] = "connected";
             TelnetServer.ClearClientScreen(telnetClient);
             TelnetServer.SendMessageToClient(telnetClient, 
-                "Terminal granted " + telnetClient.GetTerminal().Id + ".\r\n\r\n"
+                "Terminal granted " + telnetClient.GetTerminal().GetId() + ".\r\n\r\n"
                 + "Welcome to Before Our Time. For help type \"help\".\r\n\r\n"
                 + "Welcome> ");
         }
@@ -168,21 +169,21 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// </summary>
         /// <param name="terminal"></param>
         /// <param name="environmentUpdate"></param>
-        private void MessageFromTerminal(Terminal terminal, IMessage message)
+        private void MessageFromTerminal(ITerminal terminal, IMessage message)
         {
             if (MessageHandlersByType.ContainsKey(message.GetType())) {
                 MessageHandlersByType[message.GetType()].ForEach(delegate (ITranslate handler)
                 {
-                    handler.Translate(message, TelnetServer, Clients[terminal.Id]);
+                    handler.Translate(message, TelnetServer, Clients[terminal.GetId()]);
                 });
             }
             else
             {
-                TelnetServer.SendMessageToClient(Clients[terminal.Id], "\r\n\r\n"
+                TelnetServer.SendMessageToClient(Clients[terminal.GetId()], "\r\n\r\n"
                     + $"Unknown message from server ({message.GetType().ToString()}):\r\n"
                     + JsonConvert.SerializeObject(message));
             }
-            TelnetServer.SendMessageToClient(Clients[terminal.Id], "\r\n\r\n> ");
+            TelnetServer.SendMessageToClient(Clients[terminal.GetId()], "\r\n\r\n> ");
         }
         /// <summary>
         /// Process a message from the telnet client (MFC) to the terminal
@@ -191,15 +192,15 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="message"></param>
         private void MessageFromClient(TelnetClient telnetClient, string message)
         {
-            if (telnetClient.GetTerminal().Status == TerminalStatus.Guest)
+            if (telnetClient.GetTerminal().GetStatus() == TerminalStatus.Guest)
             {
                 MFCTerminalGuest(telnetClient, message);
             }
-            else if (telnetClient.GetTerminal().Status == TerminalStatus.Authenticated)
+            else if (telnetClient.GetTerminal().GetStatus() == TerminalStatus.Authenticated)
             {
                 MFCTerminalAuthenticated(telnetClient, message);
             }
-            else if (telnetClient.GetTerminal().Status == TerminalStatus.Attached)
+            else if (telnetClient.GetTerminal().GetStatus() == TerminalStatus.Attached)
             {
                 MFCTerminalAttached(telnetClient, message);
             }
@@ -292,7 +293,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="message">message from client</param>
         private void MFCTerminalGuest(TelnetClient telnetClient, string message)
         {
-            if (telnetClient.GetTerminal().DataBag["step"] == "connected")
+            if (telnetClient.GetTerminal().GetDataBag()["step"] == "connected")
             {
                 switch (message.ToLower())
                 {
@@ -312,12 +313,12 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     case "new":
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                             + "Name: ");
-                        telnetClient.GetTerminal().DataBag["step"] = "create_name";
+                        telnetClient.GetTerminal().GetDataBag()["step"] = "create_name";
                         break;
                     case "login":
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                             + "Email: ");
-                        telnetClient.GetTerminal().DataBag["step"] = "login_name";
+                        telnetClient.GetTerminal().GetDataBag()["step"] = "login_name";
                         break;
                     default:
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n"
@@ -326,67 +327,67 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         break;
                 }
             }
-            else if (telnetClient.GetTerminal().DataBag["step"] == "login_name")
+            else if (telnetClient.GetTerminal().GetDataBag()["step"] == "login_name")
             {
-                telnetClient.GetTerminal().DataBag["login_name"] = message;
-                telnetClient.GetTerminal().DataBag["step"] = "login_password";
+                telnetClient.GetTerminal().GetDataBag()["login_name"] = message;
+                telnetClient.GetTerminal().GetDataBag()["step"] = "login_password";
                 TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                     + "Password: ");
             }
-            else if (telnetClient.GetTerminal().DataBag["step"] == "login_password")
+            else if (telnetClient.GetTerminal().GetDataBag()["step"] == "login_password")
             {
                 var loginRequest = new LoginRequest()
                 {
-                    Email = telnetClient.GetTerminal().DataBag["login_name"],
+                    Email = telnetClient.GetTerminal().GetDataBag()["login_name"],
                     Password = message
                 };
                 LoginResponse loginResponse = (LoginResponse)telnetClient.GetTerminal().SendToApi(loginRequest);
                 if (loginResponse.IsSuccess())
                 {
                     telnetClient.GetTerminal().Authenticate(loginResponse.AccountId.Value);
-                    telnetClient.GetTerminal().OnMessageToTerminal += MessageFromTerminal;
-                    Clients[telnetClient.GetTerminal().Id] = telnetClient;
-                    telnetClient.GetTerminal().DataBag["step"] = "authenticated";
+                    telnetClient.GetTerminal().SubscribeMessageToTerminal(MessageFromTerminal);
+                    Clients[telnetClient.GetTerminal().GetId()] = telnetClient;
+                    telnetClient.GetTerminal().GetDataBag()["step"] = "authenticated";
                     TelnetServer.SendMessageToClient(telnetClient, "\r\n"
-                        + "Hello " + telnetClient.GetTerminal().DataBag["login_name"] + "\r\n\r\n"
+                        + "Hello " + telnetClient.GetTerminal().GetDataBag()["login_name"] + "\r\n\r\n"
                         + "Account> ");
                 }
                 else
                 {
-                    telnetClient.GetTerminal().DataBag["step"] = "connected";
+                    telnetClient.GetTerminal().GetDataBag()["step"] = "connected";
                     TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                         + "Bad username or password.\r\n\r\n"
                         + "Welcome> ");
                 }
             }
-            else if (telnetClient.GetTerminal().DataBag["step"] == "create_name")
+            else if (telnetClient.GetTerminal().GetDataBag()["step"] == "create_name")
             {
-                telnetClient.GetTerminal().DataBag["create_name"] = message;
-                telnetClient.GetTerminal().DataBag["step"] = "create_email";
+                telnetClient.GetTerminal().GetDataBag()["create_name"] = message;
+                telnetClient.GetTerminal().GetDataBag()["step"] = "create_email";
                 TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                     + "Email: ");
             }
-            else if (telnetClient.GetTerminal().DataBag["step"] == "create_email")
+            else if (telnetClient.GetTerminal().GetDataBag()["step"] == "create_email")
             {
-                telnetClient.GetTerminal().DataBag["create_email"] = message;
-                telnetClient.GetTerminal().DataBag["step"] = "create_password";
+                telnetClient.GetTerminal().GetDataBag()["create_email"] = message;
+                telnetClient.GetTerminal().GetDataBag()["step"] = "create_password";
                 TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                     + "Password: ");
             }
-            else if (telnetClient.GetTerminal().DataBag["step"] == "create_password")
+            else if (telnetClient.GetTerminal().GetDataBag()["step"] == "create_password")
             {
                 var createAccountResponse = telnetClient.GetTerminal().SendToApi(new CreateAccountRequest()
                 {
-                    Email = telnetClient.GetTerminal().DataBag["create_email"],
+                    Email = telnetClient.GetTerminal().GetDataBag()["create_email"],
                     Password = message
                 });
                 if (createAccountResponse.IsSuccess())
                 {
-                    telnetClient.GetTerminal().OnMessageToTerminal += MessageFromTerminal;
-                    Clients[telnetClient.GetTerminal().Id] = telnetClient;
-                    telnetClient.GetTerminal().DataBag["step"] = "authenticated";
+                    telnetClient.GetTerminal().SubscribeMessageToTerminal(MessageFromTerminal);
+                    Clients[telnetClient.GetTerminal().GetId()] = telnetClient;
+                    telnetClient.GetTerminal().GetDataBag()["step"] = "authenticated";
                     TelnetServer.SendMessageToClient(telnetClient, "\r\n"
-                        + "Hello " + telnetClient.GetTerminal().DataBag["create_name"] + "\r\n\r\n"
+                        + "Hello " + telnetClient.GetTerminal().GetDataBag()["create_name"] + "\r\n\r\n"
                         + "Account> ");
                 }
                 else
@@ -404,11 +405,11 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="message">message from client</param>
         private void MFCTerminalAuthenticated(TelnetClient telnetClient, string message)
         {
-            if (telnetClient.GetTerminal().DataBag["step"] == "create_character")
+            if (telnetClient.GetTerminal().GetDataBag()["step"] == "create_character")
             {
                 MFCTerminalAuthenticatedCreatePlayer(telnetClient, message);
             }
-            else if (telnetClient.GetTerminal().DataBag["step"] == "authenticated")
+            else if (telnetClient.GetTerminal().GetDataBag()["step"] == "authenticated")
             {
                 switch (message.Split(' ').First().ToLower())
                 {
@@ -423,12 +424,12 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             + "Account> ");
                         break;
                     case "back":
-                        telnetClient.GetTerminal().Status = TerminalStatus.Guest;
-                        telnetClient.GetTerminal().DataBag["step"] = "connected";
+                        telnetClient.GetTerminal().SetStatus(TerminalStatus.Guest);
+                        telnetClient.GetTerminal().GetDataBag()["step"] = "connected";
                         TelnetServer.SendMessageToClient(telnetClient, "\r\nWelcome> ");
                         break;
                     case "new":
-                        telnetClient.GetTerminal().DataBag["step"] = "create_character";
+                        telnetClient.GetTerminal().GetDataBag()["step"] = "create_character";
                         MFCTerminalAuthenticatedCreatePlayer(telnetClient, message);
                         break;
                     case "list":
@@ -455,13 +456,13 @@ namespace BeforeOurTime.Business.Servers.Telnet
                             if (player.Visible.Name.ToLower() == name)
                             {
                                 telnetClient.GetTerminal().Attach(player.Id);
-                                telnetClient.GetTerminal().DataBag["step"] = "attached";
+                                telnetClient.GetTerminal().GetDataBag()["step"] = "attached";
                                 TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                                     + "Terminal attached to avatar. Play!\r\n\r\n"
                                     + "> ");
                             }
                         });
-                        if (telnetClient.GetTerminal().Status != TerminalStatus.Attached)
+                        if (telnetClient.GetTerminal().GetStatus() != TerminalStatus.Attached)
                         {
                             TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                                 + "Unknown character \"" + name + "\"\r\n"
@@ -486,31 +487,31 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="message">message from client</param>
         private void MFCTerminalAuthenticatedCreatePlayer(TelnetClient telnetClient, string message)
         {
-            if (!telnetClient.GetTerminal().DataBag.ContainsKey("create_character_step"))
+            if (!telnetClient.GetTerminal().GetDataBag().ContainsKey("create_character_step"))
             {
-                telnetClient.GetTerminal().DataBag["create_character_step"] = "create";
+                telnetClient.GetTerminal().GetDataBag()["create_character_step"] = "create";
             }
-            switch (telnetClient.GetTerminal().DataBag["create_character_step"])
+            switch (telnetClient.GetTerminal().GetDataBag()["create_character_step"])
             {
                 case "create":
                     TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                         + "Ok, let's create a new character.\r\n\r\n"
                         + " Name: ");
-                    telnetClient.GetTerminal().DataBag["create_character_step"] = "save_name";
+                    telnetClient.GetTerminal().GetDataBag()["create_character_step"] = "save_name";
                     break;
                 case "save_name":
-                    telnetClient.GetTerminal().DataBag["create_character_name"] = message;
-                    if (telnetClient.GetTerminal().CreatePlayer(telnetClient.GetTerminal().DataBag["create_character_name"]))
+                    telnetClient.GetTerminal().GetDataBag()["create_character_name"] = message;
+                    if (telnetClient.GetTerminal().CreatePlayer(telnetClient.GetTerminal().GetDataBag()["create_character_name"]))
                     {
-                        telnetClient.GetTerminal().DataBag["step"] = "attached";
+                        telnetClient.GetTerminal().GetDataBag()["step"] = "attached";
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                             + "Terminal attached to avatar. Play!\r\n\r\n"
                             + "> ");
                     } else
                     {
-                        telnetClient.GetTerminal().DataBag["step"] = "attached";
-                        telnetClient.GetTerminal().DataBag.Remove("create_character_name");
-                        telnetClient.GetTerminal().DataBag.Remove("create_character_step");
+                        telnetClient.GetTerminal().GetDataBag()["step"] = "attached";
+                        telnetClient.GetTerminal().GetDataBag().Remove("create_character_name");
+                        telnetClient.GetTerminal().GetDataBag().Remove("create_character_step");
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n"
                             + "Something went wrong. Character not created.\r\n\r\n"
                             + "Account> ");

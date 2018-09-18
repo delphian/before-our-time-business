@@ -13,9 +13,6 @@ using BeforeOurTime.Repository.Dbs.EF.Items;
 using BeforeOurTime.Repository.Dbs.EF.Items.Attributes;
 using BeforeOurTime.Repository.Models;
 using BeforeOurTime.Repository.Models.Accounts;
-using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Data;
-using BeforeOurTime.Repository.Models.Scripts.Interfaces;
 using BeforeOutTime.Repository.Dbs.EF;
 using Jint;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +40,9 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
 using BeforeOurTime.Business.Modules;
+using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Modules;
 
 namespace BeforeOurTime.Business
 {
@@ -106,8 +106,6 @@ namespace BeforeOurTime.Business
                 .AddLogging()
                 // Repositories
                 .AddScoped<IAccountRepo, AccountRepo>()
-                .AddScoped<IMessageRepo, MessageRepo>()
-                .AddScoped<IScriptInterfaceRepo, ScriptInterfaceRepo>()
                 // Repositories (Items)
                 .AddScoped<IItemRepo, ItemRepo>()
                 .AddScoped<IVisibleAttributeRepo, VisibleAttributeRepo>()
@@ -153,13 +151,14 @@ namespace BeforeOurTime.Business
         private static void ListenToTerminals()
         {
             var api = ServiceProvider.GetService<IApi>();
-            ((TerminalManager)ServiceProvider.GetService<ITerminalManager>()).OnTerminalCreated += delegate (Terminal terminal)
+            ((TerminalManager)ServiceProvider.GetService<ITerminalManager>()).OnTerminalCreated += delegate (ITerminal terminal)
             {
-                terminal.OnMessageToServer += delegate (Terminal xterminal, IRequest request)
+                ((Terminal)terminal).OnMessageToServer += delegate (ITerminal xterminal, IRequest request)
                 {
                     lock (thisLock)
                     {
                         var response = api.GetMessageManager().HandleRequest(api, terminal, request);
+                        response = api.GetModuleManager().HandleMessage(request, api, terminal, response);
                         return response;
                     }
                 };

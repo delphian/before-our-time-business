@@ -17,6 +17,8 @@ using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Messages.Requests.List;
 using System.Linq;
 using BeforeOurTime.Models.Messages.Systems.Ping;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Terminals;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -37,7 +39,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <summary>
         /// Single generic connection used by the environment to communicate with clients
         /// </summary>
-        private Terminal Terminal { set; get; }
+        private ITerminal Terminal { set; get; }
         /// <summary>
         /// HTTP Context at time websocket was established
         /// </summary>
@@ -57,7 +59,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         public WebSocketClient(
             IApi api, 
-            Terminal terminal,
+            ITerminal terminal,
             HttpContext context,
             System.Net.WebSockets.WebSocket webSocket)
         {
@@ -68,7 +70,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             Context = context;
             WebSocket = webSocket;
             Cts = new CancellationTokenSource();
-            Terminal.OnMessageToTerminal += OnMessageFromServer;
+            Terminal.SubscribeMessageToTerminal(OnMessageFromServer);
         }
         /// <summary>
         /// Monitor websocket health
@@ -229,7 +231,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="message">All intra-item, environment and terminal communications are in the form of Message</param>
-        public async void OnMessageFromServer(Terminal terminal, IMessage message)
+        public async void OnMessageFromServer(ITerminal terminal, IMessage message)
         {
             await SendAsync(message, CancellationToken.None);
         }

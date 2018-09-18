@@ -2,8 +2,6 @@
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Characters;
-using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

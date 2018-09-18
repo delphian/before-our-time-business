@@ -1,12 +1,13 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Emote;
 using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Repository.Models.Messages;
+using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -38,12 +39,12 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
         /// <param name="terminal"></param>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
             if (request.IsMessageType<EmoteRequest>())
             {
                 var emoteRequest = request.GetMessageAsType<EmoteRequest>();
-                var player = api.GetItemManager().Read(terminal.PlayerId.Value);
+                var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                 var location = api.GetItemManager().Read(player.ParentId.Value);
                 api.GetMessageManager().SendMessageToLocation(new EmoteEvent()
                     {

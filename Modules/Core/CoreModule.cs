@@ -1,11 +1,11 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Business.Dbs;
 using BeforeOurTime.Business.Models;
 using BeforeOurTime.Business.Modules.Core.Dbs;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
-using BeforeOurTime.Business.Modules.Core.Models.Data;
 using BeforeOurTime.Models;
+using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Models.Items;
@@ -15,8 +15,15 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Dbs;
+using BeforeOurTime.Models.Modules.Core.Messages.ReadItemJson;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Terminals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +42,10 @@ namespace BeforeOurTime.Business.Modules.Core
         /// </summary>
         private IConfiguration Configuration { set; get; }
         /// <summary>
+        /// Centralized log messages
+        /// </summary>
+        private ILogger Logger { set; get; }
+        /// <summary>
         /// Access to items in the data store
         /// </summary>
         private IItemRepo ItemRepo { set; get; }
@@ -48,9 +59,12 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="itemRepo">Access to items in the data store</param>
         public CoreModule(
             IConfiguration configuration,
+            ILogger logger,
             IItemRepo itemRepo)
         {
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            Configuration = configuration;
+            Logger = logger;
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
             var dbOptions = new DbContextOptionsBuilder<EFCoreModuleContext>();
                 dbOptions.UseSqlServer(connectionString);
                 dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
@@ -82,7 +96,7 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
-                CreateItemRequest._Id
+                CoreReadItemJsonRequest._Id
             };
         }
         /// <summary>
@@ -100,12 +114,45 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="message"></param>
         /// <param name="terminal"></param>
         /// <param name="response"></param>
-        public void HandleMessage(IMessage message, IApi api, Terminal terminal, IResponse response)
+        public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
         {
-            if (message.GetMessageId() == CreateItemRequest._Id)
+            if (message.GetMessageId() == CoreReadItemJsonRequest._Id)
             {
-
+                var request = message.GetMessageAsType<CoreReadItemJsonRequest>();
+                response = new CoreReadItemJsonResponse()
+                {
+                    _requestInstanceId = request.GetRequestInstanceId(),
+                };
+                try
+                {
+                    var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
+                    var coreItemsJson = new List<CoreItemJson>();
+                    // Read enumerated list of items
+                    if (request.ItemIds != null)
+                    {
+                        var items = api.GetItemManager().Read(request.ItemIds);
+                        items.ForEach(item =>
+                        {
+                            coreItemsJson.Add(new CoreItemJson()
+                            {
+                                Id = item.Id.ToString(),
+                                JSON = JsonConvert.SerializeObject(item, Formatting.Indented)
+                            });
+                        });
+                    }
+                    ((CoreReadItemJsonResponse)response)._responseSuccess = true;
+                    ((CoreReadItemJsonResponse)response).CoreReadItemJsonEvent = new CoreReadItemJsonEvent()
+                    {
+                        ItemsJson = coreItemsJson
+                    };
+                }
+                catch (Exception e)
+                {
+                    ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
+                    ((CoreReadItemJsonResponse)response)._responseMessage = e.Message;
+                }
             }
+            return response;
         }
         /// <summary>
         /// Get the default game

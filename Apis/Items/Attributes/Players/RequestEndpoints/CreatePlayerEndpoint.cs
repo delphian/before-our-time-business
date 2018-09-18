@@ -22,6 +22,9 @@ using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
 using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Business.Modules.Core;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core;
 
 namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
 {
@@ -47,7 +50,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
         /// <param name="api"></param>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
             if (request.IsMessageType<CreateAccountCharacterRequest>())
             {
@@ -83,7 +86,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                         new PlayerAttribute()
                         {
                             Name = createPlayerRequest.Name,
-                            AccountId = terminal.AccountId.Value
+                            AccountId = terminal.GetAccountId().Value
                         },
                         defaultLocationId);
                     ((CreateAccountCharacterResponse)response)._responseSuccess = true;

@@ -1,11 +1,14 @@
 ﻿using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Business.Dbs;
 using BeforeOurTime.Models;
+using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Terminals;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +25,10 @@ namespace BeforeOurTime.Business.Modules
         /// System configuration
         /// </summary>
         private IConfiguration Configuration { set; get; }
+        /// <summary>
+        /// Centralized logging system
+        /// </summary>
+        private ILogger Logger { set; get; }
         /// <summary>
         /// Access to items in the data store
         /// </summary>
@@ -43,9 +50,11 @@ namespace BeforeOurTime.Business.Modules
         /// </summary>
         public ModuleManager(
             IConfiguration configuration, 
+            ILogger logger,
             IItemRepo itemRepo)
         {
             Configuration = configuration;
+            Logger = logger;
             ItemRepo = itemRepo;
             RegisterModules();
         }
@@ -58,11 +67,18 @@ namespace BeforeOurTime.Business.Modules
             Modules = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (IModule)Activator.CreateInstance(x, new object[] { Configuration, ItemRepo }))
+                .Select(x => (IModule)Activator.CreateInstance(x, new object[] {
+                    Configuration,
+                    Logger,
+                    ItemRepo }))
                 .ToList();
             Modules.ForEach((module) =>
             {
-                Repositories.AddRange(module.GetRepositories());
+                module.GetRepositories().ForEach(repository =>
+                {
+                    Logger.LogDebug($"Module {module.GetType().Name} is loading repository {repository.GetType().Name}");
+                    Repositories.Add(repository);
+                });
                 module.RegisterForMessages().ForEach(messageId =>
                 {
                     if (MessageHandlers.ContainsKey(messageId))
@@ -78,6 +94,7 @@ namespace BeforeOurTime.Business.Modules
             Modules.ForEach((module) =>
             {
                 module.Initialize(Repositories);
+                Logger.LogInformation($"Module {module.GetType().Name} initialized");
             });
         }
         /// <summary>
@@ -121,13 +138,14 @@ namespace BeforeOurTime.Business.Modules
         /// <param name="message"></param>
         /// <param name="terminal"></param>
         /// <param name="response"></param>
-        public void HandleMessage(IMessage message, IApi api, Terminal terminal, IResponse response)
+        public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
         {
             var modules = GetModulesForMessage(message.GetMessageId());
             modules.ForEach(module =>
             {
-                module.HandleMessage(message, api, terminal, response);
+                response = module.HandleMessage(message, api, terminal, response);
             });
+            return response;
         }
     }
 }

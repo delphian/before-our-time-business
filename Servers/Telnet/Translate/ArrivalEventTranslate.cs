@@ -6,7 +6,6 @@ using BeforeOurTime.Business.Servers.Telnet;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Events.Arrivals;
-using BeforeOurTime.Repository.Models.Messages;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {

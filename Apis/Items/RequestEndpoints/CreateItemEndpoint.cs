@@ -16,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Terminals;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -32,7 +34,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             return new List<Guid>()
             {
-                CreateItemRequest._Id
+                ReadItemJsonRequest._Id
             };
         }
         /// <summary>
@@ -42,12 +44,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="terminal"></param>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
-            if (request.GetType() == typeof(CreateItemRequest))
+            if (request.GetType() == typeof(ReadItemJsonRequest))
             {
-                var createItemRequest = request.GetMessageAsType<CreateItemRequest>();
-                var player = api.GetItemManager().Read(terminal.PlayerId.Value);
+                var createItemRequest = request.GetMessageAsType<ReadItemJsonRequest>();
+                var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
             }
             return response;
         }

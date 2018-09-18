@@ -1,12 +1,14 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Requests.Login;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
+using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -39,7 +41,7 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
         /// <param name="terminal"></param>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
             if (request.IsMessageType<LoginRequest>())
             {

@@ -7,7 +7,6 @@ using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Locations.ReadLocationSummary;
 using BeforeOurTime.Models.Messages.Responses.List;
-using BeforeOurTime.Repository.Models.Messages;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {

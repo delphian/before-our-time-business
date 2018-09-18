@@ -8,13 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Accounts;
-using BeforeOurTime.Repository.Models.Messages;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
 using BeforeOurTime.Models.Messages.Requests.Login;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using BeforeOurTime.Models.Terminals;
 
 namespace BeforeOurTime.Business.Apis.Terminals
 {
@@ -28,12 +28,12 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <summary>
         /// List of all active terminals
         /// </summary>
-        protected List<Terminal> Terminals = new List<Terminal>();
+        protected List<ITerminal> Terminals = new List<ITerminal>();
         /// <summary>
         /// Definition of function that may subscribe to OnTerminalCreated
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        public delegate void TerminalCreated(Terminal terminal);
+        public delegate void TerminalCreated(ITerminal terminal);
         /// <summary>
         /// Subscribe to notification after a new terminal has been created
         /// </summary>
@@ -42,7 +42,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// Definition of function that may subscribe to OnTerminalDestroyed 
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        public delegate void TerminalDestroyed(Terminal terminal);
+        public delegate void TerminalDestroyed(ITerminal terminal);
         /// <summary>
         /// Subscribe to notification before a terminal is destroyed
         /// </summary>
@@ -64,12 +64,12 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <param name="serverName">Name of server module</param>
         /// <param name="address">IPAddress of connection</param>
         /// <returns></returns>
-        public Terminal RequestTerminal(string serverName, IPEndPoint address)
+        public ITerminal RequestTerminal(string serverName, IPEndPoint address)
         {
-            var terminal = new Terminal(this, Logger);
-            terminal.Status = TerminalStatus.Guest;
+            var terminal = new Terminal(this, Logger) as ITerminal;
+            terminal.SetStatus(TerminalStatus.Guest);
             Terminals.Add(terminal);
-            Logger.LogInformation($"Terminal ({terminal.Id}) granted {terminal.Status} status for {address.ToString()} through {serverName}");
+            Logger.LogInformation($"Terminal ({terminal.GetId()}) granted {terminal.GetStatus()} status for {address.ToString()} through {serverName}");
             OnTerminalCreated?.Invoke(terminal);
             return terminal;
         }
@@ -77,11 +77,11 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// Destroy a terminal and notify subscribers
         /// </summary>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
-        public TerminalManager DestroyTerminal(Terminal terminal)
+        public ITerminalManager DestroyTerminal(ITerminal terminal)
         {
             Terminals.Remove(terminal);
-            Logger.LogInformation($"Terminal ({terminal.Id}) removed");
-            OnTerminalDestroyed?.Invoke((Terminal)terminal.Clone());
+            Logger.LogInformation($"Terminal ({terminal.GetId()}) removed");
+            OnTerminalDestroyed?.Invoke((ITerminal)terminal.Clone());
             terminal = null;
             return this;
         }
@@ -92,13 +92,13 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <param name="environmentUpdate"></param>
         public void SendToTerminalId(Guid terminalId, IMessage environmentUpdate)
         {
-            Terminals.FirstOrDefault(x => x.Id == terminalId).SendToClient(environmentUpdate);
+            Terminals.FirstOrDefault(x => x.GetId() == terminalId).SendToClient(environmentUpdate);
         }
         /// <summary>
         /// Get list of all active terminals
         /// </summary>
         /// <returns></returns>
-        public List<Terminal> GetTerminals()
+        public List<ITerminal> GetTerminals()
         {
             return Terminals;
         }

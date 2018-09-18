@@ -20,6 +20,8 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
 using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 using BeforeOurTime.Models.Exceptions;
 using BeforeOurTime.Business.Modules;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Modules;
 
 namespace BeforeOurTime.Business.Apis
 {

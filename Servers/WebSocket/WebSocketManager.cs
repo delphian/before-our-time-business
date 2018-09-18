@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using BeforeOurTime.Models.Apis;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {

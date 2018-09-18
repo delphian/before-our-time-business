@@ -3,8 +3,6 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.Primitives.Images;
-using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

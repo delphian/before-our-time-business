@@ -8,11 +8,12 @@ using BeforeOurTime.Models.Messages.Events.Arrivals;
 using BeforeOurTime.Models.Messages.Events.Departures;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Terminals;
 
 namespace BeforeOurTime.Business.Apis.Messages
 {
@@ -21,7 +22,6 @@ namespace BeforeOurTime.Business.Apis.Messages
     /// </summary>
     public class MessageManager : IMessageManager
     {
-        private IMessageRepo MessageRepo { set; get; }
         private ITerminalManager TerminalManager { set; get; }
         /// <summary>
         /// List of endpoints to process message requests
@@ -36,10 +36,8 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// </summary>
         /// <param name="messageRepo"></param>
         public MessageManager(
-            IMessageRepo messageRepo,
             ITerminalManager terminalManager)
         {
-            MessageRepo = messageRepo;
             TerminalManager = terminalManager;
             RequestEndpoints = BuildRequestEndpoints();
             RequestEndpointsForTypes = BuildRequestEndpointsForTypes(RequestEndpoints);
@@ -52,20 +50,14 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// <param name="senderId"></param>
         public void SendMessage(IMessage message, List<Item> recipients, Guid senderId)
         {
-            var savedMessage = new SavedMessage()
-            {
-                SenderId = senderId,
-//                DelegateId = ScriptManager.GetDelegateDefinition("onArrival").GetId(),
-                Package = JsonConvert.SerializeObject(message)
-            };
             recipients.ForEach(delegate (Item recipient)
             {
                 var playerAttribute = recipient.GetAttribute<PlayerAttribute>();
                 if (playerAttribute != null)
                 {
                     var terminalId = TerminalManager.GetTerminals()
-                        .Where(x => x.PlayerId == recipient.Id)
-                        .Select(x => x.Id)
+                        .Where(x => x.GetPlayerId() == recipient.Id)
+                        .Select(x => x.GetId())
                         .FirstOrDefault();
                     if (terminalId != Guid.Empty)
                     {
@@ -132,16 +124,6 @@ namespace BeforeOurTime.Business.Apis.Messages
                 , location, actorId);
         }
         /// <summary>
-        /// Get all messages awaiting deliver and prompty delete from data store
-        /// </summary>
-        /// <returns></returns>
-        public List<SavedMessage> CullAllMessages()
-        {
-            List<SavedMessage> messages = MessageRepo.Read();
-            MessageRepo.Delete();
-            return messages;
-        }
-        /// <summary>
         /// Use reflection to register all classes which desire to handle message requests
         /// </summary>
         /// <returns></returns>
@@ -193,7 +175,7 @@ namespace BeforeOurTime.Business.Apis.Messages
         /// <param name="api"></param>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         /// <param name="terminalRequest">A request from a terminal</param>
-        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request)
+        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request)
         {
             IResponse response = new Response() {
                 _requestInstanceId = request.GetRequestInstanceId(),
@@ -204,7 +186,7 @@ namespace BeforeOurTime.Business.Apis.Messages
                 .Where(x => x.Key == requestGuid)
                 .Select(x => x.Value)
                 .FirstOrDefault();
-            requestEndpointsForType?.ForEach(delegate (IRequestEndpoint requestEndpoint)
+            requestEndpointsForType?.ForEach(requestEndpoint =>
             {
                 response = requestEndpoint.HandleRequest(api, terminal, request, response);
             });

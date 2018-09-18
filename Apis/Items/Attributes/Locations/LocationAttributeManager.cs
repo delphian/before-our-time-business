@@ -5,8 +5,6 @@ using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Repository.Models;
-using BeforeOurTime.Repository.Models.Messages;
-using BeforeOurTime.Repository.Models.Messages.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,6 +15,8 @@ using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items.Locations;
 using BeforeOurTime.Business.Modules;
 using BeforeOurTime.Business.Modules.Core;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations
 {

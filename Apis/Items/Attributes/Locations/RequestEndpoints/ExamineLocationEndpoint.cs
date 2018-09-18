@@ -21,6 +21,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Terminals;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -47,12 +49,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="terminal"></param>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
             if (request.GetType() == typeof(ListLocationRequest))
             {
                 var player = api.GetItemManager().Read(
-                    terminal.PlayerId.Value,
+                    terminal.GetPlayerId().Value,
                     new TransactionOptions() { NoTracking = true });
                 var location = api.GetItemManager().Read(player.ParentId.Value).GetAsItem<LocationItem>();
                 var ioLocationUpdate = new ReadLocationSummaryResponse()

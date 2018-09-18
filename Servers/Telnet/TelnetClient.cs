@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages.Responses.List;
+using BeforeOurTime.Models.Terminals;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -48,7 +49,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <summary>
         /// Single generic connection used by the environment to communicate with clients
         /// </summary>
-        private Terminal Terminal { set; get; }
+        private ITerminal Terminal { set; get; }
         /// <summary>
         /// Currently tracked available location exits
         /// </summary>
@@ -116,7 +117,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Get the client's associated environment terminal
         /// </summary>
         /// <returns></returns>
-        public Terminal GetTerminal()
+        public ITerminal GetTerminal()
         {
             return Terminal;
         }
@@ -143,7 +144,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// Sets the client's associated environment terminal
         /// </summary>
         /// <param name="terminal"></param>
-        public void SetTerminal(Terminal terminal)
+        public void SetTerminal(ITerminal terminal)
         {
             Terminal = terminal;
         }

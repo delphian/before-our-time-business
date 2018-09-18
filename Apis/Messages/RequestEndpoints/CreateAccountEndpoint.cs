@@ -2,12 +2,14 @@
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Terminals;
+using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.Messages.Events.Created;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Create;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.Create;
+using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -38,7 +40,7 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
         /// <param name="api"></param>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
             if (request.IsMessageType<CreateAccountRequest>())
             {

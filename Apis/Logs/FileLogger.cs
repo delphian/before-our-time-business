@@ -53,5 +53,22 @@ namespace BeforeOurTime.Business.Apis.Logs
                 }
             }
         }
+
+        /// <summary>
+        /// Log simple error message with detailed exception history
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="exception"></param>
+        public void LogException(string message, Exception exception)
+        {
+            var traverse = exception;
+            while (traverse != null)
+            {
+                message += ": " + traverse.Message;
+                traverse = traverse.InnerException;
+            }
+            this.LogError(message);
+        }
+
     }
 }

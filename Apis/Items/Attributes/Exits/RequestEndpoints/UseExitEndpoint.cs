@@ -3,12 +3,14 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Go;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -39,13 +41,13 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits.RequestEndpoints
         /// <param name="api"></param>
         /// <param name="terminal"></param>
         /// <param name="terminalRequest"></param>
-        public IResponse HandleRequest(IApi api, Terminal terminal, IRequest request, IResponse response)
+        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
             if (request.GetType() == typeof(GoRequest))
             {
                 var goRequest = request.GetMessageAsType<GoRequest>();
                 var exit = api.GetItemManager().Read(goRequest.ItemId);
-                var player = api.GetItemManager().Read(terminal.PlayerId.Value);
+                var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                 var locationAttribute = api.GetAttributeManager<ILocationAttributeManager>()
                     .Read(exit.GetAttribute<ExitAttribute>().DestinationLocationId);
                 var location = api.GetItemManager().Read(locationAttribute.ItemId);
