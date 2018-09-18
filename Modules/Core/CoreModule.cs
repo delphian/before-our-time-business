@@ -12,12 +12,12 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Items.Games;
 using BeforeOurTime.Models.Items.Locations;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
-using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Dbs;
-using BeforeOurTime.Models.Modules.Core.Messages.ReadItemJson;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.EntityFrameworkCore;
@@ -96,7 +96,8 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
-                CoreReadItemJsonRequest._Id
+                CoreReadItemJsonRequest._Id,
+                CoreUpdateItemJsonRequest._Id
             };
         }
         /// <summary>
@@ -237,9 +238,9 @@ namespace BeforeOurTime.Business.Modules.Core
         public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
         {
             if (message.GetMessageId() == CoreReadItemJsonRequest._Id)
-            {
                 response = HandleCoreReadItemJsonRequest(message, api, terminal, response);
-            }
+            if (message.GetMessageId() == CoreUpdateItemJsonRequest._Id)
+                response = HandleCoreUpdateItemJsonRequest(message, api, terminal, response);
             return response;
         }
         /// <summary>
@@ -283,6 +284,40 @@ namespace BeforeOurTime.Business.Modules.Core
             {
                 ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
                 ((CoreReadItemJsonResponse)response)._responseMessage = e.Message;
+            }
+            return response;
+        }
+        /// <summary>
+        /// Handle a message
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="message"></param>
+        /// <param name="terminal"></param>
+        /// <param name="response"></param>
+        private IResponse HandleCoreUpdateItemJsonRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        {
+            var request = message.GetMessageAsType<CoreUpdateItemJsonRequest>();
+            response = new CoreUpdateItemJsonResponse()
+            {
+                _requestInstanceId = request.GetRequestInstanceId(),
+            };
+            try
+            {
+                request.ItemsJson.ForEach(itemJson =>
+                {
+                    var item = JsonConvert.DeserializeObject<Item>(itemJson.JSON);
+                    ItemRepo.Update(item);
+                });
+                ((CoreUpdateItemJsonResponse)response)._responseSuccess = true;
+                ((CoreUpdateItemJsonResponse)response).CoreUpdateItemJsonEvent = new CoreUpdateItemJsonEvent()
+                {
+                    ItemsJson = request.ItemsJson
+                };
+            }
+            catch (Exception e)
+            {
+                ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
+                ((CoreUpdateItemJsonResponse)response)._responseMessage = e.Message;
             }
             return response;
         }
