@@ -20,7 +20,6 @@ using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
-using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Business.Modules.Core;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;

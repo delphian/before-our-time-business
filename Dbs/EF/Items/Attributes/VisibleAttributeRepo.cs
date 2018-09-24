@@ -1,7 +1,6 @@
 ﻿using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
-using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOutTime.Repository.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using System;

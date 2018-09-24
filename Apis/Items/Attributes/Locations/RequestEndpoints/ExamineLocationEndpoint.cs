@@ -10,7 +10,6 @@ using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using BeforeOurTime.Models.Items.Characters;
 using BeforeOurTime.Models.Items.Exits;
-using BeforeOurTime.Models.Items.Locations;
 using BeforeOurTime.Models.Messages.Locations.ReadLocationSummary;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
@@ -23,6 +22,7 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {

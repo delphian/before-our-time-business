@@ -33,7 +33,6 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
 using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.ItemAttributes.Physicals;
-using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using BeforeOurTime.Models.Items;
@@ -111,7 +110,6 @@ namespace BeforeOurTime.Business
                 .AddScoped<IVisibleAttributeRepo, VisibleAttributeRepo>()
                 .AddScoped<IPlayerAttributeRepo, PlayerAttributeRepo>()
                 .AddScoped<ICharacterAttributeRepo, CharacterAttributeRepo>()
-                .AddScoped<ILocationAttributeRepo, LocationAttributeRepo>()
                 .AddScoped<IPhysicalAttributeRepo, PhysicalAttributeRepo>()
                 .AddScoped<IExitAttributeRepo, ExitAttributeRepo>()
                 // Main environment interface API
@@ -122,7 +120,6 @@ namespace BeforeOurTime.Business
                 // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IVisibleAttributeManager, VisibleAttributeManager>()
-                .AddScoped<ILocationAttributeManager, LocationAttributeManager>()
                 .AddScoped<IPlayerAttributeManager, PlayerAttributeManager>()
                 .AddScoped<ICharacterAttributeManager, CharacterAttributeManager>()
                 .AddScoped<IPhysicalAttributeManager, PhysicalAttributeManager>()

@@ -54,7 +54,6 @@ namespace BeforeOurTime.Business.Apis
             IVisibleAttributeManager visibleAttributeManager,
             IPlayerAttributeManager attributePlayerManager,
             ICharacterAttributeManager characterAttributeManager,
-            ILocationAttributeManager attributeLocationManager,
             IPhysicalAttributeManager attributePhysicalManager,
             IExitAttributeManager attributeExitManager,
             IModuleManager moduleManager)
@@ -69,7 +68,6 @@ namespace BeforeOurTime.Business.Apis
             AttributeManagerList.Add(typeof(IVisibleAttributeManager), visibleAttributeManager);
             AttributeManagerList.Add(typeof(IPlayerAttributeManager), attributePlayerManager);
             AttributeManagerList.Add(typeof(ICharacterAttributeManager), characterAttributeManager);
-            AttributeManagerList.Add(typeof(ILocationAttributeManager), attributeLocationManager);
             AttributeManagerList.Add(typeof(IPhysicalAttributeManager), attributePhysicalManager);
             AttributeManagerList.Add(typeof(IExitAttributeManager), attributeExitManager);
         }

@@ -1,24 +1,22 @@
 ﻿using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Logs;
-using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Business.Models;
-using BeforeOurTime.Business.Modules.Core.Dbs;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.ItemAttributes;
-using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Games;
-using BeforeOurTime.Models.Items.Locations;
+using BeforeOurTime.Models.Managers;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Dbs;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +48,15 @@ namespace BeforeOurTime.Business.Modules.Core
         /// </summary>
         private IItemRepo ItemRepo { set; get; }
         /// <summary>
-        /// Access to Game Data in the data store
+        /// Item managers created or required by the module
+        /// </summary>
+        private List<IDataManager> ItemManagers { set; get; } = new List<IDataManager>();
+        /// <summary>
+        /// Data repositories created or required by the module
+        /// </summary>
+        private List<ICrudDataRepository> DataRepositories { set; get; } = new List<ICrudDataRepository>();
+        /// <summary>
+        /// Game data repository
         /// </summary>
         private IGameDataRepo GameDataRepo { set; get; }
         /// <summary>
@@ -74,7 +80,22 @@ namespace BeforeOurTime.Business.Modules.Core
             ItemRepo.OnItemRead += OnItemRead;
             ItemRepo.OnItemUpdate += OnItemUpdate;
             ItemRepo.OnItemDelete += OnItemDelete;
-            GameDataRepo = new EFGameDataRepo(Db, ItemRepo);
+            ItemManagers = BuildItemManagers(Db, ItemRepo);
+        }
+        /// <summary>
+        /// Build all the item managers for the module
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="itemRepo"></param>
+        /// <returns></returns>
+        List<IDataManager> BuildItemManagers(EFCoreModuleContext db, IItemRepo itemRepo)
+        {
+            var managers = new List<IDataManager>
+            {
+                new GameItemManager(itemRepo, new EFGameDataRepo(Db, itemRepo)),
+                new LocationItemManager(itemRepo, new EFLocationDataRepo(Db, itemRepo))
+            };
+            return managers;
         }
         /// <summary>
         /// Get repositories declared by the module
@@ -82,11 +103,24 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <returns></returns>
         public List<ICrudDataRepository> GetRepositories()
         {
-            var repositories = new List<ICrudDataRepository>()
-            {
-                GameDataRepo
-            };
-            return repositories;
+            return DataRepositories;
+        }
+        /// <summary>
+        /// Get item managers declared by the module
+        /// </summary>
+        /// <returns></returns>
+        public List<IDataManager> GetManagers()
+        {
+            return ItemManagers;
+        }
+        /// <summary>
+        /// Get item manager of specified type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetManager<T>()
+        {
+            return ItemManagers.Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
         /// <summary>
         /// Get message identifiers of messages handled by module
@@ -97,7 +131,8 @@ namespace BeforeOurTime.Business.Modules.Core
             return new List<Guid>()
             {
                 CoreReadItemJsonRequest._Id,
-                CoreUpdateItemJsonRequest._Id
+                CoreUpdateItemJsonRequest._Id,
+                CoreCreateItemJsonRequest._Id
             };
         }
         /// <summary>
@@ -106,7 +141,9 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="repositories"></param>
         public void Initialize(List<ICrudDataRepository> repositories)
         {
-            GameDataRepo = (IGameDataRepo)repositories.Where(x => x is IGameDataRepo).FirstOrDefault();
+            GameDataRepo = repositories
+                .Where(x => x is IGameDataRepo)
+                .Select(x => (IGameDataRepo)x).FirstOrDefault();
         }
         /// <summary>
         /// Get the default game
@@ -135,9 +172,9 @@ namespace BeforeOurTime.Business.Modules.Core
                 var locationItem = ItemRepo.Create(new LocationItem()
                 {
                     ParentId = gameItem.Id,
-                    Attributes = new List<ItemAttribute>()
+                    Data = new List<IItemData>()
                     {
-                        new LocationAttribute()
+                        new LocationData()
                         {
                             Name = "A Dark Void",
                             Description = "Cool mists and dark shadows shroud "
@@ -152,7 +189,7 @@ namespace BeforeOurTime.Business.Modules.Core
                     }
                 });
                 defaultGameData = gameItem.GetData<GameData>();
-                defaultGameData.DefaultLocationId = locationItem.GetAttribute<LocationAttribute>().ItemId;
+                defaultGameData.DefaultLocationId = locationItem.GetData<LocationData>().DataItemId;
                 GameDataRepo.Update(defaultGameData);
             }
             var defaultGameItem = ItemRepo.Read(defaultGameData.DataItemId);
@@ -241,6 +278,8 @@ namespace BeforeOurTime.Business.Modules.Core
                 response = HandleCoreReadItemJsonRequest(message, api, terminal, response);
             if (message.GetMessageId() == CoreUpdateItemJsonRequest._Id)
                 response = HandleCoreUpdateItemJsonRequest(message, api, terminal, response);
+            if (message.GetMessageId() == CoreCreateItemJsonRequest._Id)
+                response = HandleCoreCreateItemJsonRequest(message, api, terminal, response);
             return response;
         }
         /// <summary>
@@ -310,6 +349,40 @@ namespace BeforeOurTime.Business.Modules.Core
                 });
                 ((CoreUpdateItemJsonResponse)response)._responseSuccess = true;
                 ((CoreUpdateItemJsonResponse)response).CoreUpdateItemJsonEvent = new CoreUpdateItemJsonEvent()
+                {
+                    ItemsJson = request.ItemsJson
+                };
+            }
+            catch (Exception e)
+            {
+                ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
+                ((CoreUpdateItemJsonResponse)response)._responseMessage = e.Message;
+            }
+            return response;
+        }
+        /// <summary>
+        /// Handle a message
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="message"></param>
+        /// <param name="terminal"></param>
+        /// <param name="response"></param>
+        private IResponse HandleCoreCreateItemJsonRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        {
+            var request = message.GetMessageAsType<CoreCreateItemJsonRequest>();
+            response = new CoreCreateItemJsonResponse()
+            {
+                _requestInstanceId = request.GetRequestInstanceId(),
+            };
+            try
+            {
+                request.ItemsJson.ForEach(itemJson =>
+                {
+                    var item = JsonConvert.DeserializeObject<Item>(itemJson.JSON);
+                    ItemRepo.Create(item);
+                });
+                ((CoreCreateItemJsonResponse)response)._responseSuccess = true;
+                ((CoreCreateItemJsonResponse)response).CoreCreateItemJsonEvent = new CoreCreateItemJsonEvent()
                 {
                     ItemsJson = request.ItemsJson
                 };

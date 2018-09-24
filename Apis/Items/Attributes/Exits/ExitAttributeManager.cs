@@ -3,12 +3,12 @@ using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Exits;
-using BeforeOurTime.Models.ItemAttributes.Locations;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits
 {
@@ -94,7 +94,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits
         /// <returns></returns>
         public List<Item> GetLocationInboundExits(Item location, TransactionOptions options = null)
         {
-            var locationAttribute = location.GetAttribute<LocationAttribute>();
+            var locationAttribute = location.GetData<LocationData>();
             var exitAttributes = ((IExitAttributeRepo)AttributeRepo)
                 .ReadWithDestination(locationAttribute, options);
             var exitItems = ItemManager.Read(exitAttributes.Select(x => x.ItemId).ToList(), options);

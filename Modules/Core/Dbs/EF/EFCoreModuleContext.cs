@@ -15,6 +15,7 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
     public class EFCoreModuleContext : DbContext
     {
         public DbSet<GameData> Games { set; get; }
+        public DbSet<LocationData> Locations { set; get; }
         public EFCoreModuleContext() : base() { }
         public EFCoreModuleContext(DbContextOptions<EFCoreModuleContext> options) : base(options) { }
         /// <summary>
@@ -44,6 +45,14 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
                 .HasKey(x => x.Id);
             modelBuilder.Entity<GameData>()
                 .Ignore(x => x.DataType);
+            // Item Attribute Location
+            modelBuilder.Entity<LocationData>()
+                .ToTable("Item_Data_Locations");
+            modelBuilder.Entity<LocationData>()
+                .HasKey(x => x.Id);
+            modelBuilder.Entity<LocationData>()
+                .Ignore(x => x.DataType)
+                .Property(x => x.Name).IsRequired();
         }
         public DbSet<T> GetDbSet<T>() where T : Model
         {

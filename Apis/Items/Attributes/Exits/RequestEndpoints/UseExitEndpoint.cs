@@ -10,6 +10,8 @@ using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Go;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;
@@ -48,9 +50,12 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits.RequestEndpoints
                 var goRequest = request.GetMessageAsType<GoRequest>();
                 var exit = api.GetItemManager().Read(goRequest.ItemId);
                 var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
-                var locationAttribute = api.GetAttributeManager<ILocationAttributeManager>()
+                var locationAttribute = api
+                    .GetModuleManager()
+                    .GetModule<ICoreModule>()
+                    .GetManager<ILocationItemManager>()
                     .Read(exit.GetAttribute<ExitAttribute>().DestinationLocationId);
-                var location = api.GetItemManager().Read(locationAttribute.ItemId);
+                var location = api.GetItemManager().Read(locationAttribute.DataItemId);
                 api.GetItemManager().Move(player, location, exit);
                 var lookRequestHandler = new ExamineLocationEndpoint();
                 response = lookRequestHandler.HandleRequest(api, terminal, new ListLocationRequest()

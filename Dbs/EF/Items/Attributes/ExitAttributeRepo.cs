@@ -2,11 +2,11 @@
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Exits;
-using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOutTime.Repository.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
 
 namespace BeforeOurTime.Repository.Dbs.EF.Items.Attributes
 {
@@ -51,11 +51,11 @@ namespace BeforeOurTime.Repository.Dbs.EF.Items.Attributes
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
         public List<ExitAttribute> ReadWithDestination(
-            LocationAttribute locationAttribute, 
+            LocationData locationData, 
             TransactionOptions options = null)
         {
             var attributeIds = Set
-                .Where(x => x.DestinationLocationId == locationAttribute.Id)
+                .Where(x => x.DestinationLocationId == locationData.Id)
                 .Select(x => x.Id)
                 .ToList();
             var attributes = Read(attributeIds, options);

@@ -9,7 +9,6 @@ using System.Text;
 using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Exits;
-using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.Primitives.Images;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
@@ -25,7 +24,6 @@ namespace BeforeOutTime.Repository.Dbs.EF
         // Items
         public DbSet<Item> Items { set; get; }
         public DbSet<VisibleAttribute> Visibles { set; get; }
-        public DbSet<LocationAttribute> Locations { set; get; }
         public DbSet<PlayerAttribute> Players { set; get; }
         public DbSet<PhysicalAttribute> Physicals { set; get; }
         public DbSet<ExitAttribute> Exits { set; get; }
@@ -72,19 +70,6 @@ namespace BeforeOutTime.Repository.Dbs.EF
                 .HasForeignKey<VisibleAttribute>(x => x.ItemId);
             modelBuilder.Entity<VisibleAttribute>()
                 .Ignore(x => x.AttributeType);
-            // Item Attribute Location
-            modelBuilder.Entity<LocationAttribute>()
-                .ToTable("Item_Attribute_Locations");
-            modelBuilder.Entity<LocationAttribute>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<LocationAttribute>()
-                .HasOne(x => x.Item)
-                .WithOne()
-                .HasForeignKey<LocationAttribute>(x => x.ItemId)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<LocationAttribute>()
-                .Ignore(x => x.AttributeType)
-                .Property(x => x.Name).IsRequired();
             // Item Attribute Player
             modelBuilder.Entity<PlayerAttribute>()
                 .ToTable("Item_Attribute_Players");

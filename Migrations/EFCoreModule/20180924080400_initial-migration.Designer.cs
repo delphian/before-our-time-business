@@ -4,22 +4,24 @@ using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace BeforeOurTime.Business.Migrations
+namespace BeforeOurTime.Business.Migrations.EFCoreModule
 {
     [DbContext(typeof(EFCoreModuleContext))]
-    partial class EFCoreModuleContextModelSnapshot : ModelSnapshot
+    [Migration("20180924080400_initial-migration")]
+    partial class initialmigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.0-rtm-30799")
+                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("BeforeOurTime.Business.Modules.Core.Models.Data.GameData", b =>
+            modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.GameData", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -33,6 +35,23 @@ namespace BeforeOurTime.Business.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Item_Data_Games");
+                });
+
+            modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.LocationData", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("DataItemId");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Item_Data_Locations");
                 });
 #pragma warning restore 612, 618
         }

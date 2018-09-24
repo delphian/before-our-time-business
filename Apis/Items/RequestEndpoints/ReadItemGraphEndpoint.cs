@@ -1,15 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.ItemAttributes;
-using BeforeOurTime.Models.ItemAttributes.Characters;
-using BeforeOurTime.Models.ItemAttributes.Players;
-using BeforeOurTime.Models.Items.Games;
-using BeforeOurTime.Models.ItemProperties.Visible;
-using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
-using BeforeOurTime.Models.Messages.CRUD.Items.ReadItem;
 using BeforeOurTime.Models.Messages.CRUD.Items.ReadItemGraph;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
@@ -25,6 +16,8 @@ using BeforeOurTime.Business.Modules.Core;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {

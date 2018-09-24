@@ -3,6 +3,7 @@ using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Managers;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
@@ -42,6 +43,10 @@ namespace BeforeOurTime.Business.Modules
         /// </summary>
         private List<ICrudDataRepository> Repositories { set; get; } = new List<ICrudDataRepository>();
         /// <summary>
+        /// List of all registered item managers
+        /// </summary>
+        private List<IDataManager> Managers { set; get; } = new List<IDataManager>();
+        /// <summary>
         /// Record which modules have registered for specific messages
         /// </summary>
         private Dictionary<Guid, List<IModule>> MessageHandlers { set; get; } = new Dictionary<Guid, List<IModule>>();
@@ -78,6 +83,11 @@ namespace BeforeOurTime.Business.Modules
                 {
                     Logger.LogDebug($"Module {module.GetType().Name} is loading repository {repository.GetType().Name}");
                     Repositories.Add(repository);
+                });
+                module.GetManagers().ForEach(manager =>
+                {
+                    Logger.LogDebug($"Module {module.GetType().Name} is loading item manager {manager.GetType().Name}");
+                    Managers.Add(manager);
                 });
                 module.RegisterForMessages().ForEach(messageId =>
                 {
@@ -116,6 +126,16 @@ namespace BeforeOurTime.Business.Modules
         {
             var repository = Repositories.Where(x => x is T).Select(x => x).FirstOrDefault();
             return (T)repository;
+        }
+        /// <summary>
+        /// Get item manager that implements interface
+        /// </summary>
+        /// <typeparam name="T">Interface that item manager must implement</typeparam>
+        /// <returns></returns>
+        public T GetManager<T>() where T : IDataManager
+        {
+            var manager = Managers.Where(x => x is T).Select(x => x).FirstOrDefault();
+            return (T)manager;
         }
         /// <summary>
         /// Get all modules that have registered handle a message

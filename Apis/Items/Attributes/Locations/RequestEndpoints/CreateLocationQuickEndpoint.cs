@@ -19,6 +19,8 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Managers;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -54,7 +56,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                 var location = api.GetItemManager().Read(player.ParentId.Value);
                 var createFromLocationItemId = createLocationQuickRequest.FromLocationItemId ??
                                                player.ParentId.Value;
-                var newLocationItem = api.GetAttributeManager<ILocationAttributeManager>()
+                var newLocationItem = api
+                    .GetModuleManager()
+                    .GetModule<ICoreModule>()
+                    .GetManager<ILocationItemManager>()
                     .CreateFromHere(createFromLocationItemId);
                 response = new CreateLocationQuickResponse()
                 {

@@ -2,7 +2,6 @@
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes.Players;
-using BeforeOurTime.Models.ItemProperties.Visible;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Events.Arrivals;
 using BeforeOurTime.Models.Messages.Events.Departures;
@@ -14,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
 
 namespace BeforeOurTime.Business.Apis.Messages
 {

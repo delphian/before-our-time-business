@@ -10,7 +10,6 @@ using System.Text;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
 using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
-using BeforeOurTime.Models.ItemAttributes.Locations;
 using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.Items.Players;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
