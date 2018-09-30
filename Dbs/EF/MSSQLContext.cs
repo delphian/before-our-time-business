@@ -1,7 +1,5 @@
-﻿using BeforeOurTime.Repository.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;

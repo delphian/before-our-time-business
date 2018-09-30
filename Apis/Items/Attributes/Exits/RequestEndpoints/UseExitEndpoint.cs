@@ -11,6 +11,7 @@ using BeforeOurTime.Models.Messages.Requests.Go;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
@@ -54,6 +55,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits.RequestEndpoints
                     .GetModuleManager()
                     .GetModule<ICoreModule>()
                     .GetManager<ILocationItemManager>()
+                    .GetRepository<ILocationDataRepo>()
                     .Read(exit.GetAttribute<ExitAttribute>().DestinationLocationId);
                 var location = api.GetItemManager().Read(locationAttribute.DataItemId);
                 api.GetItemManager().Move(player, location, exit);

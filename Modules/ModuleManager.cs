@@ -3,7 +3,6 @@ using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Managers;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
@@ -41,11 +40,11 @@ namespace BeforeOurTime.Business.Modules
         /// <summary>
         /// List of all registered CRUD repositories
         /// </summary>
-        private List<ICrudDataRepository> Repositories { set; get; } = new List<ICrudDataRepository>();
+        private List<ICrudModelRepository> Repositories { set; get; } = new List<ICrudModelRepository>();
         /// <summary>
         /// List of all registered item managers
         /// </summary>
-        private List<IDataManager> Managers { set; get; } = new List<IDataManager>();
+        private List<IModelManager> Managers { set; get; } = new List<IModelManager>();
         /// <summary>
         /// Record which modules have registered for specific messages
         /// </summary>
@@ -122,7 +121,7 @@ namespace BeforeOurTime.Business.Modules
         /// </summary>
         /// <typeparam name="T">Interface that repository must implement</typeparam>
         /// <returns></returns>
-        public T GetRepository<T>() where T : ICrudDataRepository
+        public T GetRepository<T>() where T : ICrudModelRepository
         {
             var repository = Repositories.Where(x => x is T).Select(x => x).FirstOrDefault();
             return (T)repository;
@@ -132,7 +131,7 @@ namespace BeforeOurTime.Business.Modules
         /// </summary>
         /// <typeparam name="T">Interface that item manager must implement</typeparam>
         /// <returns></returns>
-        public T GetManager<T>() where T : IDataManager
+        public T GetManager<T>() where T : IModelManager
         {
             var manager = Managers.Where(x => x is T).Select(x => x).FirstOrDefault();
             return (T)manager;

@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Models;
-using BeforeOurTime.Models.Accounts;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes.Players;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +11,7 @@ using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.Primitives.Images;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
+using BeforeOurTime.Models.Modules.Account.Models.Data;
 
 namespace BeforeOutTime.Repository.Dbs.EF
 {
@@ -20,7 +20,6 @@ namespace BeforeOutTime.Repository.Dbs.EF
     /// </summary>
     public class BaseContext : DbContext
     {
-        public DbSet<Account> Accounts { set; get;  }
         // Items
         public DbSet<Item> Items { set; get; }
         public DbSet<VisibleAttribute> Visibles { set; get; }
@@ -33,16 +32,8 @@ namespace BeforeOutTime.Repository.Dbs.EF
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Ignore<AccountData>();
             modelBuilder.Ignore<ItemAttribute>();
-            // Account
-            modelBuilder.Entity<Account>()
-                .ToTable("Accounts")
-                .HasIndex(account => account.Name).IsUnique(true);
-            modelBuilder.Entity<Account>()
-                .HasKey(account => account.Id);
-            modelBuilder.Entity<Account>()
-                .Ignore(account => account.Characters)
-                .Property(x => x.Name).IsRequired();
             // Icon
             modelBuilder.Entity<Image>()
                 .ToTable("Icons");
@@ -83,11 +74,6 @@ namespace BeforeOutTime.Repository.Dbs.EF
             modelBuilder.Entity<PlayerAttribute>()
                 .Ignore(x => x.AttributeType)
                 .Property(x => x.AccountId).IsRequired();
-            modelBuilder.Entity<PlayerAttribute>()
-                .HasOne<Account>()
-                .WithMany()
-                .HasForeignKey(x => x.AccountId)
-                .OnDelete(DeleteBehavior.Restrict);
             // Item Attribute Physical
             modelBuilder.Entity<PhysicalAttribute>()
                 .ToTable("Item_Attribute_Physicals");

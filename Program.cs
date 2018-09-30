@@ -1,7 +1,6 @@
 ﻿#define DEBUG
 
 using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Apis.Messages;
@@ -11,8 +10,6 @@ using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Dbs.EF.Items;
 using BeforeOurTime.Repository.Dbs.EF.Items.Attributes;
-using BeforeOurTime.Repository.Models;
-using BeforeOurTime.Repository.Models.Accounts;
 using BeforeOutTime.Repository.Dbs.EF;
 using Jint;
 using Microsoft.EntityFrameworkCore;
@@ -103,8 +100,6 @@ namespace BeforeOurTime.Business
                 .AddSingleton<IConfiguration>(configuration)
                 .AddDbContext<BaseContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped)
                 .AddLogging()
-                // Repositories
-                .AddScoped<IAccountRepo, AccountRepo>()
                 // Repositories (Items)
                 .AddScoped<IItemRepo, ItemRepo>()
                 .AddScoped<IVisibleAttributeRepo, VisibleAttributeRepo>()
@@ -113,7 +108,6 @@ namespace BeforeOurTime.Business
                 .AddScoped<IPhysicalAttributeRepo, PhysicalAttributeRepo>()
                 .AddScoped<IExitAttributeRepo, ExitAttributeRepo>()
                 // Main environment interface API
-                .AddScoped<IAccountManager, AccountManager>()
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<ITerminalManager, TerminalManager>()
                 .AddScoped<IModuleManager, ModuleManager>()

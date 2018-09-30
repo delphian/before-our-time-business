@@ -3,9 +3,7 @@ using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Managers;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Core;
@@ -48,17 +46,21 @@ namespace BeforeOurTime.Business.Modules.Core
         /// </summary>
         private IItemRepo ItemRepo { set; get; }
         /// <summary>
-        /// Item managers created or required by the module
+        /// Managers created or required by the module
         /// </summary>
-        private List<IDataManager> ItemManagers { set; get; } = new List<IDataManager>();
+        private List<IModelManager> Managers { set; get; } = new List<IModelManager>();
         /// <summary>
         /// Data repositories created or required by the module
         /// </summary>
-        private List<ICrudDataRepository> DataRepositories { set; get; } = new List<ICrudDataRepository>();
+        private List<ICrudModelRepository> Repositories { set; get; } = new List<ICrudModelRepository>();
         /// <summary>
         /// Game data repository
         /// </summary>
         private IGameDataRepo GameDataRepo { set; get; }
+        /// <summary>
+        /// Location data repository
+        /// </summary>
+        private ILocationDataRepo LocationDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -80,7 +82,7 @@ namespace BeforeOurTime.Business.Modules.Core
             ItemRepo.OnItemRead += OnItemRead;
             ItemRepo.OnItemUpdate += OnItemUpdate;
             ItemRepo.OnItemDelete += OnItemDelete;
-            ItemManagers = BuildItemManagers(Db, ItemRepo);
+            Managers = BuildManagers(Db, ItemRepo);
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -88,9 +90,9 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="db"></param>
         /// <param name="itemRepo"></param>
         /// <returns></returns>
-        List<IDataManager> BuildItemManagers(EFCoreModuleContext db, IItemRepo itemRepo)
+        List<IModelManager> BuildManagers(EFCoreModuleContext db, IItemRepo itemRepo)
         {
-            var managers = new List<IDataManager>
+            var managers = new List<IModelManager>
             {
                 new GameItemManager(itemRepo, new EFGameDataRepo(Db, itemRepo)),
                 new LocationItemManager(itemRepo, new EFLocationDataRepo(Db, itemRepo))
@@ -101,26 +103,35 @@ namespace BeforeOurTime.Business.Modules.Core
         /// Get repositories declared by the module
         /// </summary>
         /// <returns></returns>
-        public List<ICrudDataRepository> GetRepositories()
+        public List<ICrudModelRepository> GetRepositories()
         {
-            return DataRepositories;
+            return Repositories;
+        }
+        /// <summary>
+        /// Get repository as interface
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetRepository<T>() where T : ICrudModelRepository
+        {
+            return GetRepositories().Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
         /// <summary>
         /// Get item managers declared by the module
         /// </summary>
         /// <returns></returns>
-        public List<IDataManager> GetManagers()
+        public List<IModelManager> GetManagers()
         {
-            return ItemManagers;
+            return Managers;
         }
         /// <summary>
-        /// Get item manager of specified type
+        /// Get manager of specified type
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public T GetManager<T>()
         {
-            return ItemManagers.Where(x => x is T).Select(x => (T)x).FirstOrDefault();
+            return Managers.Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
         /// <summary>
         /// Get message identifiers of messages handled by module
@@ -139,11 +150,14 @@ namespace BeforeOurTime.Business.Modules.Core
         /// Initialize module
         /// </summary>
         /// <param name="repositories"></param>
-        public void Initialize(List<ICrudDataRepository> repositories)
+        public void Initialize(List<ICrudModelRepository> repositories)
         {
             GameDataRepo = repositories
                 .Where(x => x is IGameDataRepo)
                 .Select(x => (IGameDataRepo)x).FirstOrDefault();
+            LocationDataRepo = repositories
+                .Where(x => x is ILocationDataRepo)
+                .Select(x => (ILocationDataRepo)x).FirstOrDefault();
         }
         /// <summary>
         /// Get the default game
@@ -223,6 +237,12 @@ namespace BeforeOurTime.Business.Modules.Core
                 data.DataItemId = item.Id;
                 GameDataRepo.Create(data, options);
             }
+            if (item.HasData<LocationData>())
+            {
+                var data = item.GetData<LocationData>();
+                data.DataItemId = item.Id;
+                LocationDataRepo.Create(data, options);
+            }
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
@@ -231,10 +251,15 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemRead(Item item, TransactionOptions options = null)
         {
-            var data = GameDataRepo.Read(item, options);
-            if (data != null)
+            var gameData = GameDataRepo.Read(item, options);
+            var locationData = LocationDataRepo.Read(item, options);
+            if (gameData != null)
             {
-                item.Data.Add(data);
+                item.Data.Add(gameData);
+            }
+            if (locationData != null)
+            {
+                item.Data.Add(locationData);
             }
         }
         /// <summary>
@@ -249,6 +274,11 @@ namespace BeforeOurTime.Business.Modules.Core
                 var data = item.GetData<GameData>();
                 GameDataRepo.Update(data, options);
             }
+            if (item.HasData<LocationData>())
+            {
+                var data = item.GetData<LocationData>();
+                LocationDataRepo.Update(data, options);
+            }
         }
         /// <summary>
         /// Delete attribute of base item before base item is deleted
@@ -261,6 +291,11 @@ namespace BeforeOurTime.Business.Modules.Core
             {
                 var data = item.GetData<GameData>();
                 GameDataRepo.Delete(data, options);
+            }
+            if (item.HasAttribute<LocationData>())
+            {
+                var data = item.GetData<LocationData>();
+                LocationDataRepo.Delete(data, options);
             }
         }
         #endregion

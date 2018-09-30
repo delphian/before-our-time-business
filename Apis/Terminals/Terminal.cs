@@ -1,5 +1,4 @@
-﻿using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Items.Characters;
+﻿using BeforeOurTime.Models.Items.Characters;
 using BeforeOurTime.Models.Json;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
@@ -11,7 +10,6 @@ using BeforeOurTime.Models.Messages.Responses.Create;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
 using BeforeOurTime.Models.Terminals;
-using BeforeOurTime.Repository.Models.Accounts;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;

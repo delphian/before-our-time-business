@@ -8,6 +8,8 @@ using BeforeOurTime.Models.Messages.Requests.Login;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Messages.Responses.Login;
+using BeforeOurTime.Models.Modules.Account.Managers;
+using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;
@@ -46,7 +48,9 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
             if (request.IsMessageType<LoginRequest>())
             {
                 var loginRequest = request.GetMessageAsType<LoginRequest>();
-                var account = api.GetAccountManager().Authenticate(loginRequest.Email, loginRequest.Password);
+                var account = api.GetModuleManager().GetModule<IAccountModule>()
+                    .GetManager<IAccountManager>()
+                    .Authenticate(loginRequest.Email, loginRequest.Password);
                 response = new LoginResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),

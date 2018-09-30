@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace BeforeOurTime.Business.Migrations
+namespace BeforeOurTime.Business.Migrations.MSSQL
 {
     [DbContext(typeof(MSSQLContext))]
-    [Migration("20180924080341_initial-migration")]
+    [Migration("20180930064059_initial-migration")]
     partial class initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,26 +20,6 @@ namespace BeforeOurTime.Business.Migrations
                 .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("BeforeOurTime.Models.Accounts.Account", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Email");
-
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.Property<string>("Password");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Accounts");
-                });
 
             modelBuilder.Entity("BeforeOurTime.Models.ItemAttributes.Characters.CharacterAttribute", b =>
                 {
@@ -150,8 +130,6 @@ namespace BeforeOurTime.Business.Migrations
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
 
                     b.HasIndex("ItemId")
                         .IsUnique();
@@ -279,11 +257,6 @@ namespace BeforeOurTime.Business.Migrations
 
             modelBuilder.Entity("BeforeOurTime.Models.ItemAttributes.Players.PlayerAttribute", b =>
                 {
-                    b.HasOne("BeforeOurTime.Models.Accounts.Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("BeforeOurTime.Models.Items.Item", "Item")
                         .WithOne()
                         .HasForeignKey("BeforeOurTime.Models.ItemAttributes.Players.PlayerAttribute", "ItemId")

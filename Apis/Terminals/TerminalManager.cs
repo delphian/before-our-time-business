@@ -2,19 +2,13 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
-using BeforeOurTime.Models.Accounts;
-using BeforeOurTime.Models.Accounts.Authentication;
 using Microsoft.Extensions.DependencyInjection;
-using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.Items.Attributes;
-using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Messages.Responses.List;
-using BeforeOurTime.Models.Messages.Responses.Login;
-using BeforeOurTime.Models.Messages.Requests.Login;
 using System.Net;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Account.Managers;
 
 namespace BeforeOurTime.Business.Apis.Terminals
 {
@@ -55,7 +49,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         )
         {
             var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
-            AccountManager = scopedProvider.GetService<IAccountManager>();
+            AccountManager = scopedProvider.GetService<IModuleManager>().GetManager<IAccountManager>();
             Logger = serviceProvider.GetService<ILogger>();
         }
         /// <summary>

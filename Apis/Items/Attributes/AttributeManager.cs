@@ -1,9 +1,6 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes;
-using BeforeOurTime.Models;
+﻿using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
-using BeforeOurTime.Repository.Dbs.EF;
-using BeforeOurTime.Repository.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

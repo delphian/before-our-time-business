@@ -9,6 +9,8 @@ using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Create;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.Create;
+using BeforeOurTime.Models.Modules.Account.Managers;
+using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;
@@ -45,10 +47,10 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
             if (request.IsMessageType<CreateAccountRequest>())
             {
                 var createAccountRequest = request.GetMessageAsType<CreateAccountRequest>();
-                var account = api.GetAccountManager().Create(
-                    createAccountRequest.Email,
-                    createAccountRequest.Email,
-                    createAccountRequest.Password);
+                var account = api.GetModuleManager().GetModule<IAccountModule>()
+                    .GetManager<IAccountManager>().Create(
+                        createAccountRequest.Email,
+                        createAccountRequest.Password);
                 var createAccountResponse = new CreateAccountResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),

@@ -1,26 +1,12 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace BeforeOurTime.Business.Migrations
+namespace BeforeOurTime.Business.Migrations.MSSQL
 {
     public partial class initialmigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Accounts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    Email = table.Column<string>(nullable: true),
-                    Password = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Accounts", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Icons",
                 columns: table => new
@@ -154,12 +140,6 @@ namespace BeforeOurTime.Business.Migrations
                 {
                     table.PrimaryKey("PK_Item_Attribute_Players", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Item_Attribute_Players_Accounts_AccountId",
-                        column: x => x.AccountId,
-                        principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_Item_Attribute_Players_Items_ItemId",
                         column: x => x.ItemId,
                         principalTable: "Items",
@@ -224,12 +204,6 @@ namespace BeforeOurTime.Business.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Accounts_Name",
-                table: "Accounts",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Item_Attribute_Characters_HealthId",
                 table: "Item_Attribute_Characters",
                 column: "HealthId");
@@ -261,11 +235,6 @@ namespace BeforeOurTime.Business.Migrations
                 table: "Item_Attribute_Physicals",
                 column: "ItemId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Item_Attribute_Players_AccountId",
-                table: "Item_Attribute_Players",
-                column: "AccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Item_Attribute_Players_ItemId",
@@ -312,9 +281,6 @@ namespace BeforeOurTime.Business.Migrations
 
             migrationBuilder.DropTable(
                 name: "LocationData");
-
-            migrationBuilder.DropTable(
-                name: "Accounts");
 
             migrationBuilder.DropTable(
                 name: "Icons");

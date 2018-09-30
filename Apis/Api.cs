@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using BeforeOurTime.Business.Apis.Accounts;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Items.Attributes;
@@ -13,13 +12,11 @@ using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Items;
 using System.Threading.Tasks;
 using System.Threading;
-using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Items.Attributes.Players;
 using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
 using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
 using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 using BeforeOurTime.Models.Exceptions;
-using BeforeOurTime.Business.Modules;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Modules;
 
@@ -35,7 +32,6 @@ namespace BeforeOurTime.Business.Apis
         private ILogger Logger { set; get; }
         private IConfiguration Configuration { set; get; }
         private IMessageManager MessageManager { set; get; }
-        private IAccountManager AccountManager { set; get; }
         private IItemManager ItemManager { set; get; }
         private ITerminalManager TerminalManager { set; get; }
         private IModuleManager ModuleManager { set; get; }
@@ -48,7 +44,6 @@ namespace BeforeOurTime.Business.Apis
             ILogger logger,
             IConfiguration configuration,
             IMessageManager messageManager,
-            IAccountManager accountManager,
             IItemManager itemManager,
             ITerminalManager terminalManager,
             IVisibleAttributeManager visibleAttributeManager,
@@ -61,7 +56,6 @@ namespace BeforeOurTime.Business.Apis
             Logger = logger;
             Configuration = configuration;
             MessageManager = messageManager;
-            AccountManager = accountManager;
             ItemManager = itemManager;
             TerminalManager = terminalManager;
             ModuleManager = moduleManager;
@@ -74,10 +68,6 @@ namespace BeforeOurTime.Business.Apis
         public IMessageManager GetMessageManager()
         {
             return MessageManager;
-        }
-        public IAccountManager GetAccountManager()
-        {
-            return AccountManager;
         }
         public IItemManager GetItemManager()
         {

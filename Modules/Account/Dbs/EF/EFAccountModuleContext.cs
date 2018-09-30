@@ -13,12 +13,11 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
     /// <summary>
     /// Entity framework database context
     /// </summary>
-    public class EFCoreModuleContext : DbContext
+    public class EFAccountModuleContext : DbContext
     {
-        public DbSet<GameData> Games { set; get; }
-        public DbSet<LocationData> Locations { set; get; }
-        public EFCoreModuleContext() : base() { }
-        public EFCoreModuleContext(DbContextOptions<EFCoreModuleContext> options) : base(options) { }
+        public DbSet<AccountData> Accounts { set; get; }
+        public EFAccountModuleContext() : base() { }
+        public EFAccountModuleContext(DbContextOptions<EFAccountModuleContext> options) : base(options) { }
         /// <summary>
         /// Used when called from dotnet shell commands
         /// </summary>
@@ -39,21 +38,14 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Ignore<Item>();
-            modelBuilder.Ignore<AccountData>();
-            // Item Game Data
-            modelBuilder.Entity<GameData>()
-                .ToTable("Item_Data_Games");
-            modelBuilder.Entity<GameData>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<GameData>()
-                .Ignore(x => x.DataType);
-            // Item Attribute Location
-            modelBuilder.Entity<LocationData>()
-                .ToTable("Item_Data_Locations");
-            modelBuilder.Entity<LocationData>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<LocationData>()
-                .Ignore(x => x.DataType)
+            // Account
+            modelBuilder.Entity<AccountData>()
+                .ToTable("Accounts")
+                .HasIndex(account => account.Name).IsUnique(true);
+            modelBuilder.Entity<AccountData>()
+                .HasKey(account => account.Id);
+            modelBuilder.Entity<AccountData>()
+                .Ignore(account => account.Characters)
                 .Property(x => x.Name).IsRequired();
         }
         public DbSet<T> GetDbSet<T>() where T : Model
