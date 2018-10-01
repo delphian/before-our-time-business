@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Account.Managers;
+using BeforeOurTime.Models.Logs;
 
 namespace BeforeOurTime.Business.Apis.Terminals
 {
@@ -17,7 +18,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
     /// </summary>
     public class TerminalManager : ITerminalManager
     {
-        private ILogger Logger { set; get; }
+        private IBotLogger Logger { set; get; }
         private IAccountManager AccountManager { set; get; }
         /// <summary>
         /// List of all active terminals
@@ -50,7 +51,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         {
 //            var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
             AccountManager = serviceProvider.GetService<IModuleManager>().GetManager<IAccountManager>();
-            Logger = serviceProvider.GetService<ILogger>();
+            Logger = serviceProvider.GetService<IBotLogger>();
         }
         /// <summary>
         /// Create a new terminal

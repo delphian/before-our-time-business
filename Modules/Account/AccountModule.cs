@@ -1,23 +1,16 @@
-﻿using BeforeOurTime.Business.Apis.Logs;
-using BeforeOurTime.Business.Modules.Account.Dbs.EF;
+﻿using BeforeOurTime.Business.Modules.Account.Dbs.EF;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests.Create;
+using BeforeOurTime.Models.Messages.Requests.Login;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Account.Dbs;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Core;
-using BeforeOurTime.Models.Modules.Core.Dbs;
-using BeforeOurTime.Models.Modules.Core.Managers;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
-using BeforeOurTime.Models.Modules.Core.Models.Data;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -43,7 +36,7 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <summary>
         /// Centralized log messages
         /// </summary>
-        private ILogger Logger { set; get; }
+        private IBotLogger Logger { set; get; }
         /// <summary>
         /// Access to items in the data store
         /// </summary>
@@ -66,7 +59,7 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="itemRepo">Access to items in the data store</param>
         public AccountModule(
             IConfiguration configuration,
-            ILogger logger,
+            IBotLogger logger,
             IItemRepo itemRepo)
         {
             Configuration = configuration;
@@ -77,7 +70,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             Db = new EFAccountModuleContext(dbOptions.Options);
             ItemRepo = itemRepo;
-            Managers = BuildManagers(Db, ItemRepo);
+            Managers = BuildManagers(Logger, Db, ItemRepo);
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -85,11 +78,11 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="db"></param>
         /// <param name="itemRepo"></param>
         /// <returns></returns>
-        List<IModelManager> BuildManagers(EFAccountModuleContext db, IItemRepo itemRepo)
+        List<IModelManager> BuildManagers(IBotLogger logger, EFAccountModuleContext db, IItemRepo itemRepo)
         {
             var managers = new List<IModelManager>
             {
-                new AccountManager(itemRepo, new EFAccountDataRepo(db)),
+                new AccountManager(logger, itemRepo, new EFAccountDataRepo(db)),
             };
             return managers;
         }
@@ -135,7 +128,9 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
-                CreateAccountRequest._Id
+                CreateAccountRequest._Id,
+                LoginRequest._Id,
+                LogoutRequest._Id
             };
         }
         /// <summary>
@@ -199,6 +194,12 @@ namespace BeforeOurTime.Business.Modules.Core
             if (message.GetMessageId() == CreateAccountRequest._Id)
                 response = GetManager<IAccountManager>()
                     .HandleCreateAccountRequest(message, api, terminal, response);
+            if (message.GetMessageId() == LoginRequest._Id)
+                response = GetManager<IAccountManager>()
+                    .HandleLoginAccountRequest(message, api, terminal, response);
+            if (message.GetMessageId() == LogoutRequest._Id)
+                response = GetManager<IAccountManager>()
+                    .HandleLogoutAccountRequest(message, api, terminal, response);
             return response;
         }
         #endregion

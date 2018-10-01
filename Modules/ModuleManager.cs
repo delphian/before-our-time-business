@@ -3,6 +3,7 @@ using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
@@ -28,7 +29,7 @@ namespace BeforeOurTime.Business.Modules
         /// <summary>
         /// Centralized logging system
         /// </summary>
-        private ILogger Logger { set; get; }
+        private IBotLogger Logger { set; get; }
         /// <summary>
         /// Access to items in the data store
         /// </summary>
@@ -54,7 +55,7 @@ namespace BeforeOurTime.Business.Modules
         /// </summary>
         public ModuleManager(
             IConfiguration configuration, 
-            ILogger logger,
+            IBotLogger logger,
             IItemRepo itemRepo)
         {
             Configuration = configuration;

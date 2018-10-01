@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BeforeOurTime.Models.Logs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Apis.Logs
 {
-    public class FileLogger : ILogger
+    public class FileLogger : IBotLogger
     {
         private string pathToFile = Directory.GetCurrentDirectory() + "/logs.txt";
         private LogLevel LogLevel { set; get; }

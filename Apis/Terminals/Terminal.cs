@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Models.Items.Characters;
 using BeforeOurTime.Models.Json;
+using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Create;
@@ -28,7 +29,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// Central manager of all client connections regardless of protocol (telnet, websocket, etc)
         /// </summary>
         protected TerminalManager TerminalManager { set; get; }
-        private ILogger Logger { set; get; }
+        private IBotLogger Logger { set; get; }
         /// <summary>
         /// Unique terminal identifier
         /// </summary>
@@ -78,7 +79,7 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <param name="terminalManager">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         public Terminal(
             TerminalManager terminalManager, 
-            ILogger logger)
+            IBotLogger logger)
         {
             Id = Guid.NewGuid();
             TerminalManager = terminalManager;

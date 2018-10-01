@@ -4,6 +4,7 @@ using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Core;
@@ -40,7 +41,7 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <summary>
         /// Centralized log messages
         /// </summary>
-        private ILogger Logger { set; get; }
+        private IBotLogger Logger { set; get; }
         /// <summary>
         /// Access to items in the data store
         /// </summary>
@@ -67,7 +68,7 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="itemRepo">Access to items in the data store</param>
         public CoreModule(
             IConfiguration configuration,
-            ILogger logger,
+            IBotLogger logger,
             IItemRepo itemRepo)
         {
             Configuration = configuration;
@@ -82,7 +83,7 @@ namespace BeforeOurTime.Business.Modules.Core
             ItemRepo.OnItemRead += OnItemRead;
             ItemRepo.OnItemUpdate += OnItemUpdate;
             ItemRepo.OnItemDelete += OnItemDelete;
-            Managers = BuildManagers(Db, ItemRepo);
+            Managers = BuildManagers(Logger, Db, ItemRepo);
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -90,12 +91,12 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="db"></param>
         /// <param name="itemRepo"></param>
         /// <returns></returns>
-        List<IModelManager> BuildManagers(EFCoreModuleContext db, IItemRepo itemRepo)
+        List<IModelManager> BuildManagers(IBotLogger logger, EFCoreModuleContext db, IItemRepo itemRepo)
         {
             var managers = new List<IModelManager>
             {
-                new GameItemManager(itemRepo, new EFGameDataRepo(Db, itemRepo)),
-                new LocationItemManager(itemRepo, new EFLocationDataRepo(Db, itemRepo))
+                new GameItemManager(logger, itemRepo, new EFGameDataRepo(Db, itemRepo)),
+                new LocationItemManager(logger, itemRepo, new EFLocationDataRepo(Db, itemRepo))
             };
             return managers;
         }

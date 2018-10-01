@@ -19,6 +19,7 @@ using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 using BeforeOurTime.Models.Exceptions;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Logs;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -29,7 +30,7 @@ namespace BeforeOurTime.Business.Apis
     {
         private object lockObject = null;
         private Dictionary<Type, IAttributeManager> AttributeManagerList = new Dictionary<Type, IAttributeManager>();
-        private ILogger Logger { set; get; }
+        private IBotLogger Logger { set; get; }
         private IConfiguration Configuration { set; get; }
         private IMessageManager MessageManager { set; get; }
         private IItemManager ItemManager { set; get; }
@@ -41,7 +42,7 @@ namespace BeforeOurTime.Business.Apis
         /// <param name="itemRepo"></param>
         /// <param name="messageRepo"></param>
         public Api(
-            ILogger logger,
+            IBotLogger logger,
             IConfiguration configuration,
             IMessageManager messageManager,
             IItemManager itemManager,
@@ -77,7 +78,7 @@ namespace BeforeOurTime.Business.Apis
         {
             return TerminalManager;
         }
-        public ILogger GetLogger()
+        public IBotLogger GetLogger()
         { 
             return Logger;
         }

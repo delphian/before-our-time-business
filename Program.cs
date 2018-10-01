@@ -39,6 +39,7 @@ using BeforeOurTime.Business.Modules;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Logs;
 
 namespace BeforeOurTime.Business
 {
@@ -65,13 +66,13 @@ namespace BeforeOurTime.Business
 //            var tickTask = api.TickAsync(Convert.ToInt32(Configuration.GetSection("Timing")["Tick"]), masterCts.Token);
 //            var deliverTask = api.DeliverMessagesAsync(Int32.Parse(Configuration.GetSection("Timing")["Delivery"]), masterCts.Token, Configuration, ServiceProvider);
             // Start servers
-            ServiceProvider.GetService<ILogger>().LogInformation($"Starting servers...");
+            ServiceProvider.GetService<IBotLogger>().LogInformation($"Starting servers...");
             Servers = BuildServerList(ServiceProvider.GetService<IApi>());
             Servers.ForEach(delegate (IServer server)
             {
                 server.Start();
             });
-            ServiceProvider.GetService<ILogger>().LogInformation($"All servers started");
+            ServiceProvider.GetService<IBotLogger>().LogInformation($"All servers started");
             ListenToTerminals();
             // Wait for user input
             Console.WriteLine("Ready! (Hit 'q' and enter to abort console)");
@@ -96,7 +97,7 @@ namespace BeforeOurTime.Business
             // Setup services
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services
-                .AddSingleton<ILogger>(new FileLogger(configuration))
+                .AddSingleton<IBotLogger>(new FileLogger(configuration))
                 .AddSingleton<IConfiguration>(configuration)
                 .AddDbContext<BaseContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped)
                 .AddLogging()
