@@ -5,6 +5,7 @@ using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.Requests.Create;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Account.Dbs;
 using BeforeOurTime.Models.Modules.Account.Managers;
@@ -134,6 +135,7 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
+                CreateAccountRequest._Id
             };
         }
         /// <summary>
@@ -188,8 +190,15 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="message"></param>
         /// <param name="terminal"></param>
         /// <param name="response"></param>
-        public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        public IResponse HandleMessage(
+            IMessage message, 
+            IApi api, 
+            ITerminal terminal, 
+            IResponse response)
         {
+            if (message.GetMessageId() == CreateAccountRequest._Id)
+                response = GetManager<IAccountManager>()
+                    .HandleCreateAccountRequest(message, api, terminal, response);
             return response;
         }
         #endregion
