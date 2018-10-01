@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeforeOurTime.Business.Migrations.MSSQL
 {
     [DbContext(typeof(MSSQLContext))]
-    [Migration("20180930064059_initial-migration")]
+    [Migration("20181001030522_initial-migration")]
     partial class initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,8 +74,6 @@ namespace BeforeOurTime.Business.Migrations.MSSQL
                     b.Property<int>("Time");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DestinationLocationId");
 
                     b.HasIndex("ItemId")
                         .IsUnique();
@@ -180,24 +178,6 @@ namespace BeforeOurTime.Business.Migrations.MSSQL
                     b.ToTable("Items");
                 });
 
-            modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.LocationData", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("DataItemId");
-
-                    b.Property<string>("DataType");
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LocationData");
-                });
-
             modelBuilder.Entity("BeforeOurTime.Models.Primitives.Images.Image", b =>
                 {
                     b.Property<Guid>("Id")
@@ -232,11 +212,6 @@ namespace BeforeOurTime.Business.Migrations.MSSQL
 
             modelBuilder.Entity("BeforeOurTime.Models.ItemAttributes.Exits.ExitAttribute", b =>
                 {
-                    b.HasOne("BeforeOurTime.Models.Modules.Core.Models.Data.LocationData", "DestinationLocation")
-                        .WithMany()
-                        .HasForeignKey("DestinationLocationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("BeforeOurTime.Models.Items.Item", "Item")
                         .WithOne()
                         .HasForeignKey("BeforeOurTime.Models.ItemAttributes.Exits.ExitAttribute", "ItemId")

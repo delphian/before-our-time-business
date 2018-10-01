@@ -56,21 +56,6 @@ namespace BeforeOurTime.Business.Migrations.MSSQL
                 });
 
             migrationBuilder.CreateTable(
-                name: "LocationData",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    DataType = table.Column<string>(nullable: true),
-                    DataItemId = table.Column<Guid>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LocationData", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Item_Attribute_Characters",
                 columns: table => new
                 {
@@ -90,6 +75,29 @@ namespace BeforeOurTime.Business.Migrations.MSSQL
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Item_Attribute_Characters_Items_ItemId",
+                        column: x => x.ItemId,
+                        principalTable: "Items",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Item_Attribute_Exits",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    ItemId = table.Column<Guid>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    DestinationLocationId = table.Column<Guid>(nullable: false),
+                    Time = table.Column<int>(nullable: false),
+                    Effort = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Item_Attribute_Exits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Item_Attribute_Exits_Items_ItemId",
                         column: x => x.ItemId,
                         principalTable: "Items",
                         principalColumn: "Id",
@@ -174,35 +182,6 @@ namespace BeforeOurTime.Business.Migrations.MSSQL
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Item_Attribute_Exits",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    ItemId = table.Column<Guid>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    DestinationLocationId = table.Column<Guid>(nullable: false),
-                    Time = table.Column<int>(nullable: false),
-                    Effort = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Item_Attribute_Exits", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Item_Attribute_Exits_LocationData_DestinationLocationId",
-                        column: x => x.DestinationLocationId,
-                        principalTable: "LocationData",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Item_Attribute_Exits_Items_ItemId",
-                        column: x => x.ItemId,
-                        principalTable: "Items",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Item_Attribute_Characters_HealthId",
                 table: "Item_Attribute_Characters",
@@ -213,11 +192,6 @@ namespace BeforeOurTime.Business.Migrations.MSSQL
                 table: "Item_Attribute_Characters",
                 column: "ItemId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Item_Attribute_Exits_DestinationLocationId",
-                table: "Item_Attribute_Exits",
-                column: "DestinationLocationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Item_Attribute_Exits_ItemId",
@@ -278,9 +252,6 @@ namespace BeforeOurTime.Business.Migrations.MSSQL
 
             migrationBuilder.DropTable(
                 name: "Item_Attribute_Characters_Health");
-
-            migrationBuilder.DropTable(
-                name: "LocationData");
 
             migrationBuilder.DropTable(
                 name: "Icons");

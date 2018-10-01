@@ -48,8 +48,8 @@ namespace BeforeOurTime.Business.Apis.Terminals
             IServiceProvider serviceProvider
         )
         {
-            var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
-            AccountManager = scopedProvider.GetService<IModuleManager>().GetManager<IAccountManager>();
+//            var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
+            AccountManager = serviceProvider.GetService<IModuleManager>().GetManager<IAccountManager>();
             Logger = serviceProvider.GetService<ILogger>();
         }
         /// <summary>

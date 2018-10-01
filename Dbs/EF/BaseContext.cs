@@ -12,6 +12,7 @@ using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.Primitives.Images;
 using BeforeOurTime.Models.ItemAttributes.Visibles;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
 
 namespace BeforeOutTime.Repository.Dbs.EF
 {
@@ -33,6 +34,7 @@ namespace BeforeOutTime.Repository.Dbs.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Ignore<AccountData>();
+            modelBuilder.Ignore<LocationData>();
             modelBuilder.Ignore<ItemAttribute>();
             // Icon
             modelBuilder.Entity<Image>()
@@ -113,11 +115,6 @@ namespace BeforeOutTime.Repository.Dbs.EF
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<ExitAttribute>()
                 .Ignore(x => x.AttributeType);
-            modelBuilder.Entity<ExitAttribute>()
-                .HasOne(x => x.DestinationLocation)
-                .WithMany()
-                .HasForeignKey(x => x.DestinationLocationId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
         public DbSet<T> GetDbSet<T>() where T : Model
         {

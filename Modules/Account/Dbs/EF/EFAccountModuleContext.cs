@@ -38,6 +38,7 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Ignore<Item>();
+            modelBuilder.Ignore<LocationData>();
             // Account
             modelBuilder.Entity<AccountData>()
                 .ToTable("Accounts")

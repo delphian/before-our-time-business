@@ -78,14 +78,10 @@ namespace BeforeOurTime.Business.Modules
                 .ToList();
             Modules.ForEach((module) =>
             {
-                module.GetRepositories().ForEach(repository =>
-                {
-                    Logger.LogDebug($"Module {module.GetType().Name} is loading repository {repository.GetType().Name}");
-                    Repositories.Add(repository);
-                });
+                Logger.LogDebug($"Module {module.GetType().Name}: loaded");
                 module.GetManagers().ForEach(manager =>
                 {
-                    Logger.LogDebug($"Module {module.GetType().Name} is loading item manager {manager.GetType().Name}");
+                    Logger.LogDebug($"Module {module.GetType().Name}: loading model manager {manager.GetType().Name}");
                     Managers.Add(manager);
                 });
                 module.RegisterForMessages().ForEach(messageId =>

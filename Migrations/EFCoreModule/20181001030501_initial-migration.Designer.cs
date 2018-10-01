@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeforeOurTime.Business.Migrations.EFCoreModule
 {
     [DbContext(typeof(EFCoreModuleContext))]
-    [Migration("20180930061616_initial-migration")]
+    [Migration("20181001030501_initial-migration")]
     partial class initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

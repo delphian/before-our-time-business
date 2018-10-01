@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.Logs;
+using BeforeOurTime.Business.Modules.Account.Dbs.EF;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
@@ -6,6 +7,7 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Account.Dbs;
+using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Managers;
@@ -86,6 +88,7 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             var managers = new List<IModelManager>
             {
+                new AccountManager(itemRepo, new EFAccountDataRepo(db)),
             };
             return managers;
         }
@@ -139,6 +142,9 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="repositories"></param>
         public void Initialize(List<ICrudModelRepository> repositories)
         {
+            AccountDataRepo = repositories
+                .Where(x => x is IAccountDataRepo)
+                .Select(x => (IAccountDataRepo)x).FirstOrDefault();
         }
         #region On Item Hooks
         /// <summary>
