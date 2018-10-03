@@ -24,6 +24,7 @@ using BeforeOurTime.Business.Modules.Core;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Exceptions;
 
 namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
 {
@@ -60,7 +61,11 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                 };
                 try
                 {
-                    var defaultLocationId = api.GetModuleManager().GetModule<ICoreModule>().GetDefaultLocation().Id;
+                    var defaultLocationId = api.GetModuleManager().GetModule<ICoreModule>()?.GetDefaultLocation()?.Id;
+                    if (defaultLocationId == null)
+                    {
+                        throw new BeforeOurTimeException("Default location could not be found");
+                    }
                     var createPlayerRequest = request.GetMessageAsType<CreateAccountCharacterRequest>();
                     var playerItem = api.GetAttributeManager<IPlayerAttributeManager>().Create(
                         new VisibleAttribute()
@@ -87,7 +92,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                             Name = createPlayerRequest.Name,
                             AccountId = terminal.GetAccountId().Value
                         },
-                        defaultLocationId);
+                        defaultLocationId.Value);
                     ((CreateAccountCharacterResponse)response)._responseSuccess = true;
                     ((CreateAccountCharacterResponse)response).CreatedAccountCharacterEvent = new CreatedAccountCharacterEvent()
                     {
@@ -103,7 +108,7 @@ namespace BeforeOurTime.Business.Items.Attributes.Players.RequestEndpoints
                         ((CreateAccountCharacterResponse)response)._responseMessage += traverseExceptions.Message + ". ";
                         traverseExceptions = traverseExceptions.InnerException;
                     }
-                    api.GetLogger().Log(LogLevel.Error, ((CreateAccountCharacterResponse)response)._responseMessage);
+                    api.GetLogger().LogException(((CreateAccountCharacterResponse)response)._responseMessage, e);
                 }
             }
             return response;

@@ -71,6 +71,7 @@ namespace BeforeOurTime.Business.Modules.Core
             Db = new EFAccountModuleContext(dbOptions.Options);
             ItemRepo = itemRepo;
             Managers = BuildManagers(Logger, Db, ItemRepo);
+            Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
         }
         /// <summary>
         /// Build all the item managers for the module

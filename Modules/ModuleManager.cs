@@ -85,6 +85,7 @@ namespace BeforeOurTime.Business.Modules
                     Logger.LogDebug($"Module {module.GetType().Name}: loading model manager {manager.GetType().Name}");
                     Managers.Add(manager);
                 });
+                Repositories.AddRange(module.GetRepositories());
                 module.RegisterForMessages().ForEach(messageId =>
                 {
                     if (MessageHandlers.ContainsKey(messageId))

@@ -84,6 +84,7 @@ namespace BeforeOurTime.Business.Modules.Core
             ItemRepo.OnItemUpdate += OnItemUpdate;
             ItemRepo.OnItemDelete += OnItemDelete;
             Managers = BuildManagers(Logger, Db, ItemRepo);
+            Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
         }
         /// <summary>
         /// Build all the item managers for the module
