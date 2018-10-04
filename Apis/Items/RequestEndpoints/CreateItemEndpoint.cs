@@ -6,7 +6,6 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
-using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
@@ -18,6 +17,7 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -34,7 +34,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             return new List<Guid>()
             {
-                ReadItemJsonRequest._Id
+                CoreReadItemJsonRequest._Id
             };
         }
         /// <summary>
@@ -46,9 +46,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="response"></param>
         public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
-            if (request.GetType() == typeof(ReadItemJsonRequest))
+            if (request.GetType() == typeof(CoreReadItemJsonRequest))
             {
-                var createItemRequest = request.GetMessageAsType<ReadItemJsonRequest>();
+                var createItemRequest = request.GetMessageAsType<CoreReadItemJsonRequest>();
                 var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
             }
             return response;

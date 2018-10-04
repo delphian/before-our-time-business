@@ -7,10 +7,6 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
-using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
-using BeforeOurTime.Models.Messages.CRUD.Items.DeleteItem;
-using BeforeOurTime.Models.Messages.CRUD.Items.ReadItem;
-using BeforeOurTime.Models.Messages.CRUD.Items.UpdateItem;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
@@ -23,6 +19,7 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -39,7 +36,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             return new List<Guid>()
             {
-                DeleteItemRequest._Id
+                CoreDeleteItemCrudRequest._Id
             };
         }
         /// <summary>
@@ -51,36 +48,36 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="response"></param>
         public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
-            if (request.GetType() == typeof(DeleteItemRequest))
+            if (request.GetType() == typeof(CoreDeleteItemCrudRequest))
             {
-                response = new DeleteItemResponse()
+                response = new CoreDeleteItemCrudResponse()
                 {
                     _responseSuccess = false,
                     _requestInstanceId = request.GetRequestInstanceId()
                 };
                 try
                 {
-                    var deleteItemRequest = request.GetMessageAsType<DeleteItemRequest>();
+                    var deleteItemRequest = request.GetMessageAsType<CoreDeleteItemCrudRequest>();
                     var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                     var items = api.GetItemManager().Read(deleteItemRequest.ItemIds);
                     api.GetItemManager().Delete(items, true);
-                    var deleteItemEvent = new DeleteItemEvent()
+                    var deleteItemEvent = new CoreDeleteItemCrudEvent()
                         {
                             Items = items
                         };
                     api.GetMessageManager().SendMessageToLocation(deleteItemEvent, player.Parent, player.Id);
-                    ((DeleteItemResponse)response).DeleteItemEvent = deleteItemEvent;
-                    ((DeleteItemResponse)response)._responseSuccess = true;
+                    ((CoreDeleteItemCrudResponse)response).CoreDeleteItemCrudEvent = deleteItemEvent;
+                    ((CoreDeleteItemCrudResponse)response)._responseSuccess = true;
                 }
                 catch (Exception e)
                 {
                     var traverseExceptions = e;
                     while(traverseExceptions != null)
                     {
-                        ((DeleteItemResponse)response)._responseMessage += traverseExceptions.Message + ". ";
+                        ((CoreDeleteItemCrudResponse)response)._responseMessage += traverseExceptions.Message + ". ";
                         traverseExceptions = traverseExceptions.InnerException;
                     }
-                    api.GetLogger().Log(LogLevel.Error, ((DeleteItemResponse)response)._responseMessage);
+                    api.GetLogger().Log(LogLevel.Error, ((CoreDeleteItemCrudResponse)response)._responseMessage);
                 }
             }
             return response;

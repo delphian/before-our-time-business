@@ -1,7 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
 using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Models.Messages.CRUD.Items.ReadItemGraph;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
@@ -18,6 +17,7 @@ using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -34,7 +34,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             return new List<Guid>()
             {
-                ReadItemGraphRequest._Id
+                CoreReadItemGraphRequest._Id
             };
         }
         /// <summary>
@@ -46,15 +46,15 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="response"></param>
         public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
-            if (request.GetType() == typeof(ReadItemGraphRequest))
+            if (request.GetType() == typeof(CoreReadItemGraphRequest))
             {
-                response = new ReadItemGraphResponse()
+                response = new CoreReadItemGraphResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
                 };
                 try
                 {
-                    var readItemGraphRequest = request.GetMessageAsType<ReadItemGraphRequest>();
+                    var readItemGraphRequest = request.GetMessageAsType<CoreReadItemGraphRequest>();
                     var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                     var itemId = readItemGraphRequest.ItemId ??
                         api.GetModuleManager().GetModule<ICoreModule>().GetDefaultGame().Id;
@@ -65,8 +65,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                         Name = item.Visible?.Name ?? "N/A"
                     };
                     BuildItemGraph(api.GetItemManager(), itemGraph);
-                    ((ReadItemGraphResponse)response)._responseSuccess = true;
-                    ((ReadItemGraphResponse)response).ReadItemGraphEvent = new ReadItemGraphEvent()
+                    ((CoreReadItemGraphResponse)response)._responseSuccess = true;
+                    ((CoreReadItemGraphResponse)response).CoreReadItemGraphEvent = new CoreReadItemGraphEvent()
                     {
                         ItemGraph = itemGraph
                     };
@@ -76,10 +76,10 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     var traverseExceptions = e;
                     while (traverseExceptions != null)
                     {
-                        ((ReadItemGraphResponse)response)._responseMessage += traverseExceptions.Message + ". ";
+                        ((CoreReadItemGraphResponse)response)._responseMessage += traverseExceptions.Message + ". ";
                         traverseExceptions = traverseExceptions.InnerException;
                     }
-                    api.GetLogger().Log(LogLevel.Error, ((ReadItemGraphResponse)response)._responseMessage);
+                    api.GetLogger().Log(LogLevel.Error, ((CoreReadItemGraphResponse)response)._responseMessage);
                 }
             }
             return response;

@@ -6,8 +6,6 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
-using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
-using BeforeOurTime.Models.Messages.CRUD.Items.ReadItem;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
@@ -19,6 +17,7 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -35,7 +34,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             return new List<Guid>()
             {
-                ReadItemRequest._Id
+                CoreReadItemCrudRequest._Id
             };
         }
         /// <summary>
@@ -47,9 +46,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="response"></param>
         public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
-            if (request.GetType() == typeof(ReadItemRequest))
+            if (request.GetType() == typeof(CoreReadItemCrudRequest))
             {
-                var readItemRequest = request.GetMessageAsType<ReadItemRequest>();
+                var readItemRequest = request.GetMessageAsType<CoreReadItemCrudRequest>();
                 var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                 var items = new List<Item>();
                 // Read enumerated list of items
@@ -58,22 +57,22 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     items = api.GetItemManager().Read(readItemRequest.ItemIds);
                 }
                 // Read items of type
-                if (readItemRequest.ItemAttributeTypes?.FirstOrDefault() != null)
+                if (readItemRequest.ItemPropertyTypes?.FirstOrDefault() != null)
                 {
-                    var attributeManager = api.GetAttributeManagerOfType(readItemRequest.ItemAttributeTypes.First());
+                    var attributeManager = api.GetAttributeManagerOfType(readItemRequest.ItemPropertyTypes.First());
                     items = attributeManager.ReadItem();
                 }
                 // Read all items
                 if (readItemRequest.ItemIds?.FirstOrDefault() == null &&
-                    readItemRequest.ItemAttributeTypes?.FirstOrDefault() == null)
+                    readItemRequest.ItemPropertyTypes?.FirstOrDefault() == null)
                 {
                     items = api.GetItemManager().Read();
                 }
-                response = new ReadItemResponse()
+                response = new CoreReadItemCrudResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
                     _responseSuccess = true,
-                    ReadItemEvent = new ReadItemEvent()
+                    CoreReadItemCrudEvent = new CoreReadItemCrudEvent()
                     {
                         Items = items
                     }

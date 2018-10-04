@@ -6,9 +6,6 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
-using BeforeOurTime.Models.Messages.CRUD.Items.CreateItem;
-using BeforeOurTime.Models.Messages.CRUD.Items.ReadItem;
-using BeforeOurTime.Models.Messages.CRUD.Items.UpdateItem;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
@@ -21,6 +18,7 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -37,7 +35,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             return new List<Guid>()
             {
-                UpdateItemRequest._Id
+                CoreUpdateItemCrudRequest._Id
             };
         }
         /// <summary>
@@ -49,35 +47,35 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="response"></param>
         public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
-            if (request.GetType() == typeof(UpdateItemRequest))
+            if (request.GetType() == typeof(CoreUpdateItemCrudRequest))
             {
-                response = new UpdateItemResponse()
+                response = new CoreUpdateItemCrudResponse()
                 {
                     _responseSuccess = false,
                     _requestInstanceId = request.GetRequestInstanceId()
                 };
                 try
                 {
-                    var updateItemRequest = request.GetMessageAsType<UpdateItemRequest>();
+                    var updateItemRequest = request.GetMessageAsType<CoreUpdateItemCrudRequest>();
                     var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                     api.GetItemManager().Update(updateItemRequest.Items);
-                    var updateItemEvent = new UpdateItemEvent()
+                    var updateItemEvent = new CoreUpdateItemCrudEvent()
                     {
                         Items = updateItemRequest.Items
                     };
                     api.GetMessageManager().SendMessageToLocation(updateItemEvent, player.Parent, player.Id);
-                    ((UpdateItemResponse)response).UpdateItemEvent = updateItemEvent;
-                    ((UpdateItemResponse)response)._responseSuccess = true;
+                    ((CoreUpdateItemCrudResponse)response).CoreUpdateItemCrudEvent = updateItemEvent;
+                    ((CoreUpdateItemCrudResponse)response)._responseSuccess = true;
                 }
                 catch (Exception e)
                 {
                     var traverseExceptions = e;
                     while (traverseExceptions != null)
                     {
-                        ((UpdateItemResponse)response)._responseMessage += traverseExceptions.Message + ". ";
+                        ((CoreUpdateItemCrudResponse)response)._responseMessage += traverseExceptions.Message + ". ";
                         traverseExceptions = traverseExceptions.InnerException;
                     }
-                    api.GetLogger().Log(LogLevel.Error, ((UpdateItemResponse)response)._responseMessage);
+                    api.GetLogger().Log(LogLevel.Error, ((CoreUpdateItemCrudResponse)response)._responseMessage);
                 }
             }
             return response;

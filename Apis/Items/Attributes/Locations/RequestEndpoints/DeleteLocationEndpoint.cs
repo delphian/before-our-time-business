@@ -7,7 +7,6 @@ using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Players;
-using BeforeOurTime.Models.Messages.CRUD.Items.DeleteItem;
 using BeforeOurTime.Models.Messages.Locations.CreateLocation;
 using BeforeOurTime.Models.Messages.Locations.DeleteLocation;
 using BeforeOurTime.Models.Messages.Locations.Locations.CreateLocation;
@@ -24,6 +23,7 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -71,7 +71,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     api.GetItemManager().Delete(new List<Item>() { location });
                     var deletedItems = exits ?? new List<Item>();
                     deletedItems.Add(location);
-                    var deleteItemEvent = new DeleteItemEvent()
+                    var deleteItemEvent = new CoreDeleteItemCrudEvent()
                     {
                         Items = deletedItems
                     };
