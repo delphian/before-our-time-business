@@ -1,4 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis;
+using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
@@ -6,17 +7,24 @@ using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -28,7 +36,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Modules.Core
 {
-    public class CoreModule : ICoreModule
+    public partial class CoreModule : ICoreModule
     {
         /// <summary>
         /// Entity framework database context
@@ -143,9 +151,14 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
+                CoreReadItemGraphRequest._Id,
                 CoreReadItemJsonRequest._Id,
                 CoreUpdateItemJsonRequest._Id,
-                CoreCreateItemJsonRequest._Id
+                CoreCreateItemJsonRequest._Id,
+                CoreCreateItemCrudRequest._Id,
+                CoreReadItemCrudRequest._Id,
+                CoreUpdateItemCrudRequest._Id,
+                CoreDeleteItemCrudRequest._Id
             };
         }
         /// <summary>
@@ -311,6 +324,16 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="response"></param>
         public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
         {
+            if (message.GetMessageId() == CoreReadItemGraphRequest._Id)
+                response = HandleCoreReadItemGraphRequest(message, api, terminal, response);
+            if (message.GetMessageId() == CoreCreateItemCrudRequest._Id)
+                response = HandleCoreCreateItemCrudRequest(message, api, terminal, response);
+            if (message.GetMessageId() == CoreReadItemCrudRequest._Id)
+                response = HandleCoreReadItemCrudRequest(message, api, terminal, response);
+            if (message.GetMessageId() == CoreUpdateItemCrudRequest._Id)
+                response = HandleCoreUpdateItemCrudRequest(message, api, terminal, response);
+            if (message.GetMessageId() == CoreDeleteItemCrudRequest._Id)
+                response = HandleCoreDeleteItemCrudRequest(message, api, terminal, response);
             if (message.GetMessageId() == CoreReadItemJsonRequest._Id)
                 response = HandleCoreReadItemJsonRequest(message, api, terminal, response);
             if (message.GetMessageId() == CoreUpdateItemJsonRequest._Id)
@@ -320,114 +343,29 @@ namespace BeforeOurTime.Business.Modules.Core
             return response;
         }
         /// <summary>
-        /// Handle a message
+        /// Instantite response object and wrap request handlers in try catch
         /// </summary>
-        /// <param name="api"></param>
-        /// <param name="message"></param>
-        /// <param name="terminal"></param>
-        /// <param name="response"></param>
-        private IResponse HandleCoreReadItemJsonRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        /// <typeparam name="T"></typeparam>
+        /// <param name="request"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        private IResponse HandleRequestWrapper<T>(
+            IRequest request, 
+            Action<IResponse> callback) where T : Response, new()
         {
-            var request = message.GetMessageAsType<CoreReadItemJsonRequest>();
-            response = new CoreReadItemJsonResponse()
+            var response = new T()
             {
                 _requestInstanceId = request.GetRequestInstanceId(),
             };
             try
             {
-                var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
-                var coreItemsJson = new List<CoreItemJson>();
-                // Read enumerated list of items
-                if (request.ItemIds != null)
-                {
-                    var items = api.GetItemManager().Read(request.ItemIds);
-                    items.ForEach(item =>
-                    {
-                        coreItemsJson.Add(new CoreItemJson()
-                        {
-                            Id = item.Id.ToString(),
-                            JSON = JsonConvert.SerializeObject(item, Formatting.Indented)
-                        });
-                    });
-                }
-                ((CoreReadItemJsonResponse)response)._responseSuccess = true;
-                ((CoreReadItemJsonResponse)response).CoreReadItemJsonEvent = new CoreReadItemJsonEvent()
-                {
-                    ItemsJson = coreItemsJson
-                };
+                callback(response);
+                response._responseSuccess = true;
             }
             catch (Exception e)
             {
                 ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
-                ((CoreReadItemJsonResponse)response)._responseMessage = e.Message;
-            }
-            return response;
-        }
-        /// <summary>
-        /// Handle a message
-        /// </summary>
-        /// <param name="api"></param>
-        /// <param name="message"></param>
-        /// <param name="terminal"></param>
-        /// <param name="response"></param>
-        private IResponse HandleCoreUpdateItemJsonRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
-        {
-            var request = message.GetMessageAsType<CoreUpdateItemJsonRequest>();
-            response = new CoreUpdateItemJsonResponse()
-            {
-                _requestInstanceId = request.GetRequestInstanceId(),
-            };
-            try
-            {
-                request.ItemsJson.ForEach(itemJson =>
-                {
-                    var item = JsonConvert.DeserializeObject<Item>(itemJson.JSON);
-                    ItemRepo.Update(item);
-                });
-                ((CoreUpdateItemJsonResponse)response)._responseSuccess = true;
-                ((CoreUpdateItemJsonResponse)response).CoreUpdateItemJsonEvent = new CoreUpdateItemJsonEvent()
-                {
-                    ItemsJson = request.ItemsJson
-                };
-            }
-            catch (Exception e)
-            {
-                ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
-                ((CoreUpdateItemJsonResponse)response)._responseMessage = e.Message;
-            }
-            return response;
-        }
-        /// <summary>
-        /// Handle a message
-        /// </summary>
-        /// <param name="api"></param>
-        /// <param name="message"></param>
-        /// <param name="terminal"></param>
-        /// <param name="response"></param>
-        private IResponse HandleCoreCreateItemJsonRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
-        {
-            var request = message.GetMessageAsType<CoreCreateItemJsonRequest>();
-            response = new CoreCreateItemJsonResponse()
-            {
-                _requestInstanceId = request.GetRequestInstanceId(),
-            };
-            try
-            {
-                request.ItemsJson.ForEach(itemJson =>
-                {
-                    var item = JsonConvert.DeserializeObject<Item>(itemJson.JSON);
-                    ItemRepo.Create(item);
-                });
-                ((CoreCreateItemJsonResponse)response)._responseSuccess = true;
-                ((CoreCreateItemJsonResponse)response).CoreCreateItemJsonEvent = new CoreCreateItemJsonEvent()
-                {
-                    ItemsJson = request.ItemsJson
-                };
-            }
-            catch (Exception e)
-            {
-                ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
-                ((CoreUpdateItemJsonResponse)response)._responseMessage = e.Message;
+                response._responseMessage = e.Message;
             }
             return response;
         }

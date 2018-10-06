@@ -36,6 +36,7 @@
   <ItemGroup>
     <Folder Include="Apis\Items\Attributes\Characters\RequestEndpoints\" />
     <Folder Include="Apis\Items\Attributes\Physicals\RequestEndpoints\" />
+    <Folder Include="Modules\Account\Handlers\" />
   </ItemGroup>
 
   <ItemGroup>
