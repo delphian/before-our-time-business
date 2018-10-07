@@ -2,6 +2,9 @@
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
+using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using System;
 using System.Collections.Generic;
@@ -23,7 +26,22 @@ namespace BeforeOurTime.Business.Modules.Account
             var request = message.GetMessageAsType<AccountCreateCharacterRequest>();
             response = HandleRequestWrapper<AccountCreateCharacterResponse>(request, res =>
             {
-                res.SetSuccess(false);
+                var characterItem = api.GetItemManager().Create(new CharacterItem()
+                {
+                    ParentId = api.GetModuleManager().GetModule<ICoreModule>().GetDefaultLocation().Id,
+                    Data = new List<IItemData>()
+                    {
+                        new CharacterData()
+                        {
+                            Name = request.Name,
+                            Description = "A brave new player"
+                        }
+                    }
+                });
+                ((AccountCreateCharacterResponse)res).CreatedAccountCharacterEvent = new AccountCreateCharacterEvent()
+                {
+                    ItemId = characterItem.Id
+                };
             });
             return response;
         }
