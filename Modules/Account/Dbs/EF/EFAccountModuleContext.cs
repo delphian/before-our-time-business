@@ -16,6 +16,7 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
     public class EFAccountModuleContext : DbContext
     {
         public DbSet<AccountData> Accounts { set; get; }
+        public DbSet<AccountCharacterData> AccountCharacters { set; get; }
         public EFAccountModuleContext() : base() { }
         public EFAccountModuleContext(DbContextOptions<EFAccountModuleContext> options) : base(options) { }
         /// <summary>
@@ -48,6 +49,15 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             modelBuilder.Entity<AccountData>()
                 .Ignore(account => account.Characters)
                 .Property(x => x.Name).IsRequired();
+            // Account Characters
+            modelBuilder.Entity<AccountCharacterData>()
+                .ToTable("Accounts_Characters");
+            modelBuilder.Entity<AccountCharacterData>()
+                .HasKey(x => x.Id);
+            modelBuilder.Entity<AccountCharacterData>()
+                .Property(x => x.AccountId).IsRequired();
+            modelBuilder.Entity<AccountCharacterData>()
+                .Property(x => x.CharacterItemId).IsRequired();
         }
         public DbSet<T> GetDbSet<T>() where T : Model
         {

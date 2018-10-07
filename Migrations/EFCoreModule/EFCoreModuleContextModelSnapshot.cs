@@ -19,6 +19,23 @@ namespace BeforeOurTime.Business.Migrations.EFCoreModule
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.CharacterData", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("DataItemId");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Item_Data_Characters");
+                });
+
             modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.GameData", b =>
                 {
                     b.Property<Guid>("Id")

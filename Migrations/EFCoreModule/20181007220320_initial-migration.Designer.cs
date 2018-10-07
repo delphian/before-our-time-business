@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeforeOurTime.Business.Migrations.EFCoreModule
 {
     [DbContext(typeof(EFCoreModuleContext))]
-    [Migration("20181001030501_initial-migration")]
+    [Migration("20181007220320_initial-migration")]
     partial class initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,6 +20,23 @@ namespace BeforeOurTime.Business.Migrations.EFCoreModule
                 .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.CharacterData", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("DataItemId");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Item_Data_Characters");
+                });
 
             modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.GameData", b =>
                 {

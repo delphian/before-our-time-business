@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace BeforeOurTime.Business.Migrations
+namespace BeforeOurTime.Business.Migrations.EFAccountModule
 {
     public partial class initialmigration : Migration
     {
@@ -20,6 +20,19 @@ namespace BeforeOurTime.Business.Migrations
                     table.PrimaryKey("PK_Accounts", x => x.Id);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Accounts_Characters",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    AccountId = table.Column<Guid>(nullable: false),
+                    CharacterItemId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Accounts_Characters", x => x.Id);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Accounts_Name",
                 table: "Accounts",
@@ -31,6 +44,9 @@ namespace BeforeOurTime.Business.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Accounts");
+
+            migrationBuilder.DropTable(
+                name: "Accounts_Characters");
         }
     }
 }
