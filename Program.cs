@@ -7,7 +7,6 @@ using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Servers;
 using BeforeOurTime.Models.Messages.Requests;
-using BeforeOurTime.Repository.Dbs.EF;
 using BeforeOurTime.Repository.Dbs.EF.Items;
 using BeforeOurTime.Repository.Dbs.EF.Items.Attributes;
 using BeforeOutTime.Repository.Dbs.EF;
@@ -23,18 +22,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
-using BeforeOurTime.Business.Apis.Items.Attributes.Players;
 using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
-using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
-using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Exits;
-using BeforeOurTime.Models.ItemAttributes.Physicals;
-using BeforeOurTime.Models.ItemAttributes.Characters;
-using BeforeOurTime.Models.ItemAttributes.Players;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models;
-using BeforeOurTime.Models.ItemAttributes.Visibles;
 using BeforeOurTime.Business.Modules;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Apis;
@@ -103,10 +94,6 @@ namespace BeforeOurTime.Business
                 .AddLogging()
                 // Repositories (Items)
                 .AddScoped<IItemRepo, ItemRepo>()
-                .AddScoped<IVisibleAttributeRepo, VisibleAttributeRepo>()
-                .AddScoped<IPlayerAttributeRepo, PlayerAttributeRepo>()
-                .AddScoped<ICharacterAttributeRepo, CharacterAttributeRepo>()
-                .AddScoped<IPhysicalAttributeRepo, PhysicalAttributeRepo>()
                 .AddScoped<IExitAttributeRepo, ExitAttributeRepo>()
                 // Main environment interface API
                 .AddScoped<IMessageManager, MessageManager>()
@@ -114,10 +101,6 @@ namespace BeforeOurTime.Business
                 .AddScoped<IModuleManager, ModuleManager>()
                 // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
-                .AddScoped<IVisibleAttributeManager, VisibleAttributeManager>()
-                .AddScoped<IPlayerAttributeManager, PlayerAttributeManager>()
-                .AddScoped<ICharacterAttributeManager, CharacterAttributeManager>()
-                .AddScoped<IPhysicalAttributeManager, PhysicalAttributeManager>()
                 .AddScoped<IExitAttributeManager, ExitAttributeManager>()
                 .AddScoped<IApi, Api>();
         }

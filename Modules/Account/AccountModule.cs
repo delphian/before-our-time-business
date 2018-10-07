@@ -1,15 +1,21 @@
-﻿using BeforeOurTime.Business.Modules.Account.Dbs.EF;
+﻿using BeforeOurTime.Business.Apis.Logs;
+using BeforeOurTime.Business.Modules.Account.Dbs.EF;
+using BeforeOurTime.Business.Modules.Account.Managers;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Messages.Requests.Create;
-using BeforeOurTime.Models.Messages.Requests.Login;
+using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Account.Dbs;
 using BeforeOurTime.Models.Modules.Account.Managers;
+using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
+using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.EntityFrameworkCore;
@@ -21,9 +27,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Modules.Core
+namespace BeforeOurTime.Business.Modules.Account
 {
-    public class AccountModule : IAccountModule
+    public partial class AccountModule : IAccountModule
     {
         /// <summary>
         /// Entity framework database context
@@ -129,9 +135,10 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
-                CreateAccountRequest._Id,
-                LoginRequest._Id,
-                LogoutRequest._Id
+                AccountReadCharacterRequest._Id,
+                AccountCreateAccountRequest._Id,
+                AccountLoginAccountRequest._Id,
+                AccountLogoutAccountRequest._Id
             };
         }
         /// <summary>
@@ -192,15 +199,43 @@ namespace BeforeOurTime.Business.Modules.Core
             ITerminal terminal, 
             IResponse response)
         {
-            if (message.GetMessageId() == CreateAccountRequest._Id)
-                response = GetManager<IAccountManager>()
-                    .HandleCreateAccountRequest(message, api, terminal, response);
-            if (message.GetMessageId() == LoginRequest._Id)
-                response = GetManager<IAccountManager>()
-                    .HandleLoginAccountRequest(message, api, terminal, response);
-            if (message.GetMessageId() == LogoutRequest._Id)
-                response = GetManager<IAccountManager>()
-                    .HandleLogoutAccountRequest(message, api, terminal, response);
+            if (message.GetMessageId() == AccountCreateAccountRequest._Id)
+                response = GetManager<IAccountManager>().HandleCreateAccountRequest(message, api, terminal, response);
+            if (message.GetMessageId() == AccountLoginAccountRequest._Id)
+                response = GetManager<IAccountManager>().HandleLoginAccountRequest(message, api, terminal, response);
+            if (message.GetMessageId() == AccountLogoutAccountRequest._Id)
+                response = GetManager<IAccountManager>().HandleLogoutAccountRequest(message, api, terminal, response);
+            if (message.GetMessageId() == AccountCreateCharacterRequest._Id)
+                response = HandleCreateCharacterRequest(message, api, terminal, response);
+            if (message.GetMessageId() == AccountReadCharacterRequest._Id)
+                response = HandleReadCharacterRequest(message, api, terminal, response);
+            return response;
+        }
+        /// <summary>
+        /// Instantite response object and wrap request handlers in try catch
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="request"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        private IResponse HandleRequestWrapper<T>(
+            IRequest request,
+            Action<IResponse> callback) where T : Response, new()
+        {
+            var response = new T()
+            {
+                _requestInstanceId = request.GetRequestInstanceId(),
+            };
+            try
+            {
+                callback(response);
+                response._responseSuccess = true;
+            }
+            catch (Exception e)
+            {
+                Logger.LogException($"While handling {request.GetMessageName()}", e);
+                response._responseMessage = e.Message;
+            }
             return response;
         }
         #endregion

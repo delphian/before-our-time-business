@@ -1,14 +1,8 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes;
-using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
+﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.ItemAttributes;
-using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes.Exits;
-using BeforeOurTime.Models.ItemAttributes.Physicals;
-using BeforeOurTime.Models.ItemAttributes.Players;
-using BeforeOurTime.Models.Items.Characters;
 using BeforeOurTime.Models.Items.Exits;
 using BeforeOurTime.Models.Messages.Locations.ReadLocationSummary;
 using BeforeOurTime.Models.Messages.Requests;
@@ -81,24 +75,14 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                             Description = attribute.Description
                         });
                     });
-                // Add physical items
-                location.Children
-                    .Where(x => x.HasAttribute<PhysicalAttribute>() && !x.HasAttribute<CharacterAttribute>()).ToList()
-                    .ForEach(delegate (Item item)
-                    {
-                        var attribute = item.GetAttribute<PhysicalAttribute>();
-                        ioLocationUpdate.Adendums.Add($"A {attribute.Name} is here");
-                    });
                 // Add character items
                 location.Children
-                    .Where(x => x.HasAttribute<CharacterAttribute>() || 
-                                x.HasAttribute<PlayerAttribute>())
+                    .Where(x => x is CharacterItem)
                     .Select(x => x.GetAsItem<CharacterItem>())
                     .ToList()
                     .ForEach(delegate (CharacterItem item)
                     {
-                        var attribute = item.GetAttribute<PlayerAttribute>();
-                        ioLocationUpdate.Adendums.Add($"{attribute.Name} is standing here");
+                        ioLocationUpdate.Adendums.Add($"{item.Visible.Name} is standing here");
                         ioLocationUpdate.Characters.Add(item);
                     });
                 response = ioLocationUpdate;

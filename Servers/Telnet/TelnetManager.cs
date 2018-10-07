@@ -7,22 +7,19 @@ using System.Linq;
 using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
 using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests.Go;
 using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Models.Messages.Requests.Emote;
-using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Messages.Requests.Login;
-using BeforeOurTime.Models.Messages.Responses.Login;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Messages.Requests.List;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
-using BeforeOurTime.Models.Messages.Requests.Create;
-using BeforeOurTime.Models.Items.Characters;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -336,12 +333,12 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
             else if (telnetClient.GetTerminal().GetDataBag()["step"] == "login_password")
             {
-                var loginRequest = new LoginRequest()
+                var loginRequest = new AccountLoginAccountRequest()
                 {
                     Email = telnetClient.GetTerminal().GetDataBag()["login_name"],
                     Password = message
                 };
-                LoginResponse loginResponse = (LoginResponse)telnetClient.GetTerminal().SendToApi(loginRequest);
+                AccountLoginAccountResponse loginResponse = (AccountLoginAccountResponse)telnetClient.GetTerminal().SendToApi(loginRequest);
                 if (loginResponse.IsSuccess())
                 {
                     telnetClient.GetTerminal().Authenticate(loginResponse.AccountId.Value);
@@ -376,7 +373,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
             }
             else if (telnetClient.GetTerminal().GetDataBag()["step"] == "create_password")
             {
-                var createAccountResponse = telnetClient.GetTerminal().SendToApi(new CreateAccountRequest()
+                var createAccountResponse = telnetClient.GetTerminal().SendToApi(new AccountCreateAccountRequest()
                 {
                     Email = telnetClient.GetTerminal().GetDataBag()["create_email"],
                     Password = message

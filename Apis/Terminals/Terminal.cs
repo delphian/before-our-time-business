@@ -1,15 +1,15 @@
-﻿using BeforeOurTime.Models.Items.Characters;
-using BeforeOurTime.Models.Json;
+﻿using BeforeOurTime.Models.Json;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
-using BeforeOurTime.Models.Messages.Requests.Create;
-using BeforeOurTime.Models.Messages.Requests.List;
-using BeforeOurTime.Models.Messages.Requests.Login;
 using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Models.Messages.Responses.Create;
-using BeforeOurTime.Models.Messages.Responses.List;
-using BeforeOurTime.Models.Messages.Responses.Login;
+using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
+using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.LoginCharacter;
+using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -184,14 +184,14 @@ namespace BeforeOurTime.Business.Apis.Terminals
         public List<CharacterItem> GetAttachable()
         {
             var accountCharacters = new List<CharacterItem>();
-            var request = new ListAccountCharactersRequest()
+            var request = new AccountReadCharacterRequest()
             {
                 AccountId = AccountId.Value
             };
             var response = SendToApi(request);
             if (response.IsSuccess())
             {
-                var listAccountCharactersResponse = response.GetMessageAsType<ListAccountCharactersResponse>();
+                var listAccountCharactersResponse = response.GetMessageAsType<AccountReadCharacterResponse>();
                 accountCharacters = listAccountCharactersResponse.AccountCharacters;
             }
             return accountCharacters;
@@ -203,14 +203,14 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <returns></returns>
         public bool CreatePlayer(string name)
         {
-            var createPlayerRequest = new CreateAccountCharacterRequest()
+            var createPlayerRequest = new AccountCreateCharacterRequest()
             {
                 Name = name
             };
             var response = SendToApi(createPlayerRequest);
             if (response.IsSuccess())
             {
-                var createPlayerResponse = response.GetMessageAsType<CreateAccountCharacterResponse>();
+                var createPlayerResponse = response.GetMessageAsType<AccountCreateCharacterResponse>();
                 PlayerId = createPlayerResponse.CreatedAccountCharacterEvent.ItemId;
                 Status = TerminalStatus.Attached;
             }
@@ -237,31 +237,31 @@ namespace BeforeOurTime.Business.Apis.Terminals
             };
             if (Status == TerminalStatus.Guest)
             {
-                if (request.IsMessageType<CreateAccountRequest>() ||
-                    request.IsMessageType<LoginRequest>())
+                if (request.IsMessageType<AccountCreateAccountRequest>() ||
+                    request.IsMessageType<AccountLoginAccountRequest>())
                 {
                     response = OnMessageToServer?.Invoke(this, request);
                     if (response.IsSuccess())
                     {
                         Guid? accountId;
-                        accountId = response.GetMessageAsType<LoginResponse>()?.AccountId;
-                        accountId = (accountId == null) ? response.GetMessageAsType<CreateAccountResponse>()?.CreatedAccountEvent?.AccountId : accountId;
+                        accountId = response.GetMessageAsType<AccountLoginAccountResponse>()?.AccountId;
+                        accountId = (accountId == null) ? response.GetMessageAsType<AccountCreateAccountResponse>()?.CreatedAccountEvent?.AccountId : accountId;
                         Authenticate(accountId.Value);
                     }
                 }
             }
             else
             {
-                if (request.IsMessageType<LoginAccountCharacterRequest>())
+                if (request.IsMessageType<AccountLoginCharacterRequest>())
                 {
-                    var playCharacterRequest = request.GetMessageAsType<LoginAccountCharacterRequest>();
+                    var playCharacterRequest = request.GetMessageAsType<AccountLoginCharacterRequest>();
                     Attach(playCharacterRequest.ItemId);
-                    response = new LoginAccountCharacterResponse() {
+                    response = new AccountLoginCharacterResponse() {
                         _requestInstanceId = request.GetRequestInstanceId(),
                         _responseSuccess = true
                     };
                 }
-                else if (request.IsMessageType<LogoutRequest>())
+                else if (request.IsMessageType<AccountLogoutAccountRequest>())
                 {
                     response = OnMessageToServer?.Invoke(this, request);
                     if (response.IsSuccess())

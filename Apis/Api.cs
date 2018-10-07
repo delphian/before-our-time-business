@@ -12,10 +12,7 @@ using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Items;
 using System.Threading.Tasks;
 using System.Threading;
-using BeforeOurTime.Business.Apis.Items.Attributes.Players;
 using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
-using BeforeOurTime.Business.Apis.Items.Attributes.Physicals;
-using BeforeOurTime.Business.Apis.Items.Attributes.Characters;
 using BeforeOurTime.Models.Exceptions;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Modules;
@@ -28,7 +25,6 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
-        private object lockObject = null;
         private Dictionary<Type, IAttributeManager> AttributeManagerList = new Dictionary<Type, IAttributeManager>();
         private IBotLogger Logger { set; get; }
         private IConfiguration Configuration { set; get; }
@@ -47,10 +43,6 @@ namespace BeforeOurTime.Business.Apis
             IMessageManager messageManager,
             IItemManager itemManager,
             ITerminalManager terminalManager,
-            IVisibleAttributeManager visibleAttributeManager,
-            IPlayerAttributeManager attributePlayerManager,
-            ICharacterAttributeManager characterAttributeManager,
-            IPhysicalAttributeManager attributePhysicalManager,
             IExitAttributeManager attributeExitManager,
             IModuleManager moduleManager)
         {
@@ -60,10 +52,6 @@ namespace BeforeOurTime.Business.Apis
             ItemManager = itemManager;
             TerminalManager = terminalManager;
             ModuleManager = moduleManager;
-            AttributeManagerList.Add(typeof(IVisibleAttributeManager), visibleAttributeManager);
-            AttributeManagerList.Add(typeof(IPlayerAttributeManager), attributePlayerManager);
-            AttributeManagerList.Add(typeof(ICharacterAttributeManager), characterAttributeManager);
-            AttributeManagerList.Add(typeof(IPhysicalAttributeManager), attributePhysicalManager);
             AttributeManagerList.Add(typeof(IExitAttributeManager), attributeExitManager);
         }
         public IMessageManager GetMessageManager()

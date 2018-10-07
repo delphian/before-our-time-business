@@ -1,16 +1,12 @@
 ﻿using BeforeOurTime.Models;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.ItemAttributes.Players;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using BeforeOurTime.Models.ItemAttributes.Characters;
 using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Exits;
-using BeforeOurTime.Models.ItemAttributes.Physicals;
 using BeforeOurTime.Models.Primitives.Images;
-using BeforeOurTime.Models.ItemAttributes.Visibles;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 
@@ -23,9 +19,6 @@ namespace BeforeOutTime.Repository.Dbs.EF
     {
         // Items
         public DbSet<Item> Items { set; get; }
-        public DbSet<VisibleAttribute> Visibles { set; get; }
-        public DbSet<PlayerAttribute> Players { set; get; }
-        public DbSet<PhysicalAttribute> Physicals { set; get; }
         public DbSet<ExitAttribute> Exits { set; get; }
 
         public BaseContext() : base() { }
@@ -52,57 +45,6 @@ namespace BeforeOutTime.Repository.Dbs.EF
                 .Ignore(item => item.ChildrenIds)
                 .Ignore(item => item.Attributes)
                 .Ignore(item => item.Data);
-            // Item Attribute Visible
-            modelBuilder.Entity<VisibleAttribute>()
-                .ToTable("Item_Attribute_Visibles");
-            modelBuilder.Entity<VisibleAttribute>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<VisibleAttribute>()
-                .HasOne(x => x.Item)
-                .WithOne()
-                .HasForeignKey<VisibleAttribute>(x => x.ItemId);
-            modelBuilder.Entity<VisibleAttribute>()
-                .Ignore(x => x.AttributeType);
-            // Item Attribute Player
-            modelBuilder.Entity<PlayerAttribute>()
-                .ToTable("Item_Attribute_Players");
-            modelBuilder.Entity<PlayerAttribute>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<PlayerAttribute>()
-                .HasOne(x => x.Item)
-                .WithOne()
-                .HasForeignKey<PlayerAttribute>(x => x.ItemId)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<PlayerAttribute>()
-                .Ignore(x => x.AttributeType)
-                .Property(x => x.AccountId).IsRequired();
-            // Item Attribute Physical
-            modelBuilder.Entity<PhysicalAttribute>()
-                .ToTable("Item_Attribute_Physicals");
-            modelBuilder.Entity<PhysicalAttribute>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<PhysicalAttribute>()
-                .HasOne(x => x.Item)
-                .WithOne()
-                .HasForeignKey<PhysicalAttribute>(x => x.ItemId)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<PhysicalAttribute>()
-                .Ignore(x => x.AttributeType);
-            // Item Attribute Character
-            modelBuilder.Entity<CharacterAttribute>()
-                .ToTable("Item_Attribute_Characters");
-            modelBuilder.Entity<CharacterAttribute>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<CharacterAttribute>()
-                .HasOne(x => x.Item)
-                .WithOne()
-                .HasForeignKey<CharacterAttribute>(x => x.ItemId)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<ExitAttribute>()
-                .Ignore(x => x.AttributeType);
-            // Item Character Health
-            modelBuilder.Entity<CharacterHealth>()
-                .ToTable("Item_Attribute_Characters_Health");
             // Item Attribute Exit
             modelBuilder.Entity<ExitAttribute>()
                 .ToTable("Item_Attribute_Exits");

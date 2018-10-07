@@ -1,7 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.ItemAttributes.Players;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Events.Arrivals;
 using BeforeOurTime.Models.Messages.Events.Departures;
@@ -52,17 +51,9 @@ namespace BeforeOurTime.Business.Apis.Messages
         {
             recipients.ForEach(delegate (Item recipient)
             {
-                var playerAttribute = recipient.GetAttribute<PlayerAttribute>();
-                if (playerAttribute != null)
+                if (recipient.TerminalId != null)
                 {
-                    var terminalId = TerminalManager.GetTerminals()
-                        .Where(x => x.GetPlayerId() == recipient.Id)
-                        .Select(x => x.GetId())
-                        .FirstOrDefault();
-                    if (terminalId != Guid.Empty)
-                    {
-                        TerminalManager.SendToTerminalId(terminalId, message);
-                    }
+                    TerminalManager.SendToTerminalId(recipient.TerminalId.Value, message);
                 } else
                 {
                     //var messageCopy = (SavedMessage)savedMessage.Clone();
@@ -92,10 +83,6 @@ namespace BeforeOurTime.Business.Apis.Messages
         public void SendArrivalEvent(Item item, Item location, Guid actorId)
         {
             var name = item.GetProperty<VisibleProperty>("Visible")?.Name;
-            if (item.HasAttribute<PlayerAttribute>())
-            {
-                name = item.GetAttribute<PlayerAttribute>().Name;
-            }
             SendMessageToLocation(new ArrivalEvent()
                 {
                     Item = item,
@@ -112,10 +99,6 @@ namespace BeforeOurTime.Business.Apis.Messages
         public void SendDepartureEvent(Item item, Item location, Guid actorId)
         {
             var name = item.GetProperty<VisibleProperty>("Visible")?.Name;
-            if (item.HasAttribute<PlayerAttribute>())
-            {
-                name = item.GetAttribute<PlayerAttribute>().Name;
-            }
             SendMessageToLocation(new DepartureEvent()
                 {
                     Name = name,

@@ -1,12 +1,9 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes;
-using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.ItemAttributes.Players;
+﻿using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Emote;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;
@@ -49,7 +46,7 @@ namespace BeforeOurTime.Business.Apis.Messages.RequestEndpoints
                 api.GetMessageManager().SendMessageToLocation(new EmoteEvent()
                     {
                         Item = player,
-                        Name = player.GetAttribute<PlayerAttribute>().Name,
+                        Name = player.GetProperty<VisibleProperty>("Visible")?.Name ?? "The Wind",
                         Type = emoteRequest.Type
                     }, location, player.Id);
                 response = new Response() {

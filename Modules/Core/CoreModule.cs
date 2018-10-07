@@ -2,6 +2,7 @@
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
+using BeforeOurTime.Business.Modules.Core.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
@@ -71,6 +72,10 @@ namespace BeforeOurTime.Business.Modules.Core
         /// </summary>
         private ILocationDataRepo LocationDataRepo { set; get; }
         /// <summary>
+        /// Character data repository
+        /// </summary>
+        private ICharacterDataRepo CharacterDataRepo { set; get; }
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="itemRepo">Access to items in the data store</param>
@@ -105,7 +110,8 @@ namespace BeforeOurTime.Business.Modules.Core
             var managers = new List<IModelManager>
             {
                 new GameItemManager(logger, itemRepo, new EFGameDataRepo(Db, itemRepo)),
-                new LocationItemManager(logger, itemRepo, new EFLocationDataRepo(Db, itemRepo))
+                new LocationItemManager(logger, itemRepo, new EFLocationDataRepo(Db, itemRepo)),
+                new CharacterItemManager(logger, itemRepo, new EFCharacterDataRepo(db, itemRepo))
             };
             return managers;
         }
@@ -173,6 +179,9 @@ namespace BeforeOurTime.Business.Modules.Core
             LocationDataRepo = repositories
                 .Where(x => x is ILocationDataRepo)
                 .Select(x => (ILocationDataRepo)x).FirstOrDefault();
+            CharacterDataRepo = repositories
+                .Where(x => x is ICharacterDataRepo)
+                .Select(x => (ICharacterDataRepo)x).FirstOrDefault();
         }
         /// <summary>
         /// Get the default game

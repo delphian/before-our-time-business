@@ -2,9 +2,7 @@
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
-using BeforeOurTime.Models.Messages.Requests.Login;
 using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Models.Messages.Responses.Login;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
@@ -14,7 +12,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using BeforeOurTime.Models.Messages.Requests.List;
 using System.Linq;
 using BeforeOurTime.Models.Messages.Systems.Ping;
 using BeforeOurTime.Models.Apis;
