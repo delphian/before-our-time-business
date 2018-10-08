@@ -259,12 +259,6 @@ namespace BeforeOurTime.Business.Modules.Core
             {
                 ((IItemModelManager)manager).OnItemCreate(item, options);
             });
-            if (item.HasData<LocationData>())
-            {
-                var data = item.GetData<LocationData>();
-                data.DataItemId = item.Id;
-                LocationDataRepo.Create(data, options);
-            }
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
@@ -277,11 +271,6 @@ namespace BeforeOurTime.Business.Modules.Core
             {
                 ((IItemModelManager)manager).OnItemRead(item, options);
             });
-            var locationData = LocationDataRepo.Read(item, options);
-            if (locationData != null)
-            {
-                item.Data.Add(locationData);
-            }
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
@@ -294,11 +283,6 @@ namespace BeforeOurTime.Business.Modules.Core
             {
                 ((IItemModelManager)manager).OnItemUpdate(item, options);
             });
-            if (item.HasData<LocationData>())
-            {
-                var data = item.GetData<LocationData>();
-                LocationDataRepo.Update(data, options);
-            }
         }
         /// <summary>
         /// Delete attribute of base item before base item is deleted
@@ -311,11 +295,6 @@ namespace BeforeOurTime.Business.Modules.Core
             {
                 ((IItemModelManager)manager).OnItemDelete(item, options);
             });
-            if (item.HasAttribute<LocationData>())
-            {
-                var data = item.GetData<LocationData>();
-                LocationDataRepo.Delete(data, options);
-            }
         }
         #endregion
         #region Message Handlers
