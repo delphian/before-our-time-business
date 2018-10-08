@@ -31,6 +31,7 @@ namespace BeforeOurTime.Business.Modules.Core
                     Items = updateItemRequest.Items
                 };
                 ((CoreUpdateItemCrudResponse)res).CoreUpdateItemCrudEvent = updateItemEvent;
+                res.SetSuccess(true);
             });
             return response;
         }

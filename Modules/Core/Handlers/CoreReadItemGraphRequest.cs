@@ -40,6 +40,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 {
                     ItemGraph = itemGraph
                 };
+                res.SetSuccess(true);
             });
             return response;
         }

@@ -56,10 +56,6 @@ namespace BeforeOurTime.Business.Modules.Account
         /// </summary>
         private List<ICrudModelRepository> Repositories { set; get; } = new List<ICrudModelRepository>();
         /// <summary>
-        /// Account data repository
-        /// </summary>
-        private IAccountDataRepo AccountDataRepo { set; get; }
-        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="itemRepo">Access to items in the data store</param>
@@ -90,6 +86,7 @@ namespace BeforeOurTime.Business.Modules.Account
             var managers = new List<IModelManager>
             {
                 new AccountManager(logger, itemRepo, new EFAccountDataRepo(db)),
+                new AccountCharacterManager(logger, itemRepo, new EFAccountCharacterDataRepo(db))
             };
             return managers;
         }
@@ -147,9 +144,6 @@ namespace BeforeOurTime.Business.Modules.Account
         /// <param name="repositories"></param>
         public void Initialize(List<ICrudModelRepository> repositories)
         {
-            AccountDataRepo = repositories
-                .Where(x => x is IAccountDataRepo)
-                .Select(x => (IAccountDataRepo)x).FirstOrDefault();
         }
         #region On Item Hooks
         /// <summary>
@@ -206,9 +200,9 @@ namespace BeforeOurTime.Business.Modules.Account
             if (message.GetMessageId() == AccountLogoutAccountRequest._Id)
                 response = GetManager<IAccountManager>().HandleLogoutAccountRequest(message, api, terminal, response);
             if (message.GetMessageId() == AccountCreateCharacterRequest._Id)
-                response = HandleCreateCharacterRequest(message, api, terminal, response);
+                response = GetManager<IAccountCharacterManager>().HandleCreateCharacterRequest(message, api, terminal, response);
             if (message.GetMessageId() == AccountReadCharacterRequest._Id)
-                response = HandleReadCharacterRequest(message, api, terminal, response);
+                response = GetManager<IAccountCharacterManager>().HandleReadCharacterRequest(message, api, terminal, response);
             return response;
         }
         /// <summary>

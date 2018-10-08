@@ -28,6 +28,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
                 {
                     AccountId = account.Id
                 };
+                res.SetSuccess(true);
             });
             return response;
         }

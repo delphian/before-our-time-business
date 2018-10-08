@@ -23,6 +23,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             var request = message.GetMessageAsType<AccountLogoutAccountRequest>();
             response = HandleRequestWrapper<AccountLogoutAccountResponse>(request, res =>
             {
+                res.SetSuccess(true);
             });
             return response;
         }

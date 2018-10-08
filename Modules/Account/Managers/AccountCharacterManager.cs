@@ -21,23 +21,23 @@ using BeforeOurTime.Models.Messages.Requests;
 
 namespace BeforeOurTime.Business.Modules.Account.Managers
 {
-    public partial class AccountManager : ModelManager<AccountData>, IAccountManager
+    public partial class AccountCharacterManager : ModelManager<AccountCharacterData>, IAccountCharacterManager
     {
         /// <summary>
         /// Centralized log messages
         /// </summary>
         private IBotLogger Logger { set; get; }
-        private IAccountDataRepo AccountDataRepo { set; get; }
+        private IAccountCharacterDataRepo AccountCharacterDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public AccountManager(
+        public AccountCharacterManager(
             IBotLogger logger,
             IItemRepo itemRepo,
-            IAccountDataRepo accountDataRepo)
+            IAccountCharacterDataRepo accountCharacterDataRepo)
         {
             Logger = logger;
-            AccountDataRepo = accountDataRepo;
+            AccountCharacterDataRepo = accountCharacterDataRepo;
         }
         /// <summary>
         /// Get all repositories declared by manager
@@ -45,7 +45,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// <returns></returns>
         public List<ICrudModelRepository> GetRepositories()
         {
-            return new List<ICrudModelRepository>() { AccountDataRepo };
+            return new List<ICrudModelRepository>() { AccountCharacterDataRepo };
         }
         /// <summary>
         /// Get repository as interface
@@ -57,37 +57,31 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             return GetRepositories().Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
         /// <summary>
-        /// Create a new account
+        /// Create a new account character
         /// </summary>
-        /// <param name="name">Login name</param>
-        /// <param name="password">Login password</param>
-        public AccountData Create(string name, string password)
+        /// <param name="accountId">Unique identifier of account</param>
+        /// <param name="password">Unique identifier of item to register as account character</param>
+        public AccountCharacterData Create(Guid accountId, Guid characterItemId)
         {
-            var account = AccountDataRepo.Create(new List<AccountData>()
+            var accountCharacter = AccountCharacterDataRepo.Create(new List<AccountCharacterData>()
             {
-                new AccountData()
+                new AccountCharacterData()
                 {
-                    Name = name,
-                    Password = BCrypt.Net.BCrypt.HashPassword(password)
+                    AccountId = accountId,
+                    CharacterItemId = characterItemId
                 }
             }).FirstOrDefault();
-            return account;
+            return accountCharacter;
         }
         /// <summary>
-        /// Authenticate a user name and password
+        /// Read all account characters for a single account
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="password"></param>
-        /// <returns>User account if authenticated, otherwise null</returns>
-        public AccountData Authenticate(string email, string password)
+        /// <param name="accountId">Unique account identifier</param>
+        /// <returns></returns>
+        public List<AccountCharacterData> ReadByAccound(Guid accountId)
         {
-            var authenRequest = new AuthenticationRequest()
-            {
-                PrincipalName = email,
-                PrincipalPassword = password
-            };
-            var account = AccountDataRepo.Read(authenRequest);
-            return account;
+            var characterAccounts = AccountCharacterDataRepo.ReadByAccount(new List<Guid>() { accountId });
+            return characterAccounts;
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch
@@ -107,11 +101,11 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             try
             {
                 callback(response);
+                response._responseSuccess = true;
             }
             catch (Exception e)
             {
                 Logger.LogException($"While handling {request.GetMessageName()}", e);
-                response._responseSuccess = false;
                 response._responseMessage = e.Message;
             }
             return response;

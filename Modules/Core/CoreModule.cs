@@ -92,12 +92,12 @@ namespace BeforeOurTime.Business.Modules.Core
                 dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             Db = new EFCoreModuleContext(dbOptions.Options);
             ItemRepo = itemRepo;
+            Managers = BuildManagers(Logger, Db, ItemRepo);
+            Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
             ItemRepo.OnItemCreate += OnItemCreate;
             ItemRepo.OnItemRead += OnItemRead;
             ItemRepo.OnItemUpdate += OnItemUpdate;
             ItemRepo.OnItemDelete += OnItemDelete;
-            Managers = BuildManagers(Logger, Db, ItemRepo);
-            Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -255,12 +255,10 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemCreate(Item item, TransactionOptions options = null)
         {
-            if (item.HasData<GameData>())
+            Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
             {
-                var data = item.GetData<GameData>();
-                data.DataItemId = item.Id;
-                GameDataRepo.Create(data, options);
-            }
+                ((IItemModelManager)manager).OnItemCreate(item, options);
+            });
             if (item.HasData<LocationData>())
             {
                 var data = item.GetData<LocationData>();
@@ -275,12 +273,11 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemRead(Item item, TransactionOptions options = null)
         {
-            var gameData = GameDataRepo.Read(item, options);
-            var locationData = LocationDataRepo.Read(item, options);
-            if (gameData != null)
+            Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
             {
-                item.Data.Add(gameData);
-            }
+                ((IItemModelManager)manager).OnItemRead(item, options);
+            });
+            var locationData = LocationDataRepo.Read(item, options);
             if (locationData != null)
             {
                 item.Data.Add(locationData);
@@ -293,11 +290,10 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemUpdate(Item item, TransactionOptions options = null)
         {
-            if (item.HasData<GameData>())
+            Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
             {
-                var data = item.GetData<GameData>();
-                GameDataRepo.Update(data, options);
-            }
+                ((IItemModelManager)manager).OnItemUpdate(item, options);
+            });
             if (item.HasData<LocationData>())
             {
                 var data = item.GetData<LocationData>();
@@ -311,11 +307,10 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemDelete(Item item, TransactionOptions options = null)
         {
-            if (item.HasAttribute<GameData>())
+            Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
             {
-                var data = item.GetData<GameData>();
-                GameDataRepo.Delete(data, options);
-            }
+                ((IItemModelManager)manager).OnItemDelete(item, options);
+            });
             if (item.HasAttribute<LocationData>())
             {
                 var data = item.GetData<LocationData>();
@@ -369,11 +364,11 @@ namespace BeforeOurTime.Business.Modules.Core
             try
             {
                 callback(response);
-                response._responseSuccess = true;
             }
             catch (Exception e)
             {
                 ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
+                response._responseSuccess = false;
                 response._responseMessage = e.Message;
             }
             return response;

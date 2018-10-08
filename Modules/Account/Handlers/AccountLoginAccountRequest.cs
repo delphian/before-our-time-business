@@ -25,6 +25,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             {
                 var account = Authenticate(request.Email, request.Password);
                 ((AccountLoginAccountResponse)res).AccountId = account?.Id;
+                res.SetSuccess(account?.Id != null);
             });
             return response;
         }

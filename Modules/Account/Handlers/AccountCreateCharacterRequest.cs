@@ -1,8 +1,10 @@
 ﻿using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
 using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
@@ -10,9 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BeforeOurTime.Business.Modules.Account
+namespace BeforeOurTime.Business.Modules.Account.Managers
 {
-    public partial class AccountModule
+    public partial class AccountCharacterManager
     {
         /// <summary>
         /// Handle a message
@@ -21,27 +23,21 @@ namespace BeforeOurTime.Business.Modules.Account
         /// <param name="message"></param>
         /// <param name="terminal"></param>
         /// <param name="response"></param>
-        private IResponse HandleCreateCharacterRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        public IResponse HandleCreateCharacterRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
         {
             var request = message.GetMessageAsType<AccountCreateCharacterRequest>();
             response = HandleRequestWrapper<AccountCreateCharacterResponse>(request, res =>
             {
-                var characterItem = api.GetItemManager().Create(new CharacterItem()
-                {
-                    ParentId = api.GetModuleManager().GetModule<ICoreModule>().GetDefaultLocation().Id,
-                    Data = new List<IItemData>()
-                    {
-                        new CharacterData()
-                        {
-                            Name = request.Name,
-                            Description = "A brave new player"
-                        }
-                    }
-                });
+                var mm = api.GetModuleManager();
+                var characterItem = mm.GetManager<ICharacterItemManager>()
+                    .Create(request.Name, mm.GetModule<ICoreModule>().GetDefaultLocation().Id);
+                var accountCharacter = mm.GetManager<IAccountCharacterManager>()
+                    .Create(terminal.GetAccountId().Value, characterItem.Id);
                 ((AccountCreateCharacterResponse)res).CreatedAccountCharacterEvent = new AccountCreateCharacterEvent()
                 {
                     ItemId = characterItem.Id
                 };
+                res.SetSuccess(true);
             });
             return response;
         }

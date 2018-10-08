@@ -34,6 +34,7 @@ namespace BeforeOurTime.Business.Modules.Core
                     Items = items
                 };
                 ((CoreDeleteItemCrudResponse)response).CoreDeleteItemCrudEvent = deleteItemEvent;
+                res.SetSuccess(true);
             });
             return response;
         }

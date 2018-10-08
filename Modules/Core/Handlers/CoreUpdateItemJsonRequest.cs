@@ -39,7 +39,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 {
                     ItemsJson = request.ItemsJson
                 };
-
+                res.SetSuccess(true);
             });
             return response;
         }

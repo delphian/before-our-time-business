@@ -48,6 +48,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 {
                     ItemsJson = coreItemsJson
                 };
+                res.SetSuccess(true);
             });
             return response;
         }

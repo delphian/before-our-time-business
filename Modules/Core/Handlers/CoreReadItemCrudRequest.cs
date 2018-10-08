@@ -34,6 +34,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 {
                     Items = readItems
                 };
+                res.SetSuccess(true);
             });
             return response;
         }

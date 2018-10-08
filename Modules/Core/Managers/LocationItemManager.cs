@@ -80,5 +80,60 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
 //            return locationItem;
 return null;
         }
+        #region On Item Hooks
+        /// <summary>
+        /// Create attribute, if present, after item is created
+        /// </summary>
+        /// <param name="item">Base item just created from datastore</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        public void OnItemCreate(Item item, TransactionOptions options = null)
+        {
+            if (item.HasData<LocationData>())
+            {
+                var data = item.GetData<LocationData>();
+                data.DataItemId = item.Id;
+                LocationDataRepo.Create(data, options);
+            }
+        }
+        /// <summary>
+        /// Append attribute to base item when it is loaded
+        /// </summary>
+        /// <param name="item">Base item just read from datastore</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        public void OnItemRead(Item item, TransactionOptions options = null)
+        {
+            var locationData = LocationDataRepo.Read(item, options);
+            if (locationData != null)
+            {
+                item.Data.Add(locationData);
+            }
+        }
+        /// <summary>
+        /// Append attribute to base item when it is loaded
+        /// </summary>
+        /// <param name="item">Base item about to be persisted to datastore</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        public void OnItemUpdate(Item item, TransactionOptions options = null)
+        {
+            if (item.HasData<LocationData>())
+            {
+                var data = item.GetData<LocationData>();
+                LocationDataRepo.Update(data, options);
+            }
+        }
+        /// <summary>
+        /// Delete attribute of base item before base item is deleted
+        /// </summary>
+        /// <param name="item">Base item about to be deleted</param>
+        /// <param name="options">Options to customize how data is transacted from datastore</param>
+        public void OnItemDelete(Item item, TransactionOptions options = null)
+        {
+            if (item.HasData<LocationData>())
+            {
+                var data = item.GetData<LocationData>();
+                LocationDataRepo.Delete(data, options);
+            }
+        }
+        #endregion
     }
 }
