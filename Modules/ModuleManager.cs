@@ -132,6 +132,21 @@ namespace BeforeOurTime.Business.Modules
             return (T)manager;
         }
         /// <summary>
+        /// Get all managers for an item
+        /// </summary>
+        /// <param name="item">Item to discover managers of</param>
+        /// <returns></returns>
+        public IItemModelManager GetManager(Item item)
+        {
+            var itemManager = Managers
+                .Where(x => x is IItemModelManager)
+                .Select(x => (IItemModelManager)x)
+                .ToList()
+                .Where(x => x.IsManaging(item))
+                .FirstOrDefault();
+            return itemManager;
+        }
+        /// <summary>
         /// Get all modules that have registered handle a message
         /// </summary>
         /// <param name="messageId">Unique message identifier</param>
