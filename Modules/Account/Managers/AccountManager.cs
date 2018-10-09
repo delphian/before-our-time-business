@@ -18,25 +18,28 @@ using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Modules;
 
 namespace BeforeOurTime.Business.Modules.Account.Managers
 {
     public partial class AccountManager : ModelManager<AccountData>, IAccountManager
     {
         /// <summary>
-        /// Centralized log messages
+        /// Manage all modules
         /// </summary>
-        private IBotLogger Logger { set; get; }
+        private IModuleManager ModuleManager { set; get; }
+        /// <summary>
+        /// Repository for manager
+        /// </summary>
         private IAccountDataRepo AccountDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         public AccountManager(
-            IBotLogger logger,
-            IItemRepo itemRepo,
+            IModuleManager moduleManager,
             IAccountDataRepo accountDataRepo)
         {
-            Logger = logger;
+            ModuleManager = moduleManager;
             AccountDataRepo = accountDataRepo;
         }
         /// <summary>
@@ -110,7 +113,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             }
             catch (Exception e)
             {
-                Logger.LogException($"While handling {request.GetMessageName()}", e);
+                ModuleManager.GetLogger().LogException($"While handling {request.GetMessageName()}", e);
                 response._responseSuccess = false;
                 response._responseMessage = e.Message;
             }

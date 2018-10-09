@@ -26,10 +26,10 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             var request = message.GetMessageAsType<AccountReadCharacterRequest>();
             response = HandleRequestWrapper<AccountReadCharacterResponse>(request, res =>
             {
-                var accountCharacters = api.GetModuleManager().GetManager<AccountCharacterManager>()
-                    .ReadByAccound(terminal.GetAccountId().Value);
-                var items = api.GetItemManager()
-                    .Read(accountCharacters.Select(x => x.AccountId).ToList());
+                var accountCharacters = ModuleManager.GetManager<AccountCharacterManager>()
+                    .ReadByAccount(terminal.GetAccountId().Value);
+                var items = ModuleManager.GetItemRepo()
+                    .Read(accountCharacters.Select(x => x.CharacterItemId).ToList());
                 ((AccountReadCharacterResponse)res).AccountCharacters = items.Select(x => x.GetAsItem<CharacterItem>()).ToList();
                 res.SetSuccess(true);
             });

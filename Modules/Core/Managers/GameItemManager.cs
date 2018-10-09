@@ -11,25 +11,28 @@ using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules;
 
 namespace BeforeOurTime.Business.Modules.Core.Managers
 {
     public class GameItemManager : ItemModelManager<GameItem>, IGameItemManager
     {
         /// <summary>
-        /// Centralized log messages
+        /// Manage all modules
         /// </summary>
-        private IBotLogger Logger { set; get; }
+        private IModuleManager ModuleManager { set; get; }
+        /// <summary>
+        /// Repository for manager
+        /// </summary>
         private IGameDataRepo GameDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         public GameItemManager(
-            IBotLogger logger,
-            IItemRepo itemRepo,
-            IGameDataRepo gameDataRepo) : base(itemRepo)
+            IModuleManager moduleManager,
+            IGameDataRepo gameDataRepo)
         {
-            Logger = logger;
+            ModuleManager = moduleManager;
             GameDataRepo = gameDataRepo;
         }
         /// <summary>

@@ -33,7 +33,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 request.ItemsJson.ForEach(itemJson =>
                 {
                     var item = JsonConvert.DeserializeObject<Item>(itemJson.JSON);
-                    ItemRepo.Update(item);
+                    ModuleManager.GetItemRepo().Update(item);
                 });
                 ((CoreUpdateItemJsonResponse)res).CoreUpdateItemJsonEvent = new CoreUpdateItemJsonEvent()
                 {

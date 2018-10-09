@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis;
 using BeforeOurTime.Business.Apis.Items;
+using BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Business.Modules.Core.Managers;
@@ -10,6 +11,8 @@ using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Account.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Managers;
@@ -17,13 +20,11 @@ using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
 using Microsoft.EntityFrameworkCore;
@@ -44,17 +45,9 @@ namespace BeforeOurTime.Business.Modules.Core
         /// </summary>
         private EFCoreModuleContext Db { set; get; }
         /// <summary>
-        /// System configuration
+        /// Manage all modules
         /// </summary>
-        private IConfiguration Configuration { set; get; }
-        /// <summary>
-        /// Centralized log messages
-        /// </summary>
-        private IBotLogger Logger { set; get; }
-        /// <summary>
-        /// Access to items in the data store
-        /// </summary>
-        private IItemRepo ItemRepo { set; get; }
+        private IModuleManager ModuleManager { set; get; }
         /// <summary>
         /// Managers created or required by the module
         /// </summary>
@@ -78,26 +71,21 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="itemRepo">Access to items in the data store</param>
         public CoreModule(
-            IConfiguration configuration,
-            IBotLogger logger,
-            IItemRepo itemRepo)
+            IModuleManager moduleManager)
         {
-            Configuration = configuration;
-            Logger = logger;
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            ModuleManager = moduleManager;
+            var connectionString = ModuleManager.GetConfiguration().GetConnectionString("DefaultConnection");
             var dbOptions = new DbContextOptionsBuilder<EFCoreModuleContext>();
                 dbOptions.UseSqlServer(connectionString);
                 dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             Db = new EFCoreModuleContext(dbOptions.Options);
-            ItemRepo = itemRepo;
-            Managers = BuildManagers(Logger, Db, ItemRepo);
+            Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
-            ItemRepo.OnItemCreate += OnItemCreate;
-            ItemRepo.OnItemRead += OnItemRead;
-            ItemRepo.OnItemUpdate += OnItemUpdate;
-            ItemRepo.OnItemDelete += OnItemDelete;
+            ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
+            ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
+            ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
+            ModuleManager.GetItemRepo().OnItemDelete += OnItemDelete;
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -105,13 +93,13 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="db"></param>
         /// <param name="itemRepo"></param>
         /// <returns></returns>
-        List<IModelManager> BuildManagers(IBotLogger logger, EFCoreModuleContext db, IItemRepo itemRepo)
+        List<IModelManager> BuildManagers(IModuleManager moduleManager, EFCoreModuleContext db)
         {
             var managers = new List<IModelManager>
             {
-                new GameItemManager(logger, itemRepo, new EFGameDataRepo(Db, itemRepo)),
-                new LocationItemManager(logger, itemRepo, new EFLocationDataRepo(Db, itemRepo)),
-                new CharacterItemManager(logger, itemRepo, new EFCharacterDataRepo(db, itemRepo))
+                new GameItemManager(moduleManager, new EFGameDataRepo(Db, moduleManager.GetItemRepo())),
+                new LocationItemManager(moduleManager, new EFLocationDataRepo(Db, moduleManager.GetItemRepo())),
+                new CharacterItemManager(moduleManager, new EFCharacterDataRepo(db, moduleManager.GetItemRepo()))
             };
             return managers;
         }
@@ -157,6 +145,7 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
+                CoreReadLocationSummaryRequest._Id,
                 CoreReadItemGraphRequest._Id,
                 CoreReadItemJsonRequest._Id,
                 CoreUpdateItemJsonRequest._Id,
@@ -195,7 +184,7 @@ namespace BeforeOurTime.Business.Modules.Core
             var defaultGameData = GameDataRepo.Read().FirstOrDefault();
             if (defaultGameData == null)
             {
-                var gameItem = ItemRepo.Create(new GameItem()
+                var gameItem = ModuleManager.GetItemRepo().Create(new GameItem()
                 {
                     ParentId = null,
                     Data = new List<IItemData>()
@@ -207,7 +196,7 @@ namespace BeforeOurTime.Business.Modules.Core
                         }
                     }
                 });
-                var locationItem = ItemRepo.Create(new LocationItem()
+                var locationItem = ModuleManager.GetItemRepo().Create(new LocationItem()
                 {
                     ParentId = gameItem.Id,
                     Data = new List<IItemData>()
@@ -230,7 +219,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 defaultGameData.DefaultLocationId = locationItem.GetData<LocationData>().DataItemId;
                 GameDataRepo.Update(defaultGameData);
             }
-            var defaultGameItem = ItemRepo.Read(defaultGameData.DataItemId);
+            var defaultGameItem = ModuleManager.GetItemRepo().Read(defaultGameData.DataItemId);
             return defaultGameItem;
         }
         /// <summary>
@@ -243,7 +232,7 @@ namespace BeforeOurTime.Business.Modules.Core
             var game = GetDefaultGame();
             if (game.GetData<GameData>().DefaultLocationId != null)
             {
-                defaultLocationItem = ItemRepo.Read(game.GetData<GameData>().DefaultLocationId.Value);
+                defaultLocationItem = ModuleManager.GetItemRepo().Read(game.GetData<GameData>().DefaultLocationId.Value);
             }
             return defaultLocationItem;
         }
@@ -323,6 +312,8 @@ namespace BeforeOurTime.Business.Modules.Core
                 response = HandleCoreUpdateItemJsonRequest(message, api, terminal, response);
             if (message.GetMessageId() == CoreCreateItemJsonRequest._Id)
                 response = HandleCoreCreateItemJsonRequest(message, api, terminal, response);
+            if (message.GetMessageId() == CoreReadLocationSummaryRequest._Id)
+                response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, api, terminal, response);
             return response;
         }
         /// <summary>
@@ -346,7 +337,7 @@ namespace BeforeOurTime.Business.Modules.Core
             }
             catch (Exception e)
             {
-                ((FileLogger)Logger).LogException($"While handling {request.GetMessageName()}", e);
+                ModuleManager.GetLogger().LogException($"While handling {request.GetMessageName()}", e);
                 response._responseSuccess = false;
                 response._responseMessage = e.Message;
             }

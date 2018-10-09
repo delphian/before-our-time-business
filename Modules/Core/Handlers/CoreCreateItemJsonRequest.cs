@@ -35,7 +35,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 request.ItemsJson.ForEach(itemJson =>
                 {
                     var item = JsonConvert.DeserializeObject<Item>(itemJson.JSON);
-                    ItemRepo.Create(item);
+                    ModuleManager.GetItemRepo().Create(item);
                 });
                 ((CoreCreateItemJsonResponse)res).CoreCreateItemJsonEvent = new CoreCreateItemJsonEvent()
                 {

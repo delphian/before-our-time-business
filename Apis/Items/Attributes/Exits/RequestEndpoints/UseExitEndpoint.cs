@@ -1,15 +1,10 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes;
-using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
-using BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Terminals;
+﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Go;
-using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules.Account.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Managers;
@@ -59,11 +54,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits.RequestEndpoints
                     .Read(exit.GetAttribute<ExitAttribute>().DestinationLocationId);
                 var location = api.GetItemManager().Read(locationAttribute.DataItemId);
                 api.GetItemManager().Move(player, location, exit);
-                var lookRequestHandler = new ExamineLocationEndpoint();
-                response = lookRequestHandler.HandleRequest(api, terminal, new ListLocationRequest()
-                {
-
-                }, response);
+                var lookRequestHandler = new CoreReadLocationSummaryRequest();
+                response = api.GetModuleManager().GetManager<ILocationItemManager>()
+                    .HandleReadLocationSummaryRequest(new CoreReadLocationSummaryRequest()
+                    {
+                    }, api, terminal, response);
             }
             return response;
         }

@@ -28,11 +28,8 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             var request = message.GetMessageAsType<AccountCreateCharacterRequest>();
             response = HandleRequestWrapper<AccountCreateCharacterResponse>(request, res =>
             {
-                var mm = api.GetModuleManager();
-                var characterItem = mm.GetManager<ICharacterItemManager>()
-                    .Create(request.Name, mm.GetModule<ICoreModule>().GetDefaultLocation().Id);
-                var accountCharacter = mm.GetManager<IAccountCharacterManager>()
-                    .Create(terminal.GetAccountId().Value, characterItem.Id);
+                var characterItem = ModuleManager.GetManager<IAccountCharacterManager>()
+                    .Create(terminal.GetAccountId().Value, request.Name);
                 ((AccountCreateCharacterResponse)res).CreatedAccountCharacterEvent = new AccountCreateCharacterEvent()
                 {
                     ItemId = characterItem.Id

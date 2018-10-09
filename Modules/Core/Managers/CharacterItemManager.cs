@@ -11,25 +11,28 @@ using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Business.Apis.Items;
+using BeforeOurTime.Models.Modules;
 
 namespace BeforeOurTime.Business.Modules.Core.Managers
 {
     public class CharacterItemManager : ItemModelManager<CharacterItem>, ICharacterItemManager
     {
         /// <summary>
-        /// Centralized log messages
+        /// Manage all modules
         /// </summary>
-        private ILogger Logger { set; get; }
+        private IModuleManager ModuleManager { set; get; }
+        /// <summary>
+        /// Repository for manager
+        /// </summary>
         private ICharacterDataRepo CharacterDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         public CharacterItemManager(
-            ILogger logger,
-            IItemRepo itemRepo,
-            ICharacterDataRepo characterDataRepo) : base(itemRepo)
+            IModuleManager moduleManager,
+            ICharacterDataRepo characterDataRepo)
         {
-            Logger = logger;
+            ModuleManager = moduleManager;
             CharacterDataRepo = characterDataRepo;
         }
         /// <summary>
@@ -57,7 +60,7 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         /// <returns></returns>
         public CharacterItem Create(string name, Guid locationItemId)
         {
-            var item = ItemRepo.Create(new CharacterItem()
+            var item = ModuleManager.GetItemRepo().Create(new CharacterItem()
             {
                 ParentId = locationItemId,
                 Data = new List<IItemData>()

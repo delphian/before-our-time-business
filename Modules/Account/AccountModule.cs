@@ -1,5 +1,4 @@
-﻿using BeforeOurTime.Business.Apis.Logs;
-using BeforeOurTime.Business.Modules.Account.Dbs.EF;
+﻿using BeforeOurTime.Business.Modules.Account.Dbs.EF;
 using BeforeOurTime.Business.Modules.Account.Managers;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
@@ -9,7 +8,7 @@ using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Models.Modules.Account.Dbs;
+using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
@@ -36,17 +35,9 @@ namespace BeforeOurTime.Business.Modules.Account
         /// </summary>
         private EFAccountModuleContext Db { set; get; }
         /// <summary>
-        /// System configuration
+        /// Manage all modules
         /// </summary>
-        private IConfiguration Configuration { set; get; }
-        /// <summary>
-        /// Centralized log messages
-        /// </summary>
-        private IBotLogger Logger { set; get; }
-        /// <summary>
-        /// Access to items in the data store
-        /// </summary>
-        private IItemRepo ItemRepo { set; get; }
+        private IModuleManager ModuleManager { set; get; }
         /// <summary>
         /// Managers created or required by the module
         /// </summary>
@@ -58,22 +49,21 @@ namespace BeforeOurTime.Business.Modules.Account
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="itemRepo">Access to items in the data store</param>
         public AccountModule(
-            IConfiguration configuration,
-            IBotLogger logger,
-            IItemRepo itemRepo)
+            IModuleManager moduleManager)
         {
-            Configuration = configuration;
-            Logger = logger;
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            ModuleManager = moduleManager;
+            var connectionString = ModuleManager.GetConfiguration().GetConnectionString("DefaultConnection");
             var dbOptions = new DbContextOptionsBuilder<EFAccountModuleContext>();
                 dbOptions.UseSqlServer(connectionString);
                 dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             Db = new EFAccountModuleContext(dbOptions.Options);
-            ItemRepo = itemRepo;
-            Managers = BuildManagers(Logger, Db, ItemRepo);
+            Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
+            ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
+            ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
+            ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
+            ModuleManager.GetItemRepo().OnItemDelete += OnItemDelete;
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -81,12 +71,12 @@ namespace BeforeOurTime.Business.Modules.Account
         /// <param name="db"></param>
         /// <param name="itemRepo"></param>
         /// <returns></returns>
-        List<IModelManager> BuildManagers(IBotLogger logger, EFAccountModuleContext db, IItemRepo itemRepo)
+        List<IModelManager> BuildManagers(IModuleManager moduleManager, EFAccountModuleContext db)
         {
             var managers = new List<IModelManager>
             {
-                new AccountManager(logger, itemRepo, new EFAccountDataRepo(db)),
-                new AccountCharacterManager(logger, itemRepo, new EFAccountCharacterDataRepo(db))
+                new AccountManager(ModuleManager, new EFAccountDataRepo(db)),
+                new AccountCharacterManager(ModuleManager, new EFAccountCharacterDataRepo(db))
             };
             return managers;
         }
@@ -132,6 +122,7 @@ namespace BeforeOurTime.Business.Modules.Account
         {
             return new List<Guid>()
             {
+                AccountCreateCharacterRequest._Id,
                 AccountReadCharacterRequest._Id,
                 AccountCreateAccountRequest._Id,
                 AccountLoginAccountRequest._Id,
@@ -227,7 +218,8 @@ namespace BeforeOurTime.Business.Modules.Account
             }
             catch (Exception e)
             {
-                Logger.LogException($"While handling {request.GetMessageName()}", e);
+                ModuleManager.GetLogger()
+                    .LogException($"While handling {request.GetMessageName()}", e);
                 response._responseMessage = e.Message;
             }
             return response;

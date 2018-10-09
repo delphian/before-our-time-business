@@ -72,10 +72,7 @@ namespace BeforeOurTime.Business.Modules
             Modules = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (IModule)Activator.CreateInstance(x, new object[] {
-                    Configuration,
-                    Logger,
-                    ItemRepo }))
+                .Select(x => (IModule)Activator.CreateInstance(x, new object[] { this }))
                 .ToList();
             Modules.ForEach((module) =>
             {
@@ -163,6 +160,30 @@ namespace BeforeOurTime.Business.Modules
                 response = module.HandleMessage(message, api, terminal, response);
             });
             return response;
+        }
+        /// <summary>
+        /// Get configuration
+        /// </summary>
+        /// <returns></returns>
+        public IConfiguration GetConfiguration()
+        {
+            return Configuration;
+        }
+        /// <summary>
+        /// Get logger
+        /// </summary>
+        /// <returns></returns>
+        public IBotLogger GetLogger()
+        {
+            return Logger;
+        }
+        /// <summary>
+        /// Get item repository
+        /// </summary>
+        /// <returns></returns>
+        public IItemRepo GetItemRepo()
+        {
+            return ItemRepo;
         }
     }
 }

@@ -18,25 +18,31 @@ using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
 
 namespace BeforeOurTime.Business.Modules.Account.Managers
 {
     public partial class AccountCharacterManager : ModelManager<AccountCharacterData>, IAccountCharacterManager
     {
         /// <summary>
-        /// Centralized log messages
+        /// Manage all modules
         /// </summary>
-        private IBotLogger Logger { set; get; }
+        private IModuleManager ModuleManager { set; get; }
+        /// <summary>
+        /// Manager repository
+        /// </summary>
         private IAccountCharacterDataRepo AccountCharacterDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         public AccountCharacterManager(
-            IBotLogger logger,
-            IItemRepo itemRepo,
+            IModuleManager moduleManager,
             IAccountCharacterDataRepo accountCharacterDataRepo)
         {
-            Logger = logger;
+            ModuleManager = moduleManager;
             AccountCharacterDataRepo = accountCharacterDataRepo;
         }
         /// <summary>
@@ -59,6 +65,29 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// <summary>
         /// Create a new account character
         /// </summary>
+        /// <param name="accountId">Unique account identifer to create character for</param>
+        /// <param name="name">Name of character</param>
+        /// <returns></returns>
+        public Item Create(Guid accountId, string name)
+        {
+            var characterItem = ModuleManager.GetItemRepo().Create(new CharacterItem()
+            {
+                ParentId = ModuleManager.GetModule<ICoreModule>().GetDefaultLocation().Id,
+                Data = new List<IItemData>()
+                {
+                    new CharacterData()
+                    {
+                        Name = name,
+                        Description = "A brave new player"
+                    }
+                }
+            });
+            Create(accountId, characterItem.Id);
+            return characterItem;
+        }
+        /// <summary>
+        /// Create a new account character based on an existing item
+        /// </summary>
         /// <param name="accountId">Unique identifier of account</param>
         /// <param name="password">Unique identifier of item to register as account character</param>
         public AccountCharacterData Create(Guid accountId, Guid characterItemId)
@@ -78,7 +107,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// </summary>
         /// <param name="accountId">Unique account identifier</param>
         /// <returns></returns>
-        public List<AccountCharacterData> ReadByAccound(Guid accountId)
+        public List<AccountCharacterData> ReadByAccount(Guid accountId)
         {
             var characterAccounts = AccountCharacterDataRepo.ReadByAccount(new List<Guid>() { accountId });
             return characterAccounts;
@@ -105,7 +134,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             }
             catch (Exception e)
             {
-                Logger.LogException($"While handling {request.GetMessageName()}", e);
+                ModuleManager.GetLogger().LogException($"While handling {request.GetMessageName()}", e);
                 response._responseMessage = e.Message;
             }
             return response;

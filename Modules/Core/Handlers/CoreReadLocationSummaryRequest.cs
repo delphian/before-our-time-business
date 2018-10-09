@@ -1,12 +1,6 @@
-﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Models;
-using BeforeOurTime.Models.Items;
+﻿using BeforeOurTime.Models;
 using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.Items.Exits;
-using BeforeOurTime.Models.Messages.Locations.ReadLocationSummary;
-using BeforeOurTime.Models.Messages.Requests;
-using BeforeOurTime.Models.Messages.Requests.List;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.List;
 using Newtonsoft.Json;
@@ -17,47 +11,33 @@ using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Account.Messages.Location.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.Core.Messages.Location.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
 
-namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
+namespace BeforeOurTime.Business.Modules.Core.Managers
 {
-    public class ExamineLocationEndpoint : IRequestEndpoint
+    public partial class LocationItemManager
     {
-        public ExamineLocationEndpoint()
-        {
-        }
         /// <summary>
-        /// Register to handle a specific set of IO requests
-        /// </summary>
-        /// <returns></returns>
-        public List<Guid> RegisterForRequests()
-        {
-            return new List<Guid>()
-            {
-                ListLocationRequest._Id
-            };
-        }
-        /// <summary>
-        /// Handle terminal request
+        /// Read location summary
         /// </summary>
         /// <param name="api"></param>
+        /// <param name="message"></param>
         /// <param name="terminal"></param>
-        /// <param name="request"></param>
         /// <param name="response"></param>
-        public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
+        public IResponse HandleReadLocationSummaryRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
         {
-            if (request.GetType() == typeof(ListLocationRequest))
+            var request = message.GetMessageAsType<CoreReadLocationSummaryRequest>();
+            response = HandleRequestWrapper<CoreReadLocationSummaryResponse>(request, res =>
             {
                 var player = api.GetItemManager().Read(
                     terminal.GetPlayerId().Value,
                     new TransactionOptions() { NoTracking = true });
                 var location = api.GetItemManager().Read(player.ParentId.Value).GetAsItem<LocationItem>();
-                var ioLocationUpdate = new ReadLocationSummaryResponse()
-                {
-                    _requestInstanceId = request.GetRequestInstanceId(),
-                    _responseSuccess = true,
-                    Item = location,
-                    Exits = new List<ListExitResponse>()
-                };
+                ((CoreReadLocationSummaryResponse)res).Item = location;
+                ((CoreReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
                 // Add exits
                 location.Children
                     .Where(x => x.HasAttribute(typeof(ExitAttribute)))
@@ -66,7 +46,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     .ForEach(delegate (ExitItem item)
                     {
                         var attribute = item.GetAttribute<ExitAttribute>();
-                        ioLocationUpdate.Exits.Add(new ListExitResponse()
+                        ((CoreReadLocationSummaryResponse)res).Exits.Add(new ListExitResponse()
                         {
                             _requestInstanceId = request.GetRequestInstanceId(),
                             _responseSuccess = true,
@@ -77,16 +57,16 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     });
                 // Add character items
                 location.Children
-                    .Where(x => x is CharacterItem)
+                    .Where(x => x.HasData<CharacterData>())
                     .Select(x => x.GetAsItem<CharacterItem>())
                     .ToList()
-                    .ForEach(delegate (CharacterItem item)
+                    .ForEach(item =>
                     {
-                        ioLocationUpdate.Adendums.Add($"{item.Visible.Name} is standing here");
-                        ioLocationUpdate.Characters.Add(item);
+                        ((CoreReadLocationSummaryResponse)res).Adendums.Add($"{item.Visible.Name} is standing here");
+                        ((CoreReadLocationSummaryResponse)res).Characters.Add(item);
                     });
-                response = ioLocationUpdate;
-            }
+                res.SetSuccess(true);
+            });
             return response;
         }
     }

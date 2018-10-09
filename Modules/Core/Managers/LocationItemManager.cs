@@ -10,25 +10,30 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Messages.Responses;
 
 namespace BeforeOurTime.Business.Modules.Core.Managers
 {
-    public class LocationItemManager : ItemModelManager<LocationItem>, ILocationItemManager
+    public partial class LocationItemManager : ItemModelManager<LocationItem>, ILocationItemManager
     {
         /// <summary>
-        /// Centralized log messages
+        /// Manage all modules
         /// </summary>
-        private ILogger Logger { set; get; }
+        private IModuleManager ModuleManager { set; get; }
+        /// <summary>
+        /// Repository for manager
+        /// </summary>
         private ILocationDataRepo LocationDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         public LocationItemManager(
-            ILogger logger,
-            IItemRepo itemRepo,
-            ILocationDataRepo locationDataRepo) : base(itemRepo)
+            IModuleManager moduleManager,
+            ILocationDataRepo locationDataRepo)
         {
-            Logger = logger;
+            ModuleManager = moduleManager;
             LocationDataRepo = locationDataRepo;
         }
         /// <summary>
@@ -79,6 +84,33 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
 //            ExitAttributeManager.Create(froExitAttribute, locationItem.Id);
 //            return locationItem;
 return null;
+        }
+        /// <summary>
+        /// Instantite response object and wrap request handlers in try catch
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="request"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        private IResponse HandleRequestWrapper<T>(
+            IRequest request,
+            Action<IResponse> callback) where T : Response, new()
+        {
+            var response = new T()
+            {
+                _requestInstanceId = request.GetRequestInstanceId(),
+            };
+            try
+            {
+                callback(response);
+            }
+            catch (Exception e)
+            {
+                ModuleManager.GetLogger().LogException($"While handling {request.GetMessageName()}", e);
+                response._responseSuccess = false;
+                response._responseMessage = e.Message;
+            }
+            return response;
         }
         #region On Item Hooks
         /// <summary>

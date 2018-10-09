@@ -12,7 +12,6 @@ using BeforeOurTime.Models.Messages.Requests.Go;
 using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Models.Messages.Requests.Emote;
 using Microsoft.Extensions.Logging;
-using BeforeOurTime.Models.Messages.Requests.List;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using BeforeOurTime.Models.Apis;
@@ -20,6 +19,7 @@ using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.Location.ReadLocationSummary;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -219,7 +219,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     TelnetServer.KickClient(telnetClient);
                     break;
                 case "look":
-                    var response = telnetClient.GetTerminal().SendToApi(new ListLocationRequest()
+                    var response = telnetClient.GetTerminal().SendToApi(new CoreReadLocationSummaryRequest()
                         {
                         });
                     telnetClient.GetTerminal().SendToClient(response);
