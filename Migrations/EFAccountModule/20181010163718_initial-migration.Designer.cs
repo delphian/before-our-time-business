@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace BeforeOurTime.Business.Migrations.EFCoreModule
+namespace BeforeOurTime.Business.Migrations.EFAccountModule
 {
-    [DbContext(typeof(EFCoreModuleContext))]
-    [Migration("20181007220320_initial-migration")]
+    [DbContext(typeof(EFAccountModuleContext))]
+    [Migration("20181010163718_initial-migration")]
     partial class initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,54 +21,36 @@ namespace BeforeOurTime.Business.Migrations.EFCoreModule
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.CharacterData", b =>
+            modelBuilder.Entity("BeforeOurTime.Models.Modules.Account.Models.Data.AccountCharacterData", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<Guid>("DataItemId");
+                    b.Property<Guid>("AccountId");
 
-                    b.Property<string>("Description");
+                    b.Property<Guid>("CharacterItemId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Accounts_Characters");
+                });
+
+            modelBuilder.Entity("BeforeOurTime.Models.Modules.Account.Models.Data.AccountData", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Name")
                         .IsRequired();
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Item_Data_Characters");
-                });
-
-            modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.GameData", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("DataItemId");
-
-                    b.Property<Guid?>("DefaultLocationId");
-
-                    b.Property<string>("Name");
+                    b.Property<string>("Password");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Item_Data_Games");
-                });
+                    b.HasIndex("Name")
+                        .IsUnique();
 
-            modelBuilder.Entity("BeforeOurTime.Models.Modules.Core.Models.Data.LocationData", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("DataItemId");
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Item_Data_Locations");
+                    b.ToTable("Accounts");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Items;
 using System.Threading.Tasks;
 using System.Threading;
-using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
 using BeforeOurTime.Models.Exceptions;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Modules;
@@ -43,7 +42,6 @@ namespace BeforeOurTime.Business.Apis
             IMessageManager messageManager,
             IItemManager itemManager,
             ITerminalManager terminalManager,
-            IExitAttributeManager attributeExitManager,
             IModuleManager moduleManager)
         {
             Logger = logger;
@@ -52,7 +50,6 @@ namespace BeforeOurTime.Business.Apis
             ItemManager = itemManager;
             TerminalManager = terminalManager;
             ModuleManager = moduleManager;
-            AttributeManagerList.Add(typeof(IExitAttributeManager), attributeExitManager);
         }
         public IMessageManager GetMessageManager()
         {

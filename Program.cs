@@ -8,7 +8,6 @@ using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Servers;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Repository.Dbs.EF.Items;
-using BeforeOurTime.Repository.Dbs.EF.Items.Attributes;
 using BeforeOutTime.Repository.Dbs.EF;
 using Jint;
 using Microsoft.EntityFrameworkCore;
@@ -22,8 +21,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
-using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models;
 using BeforeOurTime.Business.Modules;
@@ -94,14 +91,12 @@ namespace BeforeOurTime.Business
                 .AddLogging()
                 // Repositories (Items)
                 .AddScoped<IItemRepo, ItemRepo>()
-                .AddScoped<IExitAttributeRepo, ExitAttributeRepo>()
                 // Main environment interface API
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<ITerminalManager, TerminalManager>()
                 .AddScoped<IModuleManager, ModuleManager>()
                 // Items and item attributes
                 .AddScoped<IItemManager, ItemManager>()
-                .AddScoped<IExitAttributeManager, ExitAttributeManager>()
                 .AddScoped<IApi, Api>();
         }
         /// <summary>

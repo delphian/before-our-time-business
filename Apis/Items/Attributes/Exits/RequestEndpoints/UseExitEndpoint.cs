@@ -1,6 +1,5 @@
 ﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Requests.Go;
 using BeforeOurTime.Models.Messages.Responses;
@@ -8,6 +7,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.Location.ReadLocationSummary
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;
@@ -51,7 +51,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits.RequestEndpoints
                     .GetModule<ICoreModule>()
                     .GetManager<ILocationItemManager>()
                     .GetRepository<ILocationDataRepo>()
-                    .Read(exit.GetAttribute<ExitAttribute>().DestinationLocationId);
+                    .Read(exit.GetAttribute<ExitData>().DestinationLocationId);
                 var location = api.GetItemManager().Read(locationAttribute.DataItemId);
                 api.GetItemManager().Move(player, location, exit);
                 var lookRequestHandler = new CoreReadLocationSummaryRequest();

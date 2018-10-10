@@ -1,6 +1,4 @@
 ﻿using BeforeOurTime.Models;
-using BeforeOurTime.Models.ItemAttributes.Exits;
-using BeforeOurTime.Models.Items.Exits;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Responses.List;
 using Newtonsoft.Json;
@@ -40,12 +38,12 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
                 ((CoreReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
                 // Add exits
                 location.Children
-                    .Where(x => x.HasAttribute(typeof(ExitAttribute)))
+                    .Where(x => x.HasAttribute(typeof(ExitData)))
                     .Select(x => x.GetAsItem<ExitItem>())
                     .ToList()
                     .ForEach(delegate (ExitItem item)
                     {
-                        var attribute = item.GetAttribute<ExitAttribute>();
+                        var attribute = item.GetAttribute<ExitData>();
                         ((CoreReadLocationSummaryResponse)res).Exits.Add(new ListExitResponse()
                         {
                             _requestInstanceId = request.GetRequestInstanceId(),

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using BeforeOurTime.Models.ItemAttributes;
-using BeforeOurTime.Models.ItemAttributes.Exits;
 using BeforeOurTime.Models.Primitives.Images;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
@@ -19,7 +18,6 @@ namespace BeforeOutTime.Repository.Dbs.EF
     {
         // Items
         public DbSet<Item> Items { set; get; }
-        public DbSet<ExitAttribute> Exits { set; get; }
 
         public BaseContext() : base() { }
         public BaseContext(DbContextOptions<BaseContext> options) : base(options) { }
@@ -28,6 +26,7 @@ namespace BeforeOutTime.Repository.Dbs.EF
         {
             modelBuilder.Ignore<AccountData>();
             modelBuilder.Ignore<LocationData>();
+            modelBuilder.Ignore<ExitData>();
             modelBuilder.Ignore<ItemAttribute>();
             // Icon
             modelBuilder.Entity<Image>()
@@ -45,18 +44,6 @@ namespace BeforeOutTime.Repository.Dbs.EF
                 .Ignore(item => item.ChildrenIds)
                 .Ignore(item => item.Attributes)
                 .Ignore(item => item.Data);
-            // Item Attribute Exit
-            modelBuilder.Entity<ExitAttribute>()
-                .ToTable("Item_Attribute_Exits");
-            modelBuilder.Entity<ExitAttribute>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<ExitAttribute>()
-                .HasOne(x => x.Item)
-                .WithOne()
-                .HasForeignKey<ExitAttribute>(x => x.ItemId)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<ExitAttribute>()
-                .Ignore(x => x.AttributeType);
         }
         public DbSet<T> GetDbSet<T>() where T : Model
         {

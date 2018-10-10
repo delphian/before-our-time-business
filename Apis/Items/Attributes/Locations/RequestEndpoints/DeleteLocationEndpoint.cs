@@ -1,12 +1,6 @@
-﻿using BeforeOurTime.Business.Apis.Items.Attributes;
-using BeforeOurTime.Business.Apis.Items.Attributes.Exits;
-using BeforeOurTime.Business.Apis.Items.Attributes.Locations;
-using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Terminals;
+﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.ItemAttributes;
 using BeforeOurTime.Models.Messages.Locations.DeleteLocation;
-using BeforeOurTime.Models.Messages.Locations.Locations.CreateLocation;
 using BeforeOurTime.Models.Messages.Locations.Locations.DeleteLocation;
 using BeforeOurTime.Models.Messages.Responses;
 using Microsoft.Extensions.Logging;
@@ -19,6 +13,7 @@ using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Modules.Core.Managers;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -59,8 +54,8 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     var deleteLocationRequest = request.GetMessageAsType<DeleteLocationRequest>();
                     var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                     var location = api.GetItemManager().Read(deleteLocationRequest.LocationItemId);
-                    var exits = api.GetAttributeManager<IExitAttributeManager>()
-                        .GetLocationExits(location);
+                    var exits = api.GetModuleManager().GetManager<IExitItemManager>()
+                        .GetLocationExits(location.Id);
                     api.GetItemManager().Delete(exits, true);
                     location = api.GetItemManager().Read(deleteLocationRequest.LocationItemId);
                     api.GetItemManager().Delete(new List<Item>() { location });

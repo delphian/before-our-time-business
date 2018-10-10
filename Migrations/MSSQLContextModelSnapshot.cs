@@ -19,33 +19,6 @@ namespace BeforeOurTime.Business.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("BeforeOurTime.Models.ItemAttributes.Exits.ExitAttribute", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Description");
-
-                    b.Property<Guid>("DestinationLocationId");
-
-                    b.Property<int>("Effort");
-
-                    b.Property<Guid>("ItemId");
-
-                    b.Property<string>("Name");
-
-                    b.Property<int>("Time");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemId")
-                        .IsUnique();
-
-                    b.ToTable("Item_Attribute_Exits");
-
-                    b.HasDiscriminator().HasValue("ExitAttribute");
-                });
-
             modelBuilder.Entity("BeforeOurTime.Models.Items.Item", b =>
                 {
                     b.Property<Guid>("Id")
@@ -82,14 +55,6 @@ namespace BeforeOurTime.Business.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Icons");
-                });
-
-            modelBuilder.Entity("BeforeOurTime.Models.ItemAttributes.Exits.ExitAttribute", b =>
-                {
-                    b.HasOne("BeforeOurTime.Models.Items.Item", "Item")
-                        .WithOne()
-                        .HasForeignKey("BeforeOurTime.Models.ItemAttributes.Exits.ExitAttribute", "ItemId")
-                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("BeforeOurTime.Models.Items.Item", b =>

@@ -18,6 +18,7 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
         public DbSet<GameData> Games { set; get; }
         public DbSet<LocationData> Locations { set; get; }
         public DbSet<CharacterData> Characters { set; get; }
+        public DbSet<ExitData> Exits { set; get; }
         public EFCoreModuleContext() : base() { }
         public EFCoreModuleContext(DbContextOptions<EFCoreModuleContext> options) : base(options) { }
         /// <summary>
@@ -64,6 +65,17 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             modelBuilder.Entity<CharacterData>()
                 .Ignore(x => x.DataType)
                 .Property(x => x.Name).IsRequired();
+            // Item Exit Data
+            modelBuilder.Entity<ExitData>()
+                .ToTable("Item_Data_Exits");
+            modelBuilder.Entity<ExitData>()
+                .HasKey(x => x.Id);
+            modelBuilder.Entity<ExitData>()
+                .Ignore(x => x.DataType);
+            modelBuilder.Entity<ExitData>()
+                .Property(x => x.Name).IsRequired();
+            modelBuilder.Entity<ExitData>()
+                .Property(x => x.DestinationLocationId).IsRequired();
         }
         public DbSet<T> GetDbSet<T>() where T : Model
         {
