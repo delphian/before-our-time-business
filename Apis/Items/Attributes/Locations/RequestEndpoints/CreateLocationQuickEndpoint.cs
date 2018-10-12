@@ -1,9 +1,4 @@
 ﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.ItemAttributes;
-using BeforeOurTime.Models.Messages.Locations.CreateLocation;
-using BeforeOurTime.Models.Messages.Locations.Locations.CreateLocation;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using Newtonsoft.Json;
@@ -15,6 +10,7 @@ using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules.Account.Messages.Location.CreateLocation;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {

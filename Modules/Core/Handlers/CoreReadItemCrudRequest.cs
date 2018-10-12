@@ -1,4 +1,5 @@
-﻿using BeforeOurTime.Models.Apis;
+﻿using BeforeOurTime.Models;
+using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
@@ -29,6 +30,20 @@ namespace BeforeOurTime.Business.Modules.Core
                 if (request.ItemIds != null)
                 {
                     readItems = api.GetItemManager().Read(request.ItemIds);
+                }
+                if (request.ItemPropertyTypes != null)
+                {
+                    var managers = new List<IItemModelManager>();
+                    request.ItemPropertyTypes.ForEach(propertyType =>
+                    {
+                        var type = Type.GetType(propertyType + ",BeforeOurTime.Models");
+                        managers.AddRange(api.GetModuleManager().GetManagersOfProperty(type));
+                    });
+                    managers.ForEach(manager =>
+                    {
+                        var itemIds = manager.GetItemIds();
+                        readItems.AddRange(api.GetItemManager().Read(itemIds));
+                    });
                 }
                 ((CoreReadItemCrudResponse)res).CoreReadItemCrudEvent = new CoreReadItemCrudEvent()
                 {

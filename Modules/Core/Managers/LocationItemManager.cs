@@ -54,6 +54,15 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
             return GetRepositories().Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
         /// <summary>
+        /// Get all unique item identifiers of managed items
+        /// </summary>
+        /// <returns></returns>
+        public List<Guid> GetItemIds()
+        {
+            var itemIds = LocationDataRepo.GetItemIds();
+            return itemIds;
+        }
+        /// <summary>
         /// Create an empty new location and connecting exits from a provided location
         /// </summary>
         /// <param name="currentLocationItemId">Existing location item to link to new location with exits</param>

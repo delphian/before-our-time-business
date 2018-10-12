@@ -205,6 +205,14 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             Db.SaveChanges();
         }
         /// <summary>
+        /// Get all unique item identifiers of managed items
+        /// </summary>
+        /// <returns></returns>
+        public List<Guid> GetItemIds()
+        {
+            return Set.Select(x => x.DataItemId).ToList();
+        }
+        /// <summary>
         /// Read all exit data that target the same destination
         /// </summary>
         /// <param name="desitnationId">Location that is the destination</param>

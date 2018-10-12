@@ -206,5 +206,13 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             Db.GetDbSet<CharacterData>().RemoveRange(Read());
             Db.SaveChanges();
         }
+        /// <summary>
+        /// Get all unique item identifiers of managed items
+        /// </summary>
+        /// <returns></returns>
+        public List<Guid> GetItemIds()
+        {
+            return Set.Select(x => x.DataItemId).ToList();
+        }
     }
 }

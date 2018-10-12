@@ -64,6 +64,15 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         {
             return GetRepositories().Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
+        /// <summary>
+        /// Get all unique item identifiers of managed items
+        /// </summary>
+        /// <returns></returns>
+        public List<Guid> GetItemIds()
+        {
+            var itemIds = GameDataRepo.GetItemIds();
+            return itemIds;
+        }
         #region On Item Hooks
         /// <summary>
         /// Create attribute, if present, after item is created

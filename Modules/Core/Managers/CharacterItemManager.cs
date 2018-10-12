@@ -53,6 +53,15 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
             return GetRepositories().Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
         /// <summary>
+        /// Get all unique item identifiers of managed items
+        /// </summary>
+        /// <returns></returns>
+        public List<Guid> GetItemIds()
+        {
+            var itemIds = CharacterDataRepo.GetItemIds();
+            return itemIds;
+        }
+        /// <summary>
         /// Create a new character
         /// </summary>
         /// <param name="name">Name of character</param>

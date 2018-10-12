@@ -53,6 +53,15 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
             return GetRepositories().Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
         /// <summary>
+        /// Get all unique item identifiers of managed items
+        /// </summary>
+        /// <returns></returns>
+        public List<Guid> GetItemIds()
+        {
+            var itemIds = ExitDataRepo.GetItemIds();
+            return itemIds;
+        }
+        /// <summary>
         /// Read all exits that target the same destination
         /// </summary>
         /// <param name="locationItem"></param>

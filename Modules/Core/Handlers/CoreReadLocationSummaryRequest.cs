@@ -38,19 +38,19 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
                 ((CoreReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
                 // Add exits
                 location.Children
-                    .Where(x => x.HasAttribute(typeof(ExitData)))
+                    .Where(x => x.HasData(typeof(ExitData)))
                     .Select(x => x.GetAsItem<ExitItem>())
                     .ToList()
                     .ForEach(delegate (ExitItem item)
                     {
-                        var attribute = item.GetAttribute<ExitData>();
+                        var data = item.GetData<ExitData>();
                         ((CoreReadLocationSummaryResponse)res).Exits.Add(new ListExitResponse()
                         {
                             _requestInstanceId = request.GetRequestInstanceId(),
                             _responseSuccess = true,
                             Item = item,
-                            Name = attribute.Name,
-                            Description = attribute.Description
+                            Name = data.Name,
+                            Description = data.Description
                         });
                     });
                 // Add character items
