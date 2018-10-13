@@ -4,18 +4,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Models.Modules.Core.Dbs;
-using BeforeOurTime.Models.Modules.Core.Models.Data;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models;
-using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.World.Models.Items;
+using BeforeOurTime.Models.Modules.World.Managers;
+using BeforeOurTime.Models.Modules.World.Dbs;
+using BeforeOurTime.Models.Modules.World.Models.Data;
 
-namespace BeforeOurTime.Business.Modules.Core.Managers
+namespace BeforeOurTime.Business.Modules.World.Managers
 {
-    public class ExitItemManager : ItemModelManager<ExitItem>, IExitItemManager
+    public class GameItemManager : ItemModelManager<GameItem>, IGameItemManager
     {
         /// <summary>
         /// Manage all modules
@@ -24,16 +24,28 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         /// <summary>
         /// Repository for manager
         /// </summary>
-        private IExitDataRepo ExitDataRepo { set; get; }
+        private IGameDataRepo GameDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public ExitItemManager(
+        public GameItemManager(
             IModuleManager moduleManager,
-            IExitDataRepo exitDataRepo)
+            IGameDataRepo gameDataRepo)
         {
             ModuleManager = moduleManager;
-            ExitDataRepo = exitDataRepo;
+            GameDataRepo = gameDataRepo;
+        }
+        /// <summary>
+        /// Update games's default location
+        /// </summary>
+        /// <param name="id">Unique game attribute identifier</param>
+        /// <param name="locationId">Game's new default location</param>
+        /// <returns></returns>
+        public GameData UpdateDefaultLocation(Guid id, Guid locationId)
+        {
+            var gameData = GameDataRepo.Read(id);
+            gameData.DefaultLocationId = locationId;
+            return GameDataRepo.Update(gameData);
         }
         /// <summary>
         /// Get all repositories declared by manager
@@ -41,7 +53,7 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         /// <returns></returns>
         public List<ICrudModelRepository> GetRepositories()
         {
-            return new List<ICrudModelRepository>() { ExitDataRepo };
+            return new List<ICrudModelRepository>() { GameDataRepo };
         }
         /// <summary>
         /// Get repository as interface
@@ -58,19 +70,16 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         /// <returns></returns>
         public List<Guid> GetItemIds()
         {
-            var itemIds = ExitDataRepo.GetItemIds();
+            var itemIds = GameDataRepo.GetItemIds();
             return itemIds;
         }
         /// <summary>
-        /// Read all exits that target the same destination
+        /// Determine if item data type is managable
         /// </summary>
-        /// <param name="locationItem"></param>
-        /// <returns></returns>
-        public List<Item> GetLocationExits(Guid destinationId)
+        /// <param name="propertyData">Item data type that might be managable</param>
+        public bool IsManagingData(Type dataType)
         {
-            var exitDatas = ExitDataRepo.ReadDestinationId(destinationId);
-            var items = ModuleManager.GetItemRepo().Read(exitDatas.Select(x => x.DataItemId).ToList());
-            return items;
+            return dataType == typeof(GameData);
         }
         #region On Item Hooks
         /// <summary>
@@ -80,11 +89,11 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemCreate(Item item, TransactionOptions options = null)
         {
-            if (item.HasData<ExitData>())
+            if (item.HasData<GameData>())
             {
-                var data = item.GetData<ExitData>();
+                var data = item.GetData<GameData>();
                 data.DataItemId = item.Id;
-                ExitDataRepo.Create(data, options);
+                GameDataRepo.Create(data, options);
             }
         }
         /// <summary>
@@ -94,10 +103,10 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemRead(Item item, TransactionOptions options = null)
         {
-            var ExitData = ExitDataRepo.Read(item, options);
-            if (ExitData != null)
+            var gameData = GameDataRepo.Read(item, options);
+            if (gameData != null)
             {
-                item.Data.Add(ExitData);
+                item.Data.Add(gameData);
             }
         }
         /// <summary>
@@ -107,10 +116,10 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemUpdate(Item item, TransactionOptions options = null)
         {
-            if (item.HasData<ExitData>())
+            if (item.HasData<GameData>())
             {
-                var data = item.GetData<ExitData>();
-                ExitDataRepo.Update(data, options);
+                var data = item.GetData<GameData>();
+                GameDataRepo.Update(data, options);
             }
         }
         /// <summary>
@@ -120,10 +129,10 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemDelete(Item item, TransactionOptions options = null)
         {
-            if (item.HasData<ExitData>())
+            if (item.HasData<GameData>())
             {
-                var data = item.GetData<ExitData>();
-                ExitDataRepo.Delete(data, options);
+                var data = item.GetData<GameData>();
+                GameDataRepo.Delete(data, options);
             }
         }
         #endregion

@@ -3,17 +3,18 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using BeforeOurTime.Models.Modules.Core.Dbs;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.World.Models.Items;
+using BeforeOurTime.Models.Modules.World.Managers;
+using BeforeOurTime.Models.Modules.World.Dbs;
+using BeforeOurTime.Models.Modules.World.Models.Data;
 
-namespace BeforeOurTime.Business.Modules.Core.Managers
+namespace BeforeOurTime.Business.Modules.World.Managers
 {
     public class CharacterItemManager : ItemModelManager<CharacterItem>, ICharacterItemManager
     {
@@ -60,6 +61,14 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         {
             var itemIds = CharacterDataRepo.GetItemIds();
             return itemIds;
+        }
+        /// <summary>
+        /// Determine if item data type is managable
+        /// </summary>
+        /// <param name="propertyData">Item data type that might be managable</param>
+        public bool IsManagingData(Type dataType)
+        {
+            return dataType == typeof(CharacterData);
         }
         /// <summary>
         /// Create a new character

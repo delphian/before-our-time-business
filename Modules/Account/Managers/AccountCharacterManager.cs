@@ -5,23 +5,20 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
 using BeforeOurTime.Models.Modules.Account.Dbs;
-using BeforeOurTime.Models.Modules.Account.Models;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models.Logs;
-using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
-using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
-using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Messages.Requests;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.World.Models.Items;
+using BeforeOurTime.Models.Modules.World.Models.Data;
 
 namespace BeforeOurTime.Business.Modules.Account.Managers
 {
@@ -72,7 +69,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         {
             var characterItem = ModuleManager.GetItemRepo().Create(new CharacterItem()
             {
-                ParentId = ModuleManager.GetModule<ICoreModule>().GetDefaultLocation().Id,
+                ParentId = ModuleManager.GetModule<IWorldModule>().GetDefaultLocation().Id,
                 Data = new List<IItemData>()
                 {
                     new CharacterData()

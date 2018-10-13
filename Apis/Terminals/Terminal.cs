@@ -9,7 +9,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

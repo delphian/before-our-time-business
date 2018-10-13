@@ -13,7 +13,7 @@ using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 using BeforeOurTime.Models.Messages.Requests;
-using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules.World.Managers;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {

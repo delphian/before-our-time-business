@@ -4,8 +4,8 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace BeforeOurTime.Business.Modules.Core
             response = HandleRequestWrapper<CoreReadItemGraphResponse>(request, res =>
             {
                 var itemId = request.ItemId ??
-                    api.GetModuleManager().GetModule<ICoreModule>().GetDefaultGame().Id;
+                    api.GetModuleManager().GetModule<IWorldModule>().GetDefaultGame().Id;
                 var item = api.GetItemManager().Read(itemId).GetAsItem<GameItem>();
                 var itemGraph = new ItemGraph()
                 {

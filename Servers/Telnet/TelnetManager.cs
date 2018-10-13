@@ -16,10 +16,10 @@ using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
-using BeforeOurTime.Models.Modules.Account.Messages.Location.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.World.Models.Items;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -219,7 +219,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     TelnetServer.KickClient(telnetClient);
                     break;
                 case "look":
-                    var response = telnetClient.GetTerminal().SendToApi(new CoreReadLocationSummaryRequest()
+                    var response = telnetClient.GetTerminal().SendToApi(new WorldReadLocationSummaryRequest()
                         {
                         });
                     telnetClient.GetTerminal().SendToClient(response);

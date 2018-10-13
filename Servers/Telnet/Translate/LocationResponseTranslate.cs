@@ -5,7 +5,7 @@ using System.Text;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses.List;
-using BeforeOurTime.Models.Modules.Core.Messages.Location.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {
@@ -23,7 +23,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
         {
             return new List<Type>()
             {
-                typeof(CoreReadLocationSummaryResponse)
+                typeof(WorldReadLocationSummaryResponse)
             };
         }
         /// <summary>
@@ -37,7 +37,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             TelnetServer telnetServer,
             TelnetClient telnetClient)
         {
-            var locationResponse = message.GetMessageAsType<CoreReadLocationSummaryResponse>();
+            var locationResponse = message.GetMessageAsType<WorldReadLocationSummaryResponse>();
             telnetClient.ItemExits.Clear();
             // Send location name and description
             telnetServer.SendMessageToClient(telnetClient, "\r\n\r\n" 

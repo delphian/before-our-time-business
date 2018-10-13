@@ -9,8 +9,8 @@ using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core;
-using BeforeOurTime.Models.Modules.Core.Managers;
-using BeforeOurTime.Models.Modules.Account.Messages.Location.CreateLocation;
+using BeforeOurTime.Models.Modules.World.Messages.Location.CreateLocation;
+using BeforeOurTime.Models.Modules.World.Managers;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {
@@ -27,7 +27,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         {
             return new List<Guid>()
             {
-                CreateLocationQuickRequest._Id
+                WorldCreateLocationQuickRequest._Id
             };
         }
         /// <summary>
@@ -39,9 +39,9 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
         /// <param name="response"></param>
         public IResponse HandleRequest(IApi api, ITerminal terminal, IRequest request, IResponse response)
         {
-            if (request.GetType() == typeof(CreateLocationQuickRequest))
+            if (request.GetType() == typeof(WorldCreateLocationQuickRequest))
             {
-                var createLocationQuickRequest = request.GetMessageAsType<CreateLocationQuickRequest>();
+                var createLocationQuickRequest = request.GetMessageAsType<WorldCreateLocationQuickRequest>();
                 var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                 var location = api.GetItemManager().Read(player.ParentId.Value);
                 var createFromLocationItemId = createLocationQuickRequest.FromLocationItemId ??
@@ -51,11 +51,11 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoint
                     .GetModule<ICoreModule>()
                     .GetManager<ILocationItemManager>()
                     .CreateFromHere(createFromLocationItemId);
-                response = new CreateLocationQuickResponse()
+                response = new WorldCreateLocationQuickResponse()
                 {
                     _requestInstanceId = request.GetRequestInstanceId(),
                     _responseSuccess = true,
-                    CreateLocationEvent = new CreateLocationEvent()
+                    CreateLocationEvent = new WorldCreateLocationEvent()
                     {
                         Item = newLocationItem
                     }

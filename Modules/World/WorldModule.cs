@@ -1,7 +1,5 @@
-﻿using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.Items;
-using BeforeOurTime.Business.Apis.Logs;
-using BeforeOurTime.Business.Modules.Core.Dbs.EF;
+﻿using BeforeOurTime.Business.Modules.World.Dbs.EF;
+using BeforeOurTime.Business.Modules.World.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Items;
@@ -11,15 +9,13 @@ using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.World.Dbs;
+using BeforeOurTime.Models.Modules.World.Managers;
+using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.World.Models.Data;
+using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Terminals;
-using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,12 +27,12 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Modules.Core
 {
-    public partial class CoreModule : ICoreModule
+    public partial class WorldModule : IWorldModule
     {
         /// <summary>
         /// Entity framework database context
         /// </summary>
-        private EFCoreModuleContext Db { set; get; }
+        private EFWorldModuleContext Db { set; get; }
         /// <summary>
         /// Manage all modules
         /// </summary>
@@ -50,17 +46,29 @@ namespace BeforeOurTime.Business.Modules.Core
         /// </summary>
         private List<ICrudModelRepository> Repositories { set; get; } = new List<ICrudModelRepository>();
         /// <summary>
+        /// Game data repository
+        /// </summary>
+        private IGameDataRepo GameDataRepo { set; get; }
+        /// <summary>
+        /// Location data repository
+        /// </summary>
+        private ILocationDataRepo LocationDataRepo { set; get; }
+        /// <summary>
+        /// Character data repository
+        /// </summary>
+        private ICharacterDataRepo CharacterDataRepo { set; get; }
+        /// <summary>
         /// Constructor
         /// </summary>
-        public CoreModule(
+        public WorldModule(
             IModuleManager moduleManager)
         {
             ModuleManager = moduleManager;
             var connectionString = ModuleManager.GetConfiguration().GetConnectionString("DefaultConnection");
-            var dbOptions = new DbContextOptionsBuilder<EFCoreModuleContext>();
+            var dbOptions = new DbContextOptionsBuilder<EFWorldModuleContext>();
                 dbOptions.UseSqlServer(connectionString);
                 dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            Db = new EFCoreModuleContext(dbOptions.Options);
+            Db = new EFWorldModuleContext(dbOptions.Options);
             Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
             ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
@@ -74,10 +82,13 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="db"></param>
         /// <param name="itemRepo"></param>
         /// <returns></returns>
-        List<IModelManager> BuildManagers(IModuleManager moduleManager, EFCoreModuleContext db)
+        List<IModelManager> BuildManagers(IModuleManager moduleManager, EFWorldModuleContext db)
         {
             var managers = new List<IModelManager>
             {
+                new GameItemManager(moduleManager, new EFGameDataRepo(db, moduleManager.GetItemRepo())),
+                new LocationItemManager(moduleManager, new EFLocationDataRepo(db, moduleManager.GetItemRepo())),
+                new CharacterItemManager(moduleManager, new EFCharacterDataRepo(db, moduleManager.GetItemRepo()))
             };
             return managers;
         }
@@ -123,14 +134,7 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
-                CoreReadItemGraphRequest._Id,
-                CoreReadItemJsonRequest._Id,
-                CoreUpdateItemJsonRequest._Id,
-                CoreCreateItemJsonRequest._Id,
-                CoreCreateItemCrudRequest._Id,
-                CoreReadItemCrudRequest._Id,
-                CoreUpdateItemCrudRequest._Id,
-                CoreDeleteItemCrudRequest._Id
+                WorldReadLocationSummaryRequest._Id
             };
         }
         /// <summary>
@@ -139,6 +143,79 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="repositories"></param>
         public void Initialize(List<ICrudModelRepository> repositories)
         {
+            GameDataRepo = repositories
+                .Where(x => x is IGameDataRepo)
+                .Select(x => (IGameDataRepo)x).FirstOrDefault();
+            LocationDataRepo = repositories
+                .Where(x => x is ILocationDataRepo)
+                .Select(x => (ILocationDataRepo)x).FirstOrDefault();
+            CharacterDataRepo = repositories
+                .Where(x => x is ICharacterDataRepo)
+                .Select(x => (ICharacterDataRepo)x).FirstOrDefault();
+        }
+        /// <summary>
+        /// Get the default game
+        /// </summary>
+        /// <remarks>
+        /// Will create the default game and a location if one does not already exist
+        /// </remarks>
+        /// <returns></returns>
+        public Item GetDefaultGame()
+        {
+            var defaultGameData = GameDataRepo.Read().FirstOrDefault();
+            if (defaultGameData == null)
+            {
+                var gameItem = ModuleManager.GetItemRepo().Create(new GameItem()
+                {
+                    ParentId = null,
+                    Data = new List<IItemData>()
+                    {
+                        new GameData()
+                        {
+                            Name = "Brave New World",
+                            DefaultLocationId = null
+                        }
+                    }
+                });
+                var locationItem = ModuleManager.GetItemRepo().Create(new LocationItem()
+                {
+                    ParentId = gameItem.Id,
+                    Data = new List<IItemData>()
+                    {
+                        new LocationData()
+                        {
+                            Name = "A Dark Void",
+                            Description = "Cool mists and dark shadows shroud "
+                                + "everything in this place. Straining your eyes does little to resolve the "
+                                + "amorphous blobs that are circulating about. The oppresive silence is occationaly "
+                                + "puncuated by a distressed weeping or soft sob. A chill runs through your blood "
+                                + "when you realise these forms may have once been human. The smell of rain "
+                                + "and rotting wood pains your nose while the occational drip of water tickles "
+                                + "the top of skulls both real and imagined. Any attempt to navigate in this damp "
+                                + "cavern causes disorientation.",
+                        }
+                    }
+                });
+                defaultGameData = gameItem.GetData<GameData>();
+                defaultGameData.DefaultLocationId = locationItem.GetData<LocationData>().DataItemId;
+                GameDataRepo.Update(defaultGameData);
+            }
+            var defaultGameItem = ModuleManager.GetItemRepo().Read(defaultGameData.DataItemId);
+            return defaultGameItem;
+        }
+        /// <summary>
+        /// Get default game location
+        /// </summary>
+        /// <returns></returns>
+        public Item GetDefaultLocation()
+        {
+            Item defaultLocationItem = null;
+            var game = GetDefaultGame();
+            if (game.GetData<GameData>().DefaultLocationId != null)
+            {
+                defaultLocationItem = ModuleManager.GetItemRepo().Read(game.GetData<GameData>().DefaultLocationId.Value);
+            }
+            return defaultLocationItem;
         }
         #region On Item Hooks
         /// <summary>
@@ -200,22 +277,8 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="response"></param>
         public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
         {
-            if (message.GetMessageId() == CoreReadItemGraphRequest._Id)
-                response = HandleCoreReadItemGraphRequest(message, api, terminal, response);
-            if (message.GetMessageId() == CoreCreateItemCrudRequest._Id)
-                response = HandleCoreCreateItemCrudRequest(message, api, terminal, response);
-            if (message.GetMessageId() == CoreReadItemCrudRequest._Id)
-                response = HandleCoreReadItemCrudRequest(message, api, terminal, response);
-            if (message.GetMessageId() == CoreUpdateItemCrudRequest._Id)
-                response = HandleCoreUpdateItemCrudRequest(message, api, terminal, response);
-            if (message.GetMessageId() == CoreDeleteItemCrudRequest._Id)
-                response = HandleCoreDeleteItemCrudRequest(message, api, terminal, response);
-            if (message.GetMessageId() == CoreReadItemJsonRequest._Id)
-                response = HandleCoreReadItemJsonRequest(message, api, terminal, response);
-            if (message.GetMessageId() == CoreUpdateItemJsonRequest._Id)
-                response = HandleCoreUpdateItemJsonRequest(message, api, terminal, response);
-            if (message.GetMessageId() == CoreCreateItemJsonRequest._Id)
-                response = HandleCoreCreateItemJsonRequest(message, api, terminal, response);
+            if (message.GetMessageId() == WorldReadLocationSummaryRequest._Id)
+                response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, api, terminal, response);
             return response;
         }
         /// <summary>

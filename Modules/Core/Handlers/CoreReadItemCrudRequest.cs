@@ -25,20 +25,43 @@ namespace BeforeOurTime.Business.Modules.Core
             var request = message.GetMessageAsType<CoreReadItemCrudRequest>();
             response = HandleRequestWrapper<CoreReadItemCrudResponse>(request, res =>
             {
+                var managers = new List<IItemModelManager>();
                 var readItems = new List<Item>();
                 // Read enumerated list of items
                 if (request.ItemIds != null)
                 {
                     readItems = api.GetItemManager().Read(request.ItemIds);
+                    res.SetSuccess(true);
+                }
+                if (request.ItemTypes != null)
+                {
+                    request.ItemTypes.ForEach(itemType =>
+                    {
+                        var type = Type.GetType(itemType + ",BeforeOurTime.Models");
+                        managers.AddRange(api.GetModuleManager().GetManagers(type));
+                    });
+                    res.SetSuccess(true);
+                }
+                if (request.ItemDataTypes != null)
+                {
+                    request.ItemDataTypes.ForEach(dataType =>
+                    {
+                        var type = Type.GetType(dataType + ",BeforeOurTime.Models");
+                        managers.AddRange(api.GetModuleManager().GetManagersOfData(type));
+                    });
+                    res.SetSuccess(true);
                 }
                 if (request.ItemPropertyTypes != null)
                 {
-                    var managers = new List<IItemModelManager>();
                     request.ItemPropertyTypes.ForEach(propertyType =>
                     {
                         var type = Type.GetType(propertyType + ",BeforeOurTime.Models");
                         managers.AddRange(api.GetModuleManager().GetManagersOfProperty(type));
                     });
+                    res.SetSuccess(true);
+                }
+                if (managers.Count > 0)
+                {
                     managers.ForEach(manager =>
                     {
                         var itemIds = manager.GetItemIds();
@@ -49,7 +72,6 @@ namespace BeforeOurTime.Business.Modules.Core
                 {
                     Items = readItems
                 };
-                res.SetSuccess(true);
             });
             return response;
         }

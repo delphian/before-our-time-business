@@ -8,13 +8,13 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Modules.Account.Messages.Location.ReadLocationSummary;
-using BeforeOurTime.Models.Modules.Core.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.World.Models.Data;
+using BeforeOurTime.Models.Modules.World.Models.Items;
 
-namespace BeforeOurTime.Business.Modules.Core.Managers
+namespace BeforeOurTime.Business.Modules.World.Managers
 {
     public partial class LocationItemManager
     {
@@ -27,15 +27,15 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
         /// <param name="response"></param>
         public IResponse HandleReadLocationSummaryRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
         {
-            var request = message.GetMessageAsType<CoreReadLocationSummaryRequest>();
-            response = HandleRequestWrapper<CoreReadLocationSummaryResponse>(request, res =>
+            var request = message.GetMessageAsType<WorldReadLocationSummaryRequest>();
+            response = HandleRequestWrapper<WorldReadLocationSummaryResponse>(request, res =>
             {
                 var player = api.GetItemManager().Read(
                     terminal.GetPlayerId().Value,
                     new TransactionOptions() { NoTracking = true });
                 var location = api.GetItemManager().Read(player.ParentId.Value).GetAsItem<LocationItem>();
-                ((CoreReadLocationSummaryResponse)res).Item = location;
-                ((CoreReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
+                ((WorldReadLocationSummaryResponse)res).Item = location;
+                ((WorldReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
                 // Add exits
                 location.Children
                     .Where(x => x.HasData(typeof(ExitData)))
@@ -44,7 +44,7 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
                     .ForEach(delegate (ExitItem item)
                     {
                         var data = item.GetData<ExitData>();
-                        ((CoreReadLocationSummaryResponse)res).Exits.Add(new ListExitResponse()
+                        ((WorldReadLocationSummaryResponse)res).Exits.Add(new ListExitResponse()
                         {
                             _requestInstanceId = request.GetRequestInstanceId(),
                             _responseSuccess = true,
@@ -60,8 +60,8 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
                     .ToList()
                     .ForEach(item =>
                     {
-                        ((CoreReadLocationSummaryResponse)res).Adendums.Add($"{item.Visible.Name} is standing here");
-                        ((CoreReadLocationSummaryResponse)res).Characters.Add(item);
+                        ((WorldReadLocationSummaryResponse)res).Adendums.Add($"{item.Visible.Name} is standing here");
+                        ((WorldReadLocationSummaryResponse)res).Characters.Add(item);
                     });
                 res.SetSuccess(true);
             });
