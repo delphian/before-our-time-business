@@ -15,7 +15,7 @@ namespace BeforeOurTime.Business.Apis.Items
     /// <summary>
     /// Manages security, environment messages, CRUD, and run time considerations for items
     /// </summary>
-    public class ItemManager : IItemManager
+    public class ItemManager : ModelManager<Item>, IItemManager
     {
         private IItemRepo ItemRepo { set; get; }
         private IMessageManager MessageManager { set; get; }

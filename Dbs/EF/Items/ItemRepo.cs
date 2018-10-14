@@ -72,10 +72,18 @@ namespace BeforeOurTime.Repository.Dbs.EF.Items
             Db.SaveChanges();
             if (OnItemCreate != null)
             {
-                items.ForEach(delegate (Item item)
+                void InvokeOnItemCreate(List<Item> invokeItems)
                 {
-                    OnItemCreate(item, options);
-                });
+                    invokeItems.ForEach(item =>
+                    {
+                        OnItemCreate(item, options);
+                        if (item.Children != null && item.Children.Count > 0)
+                        {
+                            InvokeOnItemCreate(item.Children);
+                        }
+                    });
+                };
+                InvokeOnItemCreate(items);
             }
             return items;
         }

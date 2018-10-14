@@ -2,9 +2,9 @@
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using System;

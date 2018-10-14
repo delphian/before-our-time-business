@@ -13,6 +13,8 @@ using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Modules.World.Dbs;
 using BeforeOurTime.Models.Modules.World.Models.Data;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.World;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -77,30 +79,51 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <returns></returns>
         public LocationItem CreateFromHere(Guid currentLocationItemId)
         {
-//            var currentLocation = ItemRepo.Read(currentLocationItemId);
-//            var locationAttribute = new LocationAttribute()
-//            {
-//                Name = "A New Location",
-//                Description = "The relatively new construction of this place is apparant everywhere you look. In several places the c# substrate seems to be leaking from above, while behind you a small puddle of sql statements have coalesced into a small puddle. Ew..."
-//            };
-//            var defaultGameItemId = ModuleManager.GetModule<ICoreModule>().GetDefaultGame().Id;
-//            var locationItem = Create(locationAttribute, defaultGameItemId).GetAsItem<LocationItem>();
-//            var toExitAttribute = new ExitAttribute()
-//            {
-//                Name = "A New Exit",
-//                Description = "The paint is still wet on this sign!",
-//                DestinationLocationId = locationAttribute.Id
-//            };
-//            ExitAttributeManager.Create(toExitAttribute, currentLocationItemId);
-//            var froExitAttribute = new ExitAttribute()
-//            {
-//                Name = "A Return Path",
-//                Description = "Escape back to the real world",
-//                DestinationLocationId = currentLocation.GetAttribute<LocationAttribute>().Id
-//            };
-//            ExitAttributeManager.Create(froExitAttribute, locationItem.Id);
-//            return locationItem;
-return null;
+            var itemRepo = ModuleManager.GetItemRepo();
+            var gameItem = ModuleManager.GetModule<IWorldModule>().GetDefaultGame();
+            var currentLocation = itemRepo.Read(currentLocationItemId);
+            var newLocationItem = itemRepo.Create(new LocationItem()
+            {
+                ParentId = gameItem.Id,
+                Data = new List<IItemData>()
+                {
+                    new LocationData()
+                    {
+                        Name = "A New Location",
+                        Description = "Someone has barfed C# code and SQL statements all over the place. It's quite disgusting."
+                    }
+                },
+                Children = new List<Item>()
+                {
+                    new ExitItem()
+                    {
+                        Data = new List<IItemData>()
+                        {
+                            new ExitData()
+                            {
+                                DestinationLocationId = currentLocationItemId,
+                                Name = "A Return Path",
+                                Description = "Escape back to the real world"
+                            }
+                        }
+                    }
+                }
+            }).GetAsItem<LocationItem>();
+            currentLocation.Children.Add(new ExitItem()
+            {
+                ParentId = newLocationItem.Id,
+                Data =  new List<IItemData>()
+                {
+                    new ExitData()
+                    {
+                        DestinationLocationId = newLocationItem.Id,
+                        Name = "A New Exit",
+                        Description = "The paint is still wet on this sign"
+                    }
+                }
+            });
+            itemRepo.Update(currentLocation);
+            return newLocationItem;
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch

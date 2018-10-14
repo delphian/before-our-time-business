@@ -8,10 +8,11 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
-using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.World.Dbs;
 using BeforeOurTime.Models.Modules.World.Managers;
+using BeforeOurTime.Models.Modules.World.Messages.Location.CreateLocation;
 using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.World.Models.Items;
@@ -25,7 +26,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Modules.Core
+namespace BeforeOurTime.Business.Modules.World
 {
     public partial class WorldModule : IWorldModule
     {
@@ -58,6 +59,10 @@ namespace BeforeOurTime.Business.Modules.Core
         /// </summary>
         private ICharacterDataRepo CharacterDataRepo { set; get; }
         /// <summary>
+        /// Character data repository
+        /// </summary>
+        private IExitDataRepo ExitDataRepo { set; get; }
+        /// <summary>
         /// Constructor
         /// </summary>
         public WorldModule(
@@ -88,7 +93,8 @@ namespace BeforeOurTime.Business.Modules.Core
             {
                 new GameItemManager(moduleManager, new EFGameDataRepo(db, moduleManager.GetItemRepo())),
                 new LocationItemManager(moduleManager, new EFLocationDataRepo(db, moduleManager.GetItemRepo())),
-                new CharacterItemManager(moduleManager, new EFCharacterDataRepo(db, moduleManager.GetItemRepo()))
+                new CharacterItemManager(moduleManager, new EFCharacterDataRepo(db, moduleManager.GetItemRepo())),
+                new ExitItemManager(moduleManager, new EFExitDataRepo(db, moduleManager.GetItemRepo()))
             };
             return managers;
         }
@@ -134,7 +140,8 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
-                WorldReadLocationSummaryRequest._Id
+                WorldReadLocationSummaryRequest._Id,
+                WorldCreateLocationQuickRequest._Id
             };
         }
         /// <summary>
@@ -152,6 +159,9 @@ namespace BeforeOurTime.Business.Modules.Core
             CharacterDataRepo = repositories
                 .Where(x => x is ICharacterDataRepo)
                 .Select(x => (ICharacterDataRepo)x).FirstOrDefault();
+            ExitDataRepo = repositories
+                .Where(x => x is IExitDataRepo)
+                .Select(x => (IExitDataRepo)x).FirstOrDefault();
         }
         /// <summary>
         /// Get the default game
@@ -279,6 +289,8 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             if (message.GetMessageId() == WorldReadLocationSummaryRequest._Id)
                 response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, api, terminal, response);
+            if (message.GetMessageId() == WorldCreateLocationQuickRequest._Id)
+                response = GetManager<ILocationItemManager>().HandleCreateLocationQuickRequest(message, api, terminal, response);
             return response;
         }
         /// <summary>
