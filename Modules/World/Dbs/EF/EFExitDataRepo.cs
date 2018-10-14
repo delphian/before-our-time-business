@@ -145,13 +145,16 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
         {
             models.ForEach((model) =>
             {
-                var trackedModel = Read(model.Id, new TransactionOptions() { NoTracking = false });
+                var trackedModel = Read(model.Id, options);
                 if (trackedModel == null)
                 {
-                    throw new Exception("No such model exists " + typeof(ExitData).ToString() + " " + model?.Id);
+                    Create(model, options);
                 }
-                Db.Entry(trackedModel).CurrentValues.SetValues(model);
-                Db.SaveChanges();
+                else
+                {
+                    Db.Entry(trackedModel).CurrentValues.SetValues(model);
+                    Db.SaveChanges();
+                }
             });
             return models;
         }

@@ -145,14 +145,36 @@ namespace BeforeOurTime.Repository.Dbs.EF.Items
         /// <returns>List of items updated</returns>
         override public List<Item> Update(List<Item> items, TransactionOptions options = null)
         {
-            if (OnItemUpdate != null)
+            base.Update(items, options);
+            // Create child items that are new
+            void ItemCreate(List<Item> createItems)
             {
-                items.ForEach((item) =>
+                Create(createItems, options);
+                createItems.ForEach(item =>
                 {
-                    OnItemUpdate(item, options);
+                    ItemCreate(item.Children?.Where(x => x.Id == null).ToList());
                 });
             }
-            base.Update(items, options);
+            items.ForEach(item =>
+            {
+                ItemCreate(item.Children?.Where(x => x.Id == Guid.Empty).ToList());
+            });
+            // Update item data for existing items
+            if (OnItemUpdate != null)
+            {
+                void InvokeOnItemUpdate(List<Item> invokeItems)
+                {
+                    invokeItems.ForEach(item =>
+                    {
+                        OnItemUpdate(item, options);
+                        if (item.Children != null && item.Children.Count > 0)
+                        {
+                            InvokeOnItemUpdate(item.Children);
+                        }
+                    });
+                };
+                InvokeOnItemUpdate(items);
+            }
             return items;
         }
         /// <summary>

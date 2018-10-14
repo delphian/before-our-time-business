@@ -111,7 +111,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             }).GetAsItem<LocationItem>();
             currentLocation.Children.Add(new ExitItem()
             {
-                ParentId = newLocationItem.Id,
+                ParentId = currentLocation.Id,
                 Data =  new List<IItemData>()
                 {
                     new ExitData()
