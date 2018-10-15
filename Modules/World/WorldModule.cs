@@ -8,6 +8,7 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.World.Dbs;
@@ -141,7 +142,8 @@ namespace BeforeOurTime.Business.Modules.World
             return new List<Guid>()
             {
                 WorldReadLocationSummaryRequest._Id,
-                WorldCreateLocationQuickRequest._Id
+                WorldCreateLocationQuickRequest._Id,
+                CoreUseItemRequest._Id
             };
         }
         /// <summary>
@@ -291,6 +293,8 @@ namespace BeforeOurTime.Business.Modules.World
                 response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, api, terminal, response);
             if (message.GetMessageId() == WorldCreateLocationQuickRequest._Id)
                 response = GetManager<ILocationItemManager>().HandleCreateLocationQuickRequest(message, api, terminal, response);
+            if (message.GetMessageId() == CoreUseItemRequest._Id)
+                response = GetManager<IExitItemManager>().HandleUseItemRequest(message, api, terminal, response);
             return response;
         }
         /// <summary>

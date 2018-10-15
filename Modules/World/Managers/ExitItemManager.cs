@@ -12,10 +12,12 @@ using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Modules.World.Dbs;
 using BeforeOurTime.Models.Modules.World.Models.Data;
+using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Messages.Requests;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
-    public class ExitItemManager : ItemModelManager<ExitItem>, IExitItemManager
+    public partial class ExitItemManager : ItemModelManager<ExitItem>, IExitItemManager
     {
         /// <summary>
         /// Manage all modules
@@ -79,6 +81,33 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             var exitDatas = ExitDataRepo.ReadDestinationId(destinationId);
             var items = ModuleManager.GetItemRepo().Read(exitDatas.Select(x => x.DataItemId).ToList());
             return items;
+        }
+        /// <summary>
+        /// Instantite response object and wrap request handlers in try catch
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="request"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        private IResponse HandleRequestWrapper<T>(
+            IRequest request,
+            Action<IResponse> callback) where T : Response, new()
+        {
+            var response = new T()
+            {
+                _requestInstanceId = request.GetRequestInstanceId(),
+            };
+            try
+            {
+                callback(response);
+            }
+            catch (Exception e)
+            {
+                ModuleManager.GetLogger().LogException($"While handling {request.GetMessageName()}", e);
+                response._responseSuccess = false;
+                response._responseMessage = e.Message;
+            }
+            return response;
         }
         #region On Item Hooks
         /// <summary>
