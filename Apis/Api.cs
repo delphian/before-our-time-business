@@ -9,13 +9,13 @@ using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Terminals;
 using Microsoft.Extensions.Logging;
-using BeforeOurTime.Models.Items;
 using System.Threading.Tasks;
 using System.Threading;
 using BeforeOurTime.Models.Exceptions;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Logs;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -28,7 +28,6 @@ namespace BeforeOurTime.Business.Apis
         private IBotLogger Logger { set; get; }
         private IConfiguration Configuration { set; get; }
         private IMessageManager MessageManager { set; get; }
-        private IItemManager ItemManager { set; get; }
         private ITerminalManager TerminalManager { set; get; }
         private IModuleManager ModuleManager { set; get; }
         /// <summary>
@@ -40,14 +39,12 @@ namespace BeforeOurTime.Business.Apis
             IBotLogger logger,
             IConfiguration configuration,
             IMessageManager messageManager,
-            IItemManager itemManager,
             ITerminalManager terminalManager,
             IModuleManager moduleManager)
         {
             Logger = logger;
             Configuration = configuration;
             MessageManager = messageManager;
-            ItemManager = itemManager;
             TerminalManager = terminalManager;
             ModuleManager = moduleManager;
         }
@@ -57,7 +54,7 @@ namespace BeforeOurTime.Business.Apis
         }
         public IItemManager GetItemManager()
         {
-            return ItemManager;
+            return ModuleManager.GetManager<IItemManager>();
         }
         public ITerminalManager GetTerminalManager()
         {

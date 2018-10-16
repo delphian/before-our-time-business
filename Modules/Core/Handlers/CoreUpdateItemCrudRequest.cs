@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;

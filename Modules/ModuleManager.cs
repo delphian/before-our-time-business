@@ -1,12 +1,11 @@
-﻿using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.Terminals;
-using BeforeOurTime.Models;
+﻿using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Dbs;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,10 +30,6 @@ namespace BeforeOurTime.Business.Modules
         /// </summary>
         private IBotLogger Logger { set; get; }
         /// <summary>
-        /// Access to items in the data store
-        /// </summary>
-        private IItemRepo ItemRepo { set; get; }
-        /// <summary>
         /// List of all registered Api Modules
         /// </summary>
         private List<IModule> Modules { set; get; } = new List<IModule>();
@@ -55,12 +50,10 @@ namespace BeforeOurTime.Business.Modules
         /// </summary>
         public ModuleManager(
             IConfiguration configuration, 
-            IBotLogger logger,
-            IItemRepo itemRepo)
+            IBotLogger logger)
         {
             Configuration = configuration;
             Logger = logger;
-            ItemRepo = itemRepo;
             RegisterModules();
         }
         /// <summary>
@@ -243,7 +236,7 @@ namespace BeforeOurTime.Business.Modules
         /// <returns></returns>
         public IItemRepo GetItemRepo()
         {
-            return ItemRepo;
+            return GetRepository<IItemRepo>();
         }
     }
 }

@@ -1,14 +1,14 @@
-﻿using BeforeOurTime.Models;
-using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Scripts.Delegates;
-using BeforeOutTime.Repository.Dbs.EF;
+﻿using BeforeOurTime.Business.Dbs.EF;
+using BeforeOurTime.Models;
+using BeforeOurTime.Models.Modules.Core.Dbs;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Repository.Dbs.EF.Items
+namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
 {
     /// <summary>
     /// Access to items in the data store
@@ -51,7 +51,7 @@ namespace BeforeOurTime.Repository.Dbs.EF.Items
         /// Constructor
         /// </summary>
         /// <param name="db">Entity framework database context</param>
-        public ItemRepo(BaseContext db) : base(db) { 
+        public ItemRepo(EFCoreModuleContext db) : base(db) { 
             Set = db.GetDbSet<Item>();
         }
         /// <summary>

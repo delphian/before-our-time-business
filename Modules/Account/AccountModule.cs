@@ -3,7 +3,6 @@ using BeforeOurTime.Business.Modules.Account.Managers;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
@@ -16,6 +15,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
 using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -60,10 +60,6 @@ namespace BeforeOurTime.Business.Modules.Account
             Db = new EFAccountModuleContext(dbOptions.Options);
             Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
-            ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
-            ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
-            ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
-            ModuleManager.GetItemRepo().OnItemDelete += OnItemDelete;
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -135,6 +131,10 @@ namespace BeforeOurTime.Business.Modules.Account
         /// <param name="repositories"></param>
         public void Initialize(List<ICrudModelRepository> repositories)
         {
+            ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
+            ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
+            ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
+            ModuleManager.GetItemRepo().OnItemDelete += OnItemDelete;
         }
         #region On Item Hooks
         /// <summary>

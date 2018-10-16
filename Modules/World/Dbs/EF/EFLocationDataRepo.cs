@@ -1,8 +1,8 @@
 ﻿using BeforeOurTime.Models;
-using BeforeOurTime.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Dbs;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World.Dbs;
 using BeforeOurTime.Models.Modules.World.Models.Data;
-using BeforeOutTime.Repository.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

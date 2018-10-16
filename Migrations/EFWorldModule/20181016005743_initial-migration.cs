@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace BeforeOurTime.Business.Migrations.EFCoreModule
+namespace BeforeOurTime.Business.Migrations.EFWorldModule
 {
     public partial class initialmigration : Migration
     {

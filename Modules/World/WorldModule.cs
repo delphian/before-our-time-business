@@ -2,7 +2,6 @@
 using BeforeOurTime.Business.Modules.World.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
@@ -10,6 +9,7 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.World.Dbs;
 using BeforeOurTime.Models.Modules.World.Managers;
@@ -77,10 +77,6 @@ namespace BeforeOurTime.Business.Modules.World
             Db = new EFWorldModuleContext(dbOptions.Options);
             Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
-            ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
-            ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
-            ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
-            ModuleManager.GetItemRepo().OnItemDelete += OnItemDelete;
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -164,6 +160,10 @@ namespace BeforeOurTime.Business.Modules.World
             ExitDataRepo = repositories
                 .Where(x => x is IExitDataRepo)
                 .Select(x => (IExitDataRepo)x).FirstOrDefault();
+            ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
+            ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
+            ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
+            ModuleManager.GetItemRepo().OnItemDelete += OnItemDelete;
         }
         /// <summary>
         /// Get the default game

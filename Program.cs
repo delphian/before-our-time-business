@@ -1,14 +1,11 @@
 ﻿#define DEBUG
 
 using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Servers;
 using BeforeOurTime.Models.Messages.Requests;
-using BeforeOurTime.Repository.Dbs.EF.Items;
-using BeforeOutTime.Repository.Dbs.EF;
 using Jint;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,8 +18,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models;
 using BeforeOurTime.Business.Modules;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Apis;
@@ -87,16 +82,10 @@ namespace BeforeOurTime.Business
             services
                 .AddSingleton<IBotLogger>(new FileLogger(configuration))
                 .AddSingleton<IConfiguration>(configuration)
-                .AddDbContext<BaseContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped)
                 .AddLogging()
-                // Repositories (Items)
-                .AddScoped<IItemRepo, ItemRepo>()
-                // Main environment interface API
                 .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<ITerminalManager, TerminalManager>()
                 .AddScoped<IModuleManager, ModuleManager>()
-                // Items and item attributes
-                .AddScoped<IItemManager, ItemManager>()
                 .AddScoped<IApi, Api>();
         }
         /// <summary>

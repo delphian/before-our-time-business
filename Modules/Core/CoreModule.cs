@@ -1,16 +1,15 @@
-﻿using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.Items;
+﻿using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Logs;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;
@@ -18,8 +17,10 @@ using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
+using BeforeOutTime.Business.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -50,6 +51,10 @@ namespace BeforeOurTime.Business.Modules.Core
         /// </summary>
         private List<ICrudModelRepository> Repositories { set; get; } = new List<ICrudModelRepository>();
         /// <summary>
+        /// Item data repository
+        /// </summary>
+        private IItemRepo ItemRepo { set; get; }
+        /// <summary>
         /// Constructor
         /// </summary>
         public CoreModule(
@@ -57,16 +62,12 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             ModuleManager = moduleManager;
             var connectionString = ModuleManager.GetConfiguration().GetConnectionString("DefaultConnection");
-            var dbOptions = new DbContextOptionsBuilder<EFCoreModuleContext>();
+            var dbOptions = new DbContextOptionsBuilder<BaseContext>();
                 dbOptions.UseSqlServer(connectionString);
                 dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             Db = new EFCoreModuleContext(dbOptions.Options);
             Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
-            ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
-            ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
-            ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
-            ModuleManager.GetItemRepo().OnItemDelete += OnItemDelete;
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -78,6 +79,7 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             var managers = new List<IModelManager>
             {
+                new ItemManager(moduleManager, new ItemRepo(db)),
             };
             return managers;
         }
@@ -139,6 +141,13 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="repositories"></param>
         public void Initialize(List<ICrudModelRepository> repositories)
         {
+            ItemRepo = repositories
+                .Where(x => x is IItemRepo)
+                .Select(x => (IItemRepo)x).FirstOrDefault();
+            ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
+            ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
+            ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
+            ModuleManager.GetItemRepo().OnItemDelete += OnItemDelete;
         }
         #region On Item Hooks
         /// <summary>

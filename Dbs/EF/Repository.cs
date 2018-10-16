@@ -1,12 +1,12 @@
 ﻿using BeforeOurTime.Models;
-using BeforeOutTime.Repository.Dbs.EF;
+using BeforeOutTime.Business.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Repository.Dbs.EF
+namespace BeforeOurTime.Business.Dbs.EF
 {
     public class Repository<T> : IRepository<T> where T : Model, IModel
     {

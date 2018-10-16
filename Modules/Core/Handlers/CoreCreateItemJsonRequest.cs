@@ -1,9 +1,8 @@
-﻿using BeforeOurTime.Business.Apis.Items;
-using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Items;
+﻿using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
 using System;

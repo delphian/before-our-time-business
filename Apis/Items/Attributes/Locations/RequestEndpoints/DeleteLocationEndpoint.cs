@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Models.Items;
 using BeforeOurTime.Models.Messages.Locations.DeleteLocation;
 using BeforeOurTime.Models.Messages.Locations.Locations.DeleteLocation;
 using BeforeOurTime.Models.Messages.Responses;
@@ -14,6 +13,7 @@ using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules.World.Managers;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 
 namespace BeforeOurTime.Business.Apis.Items.Attributes.Locations.RequestEndpoints
 {

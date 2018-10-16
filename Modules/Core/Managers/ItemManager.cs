@@ -5,10 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Models.Items;
-using BeforeOurTime.Models.Scripts.Delegates;
 using BeforeOurTime.Models;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Dbs;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
@@ -17,8 +17,14 @@ namespace BeforeOurTime.Business.Apis.Items
     /// </summary>
     public class ItemManager : ModelManager<Item>, IItemManager
     {
+        /// <summary>
+        /// Manage all modules
+        /// </summary>
+        private IModuleManager ModuleManager { set; get; }
+        /// <summary>
+        /// Repository for manager
+        /// </summary>
         private IItemRepo ItemRepo { set; get; }
-        private IMessageManager MessageManager { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -26,11 +32,28 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="scriptManager"></param>
         /// <param name="messageManager"></param>
         public ItemManager(
-            IItemRepo itemRepo,
-            IMessageManager messageManager)
+            IModuleManager moduleManager,
+            IItemRepo itemDataRepo)
         {
-            ItemRepo = itemRepo;
-            MessageManager = messageManager;
+            ModuleManager = moduleManager;
+            ItemRepo = itemDataRepo;
+        }
+        /// <summary>
+        /// Get all repositories declared by manager
+        /// </summary>
+        /// <returns></returns>
+        public List<ICrudModelRepository> GetRepositories()
+        {
+            return new List<ICrudModelRepository>() { ItemRepo };
+        }
+        /// <summary>
+        /// Get repository as interface
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetRepository<T>() where T : ICrudModelRepository
+        {
+            return GetRepositories().Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
         /// <summary>
         /// Create a new item
@@ -143,14 +166,14 @@ namespace BeforeOurTime.Business.Apis.Items
         {
             // Send departure message
             var oldLocation = ItemRepo.Read(item.ParentId.Value);
-            MessageManager.SendDepartureEvent(item, oldLocation, source.Id);
+//            MessageManager.SendDepartureEvent(item, oldLocation, source.Id);
             // Update item's location
             item.Parent = newParent;
             item.ParentId = newParent.Id;
             ItemRepo.Update(item);
             // Send arrival message
             var newLocation = ItemRepo.Read(newParent.Id);
-            MessageManager.SendArrivalEvent(item, newLocation, source.Id);
+//            MessageManager.SendArrivalEvent(item, newLocation, source.Id);
             return item;
         }
     }
