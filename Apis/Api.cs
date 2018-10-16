@@ -4,9 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Items.Attributes;
 using BeforeOurTime.Business.Apis.Terminals;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -15,7 +13,7 @@ using BeforeOurTime.Models.Exceptions;
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Logs;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Managers;
 
 namespace BeforeOurTime.Business.Apis
 {
@@ -24,7 +22,6 @@ namespace BeforeOurTime.Business.Apis
     /// </summary>
     public partial class Api : IApi
     {
-        private Dictionary<Type, IAttributeManager> AttributeManagerList = new Dictionary<Type, IAttributeManager>();
         private IBotLogger Logger { set; get; }
         private IConfiguration Configuration { set; get; }
         private IMessageManager MessageManager { set; get; }
@@ -71,53 +68,6 @@ namespace BeforeOurTime.Business.Apis
         public IModuleManager GetModuleManager()
         {
             return ModuleManager;
-        }
-        /// <summary>
-        /// Get item attribute manager based on attribute manager type
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T GetAttributeManager<T>() where T : IAttributeManager
-        {
-            return (T)AttributeManagerList.Where(x => x.Key == typeof(T)).Select(x => x.Value).FirstOrDefault();
-        }
-        /// <summary>
-        /// Get item attribute manager based on class name of attribute type
-        /// </summary>
-        /// <param name="attributeTypeName"></param>
-        /// <returns></returns>
-        public IAttributeManager GetAttributeManagerOfType(string attributeTypeName)
-        {
-            Type attributeType;
-            try
-            {
-                attributeType = Type.GetType(attributeTypeName + ", BeforeOurTime.Models");
-                if (attributeType == null)
-                {
-                    throw new Exception();
-                }
-            }
-            catch (Exception)
-            {
-                throw new InvalidAttributeTypeException(attributeTypeName);
-            }
-            var manager = (IAttributeManager)AttributeManagerList
-                .Where(x => x.Value.IsManaging(attributeType))
-                .Select(x => x.Value)
-                .FirstOrDefault();
-            return manager;
-        }
-        /// <summary>
-        /// Get all attribute managers for an item
-        /// </summary>
-        /// <param name="item">Item to determine managers for</param>
-        /// <returns></returns>
-        public List<IAttributeManager> GetAttributeManagers(Item item)
-        {
-            return AttributeManagerList
-                .Where(x => x.Value.IsManaging(item))
-                .Select(x => x.Value)
-                .ToList();
         }
         /// <summary>
         /// (awaitable) Execute all item scripts that desire a regular periodic event

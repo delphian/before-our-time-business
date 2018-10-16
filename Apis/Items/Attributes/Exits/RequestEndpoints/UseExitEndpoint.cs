@@ -51,7 +51,7 @@ namespace BeforeOurTime.Business.Apis.Items.Attributes.Exits.RequestEndpoints
                     .GetModule<ICoreModule>()
                     .GetManager<ILocationItemManager>()
                     .GetRepository<ILocationDataRepo>()
-                    .Read(exit.GetAttribute<ExitData>().DestinationLocationId);
+                    .Read(exit.GetData<ExitData>().DestinationLocationId);
                 var location = api.GetItemManager().Read(locationAttribute.DataItemId);
                 api.GetItemManager().Move(player, location, exit);
                 var lookRequestHandler = new WorldReadLocationSummaryRequest();

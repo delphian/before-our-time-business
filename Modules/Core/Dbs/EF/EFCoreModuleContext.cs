@@ -52,7 +52,6 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
                 .HasForeignKey(item => item.ParentId);
             modelBuilder.Entity<Item>()
                 .Ignore(item => item.ChildrenIds)
-                .Ignore(item => item.Attributes)
                 .Ignore(item => item.Data);
         }
         public override void Dispose()

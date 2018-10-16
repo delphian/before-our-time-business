@@ -116,13 +116,13 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
                 items.ForEach(delegate (Item item)
                 {
                     // If this is the first time item is being loaded then allow alterations
-                    if (item.Attributes.Count == 0)
+                    if (item.Data.Count == 0)
                     {
                         OnItemRead(item, options);
                     }
                     item.Children?.ForEach((child) =>
                     {
-                        if (child.Attributes.Count == 0)
+                        if (child.Data.Count == 0)
                         {
                             OnItemRead(child, options);
                         }
