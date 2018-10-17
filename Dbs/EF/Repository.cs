@@ -129,7 +129,7 @@ namespace BeforeOurTime.Business.Dbs.EF
                 {
                     throw new Exception("No such model exists " + typeof(T).ToString() + " " + model?.Id);
                 }
-                Db.Entry(trackedModel).CurrentValues.SetValues(model);
+                Db.Entry(trackedModel).CurrentValues.SetValues(model);               
                 Db.SaveChanges();
             });
             return models;

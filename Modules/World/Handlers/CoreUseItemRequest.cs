@@ -8,6 +8,9 @@ using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
+using BeforeOurTime.Models.Modules.World.Models.Items;
+using BeforeOurTime.Models.Modules.World.Managers;
+using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -25,7 +28,15 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             var request = message.GetMessageAsType<CoreUseItemRequest>();
             response = HandleRequestWrapper<CoreUseItemResponse>(request, res =>
             {
-                res.SetSuccess(false).SetMessage("Not implemented");
+                var exit = api.GetItemManager().Read(request.ItemId.Value).GetAsItem<ExitItem>();
+                var destinationLocation = api.GetItemManager().Read(Guid.Parse(exit.Exit.DestinationId));
+                var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
+                api.GetItemManager().Move(player, destinationLocation, exit);
+                res = api.GetModuleManager().GetManager<ILocationItemManager>()
+                    .HandleReadLocationSummaryRequest(new WorldReadLocationSummaryRequest()
+                    {
+                    }, api, terminal, response);
+                res.SetSuccess(true);
             });
             return response;
         }
