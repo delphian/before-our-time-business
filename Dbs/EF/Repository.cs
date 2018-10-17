@@ -66,13 +66,10 @@ namespace BeforeOurTime.Business.Dbs.EF
         /// <returns>List of models</returns>
         public virtual List<T> Read(List<Guid> ids, TransactionOptions options = null)
         {
-            options = options ?? new TransactionOptions()
-            {
-                NoTracking = true
-            };
             var resultSet = Db.GetDbSet<T>()
                 .Where(x => ids.Contains(x.Id));
-            resultSet = (options?.NoTracking == true) ? resultSet.AsNoTracking() : resultSet;
+            if (options?.NoTracking != null) 
+                resultSet = (options?.NoTracking == true) ? resultSet.AsNoTracking() : resultSet.AsTracking();
             return resultSet.ToList();
         }
         /// <summary>
@@ -124,13 +121,12 @@ namespace BeforeOurTime.Business.Dbs.EF
             };
             models.ForEach((model) =>
             {
-                var trackedModel = Read(model.Id, new TransactionOptions() { NoTracking = false });
-                if (trackedModel == null)
-                {
-                    throw new Exception("No such model exists " + typeof(T).ToString() + " " + model?.Id);
-                }
-                Db.Entry(trackedModel).CurrentValues.SetValues(model);               
+                Db.Update(model);
                 Db.SaveChanges();
+                if (options?.NoTracking == true)
+                {
+                    Db.Entry(model).State = EntityState.Detached;
+                }
             });
             return models;
         }

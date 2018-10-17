@@ -79,7 +79,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
             {
                 while (WebSocket.State == WebSocketState.Open)
                 {
-                    await Task.Delay(60000);
+                    await Task.Delay(60000 * 2);
                     var timeoutTask = Task.Delay(10000);
                     var pingTask = SendAsync(new PingSystemMessage() { }, Cts.Token);
                     Api.GetLogger().LogDebug($"Client {Id} websocket: {WebSocket.State.ToString()}");

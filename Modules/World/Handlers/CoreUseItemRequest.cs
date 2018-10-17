@@ -32,10 +32,11 @@ namespace BeforeOurTime.Business.Modules.World.Managers
                 var destinationLocation = api.GetItemManager().Read(Guid.Parse(exit.Exit.DestinationId));
                 var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
                 api.GetItemManager().Move(player, destinationLocation, exit);
-                res = api.GetModuleManager().GetManager<ILocationItemManager>()
+                var locationSummary = api.GetModuleManager().GetManager<ILocationItemManager>()
                     .HandleReadLocationSummaryRequest(new WorldReadLocationSummaryRequest()
                     {
                     }, api, terminal, response);
+                terminal.SendToClient(locationSummary);
                 res.SetSuccess(true);
             });
             return response;
