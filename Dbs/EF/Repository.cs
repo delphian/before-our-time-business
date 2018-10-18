@@ -128,6 +128,7 @@ namespace BeforeOurTime.Business.Dbs.EF
                     Db.Entry(model).State = EntityState.Detached;
                 }
             });
+            Db.SaveChanges();
             return models;
         }
         /// <summary>
@@ -152,12 +153,7 @@ namespace BeforeOurTime.Business.Dbs.EF
         {
             models.ForEach((model) =>
             {
-                var trackedModel = Read(model.Id, new TransactionOptions() { NoTracking = false });
-                if (trackedModel == null)
-                {
-                    throw new Exception("Attempting to delete untracked model");
-                }
-                Db.GetDbSet<T>().RemoveRange(trackedModel);
+                Db.GetDbSet<T>().Remove(model);
             });
             Db.SaveChanges();
         }

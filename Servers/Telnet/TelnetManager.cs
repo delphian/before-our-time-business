@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Messages.Requests.Go;
 using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Models.Messages.Requests.Emote;
 using Microsoft.Extensions.Logging;
@@ -20,6 +19,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -258,7 +258,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 .FirstOrDefault();
             if (exitResponse != null)
             {
-                var response = telnetClient.GetTerminal().SendToApi(new GoRequest()
+                var response = telnetClient.GetTerminal().SendToApi(new CoreUseItemRequest()
                     {
                         ItemId = exitResponse.Item.Id
                     });
