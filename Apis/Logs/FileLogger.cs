@@ -49,7 +49,7 @@ namespace BeforeOurTime.Business.Apis.Logs
             {
                 using (StreamWriter outputFile = File.AppendText(pathToFile))
                 {
-                    Console.WriteLine($"{DateTime.Now.ToString()} {logLevel.ToString()}: {state.ToString()}\n");
+                    Console.WriteLine($"{DateTime.Now.ToString()} {logLevel.ToString()}: {state.ToString()}");
                     outputFile.WriteLine(logLevel.ToString() + ": " + DateTime.Now.ToString() + ": " + state.ToString());
                 }
             }

@@ -104,11 +104,19 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             {
                 NoTracking = true
             };
-            var resultSet = Set
-                .Where(x => ids.Contains(x.Id))
-                .Include(x => x.Parent)
-                .Include(x => x.Children)
-                .AsQueryable();
+            IQueryable<Item> resultSet;
+            if (ids?.Count == 0)
+            {
+                resultSet = Set;
+            }
+            else
+            {
+                resultSet = Set
+                    .Where(x => ids.Contains(x.Id))
+                    .Include(x => x.Parent)
+                    .Include(x => x.Children)
+                    .AsQueryable();
+            }
             resultSet = (options?.NoTracking == true) ? resultSet.AsNoTracking() : resultSet;
             List<Item> items = resultSet.ToList();
             if (OnItemRead != null)
