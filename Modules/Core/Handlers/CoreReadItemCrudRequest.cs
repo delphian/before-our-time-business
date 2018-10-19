@@ -64,8 +64,12 @@ namespace BeforeOurTime.Business.Modules.Core
                 {
                     managers.ForEach(manager =>
                     {
+                        // Managers should return all ids, if any. Therefore only read specified ids.
                         var itemIds = manager.GetItemIds();
-                        readItems.AddRange(api.GetItemManager().Read(itemIds));
+                        if (itemIds.Count > 0)
+                        {
+                            readItems.AddRange(api.GetItemManager().Read(itemIds));
+                        }
                     });
                 }
                 ((CoreReadItemCrudResponse)res).CoreReadItemCrudEvent = new CoreReadItemCrudEvent()

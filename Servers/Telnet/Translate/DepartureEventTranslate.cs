@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Business.Servers.Telnet;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Messages.Events.Departures;
+using BeforeOurTime.Models.Modules.Core.Messages.MoveItem;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {
@@ -23,7 +23,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
         {
             return new List<Type>()
             {
-                typeof(DepartureEvent)
+                typeof(CoreMoveItemEvent)
             };
         }
         /// <summary>
@@ -37,9 +37,10 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             TelnetServer telnetServer,
             TelnetClient telnetClient)
         {
-            var departureEvent = message.GetMessageAsType<DepartureEvent>();
+            var departureEvent = message.GetMessageAsType<CoreMoveItemEvent>();
+            var visible = departureEvent.Item.GetProperty<VisibleProperty>("Visible");
             telnetServer.SendMessageToClient(telnetClient, "\r\n"
-                + $"{AnsiColors.green}{departureEvent.Name} has departed{AnsiColors.reset}");
+                + $"{AnsiColors.green}{visible?.Name} has moved{AnsiColors.reset}");
         }
     }
 }

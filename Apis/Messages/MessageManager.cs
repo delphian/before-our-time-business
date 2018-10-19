@@ -1,8 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
 using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Messages.Events.Arrivals;
-using BeforeOurTime.Models.Messages.Events.Departures;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using Newtonsoft.Json;
@@ -73,38 +71,6 @@ namespace BeforeOurTime.Business.Apis.Messages
             var recipients = new List<Item>() { location };
             recipients.AddRange(location.Children);
             SendMessage(message, recipients, actorId);
-        }
-        /// <summary>
-        /// Distribute message to all items at a location of an item's arrival
-        /// </summary>
-        /// <param name="item">Item that has arrived</param>
-        /// <param name="location">Location item, including children, where the item has arrived</param>
-        /// <param name="actorId">Initiator of the movement</param>
-        public void SendArrivalEvent(Item item, Item location, Guid actorId)
-        {
-            var name = item.GetProperty<VisibleProperty>("Visible")?.Name;
-            SendMessageToLocation(new ArrivalEvent()
-                {
-                    Item = item,
-                    Name = name
-                }
-                , location, actorId);
-        }
-        /// <summary>
-        /// Distribute message to all items at a location of an item's departure
-        /// </summary>
-        /// <param name="item">Item that has departed</param>
-        /// <param name="location">Location item, including children, where the item has departed</param>
-        /// <param name="actorId">Initiator of the movement</param>
-        public void SendDepartureEvent(Item item, Item location, Guid actorId)
-        {
-            var name = item.GetProperty<VisibleProperty>("Visible")?.Name;
-            SendMessageToLocation(new DepartureEvent()
-                {
-                    Name = name,
-                    Item = item
-                }
-                , location, actorId);
         }
         /// <summary>
         /// Use reflection to register all classes which desire to handle message requests
