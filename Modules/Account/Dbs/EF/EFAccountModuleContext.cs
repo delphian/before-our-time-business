@@ -7,18 +7,19 @@ using Microsoft.Extensions.Configuration;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
 using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOutTime.Business.Dbs.EF;
 
 namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
 {
     /// <summary>
     /// Entity framework database context
     /// </summary>
-    public class EFAccountModuleContext : DbContext
+    public class EFAccountModuleContext : BaseContext
     {
         public DbSet<AccountData> Accounts { set; get; }
         public DbSet<AccountCharacterData> AccountCharacters { set; get; }
         public EFAccountModuleContext() : base() { }
-        public EFAccountModuleContext(DbContextOptions<EFAccountModuleContext> options) : base(options) { }
+        public EFAccountModuleContext(DbContextOptions<BaseContext> options) : base(options) { }
         /// <summary>
         /// Used when called from dotnet shell commands
         /// </summary>
@@ -58,11 +59,6 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
                 .Property(x => x.AccountId).IsRequired();
             modelBuilder.Entity<AccountCharacterData>()
                 .Property(x => x.CharacterItemId).IsRequired();
-        }
-        public DbSet<T> GetDbSet<T>() where T : Model
-        {
-            var dbSet = Set<T>();
-            return dbSet;
         }
         public override void Dispose()
         {

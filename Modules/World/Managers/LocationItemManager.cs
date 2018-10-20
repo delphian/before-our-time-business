@@ -157,24 +157,22 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// Create attribute, if present, after item is created
         /// </summary>
         /// <param name="item">Base item just created from datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemCreate(Item item, TransactionOptions options = null)
+        public void OnItemCreate(Item item)
         {
             if (item.HasData<LocationData>())
             {
                 var data = item.GetData<LocationData>();
                 data.DataItemId = item.Id;
-                LocationDataRepo.Create(data, options);
+                LocationDataRepo.Create(data);
             }
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
         /// </summary>
         /// <param name="item">Base item just read from datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemRead(Item item, TransactionOptions options = null)
+        public void OnItemRead(Item item)
         {
-            var locationData = LocationDataRepo.Read(item, options);
+            var locationData = LocationDataRepo.Read(item);
             if (locationData != null)
             {
                 item.Data.Add(locationData);
@@ -184,26 +182,24 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// Append attribute to base item when it is loaded
         /// </summary>
         /// <param name="item">Base item about to be persisted to datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemUpdate(Item item, TransactionOptions options = null)
+        public void OnItemUpdate(Item item)
         {
             if (item.HasData<LocationData>())
             {
                 var data = item.GetData<LocationData>();
-                LocationDataRepo.Update(data, options);
+                LocationDataRepo.Update(data);
             }
         }
         /// <summary>
         /// Delete attribute of base item before base item is deleted
         /// </summary>
         /// <param name="item">Base item about to be deleted</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemDelete(Item item, TransactionOptions options = null)
+        public void OnItemDelete(Item item)
         {
             if (item.HasData<LocationData>())
             {
                 var data = item.GetData<LocationData>();
-                LocationDataRepo.Delete(data, options);
+                LocationDataRepo.Delete(data);
             }
         }
         #endregion

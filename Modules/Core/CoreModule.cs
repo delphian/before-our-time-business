@@ -64,7 +64,6 @@ namespace BeforeOurTime.Business.Modules.Core
             var connectionString = ModuleManager.GetConfiguration().GetConnectionString("DefaultConnection");
             var dbOptions = new DbContextOptionsBuilder<BaseContext>();
                 dbOptions.UseSqlServer(connectionString);
-                dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             Db = new EFCoreModuleContext(dbOptions.Options);
             Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
@@ -154,48 +153,44 @@ namespace BeforeOurTime.Business.Modules.Core
         /// Create attribute, if present, after item is created
         /// </summary>
         /// <param name="item">Base item just created from datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemCreate(Item item, TransactionOptions options = null)
+        public void OnItemCreate(Item item)
         {
             Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
             {
-                ((IItemModelManager)manager).OnItemCreate(item, options);
+                ((IItemModelManager)manager).OnItemCreate(item);
             });
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
         /// </summary>
         /// <param name="item">Base item just read from datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemRead(Item item, TransactionOptions options = null)
+        public void OnItemRead(Item item)
         {
             Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
             {
-                ((IItemModelManager)manager).OnItemRead(item, options);
+                ((IItemModelManager)manager).OnItemRead(item);
             });
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
         /// </summary>
         /// <param name="item">Base item about to be persisted to datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemUpdate(Item item, TransactionOptions options = null)
+        public void OnItemUpdate(Item item)
         {
             Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
             {
-                ((IItemModelManager)manager).OnItemUpdate(item, options);
+                ((IItemModelManager)manager).OnItemUpdate(item);
             });
         }
         /// <summary>
         /// Delete attribute of base item before base item is deleted
         /// </summary>
         /// <param name="item">Base item about to be deleted</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemDelete(Item item, TransactionOptions options = null)
+        public void OnItemDelete(Item item)
         {
             Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
             {
-                ((IItemModelManager)manager).OnItemDelete(item, options);
+                ((IItemModelManager)manager).OnItemDelete(item);
             });
         }
         #endregion

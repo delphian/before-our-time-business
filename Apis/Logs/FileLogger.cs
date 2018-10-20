@@ -47,9 +47,12 @@ namespace BeforeOurTime.Business.Apis.Logs
         {
             if (logLevel >= LogLevel)
             {
+                Console.ForegroundColor = (logLevel == LogLevel.Debug) ? ConsoleColor.DarkGray : Console.ForegroundColor;
+                Console.ForegroundColor = (logLevel >= LogLevel.Error) ? ConsoleColor.Red : Console.ForegroundColor;
+                Console.WriteLine($"{DateTime.Now.ToString()} {logLevel.ToString()}: {state.ToString()}");
+                Console.ResetColor();
                 using (StreamWriter outputFile = File.AppendText(pathToFile))
                 {
-                    Console.WriteLine($"{DateTime.Now.ToString()} {logLevel.ToString()}: {state.ToString()}");
                     outputFile.WriteLine(logLevel.ToString() + ": " + DateTime.Now.ToString() + ": " + state.ToString());
                 }
             }

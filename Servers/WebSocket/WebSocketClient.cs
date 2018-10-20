@@ -133,10 +133,9 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     else
                     {
                         IResponse response;
-                        // var messageJson = Encoding.UTF8.GetString(buffer, 0, Array.IndexOf<byte>(buffer, 0));
-                        Api.GetLogger().LogDebug($"Client {Id} request: {messageJson}");
                         var message = JsonConvert.DeserializeObject<Message>(messageJson);
-                        Api.GetLogger().LogInformation($"Client {Id} request: {message.GetMessageName()}");
+                        Api.GetLogger().LogInformation($"<< {Id} {message.GetMessageName()}");
+                        Api.GetLogger().LogDebug($"<< {Id} {messageJson}");
                         var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
                         response = Terminal.SendToApi(request);
                         // Send response
@@ -200,8 +199,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 var byteMessage = new UTF8Encoding(false, true).GetBytes(messageJson);
                 var offset = 0;
                 var endOfMessage = false;
-                Api.GetLogger().LogDebug($"Client {Id} to client: {messageJson}");
-                Api.GetLogger().LogInformation($"Client {Id} to client: {message.GetMessageName()}");
+                Api.GetLogger().LogInformation($">> {Id} {message.GetMessageName()}");
+                Api.GetLogger().LogDebug($">> {Id} {messageJson}");
                 do
                 {
                     var remainingBytes = byteMessage.Count() - (offset * 1024);

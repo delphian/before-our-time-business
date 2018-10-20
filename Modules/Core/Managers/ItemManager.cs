@@ -69,32 +69,29 @@ namespace BeforeOurTime.Business.Apis.Items
         /// Read multiple models derived from Item
         /// </summary>
         /// <param name="itemIds">List of unique item identifiers</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
-        public List<Item> Read(List<Guid> itemIds, TransactionOptions options = null)
+        public List<Item> Read(List<Guid> itemIds)
         {
-            return ItemRepo.Read(itemIds, options);
+            return ItemRepo.Read(itemIds);
         }
         /// <summary>
         /// Read single model of a type derived from Item
         /// </summary>
         /// <param name="itemIds">Unique item identifier</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
-        public Item Read(Guid itemId, TransactionOptions options = null)
+        public Item Read(Guid itemId)
         {
-            return Read(new List<Guid>() { itemId }, options).FirstOrDefault();
+            return Read(new List<Guid>() { itemId }).FirstOrDefault();
         }
         /// <summary>
         /// Read all models derived from Item, or specify an offset and limit
         /// </summary>
         /// <param name="offset">Number of model records to skip</param>
         /// <param name="limit">Maximum number of model records to return</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns></returns>
-        public List<Item> Read(int? offset = null, int? limit = null, TransactionOptions options = null)
+        public List<Item> Read(int? offset = null, int? limit = null)
         {
-            return ItemRepo.Read(offset, limit, options);
+            return ItemRepo.Read(offset, limit);
         }
         /// <summary>
         /// Get the item identifiers of all item's children

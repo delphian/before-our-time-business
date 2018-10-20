@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeforeOutTime.Business.Dbs.EF
@@ -25,6 +26,16 @@ namespace BeforeOutTime.Business.Dbs.EF
         public override void Dispose()
         {
             base.Dispose();
+        }
+        public override int SaveChanges()
+        {
+            var updated = base.SaveChanges();
+            var entries = ChangeTracker.Entries().Count();
+            while (ChangeTracker.Entries().Count() > 0)
+            {
+                ChangeTracker.Entries().First().State = EntityState.Detached;
+            }
+            return updated;
         }
     }
 }

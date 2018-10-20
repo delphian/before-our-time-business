@@ -97,14 +97,13 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// Create attribute, if present, after item is created
         /// </summary>
         /// <param name="item">Base item just created from datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemCreate(Item item, TransactionOptions options = null)
+        public void OnItemCreate(Item item)
         {
             if (item.HasData<CharacterData>())
             {
                 var data = item.GetData<CharacterData>();
                 data.DataItemId = item.Id;
-                CharacterDataRepo.Create(data, options);
+                CharacterDataRepo.Create(data);
             }
         }
         /// <summary>
@@ -112,9 +111,9 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// </summary>
         /// <param name="item">Base item just read from datastore</param>
         /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemRead(Item item, TransactionOptions options = null)
+        public void OnItemRead(Item item)
         {
-            var characterData = CharacterDataRepo.Read(item, options);
+            var characterData = CharacterDataRepo.Read(item);
             if (characterData != null)
             {
                 item.Data.Add(characterData);
@@ -125,12 +124,12 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// </summary>
         /// <param name="item">Base item about to be persisted to datastore</param>
         /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemUpdate(Item item, TransactionOptions options = null)
+        public void OnItemUpdate(Item item)
         {
             if (item.HasData<CharacterData>())
             {
                 var data = item.GetData<CharacterData>();
-                CharacterDataRepo.Update(data, options);
+                CharacterDataRepo.Update(data);
             }
         }
         /// <summary>
@@ -138,12 +137,12 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// </summary>
         /// <param name="item">Base item about to be deleted</param>
         /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemDelete(Item item, TransactionOptions options = null)
+        public void OnItemDelete(Item item)
         {
             if (item.HasData<CharacterData>())
             {
                 var data = item.GetData<CharacterData>();
-                CharacterDataRepo.Delete(data, options);
+                CharacterDataRepo.Delete(data);
             }
         }
         #endregion

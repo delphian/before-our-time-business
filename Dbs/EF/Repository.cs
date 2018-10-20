@@ -10,14 +10,19 @@ namespace BeforeOurTime.Business.Dbs.EF
 {
     public class Repository<T> : IRepository<T> where T : Model, IModel
     {
-        internal BaseContext Db { set; get; }
+        protected BaseContext Db { set; get; }
+        /// <summary>
+        /// Single data set (table)
+        /// </summary>
+        protected DbSet<T> Set { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="db">Entity framework database context</param>
-        public Repository(BaseContext db)
+        public Repository(BaseContext db, DbSet<T> dbSet)
         {
             Db = db;
+            Set = dbSet;
         }
         /// <summary>
         /// Create multiple models
@@ -26,34 +31,21 @@ namespace BeforeOurTime.Business.Dbs.EF
         /// All other forms of create should call this one
         /// </remarks>
         /// <param name="models">List of models to create</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>List of models created</returns>
-        public virtual List<T> Create(List<T> models, TransactionOptions options = null)
+        public virtual List<T> Create(List<T> models)
         {
-            options = options ?? new TransactionOptions()
-            {
-                NoTracking = true
-            };
-            Db.GetDbSet<T>().AddRange(models);
+            Set.AddRange(models);
             Db.SaveChanges();
-            if (options.NoTracking == true)
-            {
-                models.ForEach((model) =>
-                {
-                    Db.Entry(model).State = EntityState.Detached;
-                });
-            }
             return models;
         }
         /// <summary>
         /// Create single model
         /// </summary>
         /// <param name="model">Model to create</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>Model created</returns>
-        public T Create(T model, TransactionOptions options = null)
+        public T Create(T model)
         {
-            return Create(new List<T>() { model }, options).FirstOrDefault();
+            return Create(new List<T>() { model }).FirstOrDefault();
         }
         /// <summary>
         /// Read multiple models
@@ -62,36 +54,31 @@ namespace BeforeOurTime.Business.Dbs.EF
         /// All other forms of read should call this one
         /// </remarks>
         /// <param name="ids">List of unique model identifiers</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>List of models</returns>
-        public virtual List<T> Read(List<Guid> ids, TransactionOptions options = null)
+        public virtual List<T> Read(List<Guid> ids)
         {
-            var resultSet = Db.GetDbSet<T>()
-                .Where(x => ids.Contains(x.Id));
-            if (options?.NoTracking != null) 
-                resultSet = (options?.NoTracking == true) ? resultSet.AsNoTracking() : resultSet.AsTracking();
+            var resultSet = Set
+                .Where(x => ids.Contains(x.Id)).AsNoTracking();
             return resultSet.ToList();
         }
         /// <summary>
         /// Read a single model
         /// </summary>
         /// <param name="id">Unique model identifier</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>Single model</returns>
-        public T Read(Guid id, TransactionOptions options = null)
+        public T Read(Guid id)
         {
-            return Read(new List<Guid>() { id }, options).FirstOrDefault();
+            return Read(new List<Guid>() { id }).FirstOrDefault();
         }
         /// <summary>
         /// Read all model records, or specify an offset and limit
         /// </summary>
         /// <param name="offset">Number of model records to skip</param>
         /// <param name="limit">Maximum number of model records to return</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>List of models</returns>
-        public List<T> Read(int? offset = null, int? limit = null, TransactionOptions options = null)
+        public List<T> Read(int? offset = null, int? limit = null)
         {
-            IQueryable<T> modelQuery = Db.GetDbSet<T>();
+            IQueryable<T> modelQuery = Set;
             if (offset != null)
             {
                 modelQuery = modelQuery.Skip(offset.Value);
@@ -101,7 +88,7 @@ namespace BeforeOurTime.Business.Dbs.EF
                 modelQuery = modelQuery.Take(limit.Value);
             }
             List<Guid> modelIds = modelQuery.Select(x => x.Id).ToList();
-            List<T> models = Read(modelIds, options);
+            List<T> models = Read(modelIds);
             return models;
         }
         /// <summary>
@@ -111,35 +98,25 @@ namespace BeforeOurTime.Business.Dbs.EF
         /// All other forms of update should call this one
         /// </remarks>
         /// <param name="models">List of models to update</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>List of models updated</returns>
-        public virtual List<T> Update(List<T> models, TransactionOptions options = null)
+        public virtual List<T> Update(List<T> models)
         {
-            options = options ?? new TransactionOptions()
-            {
-                NoTracking = true
-            };
             models.ForEach((model) =>
             {
-                Db.Update(model);
+                var trackedModel = Set.Where(x => x.Id == model.Id).First();
+                Db.Entry(trackedModel).CurrentValues.SetValues(model);
                 Db.SaveChanges();
-                if (options?.NoTracking == true)
-                {
-                    Db.Entry(model).State = EntityState.Detached;
-                }
             });
-            Db.SaveChanges();
             return models;
         }
         /// <summary>
         /// Update single model
         /// </summary>
         /// <param name="model">Model to update</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
         /// <returns>Model updated</returns>
-        public T Update(T model, TransactionOptions options = null)
+        public T Update(T model)
         {
-            return Update(new List<T>() { model }, options).FirstOrDefault();
+            return Update(new List<T>() { model }).FirstOrDefault();
         }
         /// <summary>
         /// Delete multiple models
@@ -148,12 +125,11 @@ namespace BeforeOurTime.Business.Dbs.EF
         /// All other forms of delete should call this one
         /// </remarks>
         /// <param name="models">List of models to delete</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public virtual void Delete(List<T> models, TransactionOptions options = null)
+        public virtual void Delete(List<T> models)
         {
             models.ForEach((model) =>
             {
-                Db.GetDbSet<T>().Remove(model);
+                Set.Remove(model);
             });
             Db.SaveChanges();
         }
@@ -161,18 +137,16 @@ namespace BeforeOurTime.Business.Dbs.EF
         /// Delete single model
         /// </summary>
         /// <param name="model">Model to delete</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void Delete(T model, TransactionOptions options = null)
+        public void Delete(T model)
         {
-            Delete(new List<T>() { model }, options);
+            Delete(new List<T>() { model });
         }
         /// <summary>
         /// Delete all models
         /// </summary>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void Delete(TransactionOptions options = null) 
+        public void Delete() 
         {
-            Db.GetDbSet<T>().RemoveRange(Read());
+            Set.RemoveRange(Read());
             Db.SaveChanges();
         }
     }

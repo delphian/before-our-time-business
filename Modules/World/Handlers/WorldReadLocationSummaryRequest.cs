@@ -31,8 +31,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             response = HandleRequestWrapper<WorldReadLocationSummaryResponse>(request, res =>
             {
                 var player = api.GetItemManager().Read(
-                    terminal.GetPlayerId().Value,
-                    new TransactionOptions() { NoTracking = true });
+                    terminal.GetPlayerId().Value);
                 var location = api.GetItemManager().Read(player.ParentId.Value).GetAsItem<LocationItem>();
                 ((WorldReadLocationSummaryResponse)res).Item = location;
                 ((WorldReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();

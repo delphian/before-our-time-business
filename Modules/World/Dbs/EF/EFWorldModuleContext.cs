@@ -7,20 +7,21 @@ using Microsoft.Extensions.Configuration;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
 using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOutTime.Business.Dbs.EF;
 
 namespace BeforeOurTime.Business.Modules.World.Dbs.EF
 {
     /// <summary>
     /// Entity framework database context
     /// </summary>
-    public class EFWorldModuleContext : DbContext
+    public class EFWorldModuleContext : BaseContext
     {
         public DbSet<GameData> Games { set; get; }
         public DbSet<LocationData> Locations { set; get; }
         public DbSet<CharacterData> Characters { set; get; }
         public DbSet<ExitData> Exits { set; get; }
         public EFWorldModuleContext() : base() { }
-        public EFWorldModuleContext(DbContextOptions<EFWorldModuleContext> options) : base(options) { }
+        public EFWorldModuleContext(DbContextOptions<BaseContext> options) : base(options) { }
         /// <summary>
         /// Used when called from dotnet shell commands
         /// </summary>
@@ -76,15 +77,6 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
                 .Property(x => x.Name).IsRequired();
             modelBuilder.Entity<ExitData>()
                 .Property(x => x.DestinationLocationId).IsRequired();
-        }
-        public DbSet<T> GetDbSet<T>() where T : Model
-        {
-            var dbSet = Set<T>();
-            return dbSet;
-        }
-        public override void Dispose()
-        {
-            base.Dispose();
         }
     }
 }

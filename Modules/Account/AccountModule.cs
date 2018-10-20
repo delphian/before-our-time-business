@@ -17,6 +17,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
+using BeforeOutTime.Business.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -54,9 +55,8 @@ namespace BeforeOurTime.Business.Modules.Account
         {
             ModuleManager = moduleManager;
             var connectionString = ModuleManager.GetConfiguration().GetConnectionString("DefaultConnection");
-            var dbOptions = new DbContextOptionsBuilder<EFAccountModuleContext>();
+            var dbOptions = new DbContextOptionsBuilder<BaseContext>();
                 dbOptions.UseSqlServer(connectionString);
-                dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             Db = new EFAccountModuleContext(dbOptions.Options);
             Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
@@ -141,32 +141,28 @@ namespace BeforeOurTime.Business.Modules.Account
         /// Create attribute, if present, after item is created
         /// </summary>
         /// <param name="item">Base item just created from datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemCreate(Item item, TransactionOptions options = null)
+        public void OnItemCreate(Item item)
         {
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
         /// </summary>
         /// <param name="item">Base item just read from datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemRead(Item item, TransactionOptions options = null)
+        public void OnItemRead(Item item)
         {
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
         /// </summary>
         /// <param name="item">Base item about to be persisted to datastore</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemUpdate(Item item, TransactionOptions options = null)
+        public void OnItemUpdate(Item item)
         {
         }
         /// <summary>
         /// Delete attribute of base item before base item is deleted
         /// </summary>
         /// <param name="item">Base item about to be deleted</param>
-        /// <param name="options">Options to customize how data is transacted from datastore</param>
-        public void OnItemDelete(Item item, TransactionOptions options = null)
+        public void OnItemDelete(Item item)
         {
         }
         #endregion
