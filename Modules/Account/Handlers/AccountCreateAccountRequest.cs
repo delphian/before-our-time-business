@@ -23,7 +23,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             var request = message.GetMessageAsType<AccountCreateAccountRequest>();
             response = HandleRequestWrapper<AccountCreateAccountResponse>(request, res =>
             {
-                var account = Create(request.Email, request.Password);
+                var account = Create(request.Email, request.Password, request.Temporary);
                 ((AccountCreateAccountResponse)res).CreatedAccountEvent = new AccountCreateAccountEvent()
                 {
                     AccountId = account.Id

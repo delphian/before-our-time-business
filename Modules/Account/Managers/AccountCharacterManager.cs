@@ -61,8 +61,9 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// </summary>
         /// <param name="accountId">Unique account identifer to create character for</param>
         /// <param name="name">Name of character</param>
+        /// <param name="temporary">Character is for trial purpose only</param>
         /// <returns></returns>
-        public Item Create(Guid accountId, string name)
+        public Item Create(Guid accountId, string name, bool temporary = false)
         {
             var characterItem = ModuleManager.GetItemRepo().Create(new CharacterItem()
             {
@@ -72,7 +73,8 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
                     new CharacterData()
                     {
                         Name = name,
-                        Description = "A brave new player"
+                        Description = "A brave new player",
+                        Temporary = temporary
                     }
                 }
             });

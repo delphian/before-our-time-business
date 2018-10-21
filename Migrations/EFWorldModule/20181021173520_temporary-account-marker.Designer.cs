@@ -4,14 +4,16 @@ using BeforeOurTime.Business.Modules.World.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BeforeOurTime.Business.Migrations.EFWorldModule
 {
     [DbContext(typeof(EFWorldModuleContext))]
-    partial class EFWorldModuleContextModelSnapshot : ModelSnapshot
+    [Migration("20181021173520_temporary-account-marker")]
+    partial class temporaryaccountmarker
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

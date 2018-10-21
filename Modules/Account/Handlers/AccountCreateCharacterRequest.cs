@@ -25,7 +25,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             response = HandleRequestWrapper<AccountCreateCharacterResponse>(request, res =>
             {
                 var characterItem = ModuleManager.GetManager<IAccountCharacterManager>()
-                    .Create(terminal.GetAccountId().Value, request.Name);
+                    .Create(terminal.GetAccountId().Value, request.Name, request.Temporary);
                 ((AccountCreateCharacterResponse)res).CreatedAccountCharacterEvent = new AccountCreateCharacterEvent()
                 {
                     ItemId = characterItem.Id

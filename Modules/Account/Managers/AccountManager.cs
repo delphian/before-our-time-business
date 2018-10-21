@@ -57,12 +57,14 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// </summary>
         /// <param name="name">Login name</param>
         /// <param name="password">Login password</param>
-        public AccountData Create(string name, string password)
+        /// <param name="temporary">Account is temporary for trial purposes</param>
+        public AccountData Create(string name, string password, bool temporary = false)
         {
             var account = AccountDataRepo.Create(new List<AccountData>()
             {
                 new AccountData()
                 {
+                    Temporary = temporary,
                     Name = name,
                     Password = BCrypt.Net.BCrypt.HashPassword(password)
                 }
