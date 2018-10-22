@@ -29,7 +29,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 {
                     Items = items
                 };
-                ((CoreDeleteItemCrudResponse)response).CoreDeleteItemCrudEvent = deleteItemEvent;
+                ((CoreDeleteItemCrudResponse)res).CoreDeleteItemCrudEvent = deleteItemEvent;
                 res.SetSuccess(true);
             });
             return response;
