@@ -26,7 +26,13 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
                 var account = Create(request.Email, request.Password, request.Temporary);
                 ((AccountCreateAccountResponse)res).CreatedAccountEvent = new AccountCreateAccountEvent()
                 {
-                    AccountId = account.Id
+                    Account = new Models.Modules.Account.Models.Account()
+                    {
+                        Id = account.Id,
+                        Password = null,
+                        Name = account.Name,
+                        Temporary = account.Temporary
+                    }
                 };
                 res.SetSuccess(true);
             });

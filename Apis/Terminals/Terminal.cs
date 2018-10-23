@@ -244,8 +244,8 @@ namespace BeforeOurTime.Business.Apis.Terminals
                     if (response.IsSuccess())
                     {
                         Guid? accountId;
-                        accountId = response.GetMessageAsType<AccountLoginAccountResponse>()?.AccountId;
-                        accountId = (accountId == null) ? response.GetMessageAsType<AccountCreateAccountResponse>()?.CreatedAccountEvent?.AccountId : accountId;
+                        accountId = response.GetMessageAsType<AccountLoginAccountResponse>()?.Account?.Id;
+                        accountId = (accountId == null) ? response.GetMessageAsType<AccountCreateAccountResponse>()?.CreatedAccountEvent?.Account.Id : accountId;
                         Authenticate(accountId.Value);
                     }
                 }

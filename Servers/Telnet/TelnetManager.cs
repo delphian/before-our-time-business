@@ -341,7 +341,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 AccountLoginAccountResponse loginResponse = (AccountLoginAccountResponse)telnetClient.GetTerminal().SendToApi(loginRequest);
                 if (loginResponse.IsSuccess())
                 {
-                    telnetClient.GetTerminal().Authenticate(loginResponse.AccountId.Value);
+                    telnetClient.GetTerminal().Authenticate(loginResponse.Account.Id);
                     telnetClient.GetTerminal().SubscribeMessageToTerminal(MessageFromTerminal);
                     Clients[telnetClient.GetTerminal().GetId()] = telnetClient;
                     telnetClient.GetTerminal().GetDataBag()["step"] = "authenticated";
