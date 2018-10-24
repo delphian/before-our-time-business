@@ -24,14 +24,20 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             response = HandleRequestWrapper<AccountLoginAccountResponse>(request, res =>
             {
                 var account = Authenticate(request.Email, request.Password);
-                ((AccountLoginAccountResponse)res).Account = new BeforeOurTime.Models.Modules.Account.Models.Account()
+		if (account != null) {
+                    ((AccountLoginAccountResponse)res).Account = new BeforeOurTime.Models.Modules.Account.Models.Account()
+                    {
+                        Id = account.Id,
+                        Name = account.Name,
+                        Password = null,
+                        Temporary = account.Temporary
+                    };
+                    res.SetSuccess(true);
+                }
+                else
                 {
-                    Id = account.Id,
-                    Name = account.Name,
-                    Password = null,
-                    Temporary = account.Temporary
-                };
-                res.SetSuccess(account?.Id != null);
+                    res.SetSuccess(false).SetMessage($"Login for '{request.Email}' denied");
+                }
             });
             return response;
         }
