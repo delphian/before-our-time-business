@@ -14,6 +14,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
+using BeforeOurTime.Models.Modules.Account.Messages.UpdateAccount;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
@@ -121,6 +122,7 @@ namespace BeforeOurTime.Business.Modules.Account
                 AccountCreateCharacterRequest._Id,
                 AccountReadCharacterRequest._Id,
                 AccountCreateAccountRequest._Id,
+                AccountUpdateAccountRequest._Id,
                 AccountLoginAccountRequest._Id,
                 AccountLogoutAccountRequest._Id
             };
@@ -182,6 +184,8 @@ namespace BeforeOurTime.Business.Modules.Account
         {
             if (message.GetMessageId() == AccountCreateAccountRequest._Id)
                 response = GetManager<IAccountManager>().HandleCreateAccountRequest(message, api, terminal, response);
+            if (message.GetMessageId() == AccountUpdateAccountRequest._Id)
+                response = GetManager<IAccountManager>().HandleUpdateAccountRequest(message, api, terminal, response);
             if (message.GetMessageId() == AccountLoginAccountRequest._Id)
                 response = GetManager<IAccountManager>().HandleLoginAccountRequest(message, api, terminal, response);
             if (message.GetMessageId() == AccountLogoutAccountRequest._Id)
