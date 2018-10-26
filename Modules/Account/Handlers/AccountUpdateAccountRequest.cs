@@ -1,7 +1,9 @@
 ﻿using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Messages.UpdateAccount;
+using BeforeOurTime.Models.Modules.Account.Models.Data;
 using BeforeOurTime.Models.Terminals;
 using System;
 using System.Collections.Generic;
@@ -23,7 +25,20 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             var request = message.GetMessageAsType<AccountUpdateAccountRequest>();
             response = HandleRequestWrapper<AccountUpdateAccountResponse>(request, res =>
             {
-                res.SetSuccess(false).SetMessage("Not implemented");
+                var accountManager = api.GetModuleManager().GetManager<IAccountManager>();
+                var accountData = new AccountData()
+                {
+                    Id = request.Account.Id,
+                    Name = request.Account.Name,
+                    Password = request.Account.Password,
+                    Temporary = request.Account.Temporary
+                };
+                accountManager.Update(accountData);
+                ((AccountUpdateAccountResponse)res).UpdateAccountEvent = new AccountUpdateAccountEvent()
+                {
+                    Account = request.Account
+                };
+                res.SetSuccess(true);
             });
             return response;
         }

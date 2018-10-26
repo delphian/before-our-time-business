@@ -72,6 +72,17 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             return account;
         }
         /// <summary>
+        /// Update existing account
+        /// </summary>
+        /// <param name="accountData">AccountData containing updated properties</param>
+        /// <returns></returns>
+        public AccountData Update(AccountData accountData)
+        {
+            accountData.Password = BCrypt.Net.BCrypt.HashPassword(accountData.Password);
+            AccountDataRepo.Update(accountData);
+            return accountData;
+        }
+        /// <summary>
         /// Authenticate a user name and password
         /// </summary>
         /// <param name="email"></param>
