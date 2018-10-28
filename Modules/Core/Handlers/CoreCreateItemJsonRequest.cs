@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
@@ -16,11 +17,15 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
-        private IResponse HandleCoreCreateItemJsonRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        private IResponse HandleCoreCreateItemJsonRequest(
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
+            IResponse response)
         {
             var request = message.GetMessageAsType<CoreCreateItemJsonRequest>();
             response = HandleRequestWrapper<CoreCreateItemJsonResponse>(request, res =>

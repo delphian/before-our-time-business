@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Terminals;
 using System;
@@ -14,11 +15,15 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
-        public IResponse HandleLogoutAccountRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        public IResponse HandleLogoutAccountRequest(
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
+            IResponse response)
         {
             var request = message.GetMessageAsType<AccountLogoutAccountRequest>();
             response = HandleRequestWrapper<AccountLogoutAccountResponse>(request, res =>

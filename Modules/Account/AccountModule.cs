@@ -172,28 +172,28 @@ namespace BeforeOurTime.Business.Modules.Account
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         public IResponse HandleMessage(
-            IMessage message, 
-            IApi api, 
-            ITerminal terminal, 
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
             IResponse response)
         {
             if (message.GetMessageId() == AccountCreateAccountRequest._Id)
-                response = GetManager<IAccountManager>().HandleCreateAccountRequest(message, api, terminal, response);
+                response = GetManager<IAccountManager>().HandleCreateAccountRequest(message, mm, terminal, response);
             if (message.GetMessageId() == AccountUpdateAccountRequest._Id)
-                response = GetManager<IAccountManager>().HandleUpdateAccountRequest(message, api, terminal, response);
+                response = GetManager<IAccountManager>().HandleUpdateAccountRequest(message, mm, terminal, response);
             if (message.GetMessageId() == AccountLoginAccountRequest._Id)
-                response = GetManager<IAccountManager>().HandleLoginAccountRequest(message, api, terminal, response);
+                response = GetManager<IAccountManager>().HandleLoginAccountRequest(message, mm, terminal, response);
             if (message.GetMessageId() == AccountLogoutAccountRequest._Id)
-                response = GetManager<IAccountManager>().HandleLogoutAccountRequest(message, api, terminal, response);
+                response = GetManager<IAccountManager>().HandleLogoutAccountRequest(message, mm, terminal, response);
             if (message.GetMessageId() == AccountCreateCharacterRequest._Id)
-                response = GetManager<IAccountCharacterManager>().HandleCreateCharacterRequest(message, api, terminal, response);
+                response = GetManager<IAccountCharacterManager>().HandleCreateCharacterRequest(message, mm, terminal, response);
             if (message.GetMessageId() == AccountReadCharacterRequest._Id)
-                response = GetManager<IAccountCharacterManager>().HandleReadCharacterRequest(message, api, terminal, response);
+                response = GetManager<IAccountCharacterManager>().HandleReadCharacterRequest(message, mm, terminal, response);
             return response;
         }
         /// <summary>

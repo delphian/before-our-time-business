@@ -11,6 +11,8 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Modules.World.Messages.Location.DeleteLocation;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Managers;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -19,21 +21,26 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <summary>
         /// Create location
         /// </summary>
-        /// <param name="api"></param>
-        /// <param name="terminal"></param>
-        /// <param name="request"></param>
+        /// <param name="message"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
-        public IResponse HandleDeleteLocationRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        public IResponse HandleDeleteLocationRequest(
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
+            IResponse response)
         {
             var request = message.GetMessageAsType<WorldDeleteLocationRequest>();
             response = HandleRequestWrapper<WorldDeleteLocationResponse>(request, res =>
             {
-                var location = api.GetItemManager().Read(request.LocationItemId);
-                var exits = api.GetModuleManager().GetManager<IExitItemManager>()
+                var itemManager = mm.GetManager<IItemManager>();
+                var location = itemManager.Read(request.LocationItemId);
+                var exits = mm.GetManager<IExitItemManager>()
                     .GetLocationExits(location.Id);
-                api.GetItemManager().Delete(exits, true);
-                location = api.GetItemManager().Read(request.LocationItemId);
-                api.GetItemManager().Delete(new List<Item>() { location });
+                itemManager.Delete(exits, true);
+                location = itemManager.Read(request.LocationItemId);
+                itemManager.Delete(new List<Item>() { location });
                 var deletedItems = exits ?? new List<Item>();
                 deletedItems.Add(location);
                 var deleteItemEvent = new CoreDeleteItemCrudEvent()

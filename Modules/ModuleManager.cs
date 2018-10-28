@@ -205,12 +205,12 @@ namespace BeforeOurTime.Business.Modules
         /// <param name="message"></param>
         /// <param name="terminal"></param>
         /// <param name="response"></param>
-        public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        public IResponse HandleMessage(IMessage message, ITerminal terminal, IResponse response)
         {
             var modules = GetModulesForMessage(message.GetMessageId());
             modules.ForEach(module =>
             {
-                response = module.HandleMessage(message, api, terminal, response);
+                response = module.HandleMessage(message, this, terminal, response);
             });
             return response;
         }

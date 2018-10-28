@@ -1,6 +1,8 @@
 ﻿using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;
 using BeforeOurTime.Models.Terminals;
 using System;
@@ -14,17 +16,21 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
-        private IResponse HandleCoreUpdateItemCrudRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        private IResponse HandleCoreUpdateItemCrudRequest(
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
+            IResponse response)
         {
             var request = message.GetMessageAsType<CoreUpdateItemCrudRequest>();
             response = HandleRequestWrapper<CoreUpdateItemCrudResponse>(request, res =>
             {
                 var updateItemRequest = request.GetMessageAsType<CoreUpdateItemCrudRequest>();
-                api.GetItemManager().Update(updateItemRequest.Items);
+                mm.GetManager<IItemManager>().Update(updateItemRequest.Items);
                 var updateItemEvent = new CoreUpdateItemCrudEvent()
                 {
                     Items = updateItemRequest.Items

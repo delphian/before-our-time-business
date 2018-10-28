@@ -9,6 +9,8 @@ using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.World.Messages.Location.CreateLocation;
 using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Managers;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -17,22 +19,25 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <summary>
         /// Create location
         /// </summary>
-        /// <param name="api"></param>
-        /// <param name="terminal"></param>
-        /// <param name="request"></param>
+        /// <param name="message"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
-        public IResponse HandleCreateLocationQuickRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        public IResponse HandleCreateLocationQuickRequest(
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
+            IResponse response)
         {
             var request = message.GetMessageAsType<WorldCreateLocationQuickRequest>();
             response = HandleRequestWrapper<WorldCreateLocationQuickResponse>(request, res =>
             {
-                var player = api.GetItemManager().Read(terminal.GetPlayerId().Value);
-                var location = api.GetItemManager().Read(player.ParentId.Value);
+                var itemManager = mm.GetManager<IItemManager>();
+                var player = itemManager.Read(terminal.GetPlayerId().Value);
+                var location = itemManager.Read(player.ParentId.Value);
                 var createFromLocationItemId = request.FromLocationItemId ??
                                                player.ParentId.Value;
-                var newLocationItem = api
-                    .GetModuleManager()
-                    .GetManager<ILocationItemManager>()
+                var newLocationItem = mm.GetManager<ILocationItemManager>()
                     .CreateFromHere(createFromLocationItemId);
                 ((WorldCreateLocationQuickResponse)res).CreateLocationEvent = new WorldCreateLocationEvent()
                 {

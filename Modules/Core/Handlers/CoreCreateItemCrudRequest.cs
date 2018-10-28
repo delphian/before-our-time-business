@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.CreateItem;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
@@ -15,11 +16,15 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
-        private IResponse HandleCoreCreateItemCrudRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        private IResponse HandleCoreCreateItemCrudRequest(
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
+            IResponse response)
         {
             var request = message.GetMessageAsType<CoreCreateItemCrudRequest>();
             response = HandleRequestWrapper<CoreCreateItemCrudResponse>(request, res =>

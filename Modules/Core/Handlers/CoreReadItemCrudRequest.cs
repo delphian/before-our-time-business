@@ -2,6 +2,8 @@
 using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
@@ -16,11 +18,15 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
-        private IResponse HandleCoreReadItemCrudRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        private IResponse HandleCoreReadItemCrudRequest(
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
+            IResponse response)
         {
             var request = message.GetMessageAsType<CoreReadItemCrudRequest>();
             response = HandleRequestWrapper<CoreReadItemCrudResponse>(request, res =>
@@ -30,7 +36,7 @@ namespace BeforeOurTime.Business.Modules.Core
                 // Read enumerated list of items
                 if (request.ItemIds != null)
                 {
-                    readItems = api.GetItemManager().Read(request.ItemIds);
+                    readItems = mm.GetManager<IItemManager>().Read(request.ItemIds);
                     res.SetSuccess(true);
                 }
                 if (request.ItemTypes != null)
@@ -38,7 +44,7 @@ namespace BeforeOurTime.Business.Modules.Core
                     request.ItemTypes.ForEach(itemType =>
                     {
                         var type = Type.GetType(itemType + ",BeforeOurTime.Models");
-                        managers.AddRange(api.GetModuleManager().GetManagers(type));
+                        managers.AddRange(mm.GetManagers(type));
                     });
                     res.SetSuccess(true);
                 }
@@ -47,7 +53,7 @@ namespace BeforeOurTime.Business.Modules.Core
                     request.ItemDataTypes.ForEach(dataType =>
                     {
                         var type = Type.GetType(dataType + ",BeforeOurTime.Models");
-                        managers.AddRange(api.GetModuleManager().GetManagersOfData(type));
+                        managers.AddRange(mm.GetManagersOfData(type));
                     });
                     res.SetSuccess(true);
                 }
@@ -56,7 +62,7 @@ namespace BeforeOurTime.Business.Modules.Core
                     request.ItemPropertyTypes.ForEach(propertyType =>
                     {
                         var type = Type.GetType(propertyType + ",BeforeOurTime.Models");
-                        managers.AddRange(api.GetModuleManager().GetManagersOfProperty(type));
+                        managers.AddRange(mm.GetManagersOfProperty(type));
                     });
                     res.SetSuccess(true);
                 }
@@ -68,7 +74,7 @@ namespace BeforeOurTime.Business.Modules.Core
                         var itemIds = manager.GetItemIds();
                         if (itemIds.Count > 0)
                         {
-                            readItems.AddRange(api.GetItemManager().Read(itemIds));
+                            readItems.AddRange(mm.GetManager<IItemManager>().Read(itemIds));
                         }
                     });
                 }

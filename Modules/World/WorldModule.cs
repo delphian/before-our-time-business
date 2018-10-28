@@ -138,8 +138,7 @@ namespace BeforeOurTime.Business.Modules.World
             return new List<Guid>()
             {
                 WorldReadLocationSummaryRequest._Id,
-                WorldCreateLocationQuickRequest._Id,
-                CoreUseItemRequest._Id
+                WorldCreateLocationQuickRequest._Id
             };
         }
         /// <summary>
@@ -280,18 +279,20 @@ namespace BeforeOurTime.Business.Modules.World
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
-        public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        public IResponse HandleMessage(
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
+            IResponse response)
         {
             if (message.GetMessageId() == WorldReadLocationSummaryRequest._Id)
-                response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, api, terminal, response);
+                response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, mm, terminal, response);
             if (message.GetMessageId() == WorldCreateLocationQuickRequest._Id)
-                response = GetManager<ILocationItemManager>().HandleCreateLocationQuickRequest(message, api, terminal, response);
-            if (message.GetMessageId() == CoreUseItemRequest._Id)
-                response = GetManager<IExitItemManager>().HandleUseItemRequest(message, api, terminal, response);
+                response = GetManager<ILocationItemManager>().HandleCreateLocationQuickRequest(message, mm, terminal, response);
             return response;
         }
         /// <summary>

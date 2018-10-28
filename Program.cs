@@ -117,7 +117,7 @@ namespace BeforeOurTime.Business
                     lock (thisLock)
                     {
                         var response = api.GetMessageManager().HandleRequest(api, terminal, request);
-                        response = api.GetModuleManager().HandleMessage(request, api, terminal, response);
+                        response = api.GetModuleManager().HandleMessage(request, terminal, response);
                         return response;
                     }
                 };

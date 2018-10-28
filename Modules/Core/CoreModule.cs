@@ -17,6 +17,7 @@ using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
+using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
@@ -131,7 +132,8 @@ namespace BeforeOurTime.Business.Modules.Core
                 CoreCreateItemCrudRequest._Id,
                 CoreReadItemCrudRequest._Id,
                 CoreUpdateItemCrudRequest._Id,
-                CoreDeleteItemCrudRequest._Id
+                CoreDeleteItemCrudRequest._Id,
+                CoreUseItemRequest._Id
             };
         }
         /// <summary>
@@ -202,24 +204,30 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="message"></param>
         /// <param name="terminal"></param>
         /// <param name="response"></param>
-        public IResponse HandleMessage(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        public IResponse HandleMessage(
+            IMessage message, 
+            IModuleManager moduleManager, 
+            ITerminal terminal, 
+            IResponse response)
         {
             if (message.GetMessageId() == CoreReadItemGraphRequest._Id)
-                response = HandleCoreReadItemGraphRequest(message, api, terminal, response);
+                response = HandleCoreReadItemGraphRequest(message, moduleManager, terminal, response);
             if (message.GetMessageId() == CoreCreateItemCrudRequest._Id)
-                response = HandleCoreCreateItemCrudRequest(message, api, terminal, response);
+                response = HandleCoreCreateItemCrudRequest(message, moduleManager, terminal, response);
             if (message.GetMessageId() == CoreReadItemCrudRequest._Id)
-                response = HandleCoreReadItemCrudRequest(message, api, terminal, response);
+                response = HandleCoreReadItemCrudRequest(message, moduleManager, terminal, response);
             if (message.GetMessageId() == CoreUpdateItemCrudRequest._Id)
-                response = HandleCoreUpdateItemCrudRequest(message, api, terminal, response);
+                response = HandleCoreUpdateItemCrudRequest(message, moduleManager, terminal, response);
             if (message.GetMessageId() == CoreDeleteItemCrudRequest._Id)
-                response = HandleCoreDeleteItemCrudRequest(message, api, terminal, response);
+                response = HandleCoreDeleteItemCrudRequest(message, moduleManager, terminal, response);
             if (message.GetMessageId() == CoreReadItemJsonRequest._Id)
-                response = HandleCoreReadItemJsonRequest(message, api, terminal, response);
+                response = HandleCoreReadItemJsonRequest(message, moduleManager, terminal, response);
             if (message.GetMessageId() == CoreUpdateItemJsonRequest._Id)
-                response = HandleCoreUpdateItemJsonRequest(message, api, terminal, response);
+                response = HandleCoreUpdateItemJsonRequest(message, moduleManager, terminal, response);
             if (message.GetMessageId() == CoreCreateItemJsonRequest._Id)
-                response = HandleCoreCreateItemJsonRequest(message, api, terminal, response);
+                response = HandleCoreCreateItemJsonRequest(message, moduleManager, terminal, response);
+            if (message.GetMessageId() == CoreUseItemRequest._Id)
+                response = HandleCoreUseItemRequest(message, moduleManager, terminal, response);
             return response;
         }
         /// <summary>

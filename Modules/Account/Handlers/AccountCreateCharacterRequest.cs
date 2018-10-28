@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
 using BeforeOurTime.Models.Terminals;
@@ -15,11 +16,15 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
-        public IResponse HandleCreateCharacterRequest(IMessage message, IApi api, ITerminal terminal, IResponse response)
+        public IResponse HandleCreateCharacterRequest(
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
+            IResponse response)
         {
             var request = message.GetMessageAsType<AccountCreateCharacterRequest>();
             response = HandleRequestWrapper<AccountCreateCharacterResponse>(request, res =>
