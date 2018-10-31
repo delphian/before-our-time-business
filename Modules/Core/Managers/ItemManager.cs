@@ -133,14 +133,7 @@ namespace BeforeOurTime.Business.Apis.Items
             // Move item children
             items.ForEach((item) =>
             {
-                if (deleteChildren == true)
-                {
-                    if (item.Children?.Count > 0)
-                    {
-                        Delete(item.Children, deleteChildren);
-                    }
-                }
-                else
+                if (deleteChildren == false)
                 {
                     var oldParent = item.Parent;
                     if (oldParent != null)
@@ -150,6 +143,8 @@ namespace BeforeOurTime.Business.Apis.Items
                             Move(child, oldParent, item);
                         });
                     }
+                    // Blank out the children, otherwise ef will try and delete 
+                    item.Children = new List<Item>();
                 }
             });
             ItemRepo.Delete(items);

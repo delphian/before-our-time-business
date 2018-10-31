@@ -17,15 +17,17 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Logs;
+using BeforeOurTime.Business.Apis.Terminals;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
     public class WebSocketManager : IWebSocketManager
     {
         /// <summary>
-        /// Before Our Time API
+        /// Dependency injection provider
         /// </summary>
-        public IApi Api { set; get; }
+        public IServiceProvider BotServices { set; get; }
         /// <summary>
         /// IP address to listen on
         /// </summary>
@@ -53,11 +55,11 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="serviceProvider"></param>
-        public WebSocketManager(IApi api, IConfigurationRoot configuration)
+        /// <param name="services">Dependency injection provider</param>
+        public WebSocketManager(IServiceProvider services, IConfigurationRoot configuration)
         {
             WebSocketClients = new List<WebSocketClient>();
-            Api = api;
+            BotServices = services;
             Address = IPAddress.Parse(configuration.GetSection("Servers").GetSection("WebSocket").GetSection("Listen").GetValue<string>("Address"));
             Port = configuration.GetSection("Servers").GetSection("WebSocket").GetSection("Listen").GetValue<int>("Port");
             // MessageHandlers = BuildMessageHandlers();
@@ -67,9 +69,11 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 {
                     options.ListenAnyIP(Port);
                 })
-                .ConfigureServices(services => {
-                    services.AddSingleton<IApi>(Api);
-                    services.AddSingleton<IWebSocketManager>(this);
+                .ConfigureServices(kestrelServices => {
+                    kestrelServices.AddSingleton(BotServices.GetService<IConfiguration>());
+                    kestrelServices.AddSingleton(BotServices.GetService<IBotLogger>());
+                    kestrelServices.AddSingleton(BotServices.GetService<ITerminalManager>());
+                    kestrelServices.AddSingleton<IWebSocketManager>(this);
                 })
                 .SuppressStatusMessages(true)
                 .UseStartup<WebSocketStartup>()
@@ -82,20 +86,20 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             WebSocketServer.RunAsync();
             var address = WebSocketServer.ServerFeatures.Get<IServerAddressesFeature>().Addresses.FirstOrDefault();
-            Api.GetLogger().LogInformation($"Websocket server started on {address}");
+            BotServices.GetService<IBotLogger>().LogInformation($"Websocket server started on {address}");
         }
         /// <summary>
         /// Stop the server
         /// </summary>
         public async Task Stop()
         {
-            Api.GetLogger().LogInformation($"Websocket server stopping all clients...");
+            BotServices.GetService<IBotLogger>().LogInformation($"Websocket server stopping all clients...");
             WebSocketClients.ForEach(async delegate (WebSocketClient client)
             {
                 await client.CloseAsync();
             });
             await WebSocketServer.StopAsync();
-            Api.GetLogger().LogInformation($"Websocket server stopped");
+            BotServices.GetService<IBotLogger>().LogInformation($"Websocket server stopped");
         }
         /// <summary>
         /// Get all open WebSocket clients
@@ -121,8 +125,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
     {
         public void Configure(IApplicationBuilder app)
         {
-            var api = app.ApplicationServices.GetService<IApi>();
             var webSocketManager = app.ApplicationServices.GetService<IWebSocketManager>();
+            var terminalManager = app.ApplicationServices.GetService<ITerminalManager>();
             app.UseWebSockets(new WebSocketOptions() {
                 ReceiveBufferSize = 1024 * 8
             });
@@ -133,10 +137,10 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         System.Net.WebSockets.WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                        var terminal = api.GetTerminalManager().RequestTerminal(
+                        var terminal = terminalManager.RequestTerminal(
                             "WebSocket", 
                             new IPEndPoint(context.Connection.RemoteIpAddress, context.Connection.RemotePort));
-                        var webSocketClient = new WebSocketClient(api, terminal, context, webSocket);
+                        var webSocketClient = new WebSocketClient(app.ApplicationServices, terminal, context, webSocket);
                         webSocketManager.GetWebSocketClients().Add(webSocketClient);
                         await webSocketClient.MonitorAsync();
                         await webSocketClient.ListenAsync();

@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Business.Apis;
-using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
@@ -12,10 +11,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using BeforeOurTime.Models.Messages.Systems.Ping;
-using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Terminals;
+using Microsoft.Extensions.Configuration;
+using BeforeOurTime.Models.Logs;
+using BeforeOurTime.Business.Apis.Terminals;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -24,10 +26,9 @@ namespace BeforeOurTime.Business.Servers.WebSocket
     /// </summary>
     public class WebSocketClient
     {
-        /// <summary>
-        /// Before Our Time API
-        /// </summary>
-        private IApi Api { set; get; }
+        private IServiceProvider Services { set; get; }
+        private IBotLogger Logger { set; get; }
+        private ITerminalManager TerminalManager { set; get; }
         private int LogLevel { set; get; }
         /// <summary>
         /// Unique WebSocket client identifier
@@ -55,14 +56,17 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <param name="api">Before Our Time API</param>
         /// <param name="terminal">Single generic connection used by the environment to communicate with clients</param>
         public WebSocketClient(
-            IApi api, 
+
+            IServiceProvider services, 
             ITerminal terminal,
             HttpContext context,
             System.Net.WebSockets.WebSocket webSocket)
         {
             Id = Guid.NewGuid();
-            Api = api;
-            LogLevel = Convert.ToInt32(Api.GetConfiguration().GetSection("Servers").GetSection("WebSocket")["LogLevel"]);
+            Services = services;
+            Logger = Services.GetService<IBotLogger>();
+            TerminalManager = Services.GetService<ITerminalManager>();
+            LogLevel = Convert.ToInt32(Services.GetService<IConfiguration>().GetSection("Servers").GetSection("WebSocket")["LogLevel"]);
             Terminal = terminal;
             Context = context;
             WebSocket = webSocket;
@@ -82,16 +86,16 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     await Task.Delay(60000 * 2);
                     var timeoutTask = Task.Delay(10000);
                     var pingTask = SendAsync(new PingSystemMessage() { }, Cts.Token);
-                    Api.GetLogger().LogDebug($"Client {Id} websocket: {WebSocket.State.ToString()}");
+                    Logger.LogDebug($"Client {Id} websocket: {WebSocket.State.ToString()}");
                     if (await Task.WhenAny(pingTask, timeoutTask) == timeoutTask || pingTask.Status == TaskStatus.Faulted)
                     {
                         if (pingTask.Exception?.InnerException != null)
                         {
-                            Api.GetLogger().LogWarning($"Client {Id} {pingTask.Exception.InnerException.Message}");
+                            Logger.LogWarning($"Client {Id} {pingTask.Exception.InnerException.Message}");
                         }
                         else
                         {
-                            Api.GetLogger().LogWarning($"Client {Id} remote client is not responding!");
+                            Logger.LogWarning($"Client {Id} remote client is not responding!");
                         }
                         await CloseAsync();
                     }
@@ -104,7 +108,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <returns></returns>
         public async Task ListenAsync()
         {
-            Api.GetLogger().LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
+            Logger.LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
             var buffer = new Byte[1024 * 64];
             WebSocketReceiveResult result = null;
             // Listen to websocket
@@ -134,8 +138,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     {
                         IResponse response;
                         var message = JsonConvert.DeserializeObject<Message>(messageJson);
-                        Api.GetLogger().LogInformation($"<< {Id} {message.GetMessageName()}");
-                        Api.GetLogger().LogDebug($"<< {Id} {messageJson}");
+                        Logger.LogInformation($"<< {Id} {message.GetMessageName()}");
+                        Logger.LogDebug($"<< {Id} {messageJson}");
                         var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
                         response = Terminal.SendToApi(request);
                         // Send response
@@ -151,7 +155,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                         message += $"({traverse.Message})";
                         traverse = traverse.InnerException;
                     }
-                    Api.GetLogger().LogError($"Client {Id} while recieving data: {message}");
+                    Logger.LogError($"Client {Id} while recieving data: {message}");
                     await CloseAsync();
                 }
             }
@@ -164,25 +168,25 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             if (WebSocket != null)
             {
-                Api.GetLogger().LogInformation($"Client {Id} closing connection...");
+                Logger.LogInformation($"Client {Id} closing connection...");
                 var disconnectTask = WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
                 var timeoutTask = Task.Delay(10000);
                 if (await Task.WhenAny(disconnectTask, timeoutTask) == timeoutTask || disconnectTask.Status == TaskStatus.Faulted)
                 {
-                    Api.GetLogger().LogWarning($"Client {Id} killing websocket!");
+                    Logger.LogWarning($"Client {Id} killing websocket!");
                     Cts.Cancel();
                     while (WebSocket.State == WebSocketState.Open)
                     {
                         await Task.Delay(5000);
-                        Api.GetLogger().LogInformation($"Client {Id} waiting for websocket to die...");
+                        Logger.LogInformation($"Client {Id} waiting for websocket to die...");
                     }
                 }
                 Cts.Cancel();
                 WebSocket.Dispose();
                 WebSocket = null;
                 Cts.Dispose();
-                Api.GetLogger().LogInformation($"Client {Id} connection closed");
-                Api.GetTerminalManager().DestroyTerminal(Terminal);
+                Logger.LogInformation($"Client {Id} connection closed");
+                TerminalManager.DestroyTerminal(Terminal);
             }
         }
         /// <summary>
@@ -199,8 +203,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 var byteMessage = new UTF8Encoding(false, true).GetBytes(messageJson);
                 var offset = 0;
                 var endOfMessage = false;
-                Api.GetLogger().LogInformation($">> {Id} {message.GetMessageName()}");
-                Api.GetLogger().LogDebug($">> {Id} {messageJson}");
+                Logger.LogInformation($">> {Id} {message.GetMessageName()}");
+                Logger.LogDebug($">> {Id} {messageJson}");
                 do
                 {
                     var remainingBytes = byteMessage.Count() - (offset * 1024);
@@ -219,7 +223,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     error += $"({traverse.Message})";
                     traverse = traverse.InnerException;
                 }
-                Api.GetLogger().LogError($"Client {Id} while sending data: {message.GetMessageName()}: {error}");
+                Logger.LogError($"Client {Id} while sending data: {message.GetMessageName()}: {error}");
             }
         }
         /// <summary>

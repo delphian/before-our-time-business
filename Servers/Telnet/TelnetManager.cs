@@ -20,15 +20,16 @@ using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
+using BeforeOurTime.Models.Logs;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
     public class TelnetManager : IServer
     {
         /// <summary>
-        /// Before Our Time API
+        /// Dependency injection provider
         /// </summary>
-        public IApi Api { set; get; }
+        public IServiceProvider Services { set; get; }
         /// <summary>
         /// IP address to listen on
         /// </summary>
@@ -51,10 +52,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="serviceProvider"></param>
-        public TelnetManager(IApi api, IConfigurationRoot configuration)
+        /// <param name="services">Dependency injection provider</param>
+        public TelnetManager(IServiceProvider services, IConfigurationRoot configuration)
         {
-            Api = api;
+            Services = services;
             Address = IPAddress.Parse(configuration.GetSection("Servers").GetSection("Telnet").GetSection("Listen").GetValue<string>("Address"));
             Port = configuration.GetSection("Servers").GetSection("Telnet").GetSection("Listen").GetValue<int>("Port");
             TelnetServer = new TelnetServer(Address);
@@ -71,7 +72,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         public void Start()
         {
             TelnetServer.Start(Address, Port);
-            Api.GetLogger().LogInformation($"Telnet server started on {TelnetServer.GetIPEndPoint()}");
+            Services.GetService<IBotLogger>().LogInformation($"Telnet server started on {TelnetServer.GetIPEndPoint()}");
         }
         /// <summary>
         /// Stop the server
@@ -81,7 +82,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
             await Task.Run(() =>
             {
                 TelnetServer.Stop();
-                Api.GetLogger().LogInformation($"Telnet sever stopped");
+                Services.GetService<IBotLogger>().LogInformation($"Telnet sever stopped");
             });
         }
         /// <summary>
@@ -90,7 +91,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="telnetClient"></param>
         private void ClientConnected(TelnetClient telnetClient)
         {
-            telnetClient.SetTerminal(Api.GetTerminalManager().RequestTerminal("Telnet", telnetClient.GetRemoteAddress()));
+            telnetClient.SetTerminal(Services.GetService<ITerminalManager>().RequestTerminal("Telnet", telnetClient.GetRemoteAddress()));
             telnetClient.GetTerminal().GetDataBag()["step"] = "connected";
             TelnetServer.ClearClientScreen(telnetClient);
             TelnetServer.SendMessageToClient(telnetClient, 
@@ -104,7 +105,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="telnetClient"></param>
         private void ClientDisconnected(TelnetClient telnetClient)
         {
-            Api.GetTerminalManager().DestroyTerminal(telnetClient.GetTerminal());
+            Services.GetService<ITerminalManager>().DestroyTerminal(telnetClient.GetTerminal());
             telnetClient.SetTerminal(null);
         }
         /// <summary>

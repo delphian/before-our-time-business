@@ -68,7 +68,13 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             {
                 throw new BotDatabaseException("Can not create null items");
             }
+            // Base create may modify the original parameter and copy 
+            // siblings into children if their parentId is set. This 
+            // may cause a single item to appear multiple times in the 
+            // constructed object tree.
             base.Create(items);
+            // Flatten then normalize the tree of items
+            var flattenedItems = items.Flatten();
             if (OnItemCreate != null)
             {
                 void InvokeOnItemCreate(List<Item> invokeItems)
@@ -82,7 +88,7 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
                         }
                     });
                 };
-                InvokeOnItemCreate(items);
+                InvokeOnItemCreate(flattenedItems);
             }
             return items;
         }
@@ -107,31 +113,22 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             {
                 resultSet = Set
                     .Where(x => ids.Contains(x.Id))
-                    .Include(x => x.Parent)
+//                    .Include(x => x.Parent)
                     .Include(x => x.Children)
                     .AsQueryable()
                     .AsNoTracking();
             }
             List<Item> items = resultSet.ToList();
-            if (OnItemRead != null)
+            items.ForEach(item =>
             {
-                items.ForEach(delegate (Item item)
+                // If this is the first time item is being loaded then allow alterations
+                if (item.Data.Count == 0 && OnItemRead != null)
                 {
-                    // If this is the first time item is being loaded then allow alterations
-                    if (item.Data.Count == 0)
-                    {
-                        OnItemRead(item);
-                    }
-                    item.Children?.ForEach((child) =>
-                    {
-                        if (child.Data.Count == 0)
-                        {
-                            OnItemRead(child);
-                        }
-                    });
-                    item.ChildrenIds = item.Children?.Select(x => x.Id)?.ToList();
-                });
-            }
+                    OnItemRead(item);
+                }
+                item.ChildrenIds = item.Children?.Select(x => x.Id)?.ToList() ?? new List<Guid>();
+                item.Children = (item.ChildrenIds.Count > 0) ? Read(item.ChildrenIds) : new List<Item>();
+            });
             return items;
         }
         /// <summary>
@@ -150,7 +147,7 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             // Create child items that are new
             void ItemCreate(List<Item> createItems)
             {
-                if (createItems != null)
+                if (createItems?.Count > 0)
                 {
                     Create(createItems);
                     createItems.ForEach(item =>
@@ -193,13 +190,16 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
         /// <returns>List of items created</returns>
         override public void Delete(List<Item> items)
         {
-            if (OnItemDelete != null)
+            items.ForEach(item =>
             {
-                items.ForEach(delegate (Item item)
+                if (item.Children.Count > 0)
                 {
-                    OnItemDelete(item);
-                });
-            }
+                    Delete(item.Children);
+                }
+                OnItemDelete?.Invoke(item);
+                // Remove references to children that have been deleted
+                item.Children = new List<Item>();
+            });
             base.Delete(items);
         }
         /// <summary>

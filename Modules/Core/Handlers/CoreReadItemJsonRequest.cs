@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Json;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
@@ -8,6 +9,7 @@ using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 using BeforeOurTime.Models.Terminals;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -42,15 +44,24 @@ namespace BeforeOurTime.Business.Modules.Core
                         coreItemsJson.Add(new CoreItemJson()
                         {
                             Id = item.Id.ToString(),
-                            JSON = JsonConvert.SerializeObject(item, Formatting.Indented)
+                            IncludeChildren = request.IncludeChildren,
+                            JSON = JsonConvert.SerializeObject(
+                                item, 
+                                Formatting.Indented,
+                                new JsonSerializerSettings {
+                                    ContractResolver = (request.IncludeChildren == true) ?
+                                        new BackupItemContractResolver() :
+                                        new DefaultContractResolver()
+                                })
                         });
                     });
+                    res.SetSuccess(items.Count > 0);
+                    res.SetMessage((items.Count == 0) ? "Item not found" : null);
                 }
                 ((CoreReadItemJsonResponse)res).CoreReadItemJsonEvent = new CoreReadItemJsonEvent()
                 {
                     ItemsJson = coreItemsJson
                 };
-                res.SetSuccess(true);
             });
             return response;
         }

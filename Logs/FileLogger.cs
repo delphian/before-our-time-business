@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace BeforeOurTime.Business.Apis.Logs
+namespace BeforeOurTime.Business.Logs
 {
     public class FileLogger : IBotLogger
     {

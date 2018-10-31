@@ -178,23 +178,29 @@ namespace BeforeOurTime.Business.Modules.World
             {
                 var gameItem = ModuleManager.GetItemRepo().Create(new GameItem()
                 {
+                    Id = new Guid("f4212bfe-ef65-4632-df2b-08d63af92e75"),
                     ParentId = null,
                     Data = new List<IItemData>()
                     {
                         new GameData()
                         {
+                            Id = new Guid("0f290372-6812-4eba-6f6c-08d63af92e80"),
+                            DataItemId = new Guid("f4212bfe-ef65-4632-df2b-08d63af92e75"),
                             Name = "Brave New World",
-                            DefaultLocationId = null
+                            DefaultLocationId = new Guid("91f4a03f-8cb8-467c-df2c-08d63af92e75")
                         }
                     }
                 });
                 var locationItem = ModuleManager.GetItemRepo().Create(new LocationItem()
                 {
+                    Id = new Guid("91f4a03f-8cb8-467c-df2c-08d63af92e75"),
                     ParentId = gameItem.Id,
                     Data = new List<IItemData>()
                     {
                         new LocationData()
                         {
+                            Id = new Guid("e370301f-2b91-43a0-9a30-08d63af92e86"),
+                            DataItemId = new Guid("91f4a03f-8cb8-467c-df2c-08d63af92e75"),
                             Name = "A Dark Void",
                             Description = "Cool mists and dark shadows shroud "
                                 + "everything in this place. Straining your eyes does little to resolve the "

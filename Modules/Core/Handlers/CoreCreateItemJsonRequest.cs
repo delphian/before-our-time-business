@@ -1,7 +1,9 @@
 ﻿using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Json;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
@@ -30,14 +32,27 @@ namespace BeforeOurTime.Business.Modules.Core
             var request = message.GetMessageAsType<CoreCreateItemJsonRequest>();
             response = HandleRequestWrapper<CoreCreateItemJsonResponse>(request, res =>
             {
-                request.ItemsJson.ForEach(itemJson =>
+                var items = JsonConvert.DeserializeObject<List<Item>>(request.ItemJson);
+                ModuleManager.GetItemRepo().Create(items);
+                var ItemsJson = new List<CoreItemJson>();
+                items.ForEach(item =>
                 {
-                    var item = JsonConvert.DeserializeObject<Item>(itemJson.JSON);
-                    ModuleManager.GetItemRepo().Create(item);
+                    ItemsJson.Add(new CoreItemJson()
+                    {
+                        Id = item.Id.ToString(),
+                        IncludeChildren = true,
+                        JSON = JsonConvert.SerializeObject(
+                            item,
+                            Formatting.Indented,
+                            new JsonSerializerSettings
+                            {
+                                ContractResolver = new BackupItemContractResolver()
+                            })
+                    });
                 });
                 ((CoreCreateItemJsonResponse)res).CoreCreateItemJsonEvent = new CoreCreateItemJsonEvent()
                 {
-                    ItemsJson = request.ItemsJson
+                    ItemsJson = ItemsJson
                 };
                 res.SetSuccess(true);
             });
