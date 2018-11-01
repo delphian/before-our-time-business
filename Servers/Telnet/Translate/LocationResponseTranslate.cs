@@ -51,10 +51,10 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             string exits = null;
             if (locationResponse.Exits.Count() > 0)
             {
-                locationResponse.Exits.ForEach(delegate (ListExitResponse ioExitUpdate)
+                locationResponse.Exits.ForEach(ioExitUpdate =>
                 {
                     telnetClient.ItemExits.Add(ioExitUpdate);
-                    exits = (exits != null) ? ", " : exits;
+                    exits = (exits == null) ? "" : $"{exits}, ";
                     exits += $"{AnsiColors.purpleB}{ioExitUpdate.Name}{AnsiColors.reset}";
                 });
             }

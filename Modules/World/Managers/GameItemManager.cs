@@ -77,6 +77,14 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             return itemIds;
         }
         /// <summary>
+        /// Determine if an item is managed
+        /// </summary>
+        /// <param name="item">Item that may have managable data</param>
+        public bool IsManaging(Item item)
+        {
+            return (item.Type == ItemType.Game);
+        }
+        /// <summary>
         /// Determine if item data type is managable
         /// </summary>
         /// <param name="propertyData">Item data type that might be managable</param>
