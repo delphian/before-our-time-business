@@ -12,6 +12,9 @@ using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Modules.World.Dbs;
 using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
+using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Messages.Responses;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -80,6 +83,15 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         public bool IsManagingData(Type dataType)
         {
             return dataType == typeof(GameData);
+        }
+        /// <summary>
+        /// Execute a use item request
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="userItem"></param>
+        public string UseItem(CoreUseItemRequest request, Item user, ITerminal terminal, IResponse response)
+        {
+            throw new NotImplementedException();
         }
         #region On Item Hooks
         /// <summary>

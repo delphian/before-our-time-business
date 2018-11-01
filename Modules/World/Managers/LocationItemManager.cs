@@ -15,6 +15,8 @@ using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
+using BeforeOurTime.Models.Terminals;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -71,6 +73,15 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         public bool IsManagingData(Type dataType)
         {
             return dataType == typeof(LocationData);
+        }
+        /// <summary>
+        /// Execute a use item request
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="userItem"></param>
+        public string UseItem(CoreUseItemRequest request, Item user, ITerminal terminal, IResponse response)
+        {
+            throw new NotImplementedException();
         }
         /// <summary>
         /// Create an empty new location and connecting exits from a provided location

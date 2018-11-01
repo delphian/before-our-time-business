@@ -1,10 +1,13 @@
 ﻿using BeforeOurTime.Models;
 using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Exceptions;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Dbs;
+using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Terminals;
 using Microsoft.Extensions.Configuration;
@@ -215,10 +218,39 @@ namespace BeforeOurTime.Business.Modules
             return response;
         }
         /// <summary>
+        /// Execute a use item request
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="userItem"></param>
+        public CoreUseItemResponse UseItem(CoreUseItemRequest request, Item user, ITerminal terminal, IResponse response)
+        {
+            var item = GetManager<IItemManager>().Read(request.ItemId.Value);
+            var manager = GetManager(item);
+            if (manager == null)
+            {
+                throw new BeforeOurTimeException($"No manager found to use item {item.Id.ToString()}");
+            }
+            var result = manager.UseItem(request, user, terminal, response);
+            response = new CoreUseItemResponse()
+            {
+                _requestInstanceId = request._requestInstanceId,
+                _responseSuccess = true,
+                _responseMessage = result,
+                CoreUseItemEvent = new CoreUseItemEvent()
+                {
+                    Use = request.Use,
+                    Used = item,
+                    Using = user,
+                    Success = (result == null)
+                }
+            };
+            return (CoreUseItemResponse)response;
+        }
+        /// <summary>
         /// Get configuration
         /// </summary>
         /// <returns></returns>
-        public IConfiguration GetConfiguration()
+            public IConfiguration GetConfiguration()
         {
             return Configuration;
         }

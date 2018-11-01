@@ -32,20 +32,8 @@ namespace BeforeOurTime.Business.Modules.Core
             IResponse response)
         {
             var request = message.GetMessageAsType<CoreUseItemRequest>();
-            response = HandleRequestWrapper<CoreUseItemResponse>(request, res =>
-            {
-                var itemManager = mm.GetManager<IItemManager>();
-                var exit = itemManager.Read(request.ItemId.Value).GetAsItem<ExitItem>();
-                var destinationLocation = itemManager.Read(Guid.Parse(exit.Exit.DestinationId));
-                var player = itemManager.Read(terminal.GetPlayerId().Value);
-                itemManager.Move(player, destinationLocation, exit);
-                var locationSummary = mm.GetManager<ILocationItemManager>()
-                    .HandleReadLocationSummaryRequest(new WorldReadLocationSummaryRequest()
-                    {
-                    }, mm, terminal, response);
-                terminal.SendToClient(locationSummary);
-                res.SetSuccess(true);
-            });
+            var user = mm.GetManager<IItemManager>().Read(terminal.GetPlayerId().Value);
+            response = mm.UseItem(request, user, terminal, response);
             return response;
         }
     }

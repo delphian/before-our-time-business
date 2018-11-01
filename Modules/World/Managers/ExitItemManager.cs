@@ -14,6 +14,10 @@ using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
+using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
+using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Core.Managers;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -81,6 +85,25 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             var exitDatas = ExitDataRepo.ReadDestinationId(destinationId);
             var items = ModuleManager.GetItemRepo().Read(exitDatas.Select(x => x.DataItemId).ToList());
             return items;
+        }
+        /// <summary>
+        /// Execute a use item request
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="userItem"></param>
+        public string UseItem(CoreUseItemRequest request, Item user, ITerminal terminal, IResponse response)
+        {
+            var itemManager = ModuleManager.GetManager<IItemManager>();
+            var exit = itemManager.Read(request.ItemId.Value).GetAsItem<ExitItem>();
+            var destinationLocation = itemManager.Read(Guid.Parse(exit.Exit.DestinationId));
+            var player = itemManager.Read(terminal.GetPlayerId().Value);
+            itemManager.Move(player, destinationLocation, exit);
+            var locationSummary = ModuleManager.GetManager<ILocationItemManager>()
+                .HandleReadLocationSummaryRequest(new WorldReadLocationSummaryRequest()
+                {
+                }, ModuleManager, terminal, response);
+            terminal.SendToClient(locationSummary);
+            return "";
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch
