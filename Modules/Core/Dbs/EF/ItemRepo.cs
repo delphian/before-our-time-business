@@ -143,39 +143,24 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
         /// <returns>List of items updated</returns>
         override public List<Item> Update(List<Item> items)
         {
-            base.Update(items);
             // Create child items that are new
-            void ItemCreate(List<Item> createItems)
+            void UpdateItems(List<Item> childrenItems)
             {
-                if (createItems?.Count > 0)
+                childrenItems?.ForEach(child =>
                 {
-                    Create(createItems);
-                    createItems.ForEach(item =>
+                    try
                     {
-                        ItemCreate(item.Children?.Where(x => x.Id == null).ToList());
-                    });
-                }
-            }
-            items.ForEach(item =>
-            {
-                ItemCreate(item.Children?.Where(x => x.Id == Guid.Empty).ToList());
-            });
-            // Update item data for existing items
-            if (OnItemUpdate != null)
-            {
-                void InvokeOnItemUpdate(List<Item> invokeItems)
-                {
-                    invokeItems.ForEach(item =>
+                        base.Update(new List<Item>() { child });
+                        OnItemUpdate?.Invoke(child);
+                        UpdateItems(child.Children);
+                    }
+                    catch (Exception e)
                     {
-                        OnItemUpdate(item);
-                        if (item.Children != null && item.Children.Count > 0)
-                        {
-                            InvokeOnItemUpdate(item.Children);
-                        }
-                    });
-                };
-                InvokeOnItemUpdate(items);
+                        throw new BotDatabaseException($"Unable to update item {child.Id}: {e.Message}");
+                    }
+                });
             }
+            UpdateItems(items);
             return items;
         }
         /// <summary>

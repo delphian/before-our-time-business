@@ -103,9 +103,16 @@ namespace BeforeOurTime.Business.Dbs.EF
         {
             models.ForEach((model) =>
             {
-                var trackedModel = Set.Where(x => x.Id == model.Id).First();
-                Db.Entry(trackedModel).CurrentValues.SetValues(model);
-                Db.SaveChanges();
+                var trackedModel = Set.Where(x => x.Id == model.Id).FirstOrDefault();
+                if (trackedModel == null)
+                {
+                    Create(model);
+                }
+                else
+                {
+                    Db.Entry(trackedModel).CurrentValues.SetValues(model);
+                    Db.SaveChanges();
+                }
             });
             return models;
         }
