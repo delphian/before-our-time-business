@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Business.Apis.Messages.RequestEndpoints;
-using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
@@ -8,9 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Terminals;
-using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 
 namespace BeforeOurTime.Business.Apis.Messages
 {

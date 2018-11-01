@@ -1,11 +1,10 @@
-﻿using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Json;
+﻿using BeforeOurTime.Models.Json;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;

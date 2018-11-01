@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Models;
-using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Exceptions;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
@@ -9,7 +8,7 @@ using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;

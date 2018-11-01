@@ -6,15 +6,12 @@ using System.Text;
 using System.Linq;
 using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
-using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Events.Emotes;
 using BeforeOurTime.Models.Messages.Requests.Emote;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
-using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
@@ -25,6 +22,9 @@ using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
+using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -95,7 +95,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="telnetClient"></param>
         private void ClientConnected(TelnetClient telnetClient)
         {
-            telnetClient.SetTerminal(Services.GetService<ITerminalManager>().RequestTerminal("Telnet", telnetClient.GetRemoteAddress()));
+            var terminalManager = Services.GetService<IModuleManager>().GetManager<ITerminalManager>();
+            telnetClient.SetTerminal(terminalManager.RequestTerminal("Telnet", telnetClient.GetRemoteAddress()));
             telnetClient.GetTerminal().GetDataBag()["step"] = "connected";
             TelnetServer.ClearClientScreen(telnetClient);
             TelnetServer.SendMessageToClient(telnetClient, 
@@ -109,7 +110,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="telnetClient"></param>
         private void ClientDisconnected(TelnetClient telnetClient)
         {
-            Services.GetService<ITerminalManager>().DestroyTerminal(telnetClient.GetTerminal());
+            var terminalManager = Services.GetService<IModuleManager>().GetManager<ITerminalManager>();
+            terminalManager.DestroyTerminal(telnetClient.GetTerminal());
             telnetClient.SetTerminal(null);
         }
         /// <summary>

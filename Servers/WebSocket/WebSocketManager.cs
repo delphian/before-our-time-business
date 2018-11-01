@@ -6,7 +6,6 @@ using System.Text;
 using System.Linq;
 using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
-using BeforeOurTime.Business.Apis;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using System.Net.WebSockets;
@@ -16,9 +15,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Logs;
-using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -72,7 +71,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 .ConfigureServices(kestrelServices => {
                     kestrelServices.AddSingleton(BotServices.GetService<IConfiguration>());
                     kestrelServices.AddSingleton(BotServices.GetService<IBotLogger>());
-                    kestrelServices.AddSingleton(BotServices.GetService<ITerminalManager>());
+                    kestrelServices.AddSingleton(BotServices.GetService<IModuleManager>());
                     kestrelServices.AddSingleton<IWebSocketManager>(this);
                 })
                 .SuppressStatusMessages(true)
@@ -126,7 +125,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         public void Configure(IApplicationBuilder app)
         {
             var webSocketManager = app.ApplicationServices.GetService<IWebSocketManager>();
-            var terminalManager = app.ApplicationServices.GetService<ITerminalManager>();
+            var terminalManager = app.ApplicationServices.GetService<IModuleManager>().GetManager<ITerminalManager>();
             app.UseWebSockets(new WebSocketOptions() {
                 ReceiveBufferSize = 1024 * 8
             });

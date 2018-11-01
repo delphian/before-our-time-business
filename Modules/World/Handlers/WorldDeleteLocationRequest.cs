@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Modules.World.Messages.Location.DeleteLocation;
@@ -13,6 +11,7 @@ using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {

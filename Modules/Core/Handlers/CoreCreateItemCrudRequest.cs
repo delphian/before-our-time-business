@@ -1,9 +1,8 @@
-﻿using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Messages;
+﻿using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.CreateItem;
-using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
 using System;
 using System.Collections.Generic;

@@ -1,12 +1,11 @@
 ﻿using BeforeOurTime.Models;
-using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

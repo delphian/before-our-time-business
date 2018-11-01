@@ -1,23 +1,15 @@
-﻿using BeforeOurTime.Business.Apis.Items;
-using BeforeOurTime.Business.Modules.Core.Dbs.EF;
+﻿using BeforeOurTime.Business.Modules.Terminal.Dbs.EF;
+using BeforeOurTime.Business.Modules.Terminal.Managers;
 using BeforeOurTime.Models;
+using BeforeOurTime.Models.Apis;
+using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
-using BeforeOurTime.Models.Modules.Core;
-using BeforeOurTime.Models.Modules.Core.Dbs;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
-using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
-using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Terminal;
 using BeforeOurTime.Models.Modules.Terminal.Models;
-using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
 using BeforeOutTime.Business.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,14 +20,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BeforeOurTime.Business.Modules.Core
+namespace BeforeOurTime.Business.Modules.Terminal
 {
-    public partial class CoreModule : ICoreModule
+    public partial class TerminalModule : ITerminalModule
     {
         /// <summary>
         /// Entity framework database context
         /// </summary>
-        private EFCoreModuleContext Db { set; get; }
+        private EFTerminalModuleContext Db { set; get; }
         /// <summary>
         /// Manage all modules
         /// </summary>
@@ -49,20 +41,16 @@ namespace BeforeOurTime.Business.Modules.Core
         /// </summary>
         private List<ICrudModelRepository> Repositories { set; get; } = new List<ICrudModelRepository>();
         /// <summary>
-        /// Item data repository
-        /// </summary>
-        private IItemRepo ItemRepo { set; get; }
-        /// <summary>
         /// Constructor
         /// </summary>
-        public CoreModule(
+        public TerminalModule(
             IModuleManager moduleManager)
         {
             ModuleManager = moduleManager;
             var connectionString = ModuleManager.GetConfiguration().GetConnectionString("DefaultConnection");
             var dbOptions = new DbContextOptionsBuilder<BaseContext>();
                 dbOptions.UseSqlServer(connectionString);
-            Db = new EFCoreModuleContext(dbOptions.Options);
+            Db = new EFTerminalModuleContext(dbOptions.Options);
             Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
         }
@@ -72,11 +60,11 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="db"></param>
         /// <param name="itemRepo"></param>
         /// <returns></returns>
-        List<IModelManager> BuildManagers(IModuleManager moduleManager, EFCoreModuleContext db)
+        List<IModelManager> BuildManagers(IModuleManager moduleManager, EFTerminalModuleContext db)
         {
             var managers = new List<IModelManager>
             {
-                new ItemManager(moduleManager, new ItemRepo(db)),
+                new TerminalManager(ModuleManager)
             };
             return managers;
         }
@@ -106,7 +94,7 @@ namespace BeforeOurTime.Business.Modules.Core
             return Managers;
         }
         /// <summary>
-        /// Get manager of specified type
+        /// Get item manager of specified type
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -122,15 +110,6 @@ namespace BeforeOurTime.Business.Modules.Core
         {
             return new List<Guid>()
             {
-                CoreReadItemGraphRequest._Id,
-                CoreReadItemJsonRequest._Id,
-                CoreUpdateItemJsonRequest._Id,
-                CoreCreateItemJsonRequest._Id,
-                CoreCreateItemCrudRequest._Id,
-                CoreReadItemCrudRequest._Id,
-                CoreUpdateItemCrudRequest._Id,
-                CoreDeleteItemCrudRequest._Id,
-                CoreUseItemRequest._Id
             };
         }
         /// <summary>
@@ -139,9 +118,6 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="repositories"></param>
         public void Initialize(List<ICrudModelRepository> repositories)
         {
-            ItemRepo = repositories
-                .Where(x => x is IItemRepo)
-                .Select(x => (IItemRepo)x).FirstOrDefault();
             ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
             ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
             ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
@@ -154,10 +130,6 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="item">Base item just created from datastore</param>
         public void OnItemCreate(Item item)
         {
-            Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
-            {
-                ((IItemModelManager)manager).OnItemCreate(item);
-            });
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
@@ -165,10 +137,6 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
-            Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
-            {
-                ((IItemModelManager)manager).OnItemRead(item);
-            });
         }
         /// <summary>
         /// Append attribute to base item when it is loaded
@@ -176,10 +144,6 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="item">Base item about to be persisted to datastore</param>
         public void OnItemUpdate(Item item)
         {
-            Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
-            {
-                ((IItemModelManager)manager).OnItemUpdate(item);
-            });
         }
         /// <summary>
         /// Delete attribute of base item before base item is deleted
@@ -187,44 +151,22 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="item">Base item about to be deleted</param>
         public void OnItemDelete(Item item)
         {
-            Managers.Where(x => x is IItemModelManager).ToList().ForEach(manager =>
-            {
-                ((IItemModelManager)manager).OnItemDelete(item);
-            });
         }
         #endregion
         #region Message Handlers
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         public IResponse HandleMessage(
-            IMessage message, 
-            IModuleManager moduleManager, 
-            ITerminal terminal, 
+            IMessage message,
+            IModuleManager mm,
+            ITerminal terminal,
             IResponse response)
         {
-            if (message.GetMessageId() == CoreReadItemGraphRequest._Id)
-                response = HandleCoreReadItemGraphRequest(message, moduleManager, terminal, response);
-            if (message.GetMessageId() == CoreCreateItemCrudRequest._Id)
-                response = HandleCoreCreateItemCrudRequest(message, moduleManager, terminal, response);
-            if (message.GetMessageId() == CoreReadItemCrudRequest._Id)
-                response = HandleCoreReadItemCrudRequest(message, moduleManager, terminal, response);
-            if (message.GetMessageId() == CoreUpdateItemCrudRequest._Id)
-                response = HandleCoreUpdateItemCrudRequest(message, moduleManager, terminal, response);
-            if (message.GetMessageId() == CoreDeleteItemCrudRequest._Id)
-                response = HandleCoreDeleteItemCrudRequest(message, moduleManager, terminal, response);
-            if (message.GetMessageId() == CoreReadItemJsonRequest._Id)
-                response = HandleCoreReadItemJsonRequest(message, moduleManager, terminal, response);
-            if (message.GetMessageId() == CoreUpdateItemJsonRequest._Id)
-                response = HandleCoreUpdateItemJsonRequest(message, moduleManager, terminal, response);
-            if (message.GetMessageId() == CoreCreateItemJsonRequest._Id)
-                response = HandleCoreCreateItemJsonRequest(message, moduleManager, terminal, response);
-            if (message.GetMessageId() == CoreUseItemRequest._Id)
-                response = HandleCoreUseItemRequest(message, moduleManager, terminal, response);
             return response;
         }
         /// <summary>
@@ -235,7 +177,7 @@ namespace BeforeOurTime.Business.Modules.Core
         /// <param name="callback"></param>
         /// <returns></returns>
         private IResponse HandleRequestWrapper<T>(
-            IRequest request, 
+            IRequest request,
             Action<IResponse> callback) where T : Response, new()
         {
             var response = new T()
@@ -245,11 +187,12 @@ namespace BeforeOurTime.Business.Modules.Core
             try
             {
                 callback(response);
+                response._responseSuccess = true;
             }
             catch (Exception e)
             {
-                ModuleManager.GetLogger().LogException($"While handling {request.GetMessageName()}", e);
-                response._responseSuccess = false;
+                ModuleManager.GetLogger()
+                    .LogException($"While handling {request.GetMessageName()}", e);
                 response._responseMessage = e.Message;
             }
             return response;

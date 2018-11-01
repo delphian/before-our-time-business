@@ -1,11 +1,10 @@
-﻿using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Messages;
+﻿using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Messages.UpdateAccount;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
-using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

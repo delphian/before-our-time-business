@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Terminals;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System.Threading;
@@ -25,7 +24,6 @@ namespace BeforeOurTime.Business.Apis
         private IBotLogger Logger { set; get; }
         private IConfiguration Configuration { set; get; }
         private IMessageManager MessageManager { set; get; }
-        private ITerminalManager TerminalManager { set; get; }
         private IModuleManager ModuleManager { set; get; }
         /// <summary>
         /// Constructor
@@ -36,13 +34,11 @@ namespace BeforeOurTime.Business.Apis
             IBotLogger logger,
             IConfiguration configuration,
             IMessageManager messageManager,
-            ITerminalManager terminalManager,
             IModuleManager moduleManager)
         {
             Logger = logger;
             Configuration = configuration;
             MessageManager = messageManager;
-            TerminalManager = terminalManager;
             ModuleManager = moduleManager;
         }
         public IMessageManager GetMessageManager()
@@ -52,10 +48,6 @@ namespace BeforeOurTime.Business.Apis
         public IItemManager GetItemManager()
         {
             return ModuleManager.GetManager<IItemManager>();
-        }
-        public ITerminalManager GetTerminalManager()
-        {
-            return TerminalManager;
         }
         public IBotLogger GetLogger()
         { 

@@ -1,7 +1,6 @@
 ﻿#define DEBUG
 
 using BeforeOurTime.Business.Apis.Messages;
-using BeforeOurTime.Business.Apis.Terminals;
 using BeforeOurTime.Business.Servers;
 using BeforeOurTime.Models.Messages.Requests;
 using Jint;
@@ -17,11 +16,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using BeforeOurTime.Business.Modules;
-using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Business.Logs;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
+using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Business.Modules.Terminal.Managers;
 
 namespace BeforeOurTime.Business
 {
@@ -80,7 +81,6 @@ namespace BeforeOurTime.Business
                 .AddSingleton<IConfiguration>(configuration)
                 .AddLogging()
                 .AddScoped<IMessageManager, MessageManager>()
-                .AddScoped<ITerminalManager, TerminalManager>()
                 .AddScoped<IModuleManager, ModuleManager>();
         }
         /// <summary>
@@ -104,7 +104,8 @@ namespace BeforeOurTime.Business
         /// </summary>
         private static void ListenToTerminals()
         {
-            ((TerminalManager)ServiceProvider.GetService<ITerminalManager>()).OnTerminalCreated += delegate (ITerminal terminal)
+            var terminalManager = ServiceProvider.GetService<IModuleManager>().GetManager<ITerminalManager>();
+            ((TerminalManager)terminalManager).OnTerminalCreated += delegate (ITerminal terminal)
             {
                 ((Terminal)terminal).OnMessageToServer += delegate (ITerminal xterminal, IRequest request)
                 {

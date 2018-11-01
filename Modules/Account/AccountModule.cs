@@ -17,7 +17,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.UpdateAccount;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOutTime.Business.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

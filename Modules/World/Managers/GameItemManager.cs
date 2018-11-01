@@ -13,8 +13,8 @@ using BeforeOurTime.Models.Modules.World.Dbs;
 using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
-using BeforeOurTime.Models.Terminals;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {

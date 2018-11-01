@@ -14,10 +14,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using BeforeOurTime.Models.Messages.Systems.Ping;
-using BeforeOurTime.Models.Terminals;
 using Microsoft.Extensions.Configuration;
 using BeforeOurTime.Models.Logs;
-using BeforeOurTime.Business.Apis.Terminals;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {

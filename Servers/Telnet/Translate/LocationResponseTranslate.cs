@@ -6,6 +6,7 @@ using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.World.Models.Items;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {
@@ -54,8 +55,13 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
                 locationResponse.Exits.ForEach(ioExitUpdate =>
                 {
                     telnetClient.ItemExits.Add(ioExitUpdate);
+                    var exit = ioExitUpdate.Item.GetAsItem<ExitItem>();
+                    var commands = "";
+                    exit.Uses.Uses.ForEach(use => {
+                        commands += (commands == "") ? $"{use.Name}" : $"|{use.Name}";
+                    });
                     exits = (exits == null) ? "" : $"{exits}, ";
-                    exits += $"{AnsiColors.purpleB}{ioExitUpdate.Name}{AnsiColors.reset}";
+                    exits += $"{AnsiColors.purpleB}{exit.Visible.Name} [{commands}]{AnsiColors.reset}";
                 });
             }
             else

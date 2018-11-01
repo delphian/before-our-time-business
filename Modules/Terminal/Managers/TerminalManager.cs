@@ -1,24 +1,35 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
-using BeforeOurTime.Models.Messages;
-using System.Net;
+using BeforeOurTime.Models.Messages.Responses;
 using Microsoft.Extensions.Logging;
-using BeforeOurTime.Models.Terminals;
-using BeforeOurTime.Models.Modules;
-using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Logs;
+using BeforeOurTime.Models;
+using BeforeOurTime.Models.Messages.Requests;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Terminal.Models.Data;
+using BeforeOurTime.Models.Modules.Account.Managers;
+using BeforeOurTime.Models.Modules.Terminal.Models;
+using System.Net;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
+using BeforeOurTime.Models.Messages;
 
-namespace BeforeOurTime.Business.Apis.Terminals
+namespace BeforeOurTime.Business.Modules.Terminal.Managers
 {
-    /// <summary>
-    /// Central manager of all client connections regardless of protocol (telnet, websocket, etc)
-    /// </summary>
-    public class TerminalManager : ITerminalManager
+    public partial class TerminalManager : ModelManager<TerminalData>, ITerminalManager
     {
+        /// <summary>
+        /// Log errors
+        /// </summary>
         private IBotLogger Logger { set; get; }
+        /// <summary>
+        /// Manage all modules
+        /// </summary>
+        private IModuleManager ModuleManager { set; get; }
+        /// <summary>
+        /// Manage accounts
+        /// </summary>
         private IAccountManager AccountManager { set; get; }
         /// <summary>
         /// List of all active terminals
@@ -46,12 +57,28 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// Constructor
         /// </summary>
         public TerminalManager(
-            IServiceProvider serviceProvider
-        )
+            IModuleManager moduleManager)
         {
-//            var scopedProvider = serviceProvider.CreateScope().ServiceProvider;
-            AccountManager = serviceProvider.GetService<IModuleManager>().GetManager<IAccountManager>();
-            Logger = serviceProvider.GetService<IBotLogger>();
+            ModuleManager = moduleManager;
+            AccountManager = ModuleManager.GetManager<IAccountManager>();
+            Logger = ModuleManager.GetLogger();
+        }
+        /// <summary>
+        /// Get all repositories declared by manager
+        /// </summary>
+        /// <returns></returns>
+        public List<ICrudModelRepository> GetRepositories()
+        {
+            return new List<ICrudModelRepository>();
+        }
+        /// <summary>
+        /// Get repository as interface
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetRepository<T>() where T : ICrudModelRepository
+        {
+            return GetRepositories().Where(x => x is T).Select(x => (T)x).FirstOrDefault();
         }
         /// <summary>
         /// Create a new terminal
@@ -96,6 +123,33 @@ namespace BeforeOurTime.Business.Apis.Terminals
         public List<ITerminal> GetTerminals()
         {
             return Terminals;
+        }
+        /// <summary>
+        /// Instantite response object and wrap request handlers in try catch
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="request"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        private IResponse HandleRequestWrapper<T>(
+            IRequest request,
+            Action<IResponse> callback) where T : Response, new()
+        {
+            var response = new T()
+            {
+                _requestInstanceId = request.GetRequestInstanceId(),
+            };
+            try
+            {
+                callback(response);
+            }
+            catch (Exception e)
+            {
+                ModuleManager.GetLogger().LogException($"While handling {request.GetMessageName()}", e);
+                response._responseSuccess = false;
+                response._responseMessage = e.Message;
+            }
+            return response;
         }
     }
 }

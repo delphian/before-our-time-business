@@ -1,12 +1,11 @@
-﻿using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Json;
+﻿using BeforeOurTime.Models.Json;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.CreateItemJson;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Terminals;
+using BeforeOurTime.Models.Modules.Terminal.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
