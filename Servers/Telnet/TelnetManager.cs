@@ -228,6 +228,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         var json = message.Remove(0, message.IndexOf('{'));
                         MFCAdminItemJsonUpdate(telnetClient, words[4], json);
                     }
+                    if (words[1] == "item" && words[2] == "json" && words[3] == "read")
+                    {
+                        MFCAdminItemJsonRead(telnetClient, words[4]);
+                    }
                 break;
                 case "bye":
                 case "q":
@@ -251,7 +255,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 case "help":
                     TelnetServer.SendMessageToClient(telnetClient, "\r\n\r\n" +
                         " - Admin item graph\r\n" +
-                        " - Admin item json update {guid} {json}" +
+                        " - Admin item json update {guid} {json}\r\n" +
+                        " - Admin item json read {guid}\r\n" +
                         " - Look\r\n" +
                         " - Bye\r\n" +
                         " - Go {exit name, or partial exit name}\r\n" +
@@ -284,6 +289,15 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         JSON = json
                     }
                 }
+            });
+            telnetClient.GetTerminal().SendToClient(response);
+        }
+        private void MFCAdminItemJsonRead(TelnetClient telnetClient, string itemId)
+        {
+            var response = telnetClient.GetTerminal().SendToApi(new CoreReadItemJsonRequest()
+            {
+                IncludeChildren = false,
+                ItemIds = new List<Guid>() { new Guid(itemId) }
             });
             telnetClient.GetTerminal().SendToClient(response);
         }
