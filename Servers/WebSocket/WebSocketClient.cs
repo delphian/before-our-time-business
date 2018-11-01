@@ -138,8 +138,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     {
                         IResponse response;
                         var message = JsonConvert.DeserializeObject<Message>(messageJson);
-                        Logger.LogInformation($"<< {Id} {message.GetMessageName()}");
-                        Logger.LogDebug($"<< {Id} {messageJson}");
+//                        Logger.LogInformation($"<< {Id} {message.GetMessageName()}");
+//                        Logger.LogDebug($"<< {Id} {messageJson}");
                         var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
                         response = Terminal.SendToApi(request);
                         // Send response
@@ -203,8 +203,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                 var byteMessage = new UTF8Encoding(false, true).GetBytes(messageJson);
                 var offset = 0;
                 var endOfMessage = false;
-                Logger.LogInformation($">> {Id} {message.GetMessageName()}");
-                Logger.LogDebug($">> {Id} {messageJson}");
+//                Logger.LogInformation($">> {Id} {message.GetMessageName()}");
+//                Logger.LogDebug($">> {Id} {messageJson}");
                 do
                 {
                     var remainingBytes = byteMessage.Count() - (offset * 1024);

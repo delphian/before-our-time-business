@@ -21,6 +21,10 @@ using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Logs;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -58,7 +62,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
             Services = services;
             Address = IPAddress.Parse(configuration.GetSection("Servers").GetSection("Telnet").GetSection("Listen").GetValue<string>("Address"));
             Port = configuration.GetSection("Servers").GetSection("Telnet").GetSection("Listen").GetValue<int>("Port");
-            TelnetServer = new TelnetServer(Address);
+            TelnetServer = new TelnetServer(Address, 1024 * 1024);
             TelnetServer.ClientConnected += ClientConnected;
             TelnetServer.ClientDisconnected += ClientDisconnected;
             TelnetServer.ConnectionBlocked += ClientBlocked;
@@ -213,6 +217,18 @@ namespace BeforeOurTime.Business.Servers.Telnet
             string firstWord = message.Split(' ').First();
             switch (firstWord)
             {
+                case "admin":
+                    var words = message.Split(' ');
+                    if (message == "admin item graph")
+                    {
+                        MFCAdminItemTree(telnetClient, message);
+                    }
+                    if (words[1] == "item" && words[2] == "json" && words[3] == "update")
+                    {
+                        var json = message.Remove(0, message.IndexOf('{'));
+                        MFCAdminItemJsonUpdate(telnetClient, words[4], json);
+                    }
+                break;
                 case "bye":
                 case "q":
                 case "exit":
@@ -234,6 +250,8 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     break;
                 case "help":
                     TelnetServer.SendMessageToClient(telnetClient, "\r\n\r\n" +
+                        " - Admin item graph\r\n" +
+                        " - Admin item json update {guid} {json}" +
                         " - Look\r\n" +
                         " - Bye\r\n" +
                         " - Go {exit name, or partial exit name}\r\n" +
@@ -244,6 +262,30 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     TelnetServer.SendMessageToClient(telnetClient, "\r\nBad command. Try \"help\"\r\n> ");
                     break;
             }
+        }
+        private void MFCAdminItemTree(TelnetClient telnetClient, string message)
+        {
+            var response = telnetClient.GetTerminal().SendToApi(new CoreReadItemGraphRequest()
+            {
+                ItemId = new Guid("f4212bfe-ef65-4632-df2b-08d63af92e75")
+            });
+            telnetClient.GetTerminal().SendToClient(response);
+        }
+        private void MFCAdminItemJsonUpdate(TelnetClient telnetClient, string itemId, string json)
+        {
+            var response = telnetClient.GetTerminal().SendToApi(new CoreUpdateItemJsonRequest()
+            {
+                ItemsJson = new List<CoreItemJson>()
+                {
+                    new CoreItemJson()
+                    {
+                        Id = itemId,
+                        IncludeChildren = true,
+                        JSON = json
+                    }
+                }
+            });
+            telnetClient.GetTerminal().SendToClient(response);
         }
         /// <summary>
         /// Handle Message From Client when Go command is issued

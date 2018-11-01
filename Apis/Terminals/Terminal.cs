@@ -222,6 +222,9 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <param name="message"></param>
         public void SendToClient(IMessage message)
         {
+            var messageJson = JsonConvert.SerializeObject(message);
+            Logger.LogInformation($">> {Id} {message.GetMessageName()}");
+            Logger.LogDebug($">> {Id} {messageJson}");
             OnMessageToTerminal?.Invoke(this, message);
         }
         /// <summary>
@@ -230,6 +233,9 @@ namespace BeforeOurTime.Business.Apis.Terminals
         /// <param name="request"></param>
         public IResponse SendToApi(IRequest request)
         {
+            var messageJson = JsonConvert.SerializeObject(request);
+            Logger.LogInformation($"<< {Id} {request.GetMessageName()}");
+            Logger.LogDebug($"<< {Id} {messageJson}");
             IResponse response = new Response()
             {
                 _requestInstanceId = request.GetRequestInstanceId(),

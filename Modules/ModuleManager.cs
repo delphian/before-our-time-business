@@ -224,33 +224,42 @@ namespace BeforeOurTime.Business.Modules
         /// <param name="userItem"></param>
         public CoreUseItemResponse UseItem(CoreUseItemRequest request, Item user, ITerminal terminal, IResponse response)
         {
-            var item = GetManager<IItemManager>().Read(request.ItemId.Value);
-            var manager = GetManager(item);
-            if (manager == null)
-            {
-                throw new BeforeOurTimeException($"No manager found to use item {item.Id.ToString()}");
-            }
-            var result = manager.UseItem(request, user, terminal, response);
             response = new CoreUseItemResponse()
             {
                 _requestInstanceId = request._requestInstanceId,
-                _responseSuccess = true,
-                _responseMessage = result,
                 CoreUseItemEvent = new CoreUseItemEvent()
                 {
                     Use = request.Use,
-                    Used = item,
                     Using = user,
-                    Success = (result == null)
+                    Success = false
                 }
             };
+            try
+            {
+                var item = GetManager<IItemManager>().Read(request.ItemId.Value);
+                var manager = GetManager(item);
+                if (manager == null)
+                {
+                    throw new BeforeOurTimeException($"No manager found to use item {item.Id.ToString()}");
+                }
+                var result = manager.UseItem(request, user, terminal, response);
+                ((CoreUseItemResponse)response)._responseSuccess = true;
+                ((CoreUseItemResponse)response)._responseMessage = result;
+                ((CoreUseItemResponse)response).CoreUseItemEvent.Used = item;
+                ((CoreUseItemResponse)response).CoreUseItemEvent.Success = (result == null);
+            }
+            catch (Exception e)
+            {
+                ((CoreUseItemResponse)response)._responseSuccess = false;
+                ((CoreUseItemResponse)response)._responseMessage = $"Unable to use item: {e.Message}";
+            }
             return (CoreUseItemResponse)response;
         }
         /// <summary>
         /// Get configuration
         /// </summary>
         /// <returns></returns>
-            public IConfiguration GetConfiguration()
+        public IConfiguration GetConfiguration()
         {
             return Configuration;
         }
