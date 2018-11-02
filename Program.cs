@@ -1,6 +1,5 @@
 ﻿#define DEBUG
 
-using BeforeOurTime.Business.Apis.Messages;
 using BeforeOurTime.Business.Servers;
 using BeforeOurTime.Models.Messages.Requests;
 using Jint;
@@ -84,7 +83,6 @@ namespace BeforeOurTime.Business
                 .AddSingleton<IBotLogger>(new FileLogger(configuration))
                 .AddSingleton<IConfiguration>(configuration)
                 .AddLogging()
-                .AddScoped<IMessageManager, MessageManager>()
                 .AddScoped<IModuleManager, ModuleManager>();
         }
         /// <summary>
