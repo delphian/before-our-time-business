@@ -10,6 +10,8 @@ using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules.Core.Messages.MoveItem;
+using BeforeOurTime.Models.Messages;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
@@ -157,16 +159,22 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="source">Item responsible for doing the moving</param>
         public Item Move(Item item, Item newParent, Item source = null)
         {
-            // Send departure message
             var oldLocation = ItemRepo.Read(item.ParentId.Value);
-//            MessageManager.SendDepartureEvent(item, oldLocation, source.Id);
             // Update item's location
             item.Parent = newParent;
             item.ParentId = newParent.Id;
             ItemRepo.Update(item);
-            // Send arrival message
             var newLocation = ItemRepo.Read(newParent.Id);
-//            MessageManager.SendArrivalEvent(item, newLocation, source.Id);
+            // Send messages
+            var moveItemEvent = new CoreMoveItemEvent()
+            {
+                Item = item,
+                OldParent = oldLocation,
+                NewParent = newParent
+            };
+            var messageManager = ModuleManager.GetManager<IMessageManager>();
+            messageManager.SendMessage(new List<IMessage>() { moveItemEvent }, oldLocation.Children);
+            messageManager.SendMessage(new List<IMessage>() { moveItemEvent }, newLocation.Children);
             return item;
         }
     }

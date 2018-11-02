@@ -9,12 +9,12 @@ using BeforeOurTime.Models.Modules.Core.Models.Properties;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {
-    public class DepartureEventTranslate : Translate, ITranslate
+    public class CoreMoveItemEventTranslate : Translate, ITranslate
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        public DepartureEventTranslate() { }
+        public CoreMoveItemEventTranslate() { }
         /// <summary>
         /// Register to handle a specific set of messages
         /// </summary>
@@ -37,8 +37,8 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             TelnetServer telnetServer,
             TelnetClient telnetClient)
         {
-            var departureEvent = message.GetMessageAsType<CoreMoveItemEvent>();
-            var visible = departureEvent.Item.GetProperty<VisibleProperty>("Visible");
+            var arrivalEvent = message.GetMessageAsType<CoreMoveItemEvent>();
+            var visible = arrivalEvent.Item.GetProperty<VisibleProperty>("Visible");
             telnetServer.SendMessageToClient(telnetClient, "\r\n"
                 + $"{AnsiColors.green}{visible?.Name} has moved{AnsiColors.reset}");
         }
