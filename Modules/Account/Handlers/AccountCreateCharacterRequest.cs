@@ -6,6 +6,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             var request = message.GetMessageAsType<AccountCreateCharacterRequest>();
             response = HandleRequestWrapper<AccountCreateCharacterResponse>(request, res =>
             {
-                var terminal = mm.GetManager<ITerminalManager>().GetTerminals().Where(x => x.GetId() == origin.TerminalId).FirstOrDefault();
+                var terminal = origin.GetData<TerminalData>().Terminal;
                 var characterItem = ModuleManager.GetManager<IAccountCharacterManager>()
                     .Create(terminal.GetAccountId().Value, request.Name, request.Temporary);
                 ((AccountCreateCharacterResponse)res).CreatedAccountCharacterEvent = new AccountCreateCharacterEvent()

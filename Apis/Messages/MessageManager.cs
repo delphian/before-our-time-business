@@ -10,6 +10,7 @@ using BeforeOurTime.Models.Apis;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 
 namespace BeforeOurTime.Business.Apis.Messages
 {
@@ -48,9 +49,9 @@ namespace BeforeOurTime.Business.Apis.Messages
         {
             recipients.ForEach(delegate (Item recipient)
             {
-                if (recipient.TerminalId != null)
+                if (recipient.GetData<TerminalData>() != null)
                 {
-                    TerminalManager.SendToTerminalId(recipient.TerminalId.Value, message);
+                    TerminalManager.SendToTerminalId(recipient.GetData<TerminalData>().TerminalId, message);
                 } else
                 {
                     //var messageCopy = (SavedMessage)savedMessage.Clone();

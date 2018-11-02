@@ -1,24 +1,19 @@
 ﻿using BeforeOurTime.Business.Modules.Terminal.Dbs.EF;
 using BeforeOurTime.Business.Modules.Terminal.Managers;
 using BeforeOurTime.Models;
-using BeforeOurTime.Models.Apis;
-using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal;
-using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOutTime.Business.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace BeforeOurTime.Business.Modules.Terminal
 {
@@ -137,6 +132,10 @@ namespace BeforeOurTime.Business.Modules.Terminal
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
+            Managers.Where(x => x is ITerminalManager).ToList().ForEach(manager =>
+            {
+                ((ITerminalManager)manager).OnItemRead(item);
+            });
         }
         /// <summary>
         /// Append attribute to base item when it is loaded

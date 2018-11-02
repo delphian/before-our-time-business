@@ -25,6 +25,8 @@ using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Business.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 
 namespace BeforeOurTime.Business
 {
@@ -124,9 +126,12 @@ namespace BeforeOurTime.Business
                         Item origin = (terminal.GetPlayerId() != null) ?
                             itemManager.Read(terminal.GetPlayerId().Value) :
                             new Item() {
-                                Type = ItemType.Ghost
+                                Type = ItemType.Ghost,
+                                Data = new List<IItemData>() { new TerminalData() {
+                                    TerminalId = terminal.GetId(),
+                                    Terminal = terminal
+                                } }
                             };
-                        origin.TerminalId = terminal.GetId();
                         response = ServiceProvider.GetService<IModuleManager>()
                             .HandleMessage(request, origin, response);
                         return response;

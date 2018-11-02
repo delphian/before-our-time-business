@@ -19,6 +19,7 @@ using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
+using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -109,8 +110,8 @@ namespace BeforeOurTime.Business.Modules.World.Managers
                 .HandleReadLocationSummaryRequest(new WorldReadLocationSummaryRequest()
                 {
                 }, origin, ModuleManager, response);
-            var originTerminal = ModuleManager.GetManager<ITerminalManager>().GetTerminals().Where(x => x.GetId() == origin.TerminalId).First();
-            originTerminal.SendToClient(locationSummary);
+            var terminal = origin.GetData<TerminalData>().Terminal;
+            terminal.SendToClient(locationSummary);
             return "";
         }
         /// <summary>

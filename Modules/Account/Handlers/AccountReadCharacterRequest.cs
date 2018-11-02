@@ -5,6 +5,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 using BeforeOurTime.Models.Modules.World.Models.Items;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             var request = message.GetMessageAsType<AccountReadCharacterRequest>();
             response = HandleRequestWrapper<AccountReadCharacterResponse>(request, res =>
             {
-                var terminal = mm.GetManager<ITerminalManager>().GetTerminals().Where(x => x.GetId() == origin.TerminalId).FirstOrDefault();
+                var terminal = origin.GetData<TerminalData>().Terminal;
                 var accountCharacters = ModuleManager.GetManager<AccountCharacterManager>()
                     .ReadByAccount(terminal.GetAccountId().Value);
                 var items = ModuleManager.GetItemRepo()

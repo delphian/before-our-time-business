@@ -14,6 +14,8 @@ using BeforeOurTime.Models.Modules.Terminal.Models;
 using System.Net;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Account.Dbs;
 
 namespace BeforeOurTime.Business.Modules.Terminal.Managers
 {
@@ -150,6 +152,25 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
                 response._responseMessage = e.Message;
             }
             return response;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        public void OnItemRead(Item item)
+        {
+            if (item.Type == ItemType.Character)
+            {
+                var terminal = GetTerminals().Where(x => x.GetPlayerId() == item.Id).FirstOrDefault();
+                if (terminal != null)
+                {
+                    item.Data.Add(new TerminalData()
+                    {
+                        TerminalId = terminal.GetId(),
+                        Terminal = terminal
+                    });
+                }
+            }
         }
     }
 }
