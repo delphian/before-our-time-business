@@ -10,11 +10,14 @@ using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
     /// <summary>
-    /// Manages security, environment messages, CRUD, and run time considerations for items
+    /// Pass messages between items and terminals
     /// </summary>
     public class MessageManager : ModelManager<MessageData>, IMessageManager
     {
@@ -54,6 +57,31 @@ namespace BeforeOurTime.Business.Apis.Items
         public T GetRepository<T>() where T : ICrudModelRepository
         {
             return GetRepositories().Where(x => x is T).Select(x => (T)x).FirstOrDefault();
+        }
+        /// <summary>
+        /// Send one or more messages to one or more items
+        /// </summary>
+        /// <param name="messages">List of messages to send</param>
+        /// <param name="items">List of items to send messages to</param>
+        /// <param name="origin">Origin of the messages</param>
+        public void SendMessage(List<IMessage> messages, List<Item> items, Item origin = null)
+        {
+            items.ForEach(item =>
+            {
+                // If a terminal is attached to the item then forward message to terminal
+                var terminal = item.GetData<TerminalData>()?.Terminal;
+                if (terminal != null)
+                {
+                    messages.ForEach(message =>
+                    {
+                        terminal.SendToClient(message);
+                    });
+                }
+                else
+                {
+                    // Deliver to item javascript?
+                }
+            });
         }
     }
 }

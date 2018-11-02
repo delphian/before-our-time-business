@@ -20,6 +20,7 @@ using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models.Data;
+using BeforeOurTime.Models.Messages;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -103,6 +104,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         public string UseItem(CoreUseItemRequest request, Item origin, IResponse response)
         {
             var itemManager = ModuleManager.GetManager<IItemManager>();
+            var messageManager = ModuleManager.GetManager<IMessageManager>();
             var exit = itemManager.Read(request.ItemId.Value).GetAsItem<ExitItem>();
             var destinationLocation = itemManager.Read(Guid.Parse(exit.Exit.DestinationId));
             itemManager.Move(origin, destinationLocation, exit);
@@ -110,8 +112,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
                 .HandleReadLocationSummaryRequest(new WorldReadLocationSummaryRequest()
                 {
                 }, origin, ModuleManager, response);
-            var terminal = origin.GetData<TerminalData>().Terminal;
-            terminal.SendToClient(locationSummary);
+            messageManager.SendMessage(new List<IMessage>() { locationSummary }, new List<Item>() { origin });
             return "";
         }
         /// <summary>
