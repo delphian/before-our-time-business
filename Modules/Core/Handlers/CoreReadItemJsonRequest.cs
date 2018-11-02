@@ -5,6 +5,7 @@ using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -20,13 +21,13 @@ namespace BeforeOurTime.Business.Modules.Core
         /// Handle a message
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         private IResponse HandleCoreReadItemJsonRequest(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             var request = message.GetMessageAsType<CoreReadItemJsonRequest>();

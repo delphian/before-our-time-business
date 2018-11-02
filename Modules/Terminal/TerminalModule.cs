@@ -158,13 +158,13 @@ namespace BeforeOurTime.Business.Modules.Terminal
         /// Handle a message
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         public IResponse HandleMessage(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             return response;

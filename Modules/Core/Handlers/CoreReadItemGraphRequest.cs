@@ -3,6 +3,7 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Models.Modules.World;
@@ -19,13 +20,13 @@ namespace BeforeOurTime.Business.Modules.Core
         /// Handle a message
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         private IResponse HandleCoreReadItemGraphRequest(
-            IMessage message, 
+            IMessage message,
+            Item origin,
             IModuleManager mm, 
-            ITerminal terminal, 
             IResponse response)
         {
             var request = message.GetMessageAsType<CoreReadItemGraphRequest>();

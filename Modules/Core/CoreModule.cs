@@ -7,6 +7,7 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Dbs;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;
@@ -16,6 +17,7 @@ using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
 using BeforeOutTime.Business.Dbs.EF;
@@ -198,33 +200,33 @@ namespace BeforeOurTime.Business.Modules.Core
         /// Handle a message
         /// </summary>
         /// <param name="api"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
         /// <param name="response"></param>
         public IResponse HandleMessage(
             IMessage message, 
+            Item origin,
             IModuleManager moduleManager, 
-            ITerminal terminal, 
             IResponse response)
         {
             if (message.GetMessageId() == CoreReadItemGraphRequest._Id)
-                response = HandleCoreReadItemGraphRequest(message, moduleManager, terminal, response);
+                response = HandleCoreReadItemGraphRequest(message, origin, moduleManager, response);
             if (message.GetMessageId() == CoreCreateItemCrudRequest._Id)
-                response = HandleCoreCreateItemCrudRequest(message, moduleManager, terminal, response);
+                response = HandleCoreCreateItemCrudRequest(message, origin, moduleManager, response);
             if (message.GetMessageId() == CoreReadItemCrudRequest._Id)
-                response = HandleCoreReadItemCrudRequest(message, moduleManager, terminal, response);
+                response = HandleCoreReadItemCrudRequest(message, origin, moduleManager, response);
             if (message.GetMessageId() == CoreUpdateItemCrudRequest._Id)
-                response = HandleCoreUpdateItemCrudRequest(message, moduleManager, terminal, response);
+                response = HandleCoreUpdateItemCrudRequest(message, origin, moduleManager, response);
             if (message.GetMessageId() == CoreDeleteItemCrudRequest._Id)
-                response = HandleCoreDeleteItemCrudRequest(message, moduleManager, terminal, response);
+                response = HandleCoreDeleteItemCrudRequest(message, origin, moduleManager, response);
             if (message.GetMessageId() == CoreReadItemJsonRequest._Id)
-                response = HandleCoreReadItemJsonRequest(message, moduleManager, terminal, response);
+                response = HandleCoreReadItemJsonRequest(message, origin, moduleManager, response);
             if (message.GetMessageId() == CoreUpdateItemJsonRequest._Id)
-                response = HandleCoreUpdateItemJsonRequest(message, moduleManager, terminal, response);
+                response = HandleCoreUpdateItemJsonRequest(message, origin, moduleManager, response);
             if (message.GetMessageId() == CoreCreateItemJsonRequest._Id)
-                response = HandleCoreCreateItemJsonRequest(message, moduleManager, terminal, response);
+                response = HandleCoreCreateItemJsonRequest(message, origin, moduleManager, response);
             if (message.GetMessageId() == CoreUseItemRequest._Id)
-                response = HandleCoreUseItemRequest(message, moduleManager, terminal, response);
+                response = HandleCoreUseItemRequest(message, origin, moduleManager, response);
             return response;
         }
         /// <summary>

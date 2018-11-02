@@ -3,6 +3,7 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.UpdateItem;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using System;
 using System.Collections.Generic;
@@ -16,13 +17,13 @@ namespace BeforeOurTime.Business.Modules.Core
         /// Handle a message
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         private IResponse HandleCoreUpdateItemCrudRequest(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             var request = message.GetMessageAsType<CoreUpdateItemCrudRequest>();

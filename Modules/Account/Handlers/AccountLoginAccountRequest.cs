@@ -2,6 +2,7 @@
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,13 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// Handle a message
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         public IResponse HandleLoginAccountRequest(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             var request = message.GetMessageAsType<AccountLoginAccountRequest>();

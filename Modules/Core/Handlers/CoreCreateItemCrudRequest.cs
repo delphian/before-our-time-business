@@ -2,6 +2,7 @@
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.CreateItem;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
 using System;
@@ -16,13 +17,13 @@ namespace BeforeOurTime.Business.Modules.Core
         /// Handle a message
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         private IResponse HandleCoreCreateItemCrudRequest(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             var request = message.GetMessageAsType<CoreCreateItemCrudRequest>();

@@ -18,6 +18,7 @@ using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -97,20 +98,19 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <summary>
         /// Execute a use item request
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="userItem"></param>
-        public string UseItem(CoreUseItemRequest request, Item user, ITerminal terminal, IResponse response)
+        /// <param name="origin">Item that initiated request</param>
+        public string UseItem(CoreUseItemRequest request, Item origin, IResponse response)
         {
             var itemManager = ModuleManager.GetManager<IItemManager>();
             var exit = itemManager.Read(request.ItemId.Value).GetAsItem<ExitItem>();
             var destinationLocation = itemManager.Read(Guid.Parse(exit.Exit.DestinationId));
-            var player = itemManager.Read(terminal.GetPlayerId().Value);
-            itemManager.Move(player, destinationLocation, exit);
+            itemManager.Move(origin, destinationLocation, exit);
             var locationSummary = ModuleManager.GetManager<ILocationItemManager>()
                 .HandleReadLocationSummaryRequest(new WorldReadLocationSummaryRequest()
                 {
-                }, ModuleManager, terminal, response);
-            terminal.SendToClient(locationSummary);
+                }, origin, ModuleManager, response);
+            var originTerminal = ModuleManager.GetManager<ITerminalManager>().GetTerminals().Where(x => x.GetId() == origin.TerminalId).First();
+            originTerminal.SendToClient(locationSummary);
             return "";
         }
         /// <summary>

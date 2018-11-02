@@ -21,13 +21,13 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// Create location
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         public IResponse HandleDeleteLocationRequest(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             var request = message.GetMessageAsType<WorldDeleteLocationRequest>();

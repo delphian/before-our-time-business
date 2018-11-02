@@ -23,6 +23,8 @@ using BeforeOurTime.Business.Logs;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Business.Modules.Terminal.Managers;
+using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 
 namespace BeforeOurTime.Business
 {
@@ -104,7 +106,9 @@ namespace BeforeOurTime.Business
         /// </summary>
         private static void ListenToTerminals()
         {
-            var terminalManager = ServiceProvider.GetService<IModuleManager>().GetManager<ITerminalManager>();
+            var moduleManager = ServiceProvider.GetService<IModuleManager>();
+            var terminalManager = moduleManager.GetManager<ITerminalManager>();
+            var itemManager = moduleManager.GetManager<IItemManager>();
             ((TerminalManager)terminalManager).OnTerminalCreated += delegate (ITerminal terminal)
             {
                 ((Terminal)terminal).OnMessageToServer += delegate (ITerminal xterminal, IRequest request)
@@ -116,8 +120,15 @@ namespace BeforeOurTime.Business
                             _requestInstanceId = request.GetRequestInstanceId(),
                             _responseSuccess = false
                         };
+                        // Get terminal's item, or assign it a ghost
+                        Item origin = (terminal.GetPlayerId() != null) ?
+                            itemManager.Read(terminal.GetPlayerId().Value) :
+                            new Item() {
+                                Type = ItemType.Ghost
+                            };
+                        origin.TerminalId = terminal.GetId();
                         response = ServiceProvider.GetService<IModuleManager>()
-                            .HandleMessage(request, terminal, response);
+                            .HandleMessage(request, origin, response);
                         return response;
                     }
                 };

@@ -7,6 +7,7 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Models;
@@ -285,19 +286,19 @@ namespace BeforeOurTime.Business.Modules.World
         /// Handle a message
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         public IResponse HandleMessage(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             if (message.GetMessageId() == WorldReadLocationSummaryRequest._Id)
-                response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, mm, terminal, response);
+                response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, origin, mm, response);
             if (message.GetMessageId() == WorldCreateLocationQuickRequest._Id)
-                response = GetManager<ILocationItemManager>().HandleCreateLocationQuickRequest(message, mm, terminal, response);
+                response = GetManager<ILocationItemManager>().HandleCreateLocationQuickRequest(message, origin, mm, response);
             return response;
         }
         /// <summary>

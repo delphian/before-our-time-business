@@ -203,25 +203,23 @@ namespace BeforeOurTime.Business.Modules
         /// <summary>
         /// Handle a message
         /// </summary>
-        /// <param name="api"></param>
         /// <param name="message"></param>
-        /// <param name="terminal"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="response"></param>
-        public IResponse HandleMessage(IMessage message, ITerminal terminal, IResponse response)
+        public IResponse HandleMessage(IMessage message, Item origin, IResponse response)
         {
             var modules = GetModulesForMessage(message.GetMessageId());
             modules.ForEach(module =>
             {
-                response = module.HandleMessage(message, this, terminal, response);
+                response = module.HandleMessage(message, origin, this, response);
             });
             return response;
         }
         /// <summary>
         /// Execute a use item request
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="userItem"></param>
-        public CoreUseItemResponse UseItem(CoreUseItemRequest request, Item user, ITerminal terminal, IResponse response)
+        /// <param name="origin">Item that initiated request</param>
+        public CoreUseItemResponse UseItem(CoreUseItemRequest request, Item origin, IResponse response)
         {
             response = new CoreUseItemResponse()
             {
@@ -229,7 +227,7 @@ namespace BeforeOurTime.Business.Modules
                 CoreUseItemEvent = new CoreUseItemEvent()
                 {
                     Use = request.Use,
-                    Using = user,
+                    Using = origin,
                     Success = false
                 }
             };
@@ -241,7 +239,7 @@ namespace BeforeOurTime.Business.Modules
                 {
                     throw new BeforeOurTimeException($"No manager found to use item {item.Id.ToString()}");
                 }
-                var result = manager.UseItem(request, user, terminal, response);
+                var result = manager.UseItem(request, origin, response);
                 ((CoreUseItemResponse)response)._responseSuccess = true;
                 ((CoreUseItemResponse)response)._responseMessage = result;
                 ((CoreUseItemResponse)response).CoreUseItemEvent.Used = item;

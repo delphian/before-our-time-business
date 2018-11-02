@@ -8,7 +8,7 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
-using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 
 namespace BeforeOurTime.Business.Modules.Core
 {
@@ -18,18 +18,17 @@ namespace BeforeOurTime.Business.Modules.Core
         /// Use an exit
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         private IResponse HandleCoreUseItemRequest(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             var request = message.GetMessageAsType<CoreUseItemRequest>();
-            var user = mm.GetManager<IItemManager>().Read(terminal.GetPlayerId().Value);
-            response = mm.UseItem(request, user, terminal, response);
+            response = mm.UseItem(request, origin, response);
             return response;
         }
     }

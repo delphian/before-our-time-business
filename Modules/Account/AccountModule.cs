@@ -16,6 +16,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.UpdateAccount;
 using BeforeOurTime.Models.Modules.Core;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOutTime.Business.Dbs.EF;
@@ -173,27 +174,27 @@ namespace BeforeOurTime.Business.Modules.Account
         /// Handle a message
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         public IResponse HandleMessage(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             if (message.GetMessageId() == AccountCreateAccountRequest._Id)
-                response = GetManager<IAccountManager>().HandleCreateAccountRequest(message, mm, terminal, response);
+                response = GetManager<IAccountManager>().HandleCreateAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountUpdateAccountRequest._Id)
-                response = GetManager<IAccountManager>().HandleUpdateAccountRequest(message, mm, terminal, response);
+                response = GetManager<IAccountManager>().HandleUpdateAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountLoginAccountRequest._Id)
-                response = GetManager<IAccountManager>().HandleLoginAccountRequest(message, mm, terminal, response);
+                response = GetManager<IAccountManager>().HandleLoginAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountLogoutAccountRequest._Id)
-                response = GetManager<IAccountManager>().HandleLogoutAccountRequest(message, mm, terminal, response);
+                response = GetManager<IAccountManager>().HandleLogoutAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountCreateCharacterRequest._Id)
-                response = GetManager<IAccountCharacterManager>().HandleCreateCharacterRequest(message, mm, terminal, response);
+                response = GetManager<IAccountCharacterManager>().HandleCreateCharacterRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountReadCharacterRequest._Id)
-                response = GetManager<IAccountCharacterManager>().HandleReadCharacterRequest(message, mm, terminal, response);
+                response = GetManager<IAccountCharacterManager>().HandleReadCharacterRequest(message, origin, mm, response);
             return response;
         }
         /// <summary>

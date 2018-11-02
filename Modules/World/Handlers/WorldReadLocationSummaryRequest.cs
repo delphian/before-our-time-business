@@ -11,7 +11,7 @@ using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
-using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -21,22 +21,20 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// Read location summary
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
         /// <param name="mm">Module manager</param>
-        /// <param name="terminal">Terminal that initiated request</param>
         /// <param name="response"></param>
         public IResponse HandleReadLocationSummaryRequest(
             IMessage message,
+            Item origin,
             IModuleManager mm,
-            ITerminal terminal,
             IResponse response)
         {
             var request = message.GetMessageAsType<WorldReadLocationSummaryRequest>();
             response = HandleRequestWrapper<WorldReadLocationSummaryResponse>(request, res =>
             {
                 var itemManager = mm.GetManager<IItemManager>();
-                var player = itemManager.Read(
-                    terminal.GetPlayerId().Value);
-                var location = itemManager.Read(player.ParentId.Value).GetAsItem<LocationItem>();
+                var location = itemManager.Read(origin.ParentId.Value).GetAsItem<LocationItem>();
                 ((WorldReadLocationSummaryResponse)res).Item = location;
                 ((WorldReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
                 // Add exits

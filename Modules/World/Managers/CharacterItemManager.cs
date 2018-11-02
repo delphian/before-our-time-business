@@ -105,9 +105,8 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <summary>
         /// Execute a use item request
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="userItem"></param>
-        public string UseItem(CoreUseItemRequest request, Item user, ITerminal terminal, IResponse response)
+        /// <param name="origin">Item that initiated request</param>
+        public string UseItem(CoreUseItemRequest request, Item origin, IResponse response)
         {
             throw new NotImplementedException();
         }
