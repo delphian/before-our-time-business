@@ -17,8 +17,6 @@ using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Modules.Terminal.Managers;
-using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
 using BeforeOutTime.Business.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
@@ -79,6 +77,7 @@ namespace BeforeOurTime.Business.Modules.Core
             var managers = new List<IModelManager>
             {
                 new ItemManager(moduleManager, new ItemRepo(db)),
+                new MessageManager(moduleManager, new MessageDataRepo(db))
             };
             return managers;
         }
