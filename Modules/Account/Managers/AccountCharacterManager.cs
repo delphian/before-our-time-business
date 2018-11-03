@@ -105,8 +105,20 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// <returns></returns>
         public List<AccountCharacterData> ReadByAccount(Guid accountId)
         {
-            var characterAccounts = AccountCharacterDataRepo.ReadByAccount(new List<Guid>() { accountId });
+            var characterAccounts = AccountCharacterDataRepo
+                .ReadByAccount(new List<Guid>() { accountId });
             return characterAccounts;
+        }
+        /// <summary>
+        /// Read account for a single character
+        /// </summary>
+        /// <param name="characterId">Unique character (item) identifier</param>
+        /// <returns></returns>
+        public AccountCharacterData ReadByCharacter(Guid characterId)
+        {
+            var characterData = AccountCharacterDataRepo
+                .ReadByCharacter(new List<Guid>() { characterId }).FirstOrDefault();
+            return characterData;
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch

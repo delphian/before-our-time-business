@@ -32,5 +32,15 @@ namespace BeforeOurTime.Business.Modules.Account.Dbs.EF
             var ids = Set.Where(x => accountIds.Contains(x.AccountId)).Select(x => x.Id).ToList();
             return Read(ids);
         }
+        /// <summary>
+        /// Read all account identifiers associated with characters
+        /// </summary>
+        /// <param name="characterIds"></param>
+        /// <returns></returns>
+        public List<AccountCharacterData> ReadByCharacter(List<Guid> characterIds)
+        {
+            var ids = Set.Where(x => characterIds.Contains(x.CharacterItemId)).Select(x => x.Id).ToList();
+            return Read(ids);
+        }
     }
 }

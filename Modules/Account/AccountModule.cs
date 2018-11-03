@@ -149,6 +149,10 @@ namespace BeforeOurTime.Business.Modules.Account
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
+            Managers.Where(x => x is IAccountManager).ToList().ForEach(manager =>
+            {
+                ((IAccountManager)manager).OnItemRead(item);
+            });
         }
         /// <summary>
         /// Append attribute to base item when it is loaded

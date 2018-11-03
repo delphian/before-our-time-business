@@ -12,6 +12,7 @@ using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 
 namespace BeforeOurTime.Business.Modules.Account.Managers
 {
@@ -124,6 +125,23 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
                 response._responseMessage = e.Message;
             }
             return response;
+        }
+        /// <summary>
+        /// Attach terminal data to item
+        /// </summary>
+        /// <param name="item"></param>
+        public void OnItemRead(Item item)
+        {
+            if (item.Type == ItemType.Character)
+            {
+                var characterManager = ModuleManager.GetManager<IAccountCharacterManager>();
+                var characterData = characterManager.ReadByCharacter(item.Id);
+                if (characterData != null)
+                {
+                    var accountData = AccountDataRepo.Read(characterData.AccountId);
+                    item.Data.Add(accountData);
+                }
+            }
         }
     }
 }

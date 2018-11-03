@@ -154,7 +154,7 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
             return response;
         }
         /// <summary>
-        /// 
+        /// Attach terminal data to item
         /// </summary>
         /// <param name="item"></param>
         public void OnItemRead(Item item)
