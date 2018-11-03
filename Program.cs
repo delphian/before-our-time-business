@@ -26,6 +26,8 @@ using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Terminal.Models.Data;
+using BeforeOurTime.Models.Modules.Account.Managers;
+using BeforeOurTime.Models.Modules.Account.Dbs;
 
 namespace BeforeOurTime.Business
 {
@@ -46,6 +48,8 @@ namespace BeforeOurTime.Business
             IServiceCollection services = new ServiceCollection();
             ConfigureServices(Configuration, services);
             ServiceProvider = services.BuildServiceProvider();
+            // Tell modules we are up and running
+            Setup(ServiceProvider);
             // Setup automatic message deliver and Tick counter for items
             var masterCts = new CancellationTokenSource();
             // Start servers
@@ -100,6 +104,29 @@ namespace BeforeOurTime.Business
                 .Select(x => (IServer)Activator.CreateInstance(x, services, Configuration))
                 .ToList();
             return serverList;
+        }
+        /// <summary>
+        /// Fresh database
+        /// </summary>
+        /// <param name="services"></param>
+        private static void Setup(IServiceProvider services)
+        {
+            var moduleManager = services.GetService<IModuleManager>();
+            var accountRepo = moduleManager.GetRepository<IAccountDataRepo>();
+            var accounts = accountRepo.Read();
+            if (accounts == null || accounts.Count == 0)
+            {
+                var accountManager = moduleManager.GetManager<IAccountManager>();
+                var importAccounts = moduleManager.GetConfiguration()
+                    .GetSection("Imports").GetSection("Accounts").GetChildren().ToList();
+                importAccounts.ForEach(importAccount =>
+                {
+                    var email = importAccount.GetValue<string>("Email");
+                    var password = importAccount.GetValue<string>("Password");
+                    var admin = importAccount.GetValue<bool>("Admin");
+                    accountManager.Create(email, password, false, admin);
+                });
+            }
         }
         /// <summary>
         /// Monitor terminal connections and forward messages

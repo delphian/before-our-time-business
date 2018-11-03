@@ -59,15 +59,21 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// <param name="name">Login name</param>
         /// <param name="password">Login password</param>
         /// <param name="temporary">Account is temporary for trial purposes</param>
-        public AccountData Create(string name, string password, bool temporary = false)
+        /// <param name="admin">Account has administrative rights</param>
+        public AccountData Create(
+            string name,
+            string password,
+            bool temporary = false,
+            bool admin = false)
         {
             var account = AccountDataRepo.Create(new List<AccountData>()
             {
                 new AccountData()
                 {
-                    Temporary = temporary,
                     Name = name,
-                    Password = BCrypt.Net.BCrypt.HashPassword(password)
+                    Password = BCrypt.Net.BCrypt.HashPassword(password),
+                    Temporary = temporary,
+                    Admin = admin
                 }
             }).FirstOrDefault();
             return account;

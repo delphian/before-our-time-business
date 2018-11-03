@@ -4,6 +4,9 @@
         "LinuxExample": "Server=localhost;Database=BeforeOurTime;User Id=sa;Password=Password123",
         "WindowsExample": "Server=localhost\\SQLEXPRESS;Database=BeforeOurTime;Trusted_Connection=True"
     },
+    "Imports": {
+        "Accounts": []
+    },
     "Servers": {
         "Telnet": {
             "Listen": {
