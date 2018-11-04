@@ -12,6 +12,7 @@ using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -37,6 +38,14 @@ namespace BeforeOurTime.Business.Modules.World.Managers
                 var location = itemManager.Read(origin.ParentId.Value).GetAsItem<LocationItem>();
                 ((WorldReadLocationSummaryResponse)res).Item = location;
                 ((WorldReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
+                // Add commands
+                List<Command> commands = location.Children
+                    .Where(x => x.GetProperty<CommandProperty>() != null)
+                    .Select(x => x.GetProperty<CommandProperty>())
+                    .ToList()
+                    .SelectMany(x => x.Commands)
+                    .ToList();
+                ((WorldReadLocationSummaryResponse)res).Commands = commands;
                 // Add exits
                 location.Children
                     .Where(x => x.HasData(typeof(ExitData)))

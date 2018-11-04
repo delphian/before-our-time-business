@@ -57,7 +57,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
                     telnetClient.ItemExits.Add(ioExitUpdate);
                     var exit = ioExitUpdate.Item.GetAsItem<ExitItem>();
                     var commands = "";
-                    exit.Uses.Uses.ForEach(use => {
+                    exit.CommandList.Commands.ForEach(use => {
                         commands += (commands == "") ? $"{use.Name}" : $"|{use.Name}";
                     });
                     exits = (exits == null) ? "" : $"{exits}, ";
