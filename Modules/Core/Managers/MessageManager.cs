@@ -83,5 +83,15 @@ namespace BeforeOurTime.Business.Apis.Items
                 }
             });
         }
+        /// <summary>
+        /// Send one message to one or more items
+        /// </summary>
+        /// <param name="message">The messages to send</param>
+        /// <param name="items">List of items to send messages to</param>
+        /// <param name="origin">Origin of the messages</param>
+        public void SendMessage(IMessage message, List<Item> items, Item origin = null)
+        {
+            SendMessage(new List<IMessage>() { message }, items, origin);
+        }
     }
 }

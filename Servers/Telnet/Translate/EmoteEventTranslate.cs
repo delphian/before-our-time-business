@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Business.Servers.Telnet;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Messages.Events.Emotes;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.World.Messages.Emotes;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {
@@ -23,7 +23,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
         {
             return new List<Type>()
             {
-                typeof(EmoteEvent)
+                typeof(WorldEmoteEvent)
             };
         }
         /// <summary>
@@ -37,10 +37,11 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             TelnetServer telnetServer, 
             TelnetClient telnetClient)
         {
-            var emoteEvent = message.GetMessageAsType<EmoteEvent>();
+            var emoteEvent = message.GetMessageAsType<WorldEmoteEvent>();
             var emote = "";
-            emote = emoteEvent.Type == EmoteType.Smile ? $"{emoteEvent.Name} smiles happily" : emote;
-            emote = emoteEvent.Type == EmoteType.Frown ? $"{emoteEvent.Name} frowns" : emote;
+            var itemName = emoteEvent.Origin.GetProperty<VisibleProperty>()?.Name ?? "** Something **";
+            emote = emoteEvent.EmoteType == WorldEmoteType.Smile ? $"{itemName} smiles happily" : emote;
+            emote = emoteEvent.EmoteType == WorldEmoteType.Frown ? $"{itemName} frowns" : emote;
             telnetServer.SendMessageToClient(telnetClient, "\r\n"
                 + $"{AnsiColors.whiteB}{emote}{AnsiColors.reset}");
         }
