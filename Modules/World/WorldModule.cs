@@ -10,6 +10,7 @@ using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.World.Dbs;
 using BeforeOurTime.Models.Modules.World.Managers;
+using BeforeOurTime.Models.Modules.World.Messages.Emotes.PerformEmote;
 using BeforeOurTime.Models.Modules.World.Messages.Location.CreateLocation;
 using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.Models.Data;
@@ -134,7 +135,8 @@ namespace BeforeOurTime.Business.Modules.World
             return new List<Guid>()
             {
                 WorldReadLocationSummaryRequest._Id,
-                WorldCreateLocationQuickRequest._Id
+                WorldCreateLocationQuickRequest._Id,
+                WorldPerformEmoteRequest._Id
             };
         }
         /// <summary>
@@ -295,6 +297,8 @@ namespace BeforeOurTime.Business.Modules.World
                 response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, origin, mm, response);
             if (message.GetMessageId() == WorldCreateLocationQuickRequest._Id)
                 response = GetManager<ILocationItemManager>().HandleCreateLocationQuickRequest(message, origin, mm, response);
+            if (message.GetMessageId() == WorldPerformEmoteRequest._Id)
+                response = HandlePerformEmoteRequest(message, origin, mm, response);
             return response;
         }
         /// <summary>

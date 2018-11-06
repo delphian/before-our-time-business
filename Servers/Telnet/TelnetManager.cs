@@ -7,8 +7,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using BeforeOurTime.Business.Servers.Telnet.Translate;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Messages.Events.Emotes;
-using BeforeOurTime.Models.Messages.Requests.Emote;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
@@ -25,6 +23,8 @@ using BeforeOurTime.Models.Modules.Core.Messages.ItemJson;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
+using BeforeOurTime.Models.Modules.World.Messages.Emotes;
+using BeforeOurTime.Models.Modules.World.Messages.Emotes.PerformEmote;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -334,12 +334,12 @@ namespace BeforeOurTime.Business.Servers.Telnet
         /// <param name="message"></param>
         private void MFCEmote(TelnetClient telnetClient, string message)
         {
-            EmoteType? emoteType = null;
-            emoteType = (message == "smile") ? EmoteType.Smile : emoteType;
-            emoteType = (message == "frown") ? EmoteType.Frown : emoteType;
-            telnetClient.GetTerminal().SendToApi(new EmoteRequest()
+            WorldEmoteType? emoteType = null;
+            emoteType = (message == "smile") ? WorldEmoteType.Smile : emoteType;
+            emoteType = (message == "frown") ? WorldEmoteType.Frown : emoteType;
+            telnetClient.GetTerminal().SendToApi(new WorldPerformEmoteRequest()
             {
-                Type = emoteType.Value
+                EmoteType = emoteType.Value
             });
         }
         /// <summary>
