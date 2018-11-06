@@ -88,7 +88,8 @@ namespace BeforeOurTime.Business.Modules.World
                 new GameItemManager(moduleManager, new EFGameDataRepo(db, moduleManager.GetItemRepo())),
                 new LocationItemManager(moduleManager, new EFLocationDataRepo(db, moduleManager.GetItemRepo())),
                 new CharacterItemManager(moduleManager, new EFCharacterDataRepo(db, moduleManager.GetItemRepo())),
-                new ExitItemManager(moduleManager, new EFExitDataRepo(db, moduleManager.GetItemRepo()))
+                new ExitItemManager(moduleManager, new EFExitDataRepo(db, moduleManager.GetItemRepo())),
+                new PhysicalItemDataManager(moduleManager, new EFPhysicalItemDataRepo(db, moduleManager.GetItemRepo()))
             };
             return managers;
         }

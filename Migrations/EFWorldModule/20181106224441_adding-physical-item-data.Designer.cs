@@ -4,14 +4,16 @@ using BeforeOurTime.Business.Modules.World.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BeforeOurTime.Business.Migrations.EFWorldModule
 {
     [DbContext(typeof(EFWorldModuleContext))]
-    partial class EFWorldModuleContextModelSnapshot : ModelSnapshot
+    [Migration("20181106224441_adding-physical-item-data")]
+    partial class addingphysicalitemdata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

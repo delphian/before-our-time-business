@@ -20,6 +20,7 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
         public DbSet<LocationData> Locations { set; get; }
         public DbSet<CharacterData> Characters { set; get; }
         public DbSet<ExitData> Exits { set; get; }
+        public DbSet<PhysicalItemData> Physical { set; get; }
         public EFWorldModuleContext() : base() { }
         public EFWorldModuleContext(DbContextOptions<BaseContext> options) : base(options) { }
         /// <summary>
@@ -77,6 +78,15 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
                 .Property(x => x.Name).IsRequired();
             modelBuilder.Entity<ExitData>()
                 .Property(x => x.DestinationLocationId).IsRequired();
+            // Item Physical Data
+            modelBuilder.Entity<PhysicalItemData>()
+                .ToTable("Item_Data_Physical");
+            modelBuilder.Entity<PhysicalItemData>()
+                .HasKey(x => x.Id);
+            modelBuilder.Entity<PhysicalItemData>()
+                .Ignore(x => x.DataType);
+            modelBuilder.Entity<PhysicalItemData>()
+                .Property(x => x.Name).IsRequired();
         }
     }
 }
