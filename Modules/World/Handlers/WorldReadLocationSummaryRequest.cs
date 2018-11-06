@@ -38,6 +38,8 @@ namespace BeforeOurTime.Business.Modules.World.Managers
                 var location = itemManager.Read(origin.ParentId.Value).GetAsItem<LocationItem>();
                 ((WorldReadLocationSummaryResponse)res).Item = location;
                 ((WorldReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
+                // All items
+                ((WorldReadLocationSummaryResponse)res).Items = location.Children;
                 // Add commands
                 List<Command> commands = location.Children
                     .Where(x => x.GetProperty<CommandProperty>() != null)
