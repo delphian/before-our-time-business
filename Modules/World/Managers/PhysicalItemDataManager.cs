@@ -24,7 +24,7 @@ using BeforeOurTime.Models.Messages;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
-    public partial class PhysicalItemDataManager : ItemModelManager<ExitItem>, IPhysicalItemDataManager
+    public partial class PhysicalItemDataManager : ItemModelManager<Item>, IPhysicalItemDataManager
     {
         /// <summary>
         /// Manage all modules
@@ -69,6 +69,15 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         {
             var itemIds = PhysicalItemDataRepo.GetItemIds();
             return itemIds;
+        }
+        /// <summary>
+        /// Determine if a model type should be managed by this manager
+        /// </summary>
+        /// <param name="modelType"></param>
+        /// <returns></returns>
+        public override bool IsManaging(Type modelType)
+        {
+            return false;
         }
         /// <summary>
         /// Determine if an item is managed
