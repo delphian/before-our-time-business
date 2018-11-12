@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BeforeOurTime.Business.Modules.Terminal.Managers
 {
@@ -152,7 +153,7 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
             AccountId = null;
             PlayerId = null;
             Status = TerminalStatus.Guest;
-            Logger.LogInformation($"Terminal ({Id}) reduced to {Status} status");
+            Logger.LogInformation($"!! {Id} reduced to {Status} status");
         }
         /// <summary>
         /// Authenticate to use an account
@@ -164,7 +165,7 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
             AccountId = accountId;
             PlayerId = null;
             Status = TerminalStatus.Authenticated;
-            Logger.LogInformation($"Terminal ({Id}) granted {Status} status as account {AccountId}");
+            Logger.LogInformation($"!! {Id} granted {Status} status as account {AccountId}");
         }
         /// <summary>
         /// Attach to environment item as avatar
@@ -175,7 +176,7 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
         {
             PlayerId = itemId;
             Status = TerminalStatus.Attached;
-            Logger.LogInformation($"Terminal ({Id}) granted {Status} status as character {itemId}");
+            Logger.LogInformation($"!! {Id} granted {Status} status as character {itemId}");
         }
         /// <summary>
         /// Get available characters for terminal attachment
@@ -220,7 +221,7 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
         /// Send a message to the client
         /// </summary>
         /// <param name="message"></param>
-        public void SendToClient(IMessage message)
+        public async Task SendToClientAsync(IMessage message)
         {
             var messageJson = JsonConvert.SerializeObject(message);
             Logger.LogInformation($">> {Id} {message.GetMessageName()}");

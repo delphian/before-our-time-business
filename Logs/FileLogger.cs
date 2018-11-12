@@ -57,7 +57,6 @@ namespace BeforeOurTime.Business.Logs
                 }
             }
         }
-
         /// <summary>
         /// Log simple error message with detailed exception history
         /// </summary>
@@ -71,8 +70,8 @@ namespace BeforeOurTime.Business.Logs
                 message += ": " + traverse.Message;
                 traverse = traverse.InnerException;
             }
+            message += ":: " + exception.StackTrace;
             this.LogError(message);
         }
-
     }
 }

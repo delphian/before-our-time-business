@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules;
 
 namespace BeforeOurTime.Business.Servers.WebSocket
 {
@@ -28,7 +29,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
     {
         private IServiceProvider Services { set; get; }
         private IBotLogger Logger { set; get; }
-        private ITerminalManager TerminalManager { set; get; }
+        private IModuleManager ModuleManager { set; get; }
         private int LogLevel { set; get; }
         /// <summary>
         /// Unique WebSocket client identifier
@@ -64,8 +65,8 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             Id = Guid.NewGuid();
             Services = services;
+            ModuleManager = Services.GetService<IModuleManager>();
             Logger = Services.GetService<IBotLogger>();
-            TerminalManager = Services.GetService<ITerminalManager>();
             LogLevel = Convert.ToInt32(Services.GetService<IConfiguration>().GetSection("Servers").GetSection("WebSocket")["LogLevel"]);
             Terminal = terminal;
             Context = context;
@@ -86,16 +87,16 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     await Task.Delay(60000 * 2);
                     var timeoutTask = Task.Delay(10000);
                     var pingTask = SendAsync(new PingSystemMessage() { }, Cts.Token);
-                    Logger.LogDebug($"Client {Id} websocket: {WebSocket.State.ToString()}");
+                    Logger.LogDebug($"!! {Terminal?.GetId()} websocket: {WebSocket.State.ToString()}");
                     if (await Task.WhenAny(pingTask, timeoutTask) == timeoutTask || pingTask.Status == TaskStatus.Faulted)
                     {
                         if (pingTask.Exception?.InnerException != null)
                         {
-                            Logger.LogWarning($"Client {Id} {pingTask.Exception.InnerException.Message}");
+                            Logger.LogWarning($"!! {Terminal?.GetId()} {pingTask.Exception.InnerException.Message}");
                         }
                         else
                         {
-                            Logger.LogWarning($"Client {Id} remote client is not responding!");
+                            Logger.LogWarning($"!! {Terminal?.GetId()} client is not responding!");
                         }
                         await CloseAsync();
                     }
@@ -108,11 +109,11 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         /// <returns></returns>
         public async Task ListenAsync()
         {
-            Logger.LogInformation($"Client {Id} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
+            Logger.LogInformation($"!! {Terminal?.GetId()} Listening to {Context.Connection.RemoteIpAddress}:{Context.Connection.RemotePort}...");
             var buffer = new Byte[1024 * 64];
             WebSocketReceiveResult result = null;
             // Listen to websocket
-            while (WebSocket.State == WebSocketState.Open)
+            while (!Cts.IsCancellationRequested && WebSocket?.State == WebSocketState.Open)
             {
                 try
                 {
@@ -120,30 +121,34 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     Array.Clear(buffer, 0, buffer.Length);
                     result = await WebSocket.ReceiveAsync(buffer, Cts.Token);
                     var messageJson = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    while (!result.EndOfMessage)
+                    while (!Cts.IsCancellationRequested && !result.EndOfMessage)
                     {
                         Array.Clear(buffer, 0, buffer.Length);
                         result = await WebSocket.ReceiveAsync(buffer, Cts.Token);
                         messageJson += Encoding.UTF8.GetString(buffer, 0, result.Count);
                     }
-                    if (result.MessageType == WebSocketMessageType.Close)
+                    if (!Cts.IsCancellationRequested)
                     {
-                        await CloseAsync();
-                    }
-                    else if (result.MessageType == WebSocketMessageType.Binary)
-                    {
-                        await CloseAsync();
-                    }
-                    else
-                    {
-                        IResponse response;
-                        var message = JsonConvert.DeserializeObject<Message>(messageJson);
-//                        Logger.LogInformation($"<< {Id} {message.GetMessageName()}");
-//                        Logger.LogDebug($"<< {Id} {messageJson}");
-                        var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
-                        response = Terminal.SendToApi(request);
-                        // Send response
-                        await SendAsync(response, Cts.Token);
+                        if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            if (WebSocket?.State == WebSocketState.CloseReceived)
+                            {
+                                await CloseAsync();
+                            }
+                        }
+                        else if (result.MessageType == WebSocketMessageType.Binary)
+                        {
+                            await CloseAsync();
+                        }
+                        else
+                        {
+                            IResponse response;
+                            var message = JsonConvert.DeserializeObject<Message>(messageJson);
+                            var request = (IRequest)JsonConvert.DeserializeObject(messageJson, Message.GetMessageTypeDictionary()[message.GetMessageId()]);
+                            response = Terminal.SendToApi(request);
+                            // Send response
+                            await Terminal.SendToClientAsync(response);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -155,10 +160,15 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                         message += $"({traverse.Message})";
                         traverse = traverse.InnerException;
                     }
-                    Logger.LogError($"Client {Id} while recieving data: {message}");
+                    Logger.LogError($"<< {Terminal?.GetId()} while recieving data: {message}");
                     await CloseAsync();
                 }
             }
+            WebSocket.Dispose();
+            Cts.Dispose();
+            WebSocket = null;
+            Logger.LogInformation($"!! {Terminal?.GetId()} connection closed");
+            ModuleManager.GetManager<ITerminalManager>().DestroyTerminal(Terminal);
         }
         /// <summary>
         /// Close the websocket connection
@@ -168,25 +178,19 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             if (WebSocket != null)
             {
-                Logger.LogInformation($"Client {Id} closing connection...");
+                Cts.Cancel();
+                Logger.LogInformation($">> {Terminal?.GetId()} closing connection...");
                 var disconnectTask = WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
                 var timeoutTask = Task.Delay(10000);
                 if (await Task.WhenAny(disconnectTask, timeoutTask) == timeoutTask || disconnectTask.Status == TaskStatus.Faulted)
                 {
-                    Logger.LogWarning($"Client {Id} killing websocket!");
-                    Cts.Cancel();
+                    Logger.LogWarning($"!! {Terminal?.GetId()} killing websocket!");
                     while (WebSocket.State == WebSocketState.Open)
                     {
                         await Task.Delay(5000);
-                        Logger.LogInformation($"Client {Id} waiting for websocket to die...");
+                        Logger.LogInformation($"!! {Terminal?.GetId()} waiting for websocket to die...");
                     }
                 }
-                Cts.Cancel();
-                WebSocket.Dispose();
-                WebSocket = null;
-                Cts.Dispose();
-                Logger.LogInformation($"Client {Id} connection closed");
-                TerminalManager.DestroyTerminal(Terminal);
             }
         }
         /// <summary>
@@ -199,12 +203,12 @@ namespace BeforeOurTime.Business.Servers.WebSocket
         {
             try
             {
+                if (WebSocket == null)
+                    throw new Exception("Websocket is closed!");
                 var messageJson = JsonConvert.SerializeObject(message);
                 var byteMessage = new UTF8Encoding(false, true).GetBytes(messageJson);
                 var offset = 0;
                 var endOfMessage = false;
-//                Logger.LogInformation($">> {Id} {message.GetMessageName()}");
-//                Logger.LogDebug($">> {Id} {messageJson}");
                 do
                 {
                     var remainingBytes = byteMessage.Count() - (offset * 1024);
@@ -223,7 +227,7 @@ namespace BeforeOurTime.Business.Servers.WebSocket
                     error += $"({traverse.Message})";
                     traverse = traverse.InnerException;
                 }
-                Logger.LogError($"Client {Id} while sending data: {message.GetMessageName()}: {error}");
+                Logger.LogError($">> {Terminal?.GetId()} while sending data: {message.GetMessageName()}: {error}");
             }
         }
         /// <summary>

@@ -21,6 +21,7 @@ using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -152,10 +153,11 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
-            var ExitData = PhysicalItemDataRepo.Read(item);
-            if (ExitData != null)
+            var data = PhysicalItemDataRepo.Read(item);
+            if (data != null)
             {
-                item.Data.Add(ExitData);
+                item.Data.Add(data);
+                item.SetViewModel(typeof(VisibleProperty), item.GetProperty<VisibleProperty>());
             }
         }
         /// <summary>

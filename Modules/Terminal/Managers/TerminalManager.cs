@@ -93,7 +93,7 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
             var terminal = new Terminal(this, Logger) as ITerminal;
             terminal.SetStatus(TerminalStatus.Guest);
             Terminals.Add(terminal);
-            Logger.LogInformation($"Terminal ({terminal.GetId()}) granted {terminal.GetStatus()} status for {address.ToString()} through {serverName}");
+            Logger.LogInformation($"!! {terminal?.GetId()} granted {terminal?.GetStatus()} status for {address.ToString()} through {serverName}");
             OnTerminalCreated?.Invoke(terminal);
             return terminal;
         }
@@ -104,7 +104,7 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
         public ITerminalManager DestroyTerminal(ITerminal terminal)
         {
             Terminals.Remove(terminal);
-            Logger.LogInformation($"Terminal ({terminal.GetId()}) removed");
+            Logger.LogInformation($"!! {terminal?.GetId()} terminal removed");
             OnTerminalDestroyed?.Invoke((ITerminal)terminal.Clone());
             terminal = null;
             return this;
@@ -116,7 +116,7 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
         /// <param name="environmentUpdate"></param>
         public void SendToTerminalId(Guid terminalId, IMessage environmentUpdate)
         {
-            Terminals.FirstOrDefault(x => x.GetId() == terminalId).SendToClient(environmentUpdate);
+            Terminals.FirstOrDefault(x => x.GetId() == terminalId).SendToClientAsync(environmentUpdate);
         }
         /// <summary>
         /// Get list of all active terminals

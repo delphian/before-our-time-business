@@ -74,7 +74,7 @@ namespace BeforeOurTime.Business.Apis.Items
                 {
                     messages.ForEach(message =>
                     {
-                        terminal.SendToClient(message);
+                        terminal.SendToClientAsync(message);
                     });
                 }
                 else

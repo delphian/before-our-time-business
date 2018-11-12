@@ -245,7 +245,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     var response = telnetClient.GetTerminal().SendToApi(new WorldReadLocationSummaryRequest()
                         {
                         });
-                    telnetClient.GetTerminal().SendToClient(response);
+                    telnetClient.GetTerminal().SendToClientAsync(response);
                     break;
                 case "go":
                     MFCGo(telnetClient, message);
@@ -276,7 +276,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
             {
                 ItemId = new Guid("f4212bfe-ef65-4632-df2b-08d63af92e75")
             });
-            telnetClient.GetTerminal().SendToClient(response);
+            telnetClient.GetTerminal().SendToClientAsync(response);
         }
         private void MFCAdminItemJsonUpdate(TelnetClient telnetClient, string itemId, string json)
         {
@@ -292,7 +292,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     }
                 }
             });
-            telnetClient.GetTerminal().SendToClient(response);
+            telnetClient.GetTerminal().SendToClientAsync(response);
         }
         private void MFCAdminItemJsonRead(TelnetClient telnetClient, string itemId)
         {
@@ -301,7 +301,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                 IncludeChildren = false,
                 ItemIds = new List<Guid>() { new Guid(itemId) }
             });
-            telnetClient.GetTerminal().SendToClient(response);
+            telnetClient.GetTerminal().SendToClientAsync(response);
         }
         /// <summary>
         /// Handle Message From Client when Go command is issued
@@ -321,7 +321,7 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     {
                         ItemId = exitResponse.Item.Id
                     });
-                telnetClient.GetTerminal().SendToClient(response);
+                telnetClient.GetTerminal().SendToClientAsync(response);
             } else
             {
                 TelnetServer.SendMessageToClient(telnetClient, "\r\nGo where??\r\n> ");
