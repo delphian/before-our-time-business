@@ -90,7 +90,7 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
         /// <returns></returns>
         public ITerminal RequestTerminal(string serverName, IPEndPoint address)
         {
-            var terminal = new Terminal(this, Logger) as ITerminal;
+            var terminal = new Terminal(ModuleManager) as ITerminal;
             terminal.SetStatus(TerminalStatus.Guest);
             Terminals.Add(terminal);
             Logger.LogInformation($"!! {terminal?.GetId()} granted {terminal?.GetStatus()} status for {address.ToString()} through {serverName}");

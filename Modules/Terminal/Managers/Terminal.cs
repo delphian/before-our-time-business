@@ -1,14 +1,18 @@
-﻿using BeforeOurTime.Models.Json;
+﻿using BeforeOurTime.Models.Exceptions;
+using BeforeOurTime.Models.Json;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
+using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
+using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Models.Modules.World.Models.Items;
 using Microsoft.Extensions.Logging;
@@ -26,10 +30,11 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
     /// </summary>
     public class Terminal : ITerminal
     {
+        protected IModuleManager ModuleManager { set; get; }
         /// <summary>
         /// Central manager of all client connections regardless of protocol (telnet, websocket, etc)
         /// </summary>
-        protected TerminalManager TerminalManager { set; get; }
+        protected ITerminalManager TerminalManager { set; get; }
         private IBotLogger Logger { set; get; }
         /// <summary>
         /// Unique terminal identifier
@@ -79,12 +84,12 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
         /// </summary>
         /// <param name="terminalManager">Central manager of all client connections regardless of protocol (telnet, websocket, etc)</param>
         public Terminal(
-            TerminalManager terminalManager, 
-            IBotLogger logger)
+            IModuleManager moduleManager)
         {
             Id = Guid.NewGuid();
-            TerminalManager = terminalManager;
-            Logger = logger;
+            ModuleManager = moduleManager;
+            TerminalManager = ModuleManager.GetManager<ITerminalManager>();
+            Logger = moduleManager.GetLogger();
         }
         /// <summary>
         /// Get unique terminal identifier
@@ -174,6 +179,11 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
         /// <returns></returns>
         public void Attach(Guid itemId)
         {
+            var characters = ModuleManager.GetManager<IAccountCharacterManager>().ReadByAccount(AccountId.Value);
+            if (!characters.Any(x => x.CharacterItemId == itemId))
+            {
+                throw new BotAuthorizationDeniedException("Character does not belong to account");
+            }
             PlayerId = itemId;
             Status = TerminalStatus.Attached;
             Logger.LogInformation($"!! {Id} granted {Status} status as character {itemId}");
@@ -262,11 +272,19 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
                 if (request.IsMessageType<AccountLoginCharacterRequest>())
                 {
                     var playCharacterRequest = request.GetMessageAsType<AccountLoginCharacterRequest>();
-                    Attach(playCharacterRequest.ItemId);
-                    response = new AccountLoginCharacterResponse() {
+                    response = new AccountLoginCharacterResponse()
+                    {
                         _requestInstanceId = request.GetRequestInstanceId(),
                         _responseSuccess = true
                     };
+                    try
+                    {
+                        Attach(playCharacterRequest.ItemId);
+                    }
+                    catch (Exception e)
+                    {
+                        response.SetSuccess(false).SetMessage("Can't attach to character. " + e.Message);
+                    }
                 }
                 else if (request.IsMessageType<AccountLogoutAccountRequest>())
                 {

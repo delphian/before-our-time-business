@@ -33,10 +33,12 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             response = HandleRequestWrapper<AccountReadCharacterResponse>(request, res =>
             {
                 var terminal = origin.GetData<TerminalData>().Terminal;
-                var accountCharacters = ModuleManager.GetManager<AccountCharacterManager>()
-                    .ReadByAccount(terminal.GetAccountId().Value);
-                var items = ModuleManager.GetItemRepo()
-                    .Read(accountCharacters.Select(x => x.CharacterItemId).ToList());
+                var accountCharacterIds = ModuleManager.GetManager<AccountCharacterManager>()
+                    .ReadByAccount(terminal.GetAccountId().Value)
+                    .Select(x => x.CharacterItemId).ToList();
+                var items = (accountCharacterIds.Count() > 0) ?
+                    ModuleManager.GetItemRepo().Read(accountCharacterIds) :
+                    new List<Item>();
                 ((AccountReadCharacterResponse)res).AccountCharacters = items.Select(x => x.GetAsItem<CharacterItem>()).ToList();
                 res.SetSuccess(true);
             });
