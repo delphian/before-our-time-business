@@ -36,7 +36,8 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
                         Id = account.Id,
                         Password = null,
                         Name = account.Name,
-                        Temporary = account.Temporary
+                        Temporary = account.Temporary,
+                        Admin = account.Admin
                     }
                 };
                 res.SetSuccess(true);
