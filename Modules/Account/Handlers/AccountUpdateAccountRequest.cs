@@ -36,7 +36,8 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
                     Id = request.Account.Id,
                     Name = request.Account.Name,
                     Password = request.Account.Password,
-                    Temporary = request.Account.Temporary
+                    Temporary = request.Account.Temporary,
+                    Admin = request.Account.Admin
                 };
                 accountManager.Update(accountData);
                 ((AccountUpdateAccountResponse)res).UpdateAccountEvent = new AccountUpdateAccountEvent()
