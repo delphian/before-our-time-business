@@ -13,6 +13,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.UpdateAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.UpdatePassword;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOutTime.Business.Dbs.EF;
@@ -121,7 +122,8 @@ namespace BeforeOurTime.Business.Modules.Account
                 AccountCreateAccountRequest._Id,
                 AccountUpdateAccountRequest._Id,
                 AccountLoginAccountRequest._Id,
-                AccountLogoutAccountRequest._Id
+                AccountLogoutAccountRequest._Id,
+                AccountUpdatePasswordRequest._Id
             };
         }
         /// <summary>
@@ -191,6 +193,8 @@ namespace BeforeOurTime.Business.Modules.Account
                 response = GetManager<IAccountManager>().HandleLoginAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountLogoutAccountRequest._Id)
                 response = GetManager<IAccountManager>().HandleLogoutAccountRequest(message, origin, mm, response);
+            if (message.GetMessageId() == AccountUpdatePasswordRequest._Id)
+                response = GetManager<IAccountManager>().HandleUpdatePasswordRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountCreateCharacterRequest._Id)
                 response = GetManager<IAccountCharacterManager>().HandleCreateCharacterRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountReadCharacterRequest._Id)
