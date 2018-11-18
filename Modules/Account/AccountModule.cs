@@ -12,6 +12,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
+using BeforeOurTime.Models.Modules.Account.Messages.RegisterCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.UpdateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.UpdatePassword;
 using BeforeOurTime.Models.Modules.Core;
@@ -118,6 +119,7 @@ namespace BeforeOurTime.Business.Modules.Account
             return new List<Guid>()
             {
                 AccountCreateCharacterRequest._Id,
+                AccountRegisterCharacterRequest._Id,
                 AccountReadCharacterRequest._Id,
                 AccountCreateAccountRequest._Id,
                 AccountUpdateAccountRequest._Id,
@@ -197,6 +199,8 @@ namespace BeforeOurTime.Business.Modules.Account
                 response = GetManager<IAccountManager>().HandleUpdatePasswordRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountCreateCharacterRequest._Id)
                 response = GetManager<IAccountCharacterManager>().HandleCreateCharacterRequest(message, origin, mm, response);
+            if (message.GetMessageId() == AccountRegisterCharacterRequest._Id)
+                response = GetManager<IAccountCharacterManager>().HandleRegisterCharacterRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountReadCharacterRequest._Id)
                 response = GetManager<IAccountCharacterManager>().HandleReadCharacterRequest(message, origin, mm, response);
             return response;

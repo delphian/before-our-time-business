@@ -15,6 +15,7 @@ using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.World.Models.Properties;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -70,7 +71,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Item that may have managable data</param>
         public bool IsManaging(Item item)
         {
-            return (item.Type == ItemType.Character);
+            return (item.HasData<CharacterData>());
         }
         /// <summary>
         /// Determine if item data type is managable
@@ -135,6 +136,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             if (characterData != null)
             {
                 item.Data.Add(characterData);
+                item.SetViewModel(typeof(CharacterProperty), item.GetProperty<CharacterProperty>());
             }
         }
         /// <summary>
