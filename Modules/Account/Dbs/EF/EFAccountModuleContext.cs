@@ -48,7 +48,10 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             modelBuilder.Entity<AccountData>()
                 .HasKey(account => account.Id);
             modelBuilder.Entity<AccountData>()
-                .Ignore(account => account.Characters)
+                .HasMany<AccountCharacterData>(x => x.Characters)
+                    .WithOne(x => x.Account)
+                        .HasForeignKey(x => x.AccountId);
+            modelBuilder.Entity<AccountData>()
                 .Property(x => x.Name).IsRequired();
             // Account Characters
             modelBuilder.Entity<AccountCharacterData>()
@@ -56,7 +59,9 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             modelBuilder.Entity<AccountCharacterData>()
                 .HasKey(x => x.Id);
             modelBuilder.Entity<AccountCharacterData>()
-                .Property(x => x.AccountId).IsRequired();
+                .HasOne<AccountData>(x => x.Account)
+                    .WithMany(x => x.Characters)
+                        .HasForeignKey(x => x.AccountId);
             modelBuilder.Entity<AccountCharacterData>()
                 .Property(x => x.CharacterItemId).IsRequired();
         }

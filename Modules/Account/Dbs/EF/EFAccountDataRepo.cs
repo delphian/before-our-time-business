@@ -31,6 +31,7 @@ namespace BeforeOurTime.Business.Modules.Account.Dbs.EF
             var accounts = new List<AccountData>();
             var account = Db.GetDbSet<AccountData>()
                 .Where(x => x.Name == request.PrincipalName)
+                .AsNoTracking()
                 .FirstOrDefault();
             if (account != null)
             {
@@ -40,6 +41,22 @@ namespace BeforeOurTime.Business.Modules.Account.Dbs.EF
                 }
             }
             return accounts.FirstOrDefault();
+        }
+        /// <summary>
+        /// Read multiple models
+        /// </summary>
+        /// <remarks>
+        /// All other forms of read should call this one
+        /// </remarks>
+        /// <param name="ids">List of unique model identifiers</param>
+        /// <returns>List of models</returns>
+        public override List<AccountData> Read(List<Guid> ids)
+        {
+            var resultSet = Set
+                .Where(x => ids.Contains(x.Id))
+                    .Include(x => x.Characters)
+                .AsNoTracking();
+            return resultSet.ToList();
         }
     }
 }

@@ -9,8 +9,10 @@ using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
+using BeforeOurTime.Models.Modules.Account.Messages.Json.ReadAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.ReadAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.RegisterCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.UpdateAccount;
@@ -122,6 +124,8 @@ namespace BeforeOurTime.Business.Modules.Account
                 AccountRegisterCharacterRequest._Id,
                 AccountReadCharacterRequest._Id,
                 AccountCreateAccountRequest._Id,
+                AccountReadAccountRequest._Id,
+                AccountJsonReadAccountRequest._Id,
                 AccountUpdateAccountRequest._Id,
                 AccountLoginAccountRequest._Id,
                 AccountLogoutAccountRequest._Id,
@@ -189,6 +193,10 @@ namespace BeforeOurTime.Business.Modules.Account
         {
             if (message.GetMessageId() == AccountCreateAccountRequest._Id)
                 response = GetManager<IAccountManager>().HandleCreateAccountRequest(message, origin, mm, response);
+            if (message.GetMessageId() == AccountReadAccountRequest._Id)
+                response = GetManager<IAccountManager>().HandleReadAccountRequest(message, origin, mm, response);
+            if (message.GetMessageId() == AccountJsonReadAccountRequest._Id)
+                response = GetManager<IAccountManager>().HandleJsonReadAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountUpdateAccountRequest._Id)
                 response = GetManager<IAccountManager>().HandleUpdateAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountLoginAccountRequest._Id)

@@ -4,14 +4,16 @@ using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BeforeOurTime.Business.Migrations.EFAccountModule
 {
     [DbContext(typeof(EFAccountModuleContext))]
-    partial class EFAccountModuleContextModelSnapshot : ModelSnapshot
+    [Migration("20181119055037_linking-acount-and-characters")]
+    partial class linkingacountandcharacters
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
