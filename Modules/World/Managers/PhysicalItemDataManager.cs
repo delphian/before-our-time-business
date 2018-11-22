@@ -156,8 +156,11 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             var data = PhysicalItemDataRepo.Read(item);
             if (data != null)
             {
-                item.Data.Add(data);
-                item.SetViewModel(typeof(VisibleProperty), item.GetProperty<VisibleProperty>());
+                item.SetViewModel(typeof(VisibleProperty), new VisibleProperty()
+                {
+                    Name = data.Name,
+                    Description = data.Description
+                });
             }
         }
         /// <summary>
