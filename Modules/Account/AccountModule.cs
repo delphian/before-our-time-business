@@ -10,6 +10,7 @@ using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.Json.ReadAccount;
+using BeforeOurTime.Models.Modules.Account.Messages.Json.RestoreAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadAccount;
@@ -126,6 +127,7 @@ namespace BeforeOurTime.Business.Modules.Account
                 AccountCreateAccountRequest._Id,
                 AccountReadAccountRequest._Id,
                 AccountJsonReadAccountRequest._Id,
+                AccountJsonRestoreAccountRequest._Id,
                 AccountUpdateAccountRequest._Id,
                 AccountLoginAccountRequest._Id,
                 AccountLogoutAccountRequest._Id,
@@ -209,6 +211,8 @@ namespace BeforeOurTime.Business.Modules.Account
                 response = GetManager<IAccountManager>().HandleReadAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountJsonReadAccountRequest._Id)
                 response = GetManager<IAccountManager>().HandleJsonReadAccountRequest(message, origin, mm, response);
+            if (message.GetMessageId() == AccountJsonRestoreAccountRequest._Id)
+                response = GetManager<IAccountManager>().HandleJsonRestoreAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountUpdateAccountRequest._Id)
                 response = GetManager<IAccountManager>().HandleUpdateAccountRequest(message, origin, mm, response);
             if (message.GetMessageId() == AccountLoginAccountRequest._Id)
