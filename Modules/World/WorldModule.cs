@@ -233,6 +233,18 @@ namespace BeforeOurTime.Business.Modules.World
             }
             return defaultLocationItem;
         }
+        /// <summary>
+        /// Get module's self assigned order. 
+        /// </summary>
+        /// <remarks>
+        /// Lower numbers execute first, therefore a higher module order
+        /// allows for previous module loaded values to be altered.
+        /// </remarks>
+        /// <returns></returns>
+        public int GetOrder()
+        {
+            return 300;
+        }
         #region On Item Hooks
         /// <summary>
         /// Create attribute, if present, after item is created

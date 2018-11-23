@@ -113,7 +113,6 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             {
                 resultSet = Set
                     .Where(x => ids.Contains(x.Id))
-//                    .Include(x => x.Parent)
                     .Include(x => x.Children)
                     .AsQueryable()
                     .AsNoTracking();

@@ -69,7 +69,10 @@ namespace BeforeOurTime.Business.Modules
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
                 .Select(x => (IModule)Activator.CreateInstance(x, new object[] { this }))
                 .ToList();
-            Modules.ForEach((module) =>
+            // Ordering modules before letting them register for item CRUD
+            // events works in practice, but is not guarenteed. This should
+            // be refactored.
+            Modules.OrderBy(x => x.GetOrder()).ToList().ForEach((module) =>
             {
                 Logger.LogDebug($"Module {module.GetType().Name}: loaded");
                 module.GetManagers().ForEach(manager =>

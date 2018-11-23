@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using BeforeOurTime.Models.Primitives.Images;
 using BeforeOutTime.Business.Dbs.EF;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
 
 namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
 {
@@ -54,6 +55,15 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
                 .Ignore(item => item.ChildrenIds)
                 .Ignore(item => item.Data)
                 .Ignore(item => item.ViewModels);
+            // Item Visible Data
+            modelBuilder.Entity<VisibleItemData>()
+                .ToTable("Item_Data_Visible");
+            modelBuilder.Entity<VisibleItemData>()
+                .HasKey(x => x.Id);
+            modelBuilder.Entity<VisibleItemData>()
+                .Ignore(x => x.DataType);
+            modelBuilder.Entity<VisibleItemData>()
+                .Property(x => x.Name).IsRequired();
         }
         public override void Dispose()
         {
