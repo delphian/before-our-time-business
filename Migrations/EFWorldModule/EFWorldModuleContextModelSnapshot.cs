@@ -101,12 +101,7 @@ namespace BeforeOurTime.Business.Migrations.EFWorldModule
 
                     b.Property<Guid>("DataItemId");
 
-                    b.Property<string>("Description");
-
                     b.Property<bool>("Mobile");
-
-                    b.Property<string>("Name")
-                        .IsRequired();
 
                     b.Property<int>("Weight");
 

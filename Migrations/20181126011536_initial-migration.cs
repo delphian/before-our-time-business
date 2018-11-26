@@ -24,13 +24,26 @@ namespace BeforeOurTime.Business.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Item_Data_Visible",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    DataItemId = table.Column<Guid>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Item_Data_Visible", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Items",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     Type = table.Column<int>(nullable: false),
-                    ParentId = table.Column<Guid>(nullable: true),
-                    TerminalId = table.Column<Guid>(nullable: true)
+                    ParentId = table.Column<Guid>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -53,6 +66,9 @@ namespace BeforeOurTime.Business.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Icons");
+
+            migrationBuilder.DropTable(
+                name: "Item_Data_Visible");
 
             migrationBuilder.DropTable(
                 name: "Items");

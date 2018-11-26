@@ -1,5 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
+using BeforeOurTime.Business.Modules.Core.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
@@ -77,7 +78,8 @@ namespace BeforeOurTime.Business.Modules.Core
             var managers = new List<IModelManager>
             {
                 new ItemManager(moduleManager, new ItemRepo(db)),
-                new MessageManager(moduleManager, new MessageDataRepo(db))
+                new MessageManager(moduleManager, new MessageDataRepo(db)),
+                new VisibleItemDataManager(moduleManager, new EFVisibleItemDataRepo(db, moduleManager.GetItemRepo())),
             };
             return managers;
         }

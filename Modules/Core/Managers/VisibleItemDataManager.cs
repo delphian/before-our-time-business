@@ -151,6 +151,7 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
             var data = VisibleItemDataRepo.Read(item);
             if (data != null)
             {
+                item.Data.Add(data);
                 item.SetViewModel(typeof(VisibleProperty), new VisibleProperty()
                 {
                     Name = data.Name,

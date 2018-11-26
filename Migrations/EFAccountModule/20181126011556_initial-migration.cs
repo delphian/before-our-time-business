@@ -12,8 +12,12 @@ namespace BeforeOurTime.Business.Migrations.EFAccountModule
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
+                    DataType = table.Column<string>(nullable: true),
+                    DataItemId = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(nullable: false),
-                    Password = table.Column<string>(nullable: true)
+                    Password = table.Column<string>(nullable: true),
+                    Temporary = table.Column<bool>(nullable: false),
+                    Admin = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -31,6 +35,12 @@ namespace BeforeOurTime.Business.Migrations.EFAccountModule
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Accounts_Characters", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Accounts_Characters_Accounts_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -38,15 +48,20 @@ namespace BeforeOurTime.Business.Migrations.EFAccountModule
                 table: "Accounts",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Accounts_Characters_AccountId",
+                table: "Accounts_Characters",
+                column: "AccountId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Accounts");
+                name: "Accounts_Characters");
 
             migrationBuilder.DropTable(
-                name: "Accounts_Characters");
+                name: "Accounts");
         }
     }
 }

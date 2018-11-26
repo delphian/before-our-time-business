@@ -85,8 +85,6 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
                 .HasKey(x => x.Id);
             modelBuilder.Entity<PhysicalItemData>()
                 .Ignore(x => x.DataType);
-            modelBuilder.Entity<PhysicalItemData>()
-                .Property(x => x.Name).IsRequired();
         }
     }
 }

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeforeOurTime.Business.Migrations.EFAccountModule
 {
     [DbContext(typeof(EFAccountModuleContext))]
-    [Migration("20181119055037_linking-acount-and-characters")]
-    partial class linkingacountandcharacters
+    [Migration("20181126011556_initial-migration")]
+    partial class initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeforeOurTime.Business.Migrations.EFWorldModule
 {
     [DbContext(typeof(EFWorldModuleContext))]
-    [Migration("20181106224441_adding-physical-item-data")]
-    partial class addingphysicalitemdata
+    [Migration("20181126011619_initial-migration")]
+    partial class initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -103,12 +103,7 @@ namespace BeforeOurTime.Business.Migrations.EFWorldModule
 
                     b.Property<Guid>("DataItemId");
 
-                    b.Property<string>("Description");
-
                     b.Property<bool>("Mobile");
-
-                    b.Property<string>("Name")
-                        .IsRequired();
 
                     b.Property<int>("Weight");
 

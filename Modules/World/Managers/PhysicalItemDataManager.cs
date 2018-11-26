@@ -22,6 +22,7 @@ using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.World.Models.Properties;
 
 namespace BeforeOurTime.Business.Modules.World.Managers
 {
@@ -156,10 +157,10 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             var data = PhysicalItemDataRepo.Read(item);
             if (data != null)
             {
-                item.SetViewModel(typeof(VisibleProperty), new VisibleProperty()
+                item.Data.Add(data);
+                item.SetViewModel(typeof(PhysicalItemVM), new PhysicalItemVM()
                 {
-                    Name = data.Name,
-                    Description = data.Description
+                    Mobile = data.Mobile
                 });
             }
         }

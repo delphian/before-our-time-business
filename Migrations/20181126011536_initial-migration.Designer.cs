@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeforeOurTime.Business.Migrations
 {
     [DbContext(typeof(EFCoreModuleContext))]
-    [Migration("20181126001757_visible-item-table")]
-    partial class visibleitemtable
+    [Migration("20181126011536_initial-migration")]
+    partial class initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
