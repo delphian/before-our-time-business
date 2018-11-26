@@ -1,10 +1,10 @@
 ﻿using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.CreateItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Models;
-using BeforeOurTime.ModelsModels.Modules.Core.Messages.ItemCrud.CreateItem;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,7 +29,8 @@ namespace BeforeOurTime.Business.Modules.Core
             var request = message.GetMessageAsType<CoreCreateItemCrudRequest>();
             response = HandleRequestWrapper<CoreCreateItemCrudResponse>(request, res =>
             {
-                res.SetSuccess(false);
+                mm.GetManager<IItemManager>().Create(request.Item);
+                res.SetSuccess(true);
             });
             return response;
         }
