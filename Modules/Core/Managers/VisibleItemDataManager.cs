@@ -155,7 +155,8 @@ namespace BeforeOurTime.Business.Modules.Core.Managers
                 item.SetViewModel(typeof(VisibleProperty), new VisibleProperty()
                 {
                     Name = data.Name,
-                    Description = data.Description
+                    Description = data.Description,
+                    Icon = data.Icon
                 });
             }
         }
