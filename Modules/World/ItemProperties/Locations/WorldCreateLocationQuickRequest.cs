@@ -4,16 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Models.Modules.World.Messages.Location.CreateLocation;
-using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.CreateLocation;
 
-namespace BeforeOurTime.Business.Modules.World.Managers
+namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
 {
-    public partial class LocationItemManager
+    public partial class LocationItemDataManager
     {
         /// <summary>
         /// Create location
@@ -35,7 +35,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
                 var location = itemManager.Read(origin.ParentId.Value);
                 var createFromLocationItemId = request.FromLocationItemId ??
                                                origin.ParentId.Value;
-                var newLocationItem = mm.GetManager<ILocationItemManager>()
+                var newLocationItem = mm.GetManager<ILocationItemDataManager>()
                     .CreateFromHere(createFromLocationItemId);
                 ((WorldCreateLocationResponse)res).CreateLocationEvent = new WorldCreateLocationEvent()
                 {

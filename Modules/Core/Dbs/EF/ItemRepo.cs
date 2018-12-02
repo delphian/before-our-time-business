@@ -155,7 +155,7 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
                     }
                     catch (Exception e)
                     {
-                        throw new BotDatabaseException($"Unable to update item {child.Id}: {e.Message}");
+                        throw new BotDatabaseException($"Unable to update item {child.Id}", e);
                     }
                 });
             }

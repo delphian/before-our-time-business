@@ -8,6 +8,8 @@ using BeforeOurTime.Models.Modules.Account.Models.Data;
 using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOutTime.Business.Dbs.EF;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 
 namespace BeforeOurTime.Business.Modules.World.Dbs.EF
 {
@@ -17,9 +19,9 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
     public class EFWorldModuleContext : BaseContext
     {
         public DbSet<GameData> Games { set; get; }
-        public DbSet<LocationData> Locations { set; get; }
+        public DbSet<LocationItemData> Locations { set; get; }
         public DbSet<CharacterData> Characters { set; get; }
-        public DbSet<ExitData> Exits { set; get; }
+        public DbSet<ExitItemData> Exits { set; get; }
         public DbSet<PhysicalItemData> Physical { set; get; }
         public EFWorldModuleContext() : base() { }
         public EFWorldModuleContext(DbContextOptions<BaseContext> options) : base(options) { }
@@ -52,11 +54,11 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
             modelBuilder.Entity<GameData>()
                 .Ignore(x => x.DataType);
             // Item Location Data
-            modelBuilder.Entity<LocationData>()
+            modelBuilder.Entity<LocationItemData>()
                 .ToTable("Item_Data_Locations");
-            modelBuilder.Entity<LocationData>()
+            modelBuilder.Entity<LocationItemData>()
                 .HasKey(x => x.Id);
-            modelBuilder.Entity<LocationData>()
+            modelBuilder.Entity<LocationItemData>()
                 .Ignore(x => x.DataType)
                 .Property(x => x.Name).IsRequired();
             // Item Location Data
@@ -68,15 +70,13 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
                 .Ignore(x => x.DataType)
                 .Property(x => x.Name).IsRequired();
             // Item Exit Data
-            modelBuilder.Entity<ExitData>()
+            modelBuilder.Entity<ExitItemData>()
                 .ToTable("Item_Data_Exits");
-            modelBuilder.Entity<ExitData>()
+            modelBuilder.Entity<ExitItemData>()
                 .HasKey(x => x.Id);
-            modelBuilder.Entity<ExitData>()
+            modelBuilder.Entity<ExitItemData>()
                 .Ignore(x => x.DataType);
-            modelBuilder.Entity<ExitData>()
-                .Property(x => x.Name).IsRequired();
-            modelBuilder.Entity<ExitData>()
+            modelBuilder.Entity<ExitItemData>()
                 .Property(x => x.DestinationLocationId).IsRequired();
             // Item Physical Data
             modelBuilder.Entity<PhysicalItemData>()

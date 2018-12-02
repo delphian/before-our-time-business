@@ -3,28 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Modules;
-using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Modules.World.Dbs;
-using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
-using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
-using BeforeOurTime.Models.Modules.Core.Managers;
-using BeforeOurTime.Models.Modules.Terminal.Models;
-using BeforeOurTime.Models.Modules.Terminal.Managers;
-using BeforeOurTime.Models.Modules.Terminal.Models.Data;
-using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.Core.Models.Data;
 
-namespace BeforeOurTime.Business.Modules.World.Managers
+namespace BeforeOurTime.Business.Modules.Core.ItemProperties.Visibles
 {
-    public partial class ExitItemManager : ItemModelManager<ExitItem>, IExitItemManager
+    public partial class VisibleItemDataManager : ItemModelManager<Item>, IVisibleItemDataManager
     {
         /// <summary>
         /// Manage all modules
@@ -33,16 +24,16 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <summary>
         /// Repository for manager
         /// </summary>
-        private IExitDataRepo ExitDataRepo { set; get; }
+        private IVisibleItemDataRepo VisibleItemDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public ExitItemManager(
+        public VisibleItemDataManager(
             IModuleManager moduleManager,
-            IExitDataRepo exitDataRepo)
+            IVisibleItemDataRepo visibleItemDataRepo)
         {
             ModuleManager = moduleManager;
-            ExitDataRepo = exitDataRepo;
+            VisibleItemDataRepo = visibleItemDataRepo;
         }
         /// <summary>
         /// Get all repositories declared by manager
@@ -50,7 +41,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <returns></returns>
         public List<ICrudModelRepository> GetRepositories()
         {
-            return new List<ICrudModelRepository>() { ExitDataRepo };
+            return new List<ICrudModelRepository>() { VisibleItemDataRepo };
         }
         /// <summary>
         /// Get repository as interface
@@ -67,8 +58,17 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <returns></returns>
         public List<Guid> GetItemIds()
         {
-            var itemIds = ExitDataRepo.GetItemIds();
+            var itemIds = VisibleItemDataRepo.GetItemIds();
             return itemIds;
+        }
+        /// <summary>
+        /// Determine if a model type should be managed by this manager
+        /// </summary>
+        /// <param name="modelType"></param>
+        /// <returns></returns>
+        public override bool IsManaging(Type modelType)
+        {
+            return false;
         }
         /// <summary>
         /// Determine if an item is managed
@@ -76,7 +76,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Item that may have managable data</param>
         public bool IsManaging(Item item)
         {
-            return (item.Type == ItemType.Exit);
+            return (item.HasData<VisibleItemData>());
         }
         /// <summary>
         /// Determine if item data type is managable
@@ -84,36 +84,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="propertyData">Item data type that might be managable</param>
         public bool IsManagingData(Type dataType)
         {
-            return dataType == typeof(ExitData);
-        }
-        /// <summary>
-        /// Read all exits that target the same destination
-        /// </summary>
-        /// <param name="locationItem"></param>
-        /// <returns></returns>
-        public List<Item> GetLocationExits(Guid destinationId)
-        {
-            var exitDatas = ExitDataRepo.ReadDestinationId(destinationId);
-            var items = ModuleManager.GetItemRepo().Read(exitDatas.Select(x => x.DataItemId).ToList());
-            return items;
-        }
-        /// <summary>
-        /// Execute a use item request
-        /// </summary>
-        /// <param name="origin">Item that initiated request</param>
-        public string UseItem(CoreUseItemRequest request, Item origin, IResponse response)
-        {
-            var itemManager = ModuleManager.GetManager<IItemManager>();
-            var messageManager = ModuleManager.GetManager<IMessageManager>();
-            var exit = itemManager.Read(request.ItemId.Value).GetAsItem<ExitItem>();
-            var destinationLocation = itemManager.Read(Guid.Parse(exit.Exit.DestinationId));
-            itemManager.Move(origin, destinationLocation, exit);
-            var locationSummary = ModuleManager.GetManager<ILocationItemManager>()
-                .HandleReadLocationSummaryRequest(new WorldReadLocationSummaryRequest()
-                {
-                }, origin, ModuleManager, response);
-            messageManager.SendMessage(new List<IMessage>() { locationSummary }, new List<Item>() { origin });
-            return "";
+            return dataType == typeof(VisibleItemData);
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch
@@ -149,11 +120,11 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item just created from datastore</param>
         public void OnItemCreate(Item item)
         {
-            if (item.HasData<ExitData>())
+            if (item.HasData<VisibleItemData>())
             {
-                var data = item.GetData<ExitData>();
+                var data = item.GetData<VisibleItemData>();
                 data.DataItemId = item.Id;
-                ExitDataRepo.Create(data);
+                VisibleItemDataRepo.Create(data);
             }
         }
         /// <summary>
@@ -162,10 +133,16 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
-            var ExitData = ExitDataRepo.Read(item);
-            if (ExitData != null)
+            var data = VisibleItemDataRepo.Read(item);
+            if (data != null)
             {
-                item.Data.Add(ExitData);
+                item.Data.Add(data);
+                item.SetViewModel(typeof(VisibleProperty), new VisibleProperty()
+                {
+                    Name = data.Name,
+                    Description = data.Description,
+                    Icon = data.Icon
+                });
             }
         }
         /// <summary>
@@ -174,10 +151,17 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item about to be persisted to datastore</param>
         public void OnItemUpdate(Item item)
         {
-            if (item.HasData<ExitData>())
+            if (item.HasData<VisibleItemData>())
             {
-                var data = item.GetData<ExitData>();
-                ExitDataRepo.Update(data);
+                var data = item.GetData<VisibleItemData>();
+                if (data.Id == Guid.Empty)
+                {
+                    OnItemCreate(item);
+                }
+                else
+                {
+                    VisibleItemDataRepo.Update(data);
+                }
             }
         }
         /// <summary>
@@ -186,10 +170,10 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item about to be deleted</param>
         public void OnItemDelete(Item item)
         {
-            if (item.HasData<ExitData>())
+            if (item.HasData<VisibleItemData>())
             {
-                var data = item.GetData<ExitData>();
-                ExitDataRepo.Delete(data);
+                var data = item.GetData<VisibleItemData>();
+                VisibleItemDataRepo.Delete(data);
             }
         }
         #endregion

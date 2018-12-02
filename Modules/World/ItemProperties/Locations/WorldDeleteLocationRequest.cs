@@ -4,18 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Modules.World.Messages.Location.DeleteLocation;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
-using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.DeleteLocation;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 
-namespace BeforeOurTime.Business.Modules.World.Managers
+namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
 {
-    public partial class LocationItemManager
+    public partial class LocationItemDataManager
     {
         /// <summary>
         /// Create location
@@ -35,7 +34,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             {
                 var itemManager = mm.GetManager<IItemManager>();
                 var location = itemManager.Read(request.LocationItemId);
-                var exits = mm.GetManager<IExitItemManager>()
+                var exits = mm.GetManager<IExitItemDataManager>()
                     .GetLocationExits(location.Id);
                 itemManager.Delete(exits, true);
                 location = itemManager.Read(request.LocationItemId);

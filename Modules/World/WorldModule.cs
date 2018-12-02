@@ -1,4 +1,6 @@
 ﻿using BeforeOurTime.Business.Modules.World.Dbs.EF;
+using BeforeOurTime.Business.Modules.World.ItemProperties.Exits;
+using BeforeOurTime.Business.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Business.Modules.World.Managers;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Messages;
@@ -9,16 +11,16 @@ using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.World.Dbs;
-using BeforeOurTime.Models.Modules.World.Managers;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.CreateLocation;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.Messages.Emotes.PerformEmote;
-using BeforeOurTime.Models.Modules.World.Messages.Location.CreateLocation;
-using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOutTime.Business.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -52,7 +54,7 @@ namespace BeforeOurTime.Business.Modules.World
         /// <summary>
         /// Location data repository
         /// </summary>
-        private ILocationDataRepo LocationDataRepo { set; get; }
+        private ILocationItemDataRepo LocationDataRepo { set; get; }
         /// <summary>
         /// Character data repository
         /// </summary>
@@ -60,7 +62,7 @@ namespace BeforeOurTime.Business.Modules.World
         /// <summary>
         /// Character data repository
         /// </summary>
-        private IExitDataRepo ExitDataRepo { set; get; }
+        private IExitItemDataRepo ExitDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -86,9 +88,9 @@ namespace BeforeOurTime.Business.Modules.World
             var managers = new List<IModelManager>
             {
                 new GameItemManager(moduleManager, new EFGameDataRepo(db, moduleManager.GetItemRepo())),
-                new LocationItemManager(moduleManager, new EFLocationDataRepo(db, moduleManager.GetItemRepo())),
+                new LocationItemDataManager(moduleManager, new EFLocationItemDataRepo(db, moduleManager.GetItemRepo())),
                 new CharacterItemManager(moduleManager, new EFCharacterDataRepo(db, moduleManager.GetItemRepo())),
-                new ExitItemManager(moduleManager, new EFExitDataRepo(db, moduleManager.GetItemRepo())),
+                new ExitItemDataManager(moduleManager, new EFExitItemDataRepo(db, moduleManager.GetItemRepo())),
                 new PhysicalItemDataManager(moduleManager, new EFPhysicalItemDataRepo(db, moduleManager.GetItemRepo()))
             };
             return managers;
@@ -150,14 +152,14 @@ namespace BeforeOurTime.Business.Modules.World
                 .Where(x => x is IGameDataRepo)
                 .Select(x => (IGameDataRepo)x).FirstOrDefault();
             LocationDataRepo = repositories
-                .Where(x => x is ILocationDataRepo)
-                .Select(x => (ILocationDataRepo)x).FirstOrDefault();
+                .Where(x => x is ILocationItemDataRepo)
+                .Select(x => (ILocationItemDataRepo)x).FirstOrDefault();
             CharacterDataRepo = repositories
                 .Where(x => x is ICharacterDataRepo)
                 .Select(x => (ICharacterDataRepo)x).FirstOrDefault();
             ExitDataRepo = repositories
-                .Where(x => x is IExitDataRepo)
-                .Select(x => (IExitDataRepo)x).FirstOrDefault();
+                .Where(x => x is IExitItemDataRepo)
+                .Select(x => (IExitItemDataRepo)x).FirstOrDefault();
             ModuleManager.GetItemRepo().OnItemCreate += OnItemCreate;
             ModuleManager.GetItemRepo().OnItemRead += OnItemRead;
             ModuleManager.GetItemRepo().OnItemUpdate += OnItemUpdate;
@@ -196,7 +198,7 @@ namespace BeforeOurTime.Business.Modules.World
                     ParentId = gameItem.Id,
                     Data = new List<IItemData>()
                     {
-                        new LocationData()
+                        new LocationItemData()
                         {
                             Id = new Guid("e370301f-2b91-43a0-9a30-08d63af92e86"),
                             DataItemId = new Guid("91f4a03f-8cb8-467c-df2c-08d63af92e75"),
@@ -213,7 +215,7 @@ namespace BeforeOurTime.Business.Modules.World
                     }
                 });
                 defaultGameData = gameItem.GetData<GameData>();
-                defaultGameData.DefaultLocationId = locationItem.GetData<LocationData>().DataItemId;
+                defaultGameData.DefaultLocationId = locationItem.GetData<LocationItemData>().DataItemId;
                 GameDataRepo.Update(defaultGameData);
             }
             var defaultGameItem = ModuleManager.GetItemRepo().Read(defaultGameData.DataItemId);
@@ -307,9 +309,9 @@ namespace BeforeOurTime.Business.Modules.World
             IResponse response)
         {
             if (message.GetMessageId() == WorldReadLocationSummaryRequest._Id)
-                response = GetManager<ILocationItemManager>().HandleReadLocationSummaryRequest(message, origin, mm, response);
+                response = GetManager<ILocationItemDataManager>().HandleReadLocationSummaryRequest(message, origin, mm, response);
             if (message.GetMessageId() == WorldCreateLocationQuickRequest._Id)
-                response = GetManager<ILocationItemManager>().HandleCreateLocationQuickRequest(message, origin, mm, response);
+                response = GetManager<ILocationItemDataManager>().HandleCreateLocationQuickRequest(message, origin, mm, response);
             if (message.GetMessageId() == WorldPerformEmoteRequest._Id)
                 response = HandlePerformEmoteRequest(message, origin, mm, response);
             return response;

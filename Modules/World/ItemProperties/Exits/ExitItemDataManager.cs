@@ -1,26 +1,24 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+using System.Text;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Modules;
-using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Models.Modules.World.Models.Items;
-using BeforeOurTime.Models.Modules.World.Managers;
-using BeforeOurTime.Models.Modules.World.Dbs;
-using BeforeOurTime.Models.Modules.World.Models.Data;
-using BeforeOurTime.Models.Modules.Core.Models.Data;
-using BeforeOurTime.Models.Modules.World;
+using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
-using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 
-namespace BeforeOurTime.Business.Modules.World.Managers
+namespace BeforeOurTime.Business.Modules.World.ItemProperties.Exits
 {
-    public partial class LocationItemManager : ItemModelManager<LocationItem>, ILocationItemManager
+    public partial class ExitItemDataManager : ItemModelManager<ExitItem>, IExitItemDataManager
     {
         /// <summary>
         /// Manage all modules
@@ -29,16 +27,17 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <summary>
         /// Repository for manager
         /// </summary>
-        private ILocationDataRepo LocationDataRepo { set; get; }
+        private IExitItemDataRepo ExitDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public LocationItemManager(
+        public ExitItemDataManager(
             IModuleManager moduleManager,
-            ILocationDataRepo locationDataRepo)
+            IExitItemDataRepo exitDataRepo)
         {
             ModuleManager = moduleManager;
-            LocationDataRepo = locationDataRepo;
+            ExitDataRepo = exitDataRepo;
+            ModuleManager.RegisterForItemCommands(HandleUseItemCommand);
         }
         /// <summary>
         /// Get all repositories declared by manager
@@ -46,7 +45,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <returns></returns>
         public List<ICrudModelRepository> GetRepositories()
         {
-            return new List<ICrudModelRepository>() { LocationDataRepo };
+            return new List<ICrudModelRepository>() { ExitDataRepo };
         }
         /// <summary>
         /// Get repository as interface
@@ -63,7 +62,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <returns></returns>
         public List<Guid> GetItemIds()
         {
-            var itemIds = LocationDataRepo.GetItemIds();
+            var itemIds = ExitDataRepo.GetItemIds();
             return itemIds;
         }
         /// <summary>
@@ -72,7 +71,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Item that may have managable data</param>
         public bool IsManaging(Item item)
         {
-            return (item.Type == ItemType.Location);
+            return (item.Type == ItemType.Exit);
         }
         /// <summary>
         /// Determine if item data type is managable
@@ -80,68 +79,49 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="propertyData">Item data type that might be managable</param>
         public bool IsManagingData(Type dataType)
         {
-            return dataType == typeof(LocationData);
+            return dataType == typeof(ExitItemData);
         }
         /// <summary>
-        /// Execute a use item request
+        /// Read all exits that target the same destination
         /// </summary>
-        /// <param name="origin">Item that initiated request</param>
-        public string UseItem(CoreUseItemRequest request, Item origin, IResponse response)
-        {
-            throw new NotImplementedException();
-        }
-        /// <summary>
-        /// Create an empty new location and connecting exits from a provided location
-        /// </summary>
-        /// <param name="currentLocationItemId">Existing location item to link to new location with exits</param>
+        /// <param name="locationItem"></param>
         /// <returns></returns>
-        public LocationItem CreateFromHere(Guid currentLocationItemId)
+        public List<Item> GetLocationExits(Guid destinationId)
         {
-            var itemRepo = ModuleManager.GetItemRepo();
-            var gameItem = ModuleManager.GetModule<IWorldModule>().GetDefaultGame();
-            var currentLocation = itemRepo.Read(currentLocationItemId);
-            var newLocationItem = itemRepo.Create(new LocationItem()
+            var exitDatas = ExitDataRepo.ReadDestinationId(destinationId);
+            var items = ModuleManager.GetItemRepo().Read(exitDatas.Select(x => x.DataItemId).ToList());
+            return items;
+        }
+        /// <summary>
+        /// Handle request to invoke an item command
+        /// </summary>
+        /// <param name="itemCommand"></param>
+        /// <param name="origin"></param>
+        public CoreUseItemEvent HandleUseItemCommand(ItemCommand itemCommand, Item origin)
+        {
+            CoreUseItemEvent continueIfNull = null;
+            if (itemCommand.Id == new Guid("c558c1f9-7d01-45f3-bc35-dcab52b5a37c"))
             {
-                ParentId = gameItem.Id,
-                Data = new List<IItemData>()
-                {
-                    new LocationData()
+                var itemManager = ModuleManager.GetManager<IItemManager>();
+                var messageManager = ModuleManager.GetManager<IMessageManager>();
+                var exitItem = itemManager.Read(itemCommand.ItemId.Value);
+                var destinationItem = itemManager.Read(Guid.Parse(exitItem.GetProperty<ExitItemProperty>().DestinationId));
+                itemManager.Move(origin, destinationItem, exitItem);
+                IResponse mockResponse = new Response();
+                var locationSummary = ModuleManager.GetManager<ILocationItemDataManager>()
+                    .HandleReadLocationSummaryRequest(new WorldReadLocationSummaryRequest()
                     {
-                        Name = "A New Location",
-                        Description = "Someone has barfed C# code and SQL statements all over the place. It's quite disgusting."
-                    }
-                },
-                Children = new List<Item>()
+                    }, origin, ModuleManager, mockResponse);
+                messageManager.SendMessage(new List<IMessage>() { locationSummary }, new List<Item>() { origin });
+                continueIfNull = new CoreUseItemEvent()
                 {
-                    new ExitItem()
-                    {
-                        Data = new List<IItemData>()
-                        {
-                            new ExitData()
-                            {
-                                DestinationLocationId = currentLocationItemId,
-                                Name = "A Return Path",
-                                Description = "Escape back to the real world"
-                            }
-                        }
-                    }
-                }
-            }).GetAsItem<LocationItem>();
-            currentLocation.Children.Add(new ExitItem()
-            {
-                ParentId = currentLocation.Id,
-                Data =  new List<IItemData>()
-                {
-                    new ExitData()
-                    {
-                        DestinationLocationId = newLocationItem.Id,
-                        Name = "A New Exit",
-                        Description = "The paint is still wet on this sign"
-                    }
-                }
-            });
-            itemRepo.Update(currentLocation);
-            return newLocationItem;
+                    Success = true,
+                    Used = exitItem,
+                    Using = origin,
+                    Use = itemCommand
+                };
+            }
+            return continueIfNull;
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch
@@ -177,11 +157,11 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item just created from datastore</param>
         public void OnItemCreate(Item item)
         {
-            if (item.HasData<LocationData>())
+            if (item.HasData<ExitItemData>())
             {
-                var data = item.GetData<LocationData>();
+                var data = item.GetData<ExitItemData>();
                 data.DataItemId = item.Id;
-                LocationDataRepo.Create(data);
+                ExitDataRepo.Create(data);
             }
         }
         /// <summary>
@@ -190,10 +170,10 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
-            var locationData = LocationDataRepo.Read(item);
-            if (locationData != null)
+            var ExitData = ExitDataRepo.Read(item);
+            if (ExitData != null)
             {
-                item.Data.Add(locationData);
+                item.Data.Add(ExitData);
             }
         }
         /// <summary>
@@ -202,10 +182,17 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item about to be persisted to datastore</param>
         public void OnItemUpdate(Item item)
         {
-            if (item.HasData<LocationData>())
+            if (item.HasData<ExitItemData>())
             {
-                var data = item.GetData<LocationData>();
-                LocationDataRepo.Update(data);
+                var data = item.GetData<ExitItemData>();
+                if (data.Id == Guid.Empty)
+                {
+                    OnItemCreate(item);
+                }
+                else
+                {
+                    ExitDataRepo.Update(data);
+                }
             }
         }
         /// <summary>
@@ -214,10 +201,10 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item about to be deleted</param>
         public void OnItemDelete(Item item)
         {
-            if (item.HasData<LocationData>())
+            if (item.HasData<ExitItemData>())
             {
-                var data = item.GetData<LocationData>();
-                LocationDataRepo.Delete(data);
+                var data = item.GetData<ExitItemData>();
+                ExitDataRepo.Delete(data);
             }
         }
         #endregion

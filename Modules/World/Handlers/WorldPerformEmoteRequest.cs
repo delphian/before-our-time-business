@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BeforeOurTime.Models.Modules.World.Messages.Location.CreateLocation;
 using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Modules;

@@ -103,14 +103,6 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             });
             return item.GetAsItem<CharacterItem>();
         }
-        /// <summary>
-        /// Execute a use item request
-        /// </summary>
-        /// <param name="origin">Item that initiated request</param>
-        public string UseItem(CoreUseItemRequest request, Item origin, IResponse response)
-        {
-            throw new NotImplementedException();
-        }
         #region On Item Hooks
         /// <summary>
         /// Create attribute, if present, after item is created

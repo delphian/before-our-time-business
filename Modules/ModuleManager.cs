@@ -8,6 +8,7 @@ using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -47,6 +48,10 @@ namespace BeforeOurTime.Business.Modules
         /// Record which modules have registered for specific messages
         /// </summary>
         private Dictionary<Guid, List<IModule>> MessageHandlers { set; get; } = new Dictionary<Guid, List<IModule>>();
+        /// <summary>
+        /// Modules registered to handle item commands
+        /// </summary>
+        private List<HandleItemCommand> ItemCommandHandlers { set; get; } = new List<HandleItemCommand>();
         /// <summary>
         /// Constructor
         /// </summary>
@@ -219,8 +224,19 @@ namespace BeforeOurTime.Business.Modules
             return response;
         }
         /// <summary>
+        /// Register to handle item commands when they are used
+        /// </summary>
+        /// <param name="itemCommandHandler"></param>
+        public void RegisterForItemCommands(HandleItemCommand itemCommandHandler)
+        {
+            ItemCommandHandlers.Add(itemCommandHandler);
+        }
+        /// <summary>
         /// Execute a use item request
         /// </summary>
+        /// <remarks>
+        /// Generally delegates to individual modules, but not always
+        /// </remarks>
         /// <param name="origin">Item that initiated request</param>
         public CoreUseItemResponse UseItem(CoreUseItemRequest request, Item origin, IResponse response)
         {
@@ -236,17 +252,17 @@ namespace BeforeOurTime.Business.Modules
             };
             try
             {
-                var item = GetManager<IItemManager>().Read(request.ItemId.Value);
-                var manager = GetManager(item);
-                if (manager == null)
+                ItemCommandHandlers.ForEach(itemCommandHandler =>
                 {
-                    throw new BeforeOurTimeException($"No manager found to use item {item.Id.ToString()}");
-                }
-                var result = manager.UseItem(request, origin, response);
-                ((CoreUseItemResponse)response)._responseSuccess = true;
-                ((CoreUseItemResponse)response)._responseMessage = result;
-                ((CoreUseItemResponse)response).CoreUseItemEvent.Used = item;
-                ((CoreUseItemResponse)response).CoreUseItemEvent.Success = (result == null);
+                    if (((CoreUseItemResponse)response)._responseSuccess == false) {
+                        var coreUseItemEvent = itemCommandHandler.Invoke(request.Use, origin);
+                        if (coreUseItemEvent != null)
+                        {
+                            ((CoreUseItemResponse)response).CoreUseItemEvent = coreUseItemEvent;
+                            ((CoreUseItemResponse)response)._responseSuccess = true;
+                        }
+                    }
+                });
             }
             catch (Exception e)
             {

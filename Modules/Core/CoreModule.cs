@@ -1,6 +1,6 @@
 ﻿using BeforeOurTime.Business.Apis.Items;
 using BeforeOurTime.Business.Modules.Core.Dbs.EF;
-using BeforeOurTime.Business.Modules.Core.Managers;
+using BeforeOurTime.Business.Modules.Core.ItemProperties.Visibles;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
@@ -8,7 +8,6 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core;
 using BeforeOurTime.Models.Modules.Core.Dbs;
-using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.CreateItem;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.ReadItem;

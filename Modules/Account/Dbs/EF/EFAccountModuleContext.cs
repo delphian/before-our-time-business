@@ -8,6 +8,7 @@ using BeforeOurTime.Models.Modules.Account.Models.Data;
 using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOutTime.Business.Dbs.EF;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
 
 namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
 {
@@ -40,7 +41,7 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Ignore<Item>();
-            modelBuilder.Ignore<LocationData>();
+            modelBuilder.Ignore<LocationItemData>();
             // Account
             modelBuilder.Entity<AccountData>()
                 .ToTable("Accounts")

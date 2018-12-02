@@ -6,17 +6,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 
-namespace BeforeOurTime.Business.Modules.World.Managers
+namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
 {
-    public partial class LocationItemManager
+    public partial class LocationItemDataManager
     {
         /// <summary>
         /// Read location summary
@@ -41,7 +43,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
                 // All items
                 ((WorldReadLocationSummaryResponse)res).Items = location.Children;
                 // Add commands
-                List<Command> commands = location.Children
+                List<ItemCommand> commands = location.Children
                     .Where(x => x.GetProperty<CommandProperty>() != null)
                     .Select(x => x.GetProperty<CommandProperty>())
                     .ToList()
@@ -50,19 +52,20 @@ namespace BeforeOurTime.Business.Modules.World.Managers
                 ((WorldReadLocationSummaryResponse)res).Commands = commands;
                 // Add exits
                 location.Children
-                    .Where(x => x.HasData(typeof(ExitData)))
+                    .Where(x => x.HasData(typeof(ExitItemData)))
                     .Select(x => x.GetAsItem<ExitItem>())
                     .ToList()
                     .ForEach(delegate (ExitItem item)
                     {
-                        var data = item.GetData<ExitData>();
+                        var exitItemData = item.GetData<ExitItemData>();
+                        var visibleItemProperty = item.GetProperty<VisibleProperty>();
                         ((WorldReadLocationSummaryResponse)res).Exits.Add(new ListExitResponse()
                         {
                             _requestInstanceId = request.GetRequestInstanceId(),
                             _responseSuccess = true,
                             Item = item,
-                            Name = data.Name,
-                            Description = data.Description
+                            Name = visibleItemProperty.Name,
+                            Description = visibleItemProperty.Description
                         });
                     });
                 // Add character items

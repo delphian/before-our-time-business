@@ -15,7 +15,6 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
-using BeforeOurTime.Models.Modules.World.Messages.Location.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
@@ -96,16 +95,6 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         public bool IsManagingData(Type dataType)
         {
             return dataType == typeof(PhysicalItemData);
-        }
-        /// <summary>
-        /// Execute a use item request
-        /// </summary>
-        /// <param name="origin">Item that initiated request</param>
-        public string UseItem(CoreUseItemRequest request, Item origin, IResponse response)
-        {
-            var itemManager = ModuleManager.GetManager<IItemManager>();
-            var messageManager = ModuleManager.GetManager<IMessageManager>();
-            return "";
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch

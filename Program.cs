@@ -28,6 +28,7 @@ using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Dbs;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 
 namespace BeforeOurTime.Business
 {
@@ -60,6 +61,26 @@ namespace BeforeOurTime.Business
                 server.Start();
             });
             ServiceProvider.GetService<IBotLogger>().LogInformation($"All servers started");
+            // Hacks
+            {
+                //var mm = ServiceProvider.GetService<IModuleManager>();
+                //var itemManager = mm.GetManager<IItemManager>();
+                //var exitItemDataManager = mm.GetManager<IExitItemDataManager>();
+                //var exits = itemManager.Read(exitItemDataManager.GetItemIds());
+                //exits.ForEach(exit =>
+                //{
+                //    if (!exit.HasData<VisibleItemData>())
+                //    {
+                //        var visibleItemData = new VisibleItemData()
+                //        {
+                //            Name = exit.GetData<ExitItemData>().Name,
+                //            Description = exit.GetData<ExitItemData>().Description
+                //        };
+                //        exit.Data.Add(visibleItemData);
+                //        itemManager.Update(exit);
+                //    }
+                //});
+            }
             ListenToTerminals();
             // Wait for user input
             Console.WriteLine("Ready! (Hit 'q' and enter to abort console)");
