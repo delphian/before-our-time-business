@@ -147,7 +147,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             if (data != null)
             {
                 item.Data.Add(data);
-                item.SetViewModel(typeof(PhysicalItemVM), new PhysicalItemVM()
+                item.AddProperty(typeof(PhysicalItemVM), new PhysicalItemVM()
                 {
                     Mobile = data.Mobile
                 });

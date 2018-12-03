@@ -15,6 +15,7 @@ using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
 {
@@ -41,7 +42,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
                 ((WorldReadLocationSummaryResponse)res).Item = location;
                 ((WorldReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
                 // All items
-                ((WorldReadLocationSummaryResponse)res).Items = location.Children;
+                ((WorldReadLocationSummaryResponse) res).Items = location.Children;
                 // Add commands
                 List<ItemCommand> commands = location.Children
                     .Where(x => x.GetProperty<CommandProperty>() != null)
@@ -58,7 +59,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
                     .ForEach(delegate (ExitItem item)
                     {
                         var exitItemData = item.GetData<ExitItemData>();
-                        var visibleItemProperty = item.GetProperty<VisibleProperty>();
+                        var visibleItemProperty = item.GetProperty<VisibleItemProperty>();
                         ((WorldReadLocationSummaryResponse)res).Exits.Add(new ListExitResponse()
                         {
                             _requestInstanceId = request.GetRequestInstanceId(),

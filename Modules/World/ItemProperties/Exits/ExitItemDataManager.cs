@@ -170,10 +170,16 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Exits
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
-            var ExitData = ExitDataRepo.Read(item);
-            if (ExitData != null)
+            var data = ExitDataRepo.Read(item);
+            if (data != null)
             {
-                item.Data.Add(ExitData);
+                item.Data.Add(data);
+                item.AddProperty(typeof(ExitItemProperty), new ExitItemProperty()
+                {
+                    DestinationId = data.DestinationLocationId.ToString(),
+                    Effort = data.Effort,
+                    Time = data.Time
+                });
             }
         }
         /// <summary>

@@ -14,6 +14,7 @@ using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
 {
@@ -69,7 +70,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
         /// <param name="item">Item that may have managable data</param>
         public bool IsManaging(Item item)
         {
-            return (item.Type == ItemType.Location);
+            return item.HasData<LocationItemData>();
         }
         /// <summary>
         /// Determine if item data type is managable
@@ -109,7 +110,6 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
                     },
                     new LocationItemData()
                     {
-                        Name = ""
                     }
                 },
                 Children = new List<Item>()
@@ -197,10 +197,13 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
-            var locationData = LocationDataRepo.Read(item);
-            if (locationData != null)
+            var data = LocationDataRepo.Read(item);
+            if (data != null)
             {
-                item.Data.Add(locationData);
+                item.Data.Add(data);
+                item.AddProperty(typeof(LocationItemProperty), new LocationItemProperty()
+                {
+                });
             }
         }
         /// <summary>

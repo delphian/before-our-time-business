@@ -128,7 +128,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             if (characterData != null)
             {
                 item.Data.Add(characterData);
-                item.SetViewModel(typeof(CharacterProperty), item.GetProperty<CharacterProperty>());
+                item.AddProperty(typeof(CharacterProperty), item.GetProperty<CharacterProperty>());
             }
         }
         /// <summary>

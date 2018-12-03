@@ -7,6 +7,7 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World;
@@ -201,7 +202,10 @@ namespace BeforeOurTime.Business.Modules.World
                         new LocationItemData()
                         {
                             Id = new Guid("e370301f-2b91-43a0-9a30-08d63af92e86"),
-                            DataItemId = new Guid("91f4a03f-8cb8-467c-df2c-08d63af92e75"),
+                            DataItemId = new Guid("91f4a03f-8cb8-467c-df2c-08d63af92e75")
+                        },
+                        new VisibleItemData()
+                        {
                             Name = "A Dark Void",
                             Description = "Cool mists and dark shadows shroud "
                                 + "everything in this place. Straining your eyes does little to resolve the "
@@ -210,7 +214,7 @@ namespace BeforeOurTime.Business.Modules.World
                                 + "when you realise these forms may have once been human. The smell of rain "
                                 + "and rotting wood pains your nose while the occational drip of water tickles "
                                 + "the top of skulls both real and imagined. Any attempt to navigate in this damp "
-                                + "cavern causes disorientation.",
+                                + "cavern causes disorientation."
                         }
                     }
                 });

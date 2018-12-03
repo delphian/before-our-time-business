@@ -8,6 +8,7 @@ using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Business.Dbs.EF;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
 {

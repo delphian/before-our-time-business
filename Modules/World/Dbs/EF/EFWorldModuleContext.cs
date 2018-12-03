@@ -59,8 +59,7 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
             modelBuilder.Entity<LocationItemData>()
                 .HasKey(x => x.Id);
             modelBuilder.Entity<LocationItemData>()
-                .Ignore(x => x.DataType)
-                .Property(x => x.Name).IsRequired();
+                .Ignore(x => x.DataType);
             // Item Location Data
             modelBuilder.Entity<CharacterData>()
                 .ToTable("Item_Data_Characters");

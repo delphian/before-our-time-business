@@ -12,6 +12,7 @@ using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business.Modules.Core.ItemProperties.Visibles
 {
@@ -137,7 +138,7 @@ namespace BeforeOurTime.Business.Modules.Core.ItemProperties.Visibles
             if (data != null)
             {
                 item.Data.Add(data);
-                item.SetViewModel(typeof(VisibleProperty), new VisibleProperty()
+                item.AddProperty(typeof(VisibleItemProperty), new VisibleItemProperty()
                 {
                     Name = data.Name,
                     Description = data.Description,

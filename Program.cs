@@ -29,6 +29,7 @@ using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Dbs;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
 
 namespace BeforeOurTime.Business
 {
@@ -65,19 +66,19 @@ namespace BeforeOurTime.Business
             {
                 //var mm = ServiceProvider.GetService<IModuleManager>();
                 //var itemManager = mm.GetManager<IItemManager>();
-                //var exitItemDataManager = mm.GetManager<IExitItemDataManager>();
-                //var exits = itemManager.Read(exitItemDataManager.GetItemIds());
-                //exits.ForEach(exit =>
+                //var locationItemDataManager = mm.GetManager<ILocationItemDataManager>();
+                //var locations = itemManager.Read(locationItemDataManager.GetItemIds());
+                //locations.ForEach(location =>
                 //{
-                //    if (!exit.HasData<VisibleItemData>())
+                //    if (!location.HasData<VisibleItemData>())
                 //    {
                 //        var visibleItemData = new VisibleItemData()
                 //        {
-                //            Name = exit.GetData<ExitItemData>().Name,
-                //            Description = exit.GetData<ExitItemData>().Description
+                //            Name = location.GetData<LocationItemData>().Name,
+                //            Description = location.GetData<LocationItemData>().Description
                 //        };
-                //        exit.Data.Add(visibleItemData);
-                //        itemManager.Update(exit);
+                //        location.Data.Add(visibleItemData);
+                //        itemManager.Update(location);
                 //    }
                 //});
             }

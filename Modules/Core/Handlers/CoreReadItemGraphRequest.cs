@@ -1,6 +1,7 @@
 ﻿using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemGraph;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
@@ -60,7 +61,7 @@ namespace BeforeOurTime.Business.Modules.Core
             parentItem.ChildrenIds?.ForEach((itemId) =>
             {
                 var item = itemManager.Read(itemId);
-                var name = item.GetProperty<VisibleProperty>("Visible")?.Name ?? "N/A";
+                var name = item.GetProperty<VisibleItemProperty>("Visible")?.Name ?? "N/A";
                 var childGraph = new ItemGraph()
                 {
                     Id = itemId,

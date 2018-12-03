@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 using BeforeOurTime.Models.Modules.Core.Messages.MoveItem;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
 
@@ -38,7 +39,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             TelnetClient telnetClient)
         {
             var arrivalEvent = message.GetMessageAsType<CoreMoveItemEvent>();
-            var visible = arrivalEvent.Item.GetProperty<VisibleProperty>("Visible");
+            var visible = arrivalEvent.Item.GetProperty<VisibleItemProperty>("Visible");
             telnetServer.SendMessageToClient(telnetClient, "\r\n"
                 + $"{AnsiColors.green}{visible?.Name} has moved{AnsiColors.reset}");
         }

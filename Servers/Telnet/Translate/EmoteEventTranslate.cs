@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Modules.World.Messages.Emotes;
 
@@ -39,7 +40,7 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
         {
             var emoteEvent = message.GetMessageAsType<WorldEmoteEvent>();
             var emote = "";
-            var itemName = emoteEvent.Origin.GetProperty<VisibleProperty>()?.Name ?? "** Something **";
+            var itemName = emoteEvent.Origin.GetProperty<VisibleItemProperty>()?.Name ?? "** Something **";
             emote = emoteEvent.EmoteType == WorldEmoteType.Smile ? $"{itemName} smiles happily" : emote;
             emote = emoteEvent.EmoteType == WorldEmoteType.Frown ? $"{itemName} frowns" : emote;
             telnetServer.SendMessageToClient(telnetClient, "\r\n"
