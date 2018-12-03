@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Modules.World.Models.Data;
-using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
@@ -16,6 +14,7 @@ using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadL
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 
 namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
 {
@@ -71,7 +70,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
                     });
                 // Add character items
                 location.Children
-                    .Where(x => x.HasData<CharacterData>())
+                    .Where(x => x.HasData<CharacterItemData>())
                     .Select(x => x.GetAsItem<CharacterItem>())
                     .ToList()
                     .ForEach(item =>

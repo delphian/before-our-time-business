@@ -7,19 +7,12 @@ using Microsoft.Extensions.Logging;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules;
-using BeforeOurTime.Models.Modules.World.Models.Items;
-using BeforeOurTime.Models.Modules.World.Managers;
-using BeforeOurTime.Models.Modules.World.Dbs;
-using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
-using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Models.Modules.Terminal.Models;
-using BeforeOurTime.Models.Modules.World.Models.Properties;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 
-namespace BeforeOurTime.Business.Modules.World.Managers
+namespace BeforeOurTime.Business.Modules.ItemProperties.Characters
 {
-    public class CharacterItemManager : ItemModelManager<CharacterItem>, ICharacterItemManager
+    public class CharacterItemDataManager : ItemModelManager<CharacterItem>, ICharacterItemDataManager
     {
         /// <summary>
         /// Manage all modules
@@ -28,13 +21,13 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <summary>
         /// Repository for manager
         /// </summary>
-        private ICharacterDataRepo CharacterDataRepo { set; get; }
+        private ICharacterItemDataRepo CharacterDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public CharacterItemManager(
+        public CharacterItemDataManager(
             IModuleManager moduleManager,
-            ICharacterDataRepo characterDataRepo)
+            ICharacterItemDataRepo characterDataRepo)
         {
             ModuleManager = moduleManager;
             CharacterDataRepo = characterDataRepo;
@@ -71,7 +64,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Item that may have managable data</param>
         public bool IsManaging(Item item)
         {
-            return (item.HasData<CharacterData>());
+            return (item.HasData<CharacterItemData>());
         }
         /// <summary>
         /// Determine if item data type is managable
@@ -79,7 +72,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="propertyData">Item data type that might be managable</param>
         public bool IsManagingData(Type dataType)
         {
-            return dataType == typeof(CharacterData);
+            return dataType == typeof(CharacterItemData);
         }
         /// <summary>
         /// Create a new character
@@ -94,7 +87,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
                 ParentId = locationItemId,
                 Data = new List<IItemData>()
                 {
-                    CharacterDataRepo.Create(new CharacterData()
+                    CharacterDataRepo.Create(new CharacterItemData()
                     {
                         Name = name,
                         Description = "A brave new player"
@@ -110,9 +103,9 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item just created from datastore</param>
         public void OnItemCreate(Item item)
         {
-            if (item.HasData<CharacterData>())
+            if (item.HasData<CharacterItemData>())
             {
-                var data = item.GetData<CharacterData>();
+                var data = item.GetData<CharacterItemData>();
                 data.DataItemId = item.Id;
                 CharacterDataRepo.Create(data);
             }
@@ -128,7 +121,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             if (characterData != null)
             {
                 item.Data.Add(characterData);
-                item.AddProperty(typeof(CharacterProperty), item.GetProperty<CharacterProperty>());
+                item.AddProperty(typeof(CharacterItemProperty), item.GetProperty<CharacterItemProperty>());
             }
         }
         /// <summary>
@@ -138,9 +131,9 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemUpdate(Item item)
         {
-            if (item.HasData<CharacterData>())
+            if (item.HasData<CharacterItemData>())
             {
-                var data = item.GetData<CharacterData>();
+                var data = item.GetData<CharacterItemData>();
                 CharacterDataRepo.Update(data);
             }
         }
@@ -151,9 +144,9 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemDelete(Item item)
         {
-            if (item.HasData<CharacterData>())
+            if (item.HasData<CharacterItemData>())
             {
-                var data = item.GetData<CharacterData>();
+                var data = item.GetData<CharacterItemData>();
                 CharacterDataRepo.Delete(data);
             }
         }

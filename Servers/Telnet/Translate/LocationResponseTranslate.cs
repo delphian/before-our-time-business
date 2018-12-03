@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
-using BeforeOurTime.Models.Messages.Responses.List;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadLocationSummary;
-using BeforeOurTime.Models.Modules.World.Models.Items;
 
 namespace BeforeOurTime.Business.Servers.Telnet.Translate
 {

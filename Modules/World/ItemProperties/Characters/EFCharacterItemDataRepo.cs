@@ -1,36 +1,36 @@
-﻿using BeforeOurTime.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using BeforeOurTime.Models.Modules.World.Models.Data;
-using BeforeOurTime.Models.Modules.World.Dbs;
+﻿using BeforeOurTime.Business.Dbs.EF;
+using BeforeOurTime.Business.Modules.World.Dbs.EF;
 using BeforeOurTime.Models.Modules.Core.Dbs;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Business.Dbs.EF;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace BeforeOurTime.Business.Modules.World.Dbs.EF
+namespace BeforeOurTime.Business.Modules.World.ItemProperties.Characters
 {
     /// <summary>
-    /// Access to Game Data in the data store
+    /// Central data repository for all character items
     /// </summary>
-    public class EFGameDataRepo : Repository<GameData>, IGameDataRepo
+    public class EFCharacterItemDataRepo : Repository<CharacterItemData>, ICharacterItemDataRepo
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="db">Entity framework database context</param>
-        public EFGameDataRepo(
+        public EFCharacterItemDataRepo(
             EFWorldModuleContext db,
-            IItemRepo itemRepo) : base(db, db.GetDbSet<GameData>())
+            IItemRepo itemRepo) : base(db, db.GetDbSet<CharacterItemData>())
         {
         }
         /// <summary>
-        /// Read associated game attributes of item
+        /// Read associated Location attributes of item
         /// </summary>
         /// <param name="item">Item that may have associated attributes</param>
         /// <returns></returns>
-        public GameData Read(Item item)
+        public CharacterItemData Read(Item item)
         {
             var dataId = Set.Where(x => x.DataItemId == item.Id).Select(x => x.Id).FirstOrDefault();
             return Read(dataId);

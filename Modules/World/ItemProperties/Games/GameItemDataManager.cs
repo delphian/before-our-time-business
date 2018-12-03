@@ -4,21 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Modules;
-using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules.World.Managers;
 using BeforeOurTime.Models.Modules.World.Dbs;
-using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
-using BeforeOurTime.Models.Messages.Responses;
-using BeforeOurTime.Models.Modules.Terminal.Models;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Games;
 
-namespace BeforeOurTime.Business.Modules.World.Managers
+namespace BeforeOurTime.Business.Modules.ItemProperties.Games
 {
-    public class GameItemManager : ItemModelManager<GameItem>, IGameItemManager
+    public class GameItemDataManager : ItemModelManager<GameItem>, IGameItemDataManager
     {
         /// <summary>
         /// Manage all modules
@@ -27,13 +22,13 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <summary>
         /// Repository for manager
         /// </summary>
-        private IGameDataRepo GameDataRepo { set; get; }
+        private IGameItemDataRepo GameDataRepo { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
-        public GameItemManager(
+        public GameItemDataManager(
             IModuleManager moduleManager,
-            IGameDataRepo gameDataRepo)
+            IGameItemDataRepo gameDataRepo)
         {
             ModuleManager = moduleManager;
             GameDataRepo = gameDataRepo;
@@ -44,7 +39,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="id">Unique game attribute identifier</param>
         /// <param name="locationId">Game's new default location</param>
         /// <returns></returns>
-        public GameData UpdateDefaultLocation(Guid id, Guid locationId)
+        public GameItemData UpdateDefaultLocation(Guid id, Guid locationId)
         {
             var gameData = GameDataRepo.Read(id);
             gameData.DefaultLocationId = locationId;
@@ -90,7 +85,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="propertyData">Item data type that might be managable</param>
         public bool IsManagingData(Type dataType)
         {
-            return dataType == typeof(GameData);
+            return dataType == typeof(GameItemData);
         }
         #region On Item Hooks
         /// <summary>
@@ -99,9 +94,9 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item just created from datastore</param>
         public void OnItemCreate(Item item)
         {
-            if (item.HasData<GameData>())
+            if (item.HasData<GameItemData>())
             {
-                var data = item.GetData<GameData>();
+                var data = item.GetData<GameItemData>();
                 data.DataItemId = item.Id;
                 GameDataRepo.Create(data);
             }
@@ -124,9 +119,9 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item about to be persisted to datastore</param>
         public void OnItemUpdate(Item item)
         {
-            if (item.HasData<GameData>())
+            if (item.HasData<GameItemData>())
             {
-                var data = item.GetData<GameData>();
+                var data = item.GetData<GameItemData>();
                 GameDataRepo.Update(data);
             }
         }
@@ -136,9 +131,9 @@ namespace BeforeOurTime.Business.Modules.World.Managers
         /// <param name="item">Base item about to be deleted</param>
         public void OnItemDelete(Item item)
         {
-            if (item.HasData<GameData>())
+            if (item.HasData<GameItemData>())
             {
-                var data = item.GetData<GameData>();
+                var data = item.GetData<GameItemData>();
                 GameDataRepo.Delete(data);
             }
         }

@@ -37,8 +37,4 @@
     <ProjectReference Include="..\before-our-time-models\BeforeOurTime.Models.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Modules\World\Location\" />
-  </ItemGroup>
-
 </Project>

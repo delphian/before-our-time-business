@@ -10,6 +10,8 @@ using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOutTime.Business.Dbs.EF;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Games;
 
 namespace BeforeOurTime.Business.Modules.World.Dbs.EF
 {
@@ -18,9 +20,9 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
     /// </summary>
     public class EFWorldModuleContext : BaseContext
     {
-        public DbSet<GameData> Games { set; get; }
+        public DbSet<GameItemData> Games { set; get; }
         public DbSet<LocationItemData> Locations { set; get; }
-        public DbSet<CharacterData> Characters { set; get; }
+        public DbSet<CharacterItemData> Characters { set; get; }
         public DbSet<ExitItemData> Exits { set; get; }
         public DbSet<PhysicalItemData> Physical { set; get; }
         public EFWorldModuleContext() : base() { }
@@ -47,11 +49,11 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
             modelBuilder.Ignore<Item>();
             modelBuilder.Ignore<AccountData>();
             // Item Game Data
-            modelBuilder.Entity<GameData>()
+            modelBuilder.Entity<GameItemData>()
                 .ToTable("Item_Data_Games");
-            modelBuilder.Entity<GameData>()
+            modelBuilder.Entity<GameItemData>()
                 .HasKey(x => x.Id);
-            modelBuilder.Entity<GameData>()
+            modelBuilder.Entity<GameItemData>()
                 .Ignore(x => x.DataType);
             // Item Location Data
             modelBuilder.Entity<LocationItemData>()
@@ -61,11 +63,11 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
             modelBuilder.Entity<LocationItemData>()
                 .Ignore(x => x.DataType);
             // Item Location Data
-            modelBuilder.Entity<CharacterData>()
+            modelBuilder.Entity<CharacterItemData>()
                 .ToTable("Item_Data_Characters");
-            modelBuilder.Entity<CharacterData>()
+            modelBuilder.Entity<CharacterItemData>()
                 .HasKey(x => x.Id);
-            modelBuilder.Entity<CharacterData>()
+            modelBuilder.Entity<CharacterItemData>()
                 .Ignore(x => x.DataType)
                 .Property(x => x.Name).IsRequired();
             // Item Exit Data

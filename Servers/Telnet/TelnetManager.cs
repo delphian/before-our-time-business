@@ -12,7 +12,6 @@ using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using BeforeOurTime.Models.Modules.Account.Messages.CreateAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
-using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.ReadItemJson;
@@ -25,6 +24,7 @@ using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.World.Messages.Emotes;
 using BeforeOurTime.Models.Modules.World.Messages.Emotes.PerformEmote;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadLocationSummary;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {

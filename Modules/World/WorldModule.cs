@@ -1,5 +1,9 @@
-﻿using BeforeOurTime.Business.Modules.World.Dbs.EF;
+﻿using BeforeOurTime.Business.Modules.ItemProperties.Characters;
+using BeforeOurTime.Business.Modules.ItemProperties.Games;
+using BeforeOurTime.Business.Modules.World.Dbs.EF;
+using BeforeOurTime.Business.Modules.World.ItemProperties.Characters;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Exits;
+using BeforeOurTime.Business.Modules.World.ItemProperties.Games;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Business.Modules.World.Managers;
 using BeforeOurTime.Models;
@@ -12,13 +16,13 @@ using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.World.Dbs;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Games;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.CreateLocation;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.Messages.Emotes.PerformEmote;
-using BeforeOurTime.Models.Modules.World.Models.Data;
-using BeforeOurTime.Models.Modules.World.Models.Items;
 using BeforeOutTime.Business.Dbs.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -51,7 +55,7 @@ namespace BeforeOurTime.Business.Modules.World
         /// <summary>
         /// Game data repository
         /// </summary>
-        private IGameDataRepo GameDataRepo { set; get; }
+        private IGameItemDataRepo GameDataRepo { set; get; }
         /// <summary>
         /// Location data repository
         /// </summary>
@@ -59,7 +63,7 @@ namespace BeforeOurTime.Business.Modules.World
         /// <summary>
         /// Character data repository
         /// </summary>
-        private ICharacterDataRepo CharacterDataRepo { set; get; }
+        private ICharacterItemDataRepo CharacterDataRepo { set; get; }
         /// <summary>
         /// Character data repository
         /// </summary>
@@ -88,9 +92,9 @@ namespace BeforeOurTime.Business.Modules.World
         {
             var managers = new List<IModelManager>
             {
-                new GameItemManager(moduleManager, new EFGameDataRepo(db, moduleManager.GetItemRepo())),
+                new GameItemDataManager(moduleManager, new EFGameItemDataRepo(db, moduleManager.GetItemRepo())),
                 new LocationItemDataManager(moduleManager, new EFLocationItemDataRepo(db, moduleManager.GetItemRepo())),
-                new CharacterItemManager(moduleManager, new EFCharacterDataRepo(db, moduleManager.GetItemRepo())),
+                new CharacterItemDataManager(moduleManager, new EFCharacterItemDataRepo(db, moduleManager.GetItemRepo())),
                 new ExitItemDataManager(moduleManager, new EFExitItemDataRepo(db, moduleManager.GetItemRepo())),
                 new PhysicalItemDataManager(moduleManager, new EFPhysicalItemDataRepo(db, moduleManager.GetItemRepo()))
             };
@@ -150,14 +154,14 @@ namespace BeforeOurTime.Business.Modules.World
         public void Initialize(List<ICrudModelRepository> repositories)
         {
             GameDataRepo = repositories
-                .Where(x => x is IGameDataRepo)
-                .Select(x => (IGameDataRepo)x).FirstOrDefault();
+                .Where(x => x is IGameItemDataRepo)
+                .Select(x => (IGameItemDataRepo)x).FirstOrDefault();
             LocationDataRepo = repositories
                 .Where(x => x is ILocationItemDataRepo)
                 .Select(x => (ILocationItemDataRepo)x).FirstOrDefault();
             CharacterDataRepo = repositories
-                .Where(x => x is ICharacterDataRepo)
-                .Select(x => (ICharacterDataRepo)x).FirstOrDefault();
+                .Where(x => x is ICharacterItemDataRepo)
+                .Select(x => (ICharacterItemDataRepo)x).FirstOrDefault();
             ExitDataRepo = repositories
                 .Where(x => x is IExitItemDataRepo)
                 .Select(x => (IExitItemDataRepo)x).FirstOrDefault();
@@ -184,7 +188,7 @@ namespace BeforeOurTime.Business.Modules.World
                     ParentId = null,
                     Data = new List<IItemData>()
                     {
-                        new GameData()
+                        new GameItemData()
                         {
                             Id = new Guid("0f290372-6812-4eba-6f6c-08d63af92e80"),
                             DataItemId = new Guid("f4212bfe-ef65-4632-df2b-08d63af92e75"),
@@ -218,7 +222,7 @@ namespace BeforeOurTime.Business.Modules.World
                         }
                     }
                 });
-                defaultGameData = gameItem.GetData<GameData>();
+                defaultGameData = gameItem.GetData<GameItemData>();
                 defaultGameData.DefaultLocationId = locationItem.GetData<LocationItemData>().DataItemId;
                 GameDataRepo.Update(defaultGameData);
             }
@@ -233,9 +237,9 @@ namespace BeforeOurTime.Business.Modules.World
         {
             Item defaultLocationItem = null;
             var game = GetDefaultGame();
-            if (game.GetData<GameData>().DefaultLocationId != null)
+            if (game.GetData<GameItemData>().DefaultLocationId != null)
             {
-                defaultLocationItem = ModuleManager.GetItemRepo().Read(game.GetData<GameData>().DefaultLocationId.Value);
+                defaultLocationItem = ModuleManager.GetItemRepo().Read(game.GetData<GameItemData>().DefaultLocationId.Value);
             }
             return defaultLocationItem;
         }
