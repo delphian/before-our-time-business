@@ -5,13 +5,13 @@ using System.Text;
 using BeforeOurTime.Models;
 using Microsoft.Extensions.Configuration;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
-using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOutTime.Business.Dbs.EF;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Games;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Physicals;
 
 namespace BeforeOurTime.Business.Modules.World.Dbs.EF
 {

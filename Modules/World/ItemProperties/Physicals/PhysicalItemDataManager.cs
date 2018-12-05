@@ -4,18 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using BeforeOurTime.Models.Logs;
 using BeforeOurTime.Models;
 using BeforeOurTime.Models.Modules;
-using BeforeOurTime.Models.Modules.World.Managers;
-using BeforeOurTime.Models.Modules.World.Dbs;
-using BeforeOurTime.Models.Modules.World.Models.Data;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Modules.World.Models.Properties;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Physicals;
 
-namespace BeforeOurTime.Business.Modules.World.Managers
+namespace BeforeOurTime.Business.Modules.World.ItemProperties.Physicals
 {
     public partial class PhysicalItemDataManager : ItemModelManager<Item>, IPhysicalItemDataManager
     {
@@ -139,7 +135,7 @@ namespace BeforeOurTime.Business.Modules.World.Managers
             if (data != null)
             {
                 item.Data.Add(data);
-                item.AddProperty(typeof(PhysicalItemVM), new PhysicalItemVM()
+                item.AddProperty(typeof(PhysicalItemProperty), new PhysicalItemProperty()
                 {
                     Mobile = data.Mobile
                 });
