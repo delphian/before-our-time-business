@@ -30,6 +30,8 @@ using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Dbs;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Games;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business
 {
@@ -66,19 +68,18 @@ namespace BeforeOurTime.Business
             {
                 //var mm = ServiceProvider.GetService<IModuleManager>();
                 //var itemManager = mm.GetManager<IItemManager>();
-                //var locationItemDataManager = mm.GetManager<ILocationItemDataManager>();
-                //var locations = itemManager.Read(locationItemDataManager.GetItemIds());
-                //locations.ForEach(location =>
+                //var gameItemDataManager = mm.GetManager<IGameItemDataManager>();
+                //var games = itemManager.Read(gameItemDataManager.GetItemIds());
+                //games.ForEach(game =>
                 //{
-                //    if (!location.HasData<VisibleItemData>())
+                //    if (!game.HasData<VisibleItemData>())
                 //    {
                 //        var visibleItemData = new VisibleItemData()
                 //        {
-                //            Name = location.GetData<LocationItemData>().Name,
-                //            Description = location.GetData<LocationItemData>().Description
+                //            Name = game.GetData<GameItemData>().Name
                 //        };
-                //        location.Data.Add(visibleItemData);
-                //        itemManager.Update(location);
+                //        game.Data.Add(visibleItemData);
+                //        itemManager.Update(game);
                 //    }
                 //});
             }

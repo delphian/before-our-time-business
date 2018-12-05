@@ -77,7 +77,7 @@ namespace BeforeOurTime.Business.Modules.ItemProperties.Games
         /// <param name="item">Item that may have managable data</param>
         public bool IsManaging(Item item)
         {
-            return (item.Type == ItemType.Game);
+            return item.HasData<GameItemData>();
         }
         /// <summary>
         /// Determine if item data type is managable
@@ -107,10 +107,14 @@ namespace BeforeOurTime.Business.Modules.ItemProperties.Games
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
-            var gameData = GameDataRepo.Read(item);
-            if (gameData != null)
+            var data = GameDataRepo.Read(item);
+            if (data != null)
             {
-                item.Data.Add(gameData);
+                item.Data.Add(data);
+                item.AddProperty(typeof(GameItemProperty), new GameItemProperty()
+                {
+                    DefaultLocationId = data.DefaultLocationId.ToString()
+                });
             }
         }
         /// <summary>
@@ -122,7 +126,14 @@ namespace BeforeOurTime.Business.Modules.ItemProperties.Games
             if (item.HasData<GameItemData>())
             {
                 var data = item.GetData<GameItemData>();
-                GameDataRepo.Update(data);
+                if (data.Id == Guid.Empty)
+                {
+                    OnItemCreate(item);
+                }
+                else
+                {
+                    GameDataRepo.Update(data);
+                }
             }
         }
         /// <summary>

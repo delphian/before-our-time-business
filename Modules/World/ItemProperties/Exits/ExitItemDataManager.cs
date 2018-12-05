@@ -71,7 +71,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Exits
         /// <param name="item">Item that may have managable data</param>
         public bool IsManaging(Item item)
         {
-            return (item.Type == ItemType.Exit);
+            return item.HasData<ExitItemData>();
         }
         /// <summary>
         /// Determine if item data type is managable

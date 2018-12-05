@@ -192,8 +192,11 @@ namespace BeforeOurTime.Business.Modules.World
                         {
                             Id = new Guid("0f290372-6812-4eba-6f6c-08d63af92e80"),
                             DataItemId = new Guid("f4212bfe-ef65-4632-df2b-08d63af92e75"),
-                            Name = "Brave New World",
                             DefaultLocationId = new Guid("91f4a03f-8cb8-467c-df2c-08d63af92e75")
+                        },
+                        new VisibleItemData()
+                        {
+                            Name = "Brave New World"
                         }
                     }
                 });
