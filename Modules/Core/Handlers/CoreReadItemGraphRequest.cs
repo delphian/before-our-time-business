@@ -33,11 +33,11 @@ namespace BeforeOurTime.Business.Modules.Core
             {
                 var itemId = request.ItemId ??
                     mm.GetModule<IWorldModule>().GetDefaultGame().Id;
-                var item = mm.GetManager<IItemManager>().Read(itemId).GetAsItem<GameItem>();
+                var item = mm.GetManager<IItemManager>().Read(itemId);
                 var itemGraph = new ItemGraph()
                 {
                     Id = item.Id,
-                    Name = item.Visible?.Name ?? "N/A"
+                    Name = item.GetProperty<VisibleItemProperty>()?.Name ?? "N/A"
                 };
                 BuildItemGraph(mm.GetManager<IItemManager>(), itemGraph);
                 ((CoreReadItemGraphResponse)res).CoreReadItemGraphEvent = new CoreReadItemGraphEvent()
@@ -59,7 +59,7 @@ namespace BeforeOurTime.Business.Modules.Core
             parentItem.ChildrenIds?.ForEach((itemId) =>
             {
                 var item = itemManager.Read(itemId);
-                var name = item.GetProperty<VisibleItemProperty>("Visible")?.Name ?? "N/A";
+                var name = item.GetProperty<VisibleItemProperty>()?.Name ?? "N/A";
                 var childGraph = new ItemGraph()
                 {
                     Id = itemId,

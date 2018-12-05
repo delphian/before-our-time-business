@@ -75,7 +75,7 @@ namespace BeforeOurTime.Business.Modules.Core.ItemProperties.Visibles
         /// <param name="item">Item that may have managable data</param>
         public bool IsManaging(Item item)
         {
-            return (item.HasData<VisibleItemData>());
+            return item.HasData<VisibleItemData>();
         }
         /// <summary>
         /// Determine if item data type is managable

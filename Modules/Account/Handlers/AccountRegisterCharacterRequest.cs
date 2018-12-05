@@ -4,6 +4,7 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Account.Messages.RegisterCharacter;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
@@ -38,9 +39,8 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
                 {
                     throw new BotAuthorizationDeniedException("Authorization denied");
                 }
-                var characterData = character.GetData<CharacterItemData>();
-                characterData.Temporary = false;
-                characterData.Name = request.Name;
+                character.GetData<CharacterItemData>().Temporary = false;
+                character.GetData<VisibleItemData>().Name = request.Name;
                 itemManager.Update(character);
                 ((AccountRegisterCharacterResponse)res).Item = character;
                 res.SetSuccess(true);

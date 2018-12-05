@@ -9,6 +9,7 @@ using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business.Modules.ItemProperties.Characters
 {
@@ -64,7 +65,7 @@ namespace BeforeOurTime.Business.Modules.ItemProperties.Characters
         /// <param name="item">Item that may have managable data</param>
         public bool IsManaging(Item item)
         {
-            return (item.HasData<CharacterItemData>());
+            return item.HasData<CharacterItemData>();
         }
         /// <summary>
         /// Determine if item data type is managable
@@ -87,11 +88,15 @@ namespace BeforeOurTime.Business.Modules.ItemProperties.Characters
                 ParentId = locationItemId,
                 Data = new List<IItemData>()
                 {
-                    CharacterDataRepo.Create(new CharacterItemData()
+                    new CharacterItemData()
+                    {
+                        Temporary = false
+                    },
+                    new VisibleItemData()
                     {
                         Name = name,
                         Description = "A brave new player"
-                    })
+                    }
                 }
             });
             return item.GetAsItem<CharacterItem>();
@@ -117,11 +122,14 @@ namespace BeforeOurTime.Business.Modules.ItemProperties.Characters
         /// <param name="options">Options to customize how data is transacted from datastore</param>
         public void OnItemRead(Item item)
         {
-            var characterData = CharacterDataRepo.Read(item);
-            if (characterData != null)
+            var data = CharacterDataRepo.Read(item);
+            if (data != null)
             {
-                item.Data.Add(characterData);
-                item.AddProperty(typeof(CharacterItemProperty), item.GetProperty<CharacterItemProperty>());
+                item.Data.Add(data);
+                item.AddProperty(typeof(CharacterItemProperty), new CharacterItemProperty()
+                {
+                    Temporary = data.Temporary,
+                });
             }
         }
         /// <summary>
@@ -134,7 +142,14 @@ namespace BeforeOurTime.Business.Modules.ItemProperties.Characters
             if (item.HasData<CharacterItemData>())
             {
                 var data = item.GetData<CharacterItemData>();
-                CharacterDataRepo.Update(data);
+                if (data.Id == Guid.Empty)
+                {
+                    OnItemCreate(item);
+                }
+                else
+                {
+                    CharacterDataRepo.Update(data);
+                }
             }
         }
         /// <summary>

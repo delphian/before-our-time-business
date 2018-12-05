@@ -8,8 +8,9 @@ using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Business.Dbs.EF;
 using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Visibles;
+using BeforeOurTime.Business.Modules.Core.Dbs.EF;
 
-namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
+namespace BeforeOurTime.Business.Modules.Core.ItemProperties.Visibles
 {
     /// <summary>
     /// Access to visible item data in the data store

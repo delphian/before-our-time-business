@@ -13,6 +13,7 @@ using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business.Modules.Account.Managers
 {
@@ -69,9 +70,12 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
                 {
                     new CharacterItemData()
                     {
-                        Name = name,
-                        Description = "A brave new player",
                         Temporary = temporary
+                    },
+                    new VisibleItemData()
+                    {
+                        Name = name,
+                        Description = "A brave new player"
                     }
                 }
             });

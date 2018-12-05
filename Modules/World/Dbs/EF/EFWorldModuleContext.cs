@@ -68,8 +68,7 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
             modelBuilder.Entity<CharacterItemData>()
                 .HasKey(x => x.Id);
             modelBuilder.Entity<CharacterItemData>()
-                .Ignore(x => x.DataType)
-                .Property(x => x.Name).IsRequired();
+                .Ignore(x => x.DataType);
             // Item Exit Data
             modelBuilder.Entity<ExitItemData>()
                 .ToTable("Item_Data_Exits");
