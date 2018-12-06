@@ -63,7 +63,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// <returns></returns>
         public Item Create(Guid accountId, string name, bool temporary = false)
         {
-            var characterItem = ModuleManager.GetItemRepo().Create(new CharacterItem()
+            var characterItem = ModuleManager.GetItemRepo().Create(new Item()
             {
                 ParentId = ModuleManager.GetModule<IWorldModule>().GetDefaultLocation().Id,
                 Data = new List<IItemData>()

@@ -138,15 +138,12 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// <param name="item"></param>
         public void OnItemRead(Item item)
         {
-            if (item.Type == ItemType.Character)
+            var characterManager = ModuleManager.GetManager<IAccountCharacterManager>();
+            var characterData = characterManager.ReadByCharacter(item.Id);
+            if (characterData != null)
             {
-                var characterManager = ModuleManager.GetManager<IAccountCharacterManager>();
-                var characterData = characterManager.ReadByCharacter(item.Id);
-                if (characterData != null)
-                {
-                    var accountData = AccountDataRepo.Read(characterData.AccountId);
-                    item.Data.Add(accountData);
-                }
+                var accountData = AccountDataRepo.Read(characterData.AccountId);
+                item.Data.Add(accountData);
             }
         }
     }

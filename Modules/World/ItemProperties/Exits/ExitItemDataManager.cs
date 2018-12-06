@@ -18,7 +18,7 @@ using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 
 namespace BeforeOurTime.Business.Modules.World.ItemProperties.Exits
 {
-    public partial class ExitItemDataManager : ItemModelManager<ExitItem>, IExitItemDataManager
+    public partial class ExitItemDataManager : ItemModelManager<Item>, IExitItemDataManager
     {
         /// <summary>
         /// Manage all modules

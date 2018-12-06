@@ -181,7 +181,7 @@ namespace BeforeOurTime.Business.Modules.World
             var defaultGameData = GameDataRepo.Read().FirstOrDefault();
             if (defaultGameData == null)
             {
-                var gameItem = ModuleManager.GetItemRepo().Create(new GameItem()
+                var gameItem = ModuleManager.GetItemRepo().Create(new Item()
                 {
                     Id = new Guid("f4212bfe-ef65-4632-df2b-08d63af92e75"),
                     ParentId = null,
@@ -199,7 +199,7 @@ namespace BeforeOurTime.Business.Modules.World
                         }
                     }
                 });
-                var locationItem = ModuleManager.GetItemRepo().Create(new LocationItem()
+                var locationItem = ModuleManager.GetItemRepo().Create(new Item()
                 {
                     Id = new Guid("91f4a03f-8cb8-467c-df2c-08d63af92e75"),
                     ParentId = gameItem.Id,

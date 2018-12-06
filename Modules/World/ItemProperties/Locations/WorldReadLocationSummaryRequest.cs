@@ -37,15 +37,15 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
             response = HandleRequestWrapper<WorldReadLocationSummaryResponse>(request, res =>
             {
                 var itemManager = mm.GetManager<IItemManager>();
-                var location = itemManager.Read(origin.ParentId.Value).GetAsItem<LocationItem>();
+                var location = itemManager.Read(origin.ParentId.Value);
                 ((WorldReadLocationSummaryResponse)res).Item = location;
                 ((WorldReadLocationSummaryResponse)res).Exits = new List<ListExitResponse>();
                 // All items
                 ((WorldReadLocationSummaryResponse) res).Items = location.Children;
                 // Add commands
                 List<ItemCommand> commands = location.Children
-                    .Where(x => x.GetProperty<CommandProperty>() != null)
-                    .Select(x => x.GetProperty<CommandProperty>())
+                    .Where(x => x.GetProperty<CommandItemProperty>() != null)
+                    .Select(x => x.GetProperty<CommandItemProperty>())
                     .ToList()
                     .SelectMany(x => x.Commands)
                     .ToList();
@@ -53,9 +53,8 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
                 // Add exits
                 location.Children
                     .Where(x => x.HasData(typeof(ExitItemData)))
-                    .Select(x => x.GetAsItem<ExitItem>())
                     .ToList()
-                    .ForEach(delegate (ExitItem item)
+                    .ForEach(item =>
                     {
                         var exitItemData = item.GetData<ExitItemData>();
                         var visibleItemProperty = item.GetProperty<VisibleItemProperty>();
@@ -71,11 +70,10 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
                 // Add character items
                 location.Children
                     .Where(x => x.HasData<CharacterItemData>())
-                    .Select(x => x.GetAsItem<CharacterItem>())
                     .ToList()
                     .ForEach(item =>
                     {
-                        ((WorldReadLocationSummaryResponse)res).Adendums.Add($"{item.Visible.Name} is standing here");
+                        ((WorldReadLocationSummaryResponse)res).Adendums.Add($"{item.GetProperty<VisibleItemProperty>().Name} is standing here");
                         ((WorldReadLocationSummaryResponse)res).Characters.Add(item);
                     });
                 res.SetSuccess(true);

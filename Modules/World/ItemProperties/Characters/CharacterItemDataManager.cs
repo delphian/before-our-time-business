@@ -13,7 +13,7 @@ using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business.Modules.ItemProperties.Characters
 {
-    public class CharacterItemDataManager : ItemModelManager<CharacterItem>, ICharacterItemDataManager
+    public class CharacterItemDataManager : ItemModelManager<Item>, ICharacterItemDataManager
     {
         /// <summary>
         /// Manage all modules
@@ -81,9 +81,9 @@ namespace BeforeOurTime.Business.Modules.ItemProperties.Characters
         /// <param name="name">Name of character</param>
         /// <param name="locationItemId">Initial location of new character</param>
         /// <returns></returns>
-        public CharacterItem Create(string name, Guid locationItemId)
+        public Item Create(string name, Guid locationItemId)
         {
-            var item = ModuleManager.GetItemRepo().Create(new CharacterItem()
+            var item = ModuleManager.GetItemRepo().Create(new Item()
             {
                 ParentId = locationItemId,
                 Data = new List<IItemData>()
@@ -99,7 +99,7 @@ namespace BeforeOurTime.Business.Modules.ItemProperties.Characters
                     }
                 }
             });
-            return item.GetAsItem<CharacterItem>();
+            return item;
         }
         #region On Item Hooks
         /// <summary>

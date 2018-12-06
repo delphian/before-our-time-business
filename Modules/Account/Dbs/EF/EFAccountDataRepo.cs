@@ -4,6 +4,7 @@ using BeforeOurTime.Models;
 using BeforeOurTime.Models.Modules.Account.Dbs;
 using BeforeOurTime.Models.Modules.Account.Models;
 using BeforeOurTime.Models.Modules.Account.Models.Data;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

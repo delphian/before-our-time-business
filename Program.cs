@@ -176,7 +176,6 @@ namespace BeforeOurTime.Business
                         Item origin = (terminal.GetPlayerId() != null) ?
                             itemManager.Read(terminal.GetPlayerId().Value) :
                             new Item() {
-                                Type = ItemType.Ghost,
                                 Data = new List<IItemData>() { new TerminalData() {
                                     TerminalId = terminal.GetId(),
                                     Terminal = terminal

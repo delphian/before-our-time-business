@@ -18,7 +18,7 @@ using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
 {
-    public partial class LocationItemDataManager : ItemModelManager<LocationItem>, ILocationItemDataManager
+    public partial class LocationItemDataManager : ItemModelManager<Item>, ILocationItemDataManager
     {
         /// <summary>
         /// Manage all modules
@@ -93,12 +93,12 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
         /// </summary>
         /// <param name="currentLocationItemId">Existing location item to link to new location with exits</param>
         /// <returns></returns>
-        public LocationItem CreateFromHere(Guid currentLocationItemId)
+        public Item CreateFromHere(Guid currentLocationItemId)
         {
             var itemRepo = ModuleManager.GetItemRepo();
             var gameItem = ModuleManager.GetModule<IWorldModule>().GetDefaultGame();
             var currentLocation = itemRepo.Read(currentLocationItemId);
-            var newLocationItem = itemRepo.Create(new LocationItem()
+            var newLocationItem = itemRepo.Create(new Item()
             {
                 ParentId = gameItem.Id,
                 Data = new List<IItemData>()
@@ -114,7 +114,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
                 },
                 Children = new List<Item>()
                 {
-                    new ExitItem()
+                    new Item()
                     {
                         Data = new List<IItemData>()
                         {
@@ -130,8 +130,8 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Locations
                         }
                     }
                 }
-            }).GetAsItem<LocationItem>();
-            currentLocation.Children.Add(new ExitItem()
+            });
+            currentLocation.Children.Add(new Item()
             {
                 ParentId = currentLocation.Id,
                 Data =  new List<IItemData>()

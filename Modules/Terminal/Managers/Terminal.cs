@@ -12,6 +12,7 @@ using BeforeOurTime.Models.Modules.Account.Messages.LoginAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.LoginCharacter;
 using BeforeOurTime.Models.Modules.Account.Messages.LogoutAccount;
 using BeforeOurTime.Models.Modules.Account.Messages.ReadCharacter;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Managers;
 using BeforeOurTime.Models.Modules.Terminal.Models;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
@@ -192,9 +193,9 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
         /// Get available characters for terminal attachment
         /// </summary>
         /// <returns>Detached items</returns>
-        public List<CharacterItem> GetAttachable()
+        public List<Item> GetAttachable()
         {
-            var accountCharacters = new List<CharacterItem>();
+            var accountCharacters = new List<Item>();
             var request = new AccountReadCharacterRequest()
             {
                 AccountId = AccountId.Value

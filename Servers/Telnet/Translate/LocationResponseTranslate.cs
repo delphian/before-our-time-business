@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using BeforeOurTime.Business.Terminals.Telnet.Ansi;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadLocationSummary;
 
@@ -41,8 +43,8 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
             telnetClient.ItemExits.Clear();
             // Send location name and description
             telnetServer.SendMessageToClient(telnetClient, "\r\n\r\n" 
-                + $"{AnsiColors.greenB}{locationResponse.Item.Visible.Name}{AnsiColors.reset}\r\n"
-                + locationResponse.Item.Visible.Description + "\r\n");
+                + $"{AnsiColors.greenB}{locationResponse.Item.GetProperty<VisibleItemProperty>().Name}{AnsiColors.reset}\r\n"
+                + locationResponse.Item.GetProperty<VisibleItemProperty>().Description + "\r\n");
             locationResponse.Adendums.ForEach(delegate (string adendum)
             {
                 telnetServer.SendMessageToClient(telnetClient, " - " + adendum + "\r\n");
@@ -54,13 +56,13 @@ namespace BeforeOurTime.Business.Servers.Telnet.Translate
                 locationResponse.Exits.ForEach(ioExitUpdate =>
                 {
                     telnetClient.ItemExits.Add(ioExitUpdate);
-                    var exit = ioExitUpdate.Item.GetAsItem<ExitItem>();
+                    var exit = ioExitUpdate.Item;
                     var commands = "";
-                    exit.CommandList.Commands.ForEach(use => {
+                    exit.GetProperty<CommandItemProperty>().Commands.ForEach(use => {
                         commands += (commands == "") ? $"{use.Name}" : $"|{use.Name}";
                     });
                     exits = (exits == null) ? "" : $"{exits}, ";
-                    exits += $"{AnsiColors.purpleB}{exit.Visible.Name} [{commands}]{AnsiColors.reset}";
+                    exits += $"{AnsiColors.purpleB}{exit.GetProperty<VisibleItemProperty>().Name} [{commands}]{AnsiColors.reset}";
                 });
             }
             else

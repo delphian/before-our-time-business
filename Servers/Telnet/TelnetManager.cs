@@ -25,6 +25,8 @@ using BeforeOurTime.Models.Modules.World.Messages.Emotes;
 using BeforeOurTime.Models.Modules.World.Messages.Emotes.PerformEmote;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Locations.Messages.ReadLocationSummary;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
+using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
 
 namespace BeforeOurTime.Business.Servers.Telnet
 {
@@ -491,10 +493,10 @@ namespace BeforeOurTime.Business.Servers.Telnet
                     case "list":
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n\r\n");
                         var characters = telnetClient.GetTerminal().GetAttachable();
-                        characters.ForEach(delegate (CharacterItem player)
+                        characters.ForEach(delegate (Item player)
                         {
                             TelnetServer.SendMessageToClient(telnetClient, "  " + 
-                                player.Visible.Name + 
+                                player.GetProperty<VisibleItemProperty>().Name + 
                                 " (" + player.Id + ")\r\n");
                         });
                         TelnetServer.SendMessageToClient(telnetClient, "\r\n");
@@ -507,9 +509,9 @@ namespace BeforeOurTime.Business.Servers.Telnet
                         break;
                     case "play":
                         var name = message.Split(' ').Last().ToLower();
-                        telnetClient.GetTerminal().GetAttachable().ForEach(delegate (CharacterItem player)
+                        telnetClient.GetTerminal().GetAttachable().ForEach(delegate (Item player)
                         {
-                            if (player.Visible.Name.ToLower() == name)
+                            if (player.GetProperty<VisibleItemProperty>().Name.ToLower() == name)
                             {
                                 telnetClient.GetTerminal().Attach(player.Id);
                                 telnetClient.GetTerminal().GetDataBag()["step"] = "attached";

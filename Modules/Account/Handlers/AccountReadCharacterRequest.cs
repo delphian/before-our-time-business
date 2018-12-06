@@ -37,7 +37,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
                 var items = (accountCharacterIds.Count() > 0) ?
                     ModuleManager.GetItemRepo().Read(accountCharacterIds) :
                     new List<Item>();
-                ((AccountReadCharacterResponse)res).AccountCharacters = items.Select(x => x.GetAsItem<CharacterItem>()).ToList();
+                ((AccountReadCharacterResponse)res).AccountCharacters = items;
                 res.SetSuccess(true);
             });
             return response;

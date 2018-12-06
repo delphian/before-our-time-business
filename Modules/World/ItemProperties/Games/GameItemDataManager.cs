@@ -11,7 +11,7 @@ using BeforeOurTime.Models.Modules.World.ItemProperties.Games;
 
 namespace BeforeOurTime.Business.Modules.ItemProperties.Games
 {
-    public class GameItemDataManager : ItemModelManager<GameItem>, IGameItemDataManager
+    public class GameItemDataManager : ItemModelManager<Item>, IGameItemDataManager
     {
         /// <summary>
         /// Manage all modules

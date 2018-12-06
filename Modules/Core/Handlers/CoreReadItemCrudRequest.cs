@@ -38,15 +38,6 @@ namespace BeforeOurTime.Business.Modules.Core
                     readItems = mm.GetManager<IItemManager>().Read(request.ItemIds);
                     res.SetSuccess(true);
                 }
-                if (request.ItemTypes != null)
-                {
-                    request.ItemTypes.ForEach(itemType =>
-                    {
-                        var type = Type.GetType(itemType + ",BeforeOurTime.Models");
-                        managers.AddRange(mm.GetManagers(type));
-                    });
-                    res.SetSuccess(true);
-                }
                 if (request.ItemDataTypes != null)
                 {
                     request.ItemDataTypes.ForEach(dataType =>

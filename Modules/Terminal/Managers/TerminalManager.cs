@@ -159,17 +159,14 @@ namespace BeforeOurTime.Business.Modules.Terminal.Managers
         /// <param name="item"></param>
         public void OnItemRead(Item item)
         {
-            if (item.Type == ItemType.Character)
+            var terminal = GetTerminals().Where(x => x.GetPlayerId() == item.Id).FirstOrDefault();
+            if (terminal != null)
             {
-                var terminal = GetTerminals().Where(x => x.GetPlayerId() == item.Id).FirstOrDefault();
-                if (terminal != null)
+                item.Data.Add(new TerminalData()
                 {
-                    item.Data.Add(new TerminalData()
-                    {
-                        TerminalId = terminal.GetId(),
-                        Terminal = terminal
-                    });
-                }
+                    TerminalId = terminal.GetId(),
+                    Terminal = terminal
+                });
             }
         }
     }
