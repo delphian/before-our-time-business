@@ -180,6 +180,20 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Exits
                     Effort = data.Effort,
                     Time = data.Time
                 });
+                if (data.DestinationLocationId != null && data.DestinationLocationId != Guid.Empty)
+                {
+                    if (!item.HasProperty<CommandItemProperty>())
+                    {
+                        item.AddProperty(typeof(CommandItemProperty), new CommandItemProperty() { Commands = new List<ItemCommand>() });
+                    }
+                    item.GetProperty<CommandItemProperty>().Commands.Add(
+                        new ItemCommand()
+                        {
+                            ItemId = item.Id,
+                            Id = new Guid("c558c1f9-7d01-45f3-bc35-dcab52b5a37c"),
+                            Name = "Go"
+                        });
+                }
             }
         }
         /// <summary>

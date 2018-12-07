@@ -55,7 +55,7 @@ namespace BeforeOurTime.Business.Modules.Core.Dbs.EF
             modelBuilder.Entity<Item>()
                 .Ignore(item => item.ChildrenIds)
                 .Ignore(item => item.Data)
-                .Ignore(item => item.ViewModels);
+                .Ignore(item => item.Properties);
             // Item Visible Data
             modelBuilder.Entity<VisibleItemData>()
                 .ToTable("Item_Data_Visible");
