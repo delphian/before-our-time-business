@@ -2,6 +2,7 @@
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemJson.UpdateItemJson;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Terminal.Models;
@@ -9,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeforeOurTime.Business.Modules.Core
@@ -45,8 +47,15 @@ namespace BeforeOurTime.Business.Modules.Core
                 });
                 ((CoreUpdateItemJsonResponse)res).CoreUpdateItemJsonEvent = new CoreUpdateItemJsonEvent()
                 {
-                    ItemsJson = request.ItemsJson
+                    Origin = origin,
+                    ItemsJson = request.ItemsJson,
+                    Items = mm.GetManager<IItemManager>().Read(request.ItemsJson.Select(x => Guid.Parse(x.Id)).ToList())
                 };
+                // Send message to location
+                mm.GetManager<IMessageManager>().SendMessageToSiblings(
+                    new List<IMessage>() { ((CoreUpdateItemJsonResponse)res).CoreUpdateItemJsonEvent },
+                    origin,
+                    origin);
                 res.SetSuccess(true);
             });
             return response;

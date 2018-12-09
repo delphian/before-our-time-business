@@ -84,6 +84,33 @@ namespace BeforeOurTime.Business.Apis.Items
             });
         }
         /// <summary>
+        /// Send messages to recipient and all of it's siblings
+        /// </summary>
+        /// <param name="messages">List of messages to send</param>
+        /// <param name="recipient">Recipient to send messages to</param>
+        /// <param name="origin">Origin of the messages</param>
+        public void SendMessageToSiblings(List<IMessage> messages, Item recipient, Item origin = null)
+        {
+            var recipients = new List<Item>() { recipient };
+            var addRecipients = new List<Item>();
+            if (recipient.Parent?.Children != null)
+            {
+                addRecipients.AddRange(recipient.Parent.Children);
+            }
+            else if (recipient.ParentId != null)
+            {
+                addRecipients.AddRange(ModuleManager.GetManager<IItemManager>().Read(recipient.ParentId.Value).Children);
+            }
+            addRecipients.ForEach(addRecipient =>
+            {
+                if (!recipients.Any(x => x.Id == addRecipient.Id))
+                {
+                    recipients.Add(addRecipient);
+                }
+            });
+            SendMessage(messages, recipients, origin);
+        }
+        /// <summary>
         /// Send one message to one or more items
         /// </summary>
         /// <param name="message">The messages to send</param>
