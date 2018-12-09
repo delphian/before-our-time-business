@@ -168,7 +168,7 @@ namespace BeforeOurTime.Business.Apis.Items
             // Send messages
             var moveItemEvent = new CoreMoveItemEvent()
             {
-                Item = item,
+                Item = ItemRepo.Read(item.Id),
                 OldParent = oldLocation,
                 NewParent = newParent,
                 Source = source
