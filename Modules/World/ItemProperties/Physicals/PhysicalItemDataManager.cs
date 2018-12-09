@@ -10,15 +10,25 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Physicals;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
+using BeforeOurTime.Models.Modules.Core.Managers;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 
 namespace BeforeOurTime.Business.Modules.World.ItemProperties.Physicals
 {
     public partial class PhysicalItemDataManager : ItemModelManager<Item>, IPhysicalItemDataManager
     {
+        private static Guid CommandTake = new Guid("7a878b4a-47cd-461c-8acb-942afa745d3c");
+        private static Guid CommandDrop = new Guid("b94b98dd-f089-4c32-b1bf-4d11dfe5e0d9");
         /// <summary>
         /// Manage all modules
         /// </summary>
         private IModuleManager ModuleManager { set; get; }
+        /// <summary>
+        /// Item manager
+        /// </summary>
+        private IItemManager ItemManager { set; get; }
         /// <summary>
         /// Repository for manager
         /// </summary>
@@ -32,6 +42,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Physicals
         {
             ModuleManager = moduleManager;
             PhysicalItemDataRepo = physicalItemDataRepo;
+            ModuleManager.RegisterForItemCommands(HandleUseItemCommand);
         }
         /// <summary>
         /// Get all repositories declared by manager
@@ -83,6 +94,45 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Physicals
         public bool IsManagingData(Type dataType)
         {
             return dataType == typeof(PhysicalItemData);
+        }
+        /// <summary>
+        /// Handle request to invoke an item command
+        /// </summary>
+        /// <param name="itemCommand"></param>
+        /// <param name="origin"></param>
+        public CoreUseItemEvent HandleUseItemCommand(ItemCommand itemCommand, Item origin)
+        {
+            CoreUseItemEvent continueIfNull = null;
+            if (itemCommand.Id == CommandTake)
+            {
+                var itemManager = ModuleManager.GetManager<IItemManager>();
+                var messageManager = ModuleManager.GetManager<IMessageManager>();
+                var item = itemManager.Read(itemCommand.ItemId.Value);
+                itemManager.Move(item, origin, origin);
+                continueIfNull = new CoreUseItemEvent()
+                {
+                    Success = true,
+                    Used = item,
+                    Using = origin,
+                    Use = itemCommand
+                };
+            }
+            if (itemCommand.Id == CommandDrop)
+            {
+                var itemManager = ModuleManager.GetManager<IItemManager>();
+                var messageManager = ModuleManager.GetManager<IMessageManager>();
+                var item = itemManager.Read(itemCommand.ItemId.Value);
+                var location = itemManager.Read(origin.ParentId.Value);
+                itemManager.Move(item, location, origin);
+                continueIfNull = new CoreUseItemEvent()
+                {
+                    Success = true,
+                    Used = item,
+                    Using = origin,
+                    Use = itemCommand
+                };
+            }
+            return continueIfNull;
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch
@@ -139,6 +189,23 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Physicals
                 {
                     Mobile = data.Mobile
                 });
+                if (data.Mobile == true)
+                {
+                    if (!item.HasProperty<CommandItemProperty>())
+                    {
+                        item.AddProperty(typeof(CommandItemProperty), new CommandItemProperty() { Commands = new List<ItemCommand>() });
+                    }
+                    bool inInventory = (item.ParentId != null) ?
+                        ModuleManager.GetRepository<ICharacterItemDataRepo>().ReadItemId(item.ParentId.Value) != null :
+                        false;
+                    item.GetProperty<CommandItemProperty>().Commands.Add(
+                        new ItemCommand()
+                        {
+                            ItemId = item.Id,
+                            Id = (inInventory) ? CommandDrop : CommandTake,
+                            Name = (inInventory) ? "Drop" : "Take"
+                        });
+                }
             }
         }
         /// <summary>

@@ -170,11 +170,24 @@ namespace BeforeOurTime.Business.Apis.Items
             {
                 Item = item,
                 OldParent = oldLocation,
-                NewParent = newParent
+                NewParent = newParent,
+                Source = source
             };
             var messageManager = ModuleManager.GetManager<IMessageManager>();
-            messageManager.SendMessage(new List<IMessage>() { moveItemEvent }, oldLocation.Children);
-            messageManager.SendMessage(new List<IMessage>() { moveItemEvent }, newLocation.Children);
+            var recipients = new List<Item>();
+            var addRecipients = new List<Item>();
+            addRecipients.AddRange(oldLocation.Children);
+            addRecipients.AddRange(newLocation.Children);
+            addRecipients.Add(oldLocation);
+            addRecipients.Add(newLocation);
+            addRecipients.ForEach(recipient =>
+            {
+                if (!recipients.Select(x => x.Id).ToList().Contains(recipient.Id))
+                {
+                    recipients.Add(recipient);
+                }
+            });
+            messageManager.SendMessage(new List<IMessage>() { moveItemEvent }, recipients);
             return item;
         }
     }

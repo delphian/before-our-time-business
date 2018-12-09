@@ -26,14 +26,23 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Characters
         {
         }
         /// <summary>
+        /// Read associated character data of item id
+        /// </summary>
+        /// <param name="itemId">Item id that may have associated data</param>
+        /// <returns></returns>
+        public CharacterItemData ReadItemId(Guid itemId)
+        {
+            var data = Set.Where(x => x.DataItemId == itemId).Select(x => x.Id).FirstOrDefault();
+            return Read(data);
+        }
+        /// <summary>
         /// Read associated Location attributes of item
         /// </summary>
         /// <param name="item">Item that may have associated attributes</param>
         /// <returns></returns>
         public CharacterItemData Read(Item item)
         {
-            var dataId = Set.Where(x => x.DataItemId == item.Id).Select(x => x.Id).FirstOrDefault();
-            return Read(dataId);
+            return ReadItemId(item.Id);
         }
         /// <summary>
         /// Get all unique item identifiers of managed items
