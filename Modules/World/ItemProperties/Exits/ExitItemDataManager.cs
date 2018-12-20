@@ -178,7 +178,8 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Exits
                 {
                     DestinationId = data.DestinationLocationId.ToString(),
                     Effort = data.Effort,
-                    Time = data.Time
+                    Time = data.Time,
+                    Direction = data.Direction
                 });
                 if (data.DestinationLocationId != null && data.DestinationLocationId != Guid.Empty)
                 {
