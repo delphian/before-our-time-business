@@ -35,7 +35,7 @@ namespace BeforeOurTime.Business.Modules.Account.Dbs.EF
         /// <summary>
         /// Read all account identifiers associated with characters
         /// </summary>
-        /// <param name="characterIds"></param>
+        /// <param name="characterIds">List of character item identifiers</param>
         /// <returns></returns>
         public List<AccountCharacterData> ReadByCharacter(List<Guid> characterIds)
         {

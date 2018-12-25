@@ -14,6 +14,7 @@ using BeforeOurTime.Models.Modules.World;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
+using BeforeOurTime.Models.Modules.Core.Managers;
 
 namespace BeforeOurTime.Business.Modules.Account.Managers
 {
@@ -120,6 +121,21 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             var characterData = AccountCharacterDataRepo
                 .ReadByCharacter(new List<Guid>() { characterId }).FirstOrDefault();
             return characterData;
+        }
+        /// <summary>
+        /// Delete account character item association and the character item
+        /// </summary>
+        /// <param name="characterItemIds">List of character item identifiers to delete</param>
+        public void Delete(List<Guid> characterItemIds)
+        {
+            var ItemManager = ModuleManager.GetManager<IItemManager>();
+            var accountCharacterDatas = AccountCharacterDataRepo.ReadByCharacter(characterItemIds);
+            AccountCharacterDataRepo.Delete(accountCharacterDatas);
+            var items = ItemManager.Read(characterItemIds);
+            if (items.Count > 0)
+            {
+                ItemManager.Delete(items);
+            }
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch

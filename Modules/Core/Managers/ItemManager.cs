@@ -12,6 +12,7 @@ using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.MoveItem;
 using BeforeOurTime.Models.Messages;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
@@ -132,6 +133,7 @@ namespace BeforeOurTime.Business.Apis.Items
         /// <param name="deleteChildren">Also delete all children</param>
         public void Delete(List<Item> items, bool? deleteChildren = false)
         {
+            var messageManager = ModuleManager.GetManager<IMessageManager>();
             // Move item children
             items.ForEach((item) =>
             {
@@ -148,6 +150,13 @@ namespace BeforeOurTime.Business.Apis.Items
                     // Blank out the children, otherwise ef will try and delete 
                     item.Children = new List<Item>();
                 }
+                var deleteItemEvent = new CoreDeleteItemCrudEvent()
+                {
+                    Items = new List<Item>() { item }
+                };
+                var parentItem = Read(item.ParentId.Value);
+                messageManager.SendMessage(new List<IMessage>() { deleteItemEvent },
+                    new List<Item>() { parentItem });
             });
             ItemRepo.Delete(items);
         }

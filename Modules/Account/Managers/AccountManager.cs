@@ -90,6 +90,22 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             return accountData;
         }
         /// <summary>
+        /// Delete an account and all associated account characters
+        /// </summary>
+        /// <param name="accountId"></param>
+        public void Delete(Guid accountId)
+        {
+            var accountData = AccountDataRepo.Read(accountId);
+            var accountCharacterDatas = ModuleManager.GetManager<IAccountCharacterManager>()
+                .ReadByAccount(accountId);
+            var accountCharacterItemIds = accountCharacterDatas.Select(x => x.CharacterItemId).ToList();
+            if (accountCharacterItemIds.Count > 0)
+            {
+                ModuleManager.GetManager<IAccountCharacterManager>().Delete(accountCharacterItemIds);
+            }
+            AccountDataRepo.Delete(accountData);
+        }
+        /// <summary>
         /// Authenticate a user name and password
         /// </summary>
         /// <param name="email"></param>
