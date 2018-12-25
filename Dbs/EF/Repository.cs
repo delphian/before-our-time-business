@@ -58,7 +58,8 @@ namespace BeforeOurTime.Business.Dbs.EF
         public virtual List<T> Read(List<Guid> ids)
         {
             var resultSet = Set
-                .Where(x => ids.Contains(x.Id)).AsNoTracking();
+                .Where(x => ids.Contains(x.Id))
+                .AsNoTracking();
             return resultSet.ToList();
         }
         /// <summary>

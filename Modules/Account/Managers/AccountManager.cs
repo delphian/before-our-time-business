@@ -95,7 +95,6 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// <param name="accountId"></param>
         public void Delete(Guid accountId)
         {
-            var accountData = AccountDataRepo.Read(accountId);
             var accountCharacterDatas = ModuleManager.GetManager<IAccountCharacterManager>()
                 .ReadByAccount(accountId);
             var accountCharacterItemIds = accountCharacterDatas.Select(x => x.CharacterItemId).ToList();
@@ -103,6 +102,7 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             {
                 ModuleManager.GetManager<IAccountCharacterManager>().Delete(accountCharacterItemIds);
             }
+            var accountData = AccountDataRepo.Read(accountId);
             AccountDataRepo.Delete(accountData);
         }
         /// <summary>
