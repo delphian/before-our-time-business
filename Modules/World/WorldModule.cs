@@ -4,6 +4,7 @@ using BeforeOurTime.Business.Modules.World.Dbs.EF;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Characters;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Exits;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Games;
+using BeforeOurTime.Business.Modules.World.ItemProperties.Generators;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Physicals;
 using BeforeOurTime.Models;
@@ -89,13 +90,15 @@ namespace BeforeOurTime.Business.Modules.World
         /// <returns></returns>
         List<IModelManager> BuildManagers(IModuleManager moduleManager, EFWorldModuleContext db)
         {
+            var itemRepo = moduleManager.GetItemRepo();
             var managers = new List<IModelManager>
             {
-                new GameItemDataManager(moduleManager, new EFGameItemDataRepo(db, moduleManager.GetItemRepo())),
-                new LocationItemDataManager(moduleManager, new EFLocationItemDataRepo(db, moduleManager.GetItemRepo())),
-                new CharacterItemDataManager(moduleManager, new EFCharacterItemDataRepo(db, moduleManager.GetItemRepo())),
-                new ExitItemDataManager(moduleManager, new EFExitItemDataRepo(db, moduleManager.GetItemRepo())),
-                new PhysicalItemDataManager(moduleManager, new EFPhysicalItemDataRepo(db, moduleManager.GetItemRepo()))
+                new GameItemDataManager(moduleManager, new EFGameItemDataRepo(db, itemRepo)),
+                new LocationItemDataManager(moduleManager, new EFLocationItemDataRepo(db, itemRepo)),
+                new CharacterItemDataManager(moduleManager, new EFCharacterItemDataRepo(db, itemRepo)),
+                new ExitItemDataManager(moduleManager, new EFExitItemDataRepo(db, itemRepo)),
+                new PhysicalItemDataManager(moduleManager, new EFPhysicalItemDataRepo(db, itemRepo)),
+                new GeneratorItemDataManager(moduleManager, new EFGeneratorItemDataRepo(db, itemRepo))
             };
             return managers;
         }
