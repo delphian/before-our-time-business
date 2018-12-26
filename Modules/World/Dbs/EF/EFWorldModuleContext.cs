@@ -12,6 +12,7 @@ using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Games;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Physicals;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Generators;
 
 namespace BeforeOurTime.Business.Modules.World.Dbs.EF
 {
@@ -25,6 +26,7 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
         public DbSet<CharacterItemData> Characters { set; get; }
         public DbSet<ExitItemData> Exits { set; get; }
         public DbSet<PhysicalItemData> Physical { set; get; }
+        public DbSet<GeneratorItemData> Generators { set; get; }
         public EFWorldModuleContext() : base() { }
         public EFWorldModuleContext(DbContextOptions<BaseContext> options) : base(options) { }
         /// <summary>
@@ -62,7 +64,7 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
                 .HasKey(x => x.Id);
             modelBuilder.Entity<LocationItemData>()
                 .Ignore(x => x.DataType);
-            // Item Location Data
+            // Item Character Data
             modelBuilder.Entity<CharacterItemData>()
                 .ToTable("Item_Data_Characters");
             modelBuilder.Entity<CharacterItemData>()
@@ -84,6 +86,13 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
             modelBuilder.Entity<PhysicalItemData>()
                 .HasKey(x => x.Id);
             modelBuilder.Entity<PhysicalItemData>()
+                .Ignore(x => x.DataType);
+            // Item Generator Data
+            modelBuilder.Entity<GeneratorItemData>()
+                .ToTable("Item_Data_Generators");
+            modelBuilder.Entity<GeneratorItemData>()
+                .HasKey(x => x.Id);
+            modelBuilder.Entity<GeneratorItemData>()
                 .Ignore(x => x.DataType);
         }
     }
