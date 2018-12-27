@@ -36,6 +36,21 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
             return Read(dataId);
         }
         /// <summary>
+        /// Read generator data for all generators ready to run
+        /// </summary>
+        /// <param name="futureTime">Optional future time. Defaults to now</param>
+        /// <returns></returns>
+        public List<GeneratorItemData> ReadReadyToRun(DateTime? futureTime = null)
+        {
+            var runBeforeTime = futureTime ?? DateTime.Now;
+            var readyToRun = new List<GeneratorItemData>();
+            var dataIds = Set.Where(x => 
+                                    x.IntervalTime == null ||
+                                    x.IntervalTime <= runBeforeTime)
+                             .Select(x => x.Id).ToList();
+            return Read(dataIds);
+        }
+        /// <summary>
         /// Get all unique item identifiers of managed items
         /// </summary>
         /// <returns></returns>

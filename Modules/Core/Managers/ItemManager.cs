@@ -13,6 +13,7 @@ using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.MoveItem;
 using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.DeleteItem;
+using BeforeOurTime.Models.Modules.Core.Messages.ItemCrud.CreateItem;
 
 namespace BeforeOurTime.Business.Apis.Items
 {
@@ -66,7 +67,18 @@ namespace BeforeOurTime.Business.Apis.Items
         public Item Create(Item item)
         {
             ItemRepo.Create(new List<Item>() { item });
-            return item;
+            var createdItem = Read(item.Id);
+            var messageManager = ModuleManager.GetManager<IMessageManager>();
+            var parent = Read(createdItem.ParentId.Value);
+            var recipients = new List<Item>();
+            recipients.AddRange(parent.Children);
+            recipients.Add(parent);
+            var createItemEvent = new CoreCreateItemCrudEvent()
+            {
+                Item = createdItem
+            };
+            messageManager.SendMessage(new List<IMessage>() { createItemEvent }, recipients);
+            return createdItem;
         }
         /// <summary>
         /// Read multiple models derived from Item

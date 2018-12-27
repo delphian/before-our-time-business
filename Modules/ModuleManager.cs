@@ -5,17 +5,15 @@ using BeforeOurTime.Models.Messages;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Dbs;
-using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
-using BeforeOurTime.Models.Modules.Core.Models.Properties;
-using BeforeOurTime.Models.Modules.Terminal.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Timers;
 
 namespace BeforeOurTime.Business.Modules
 {
@@ -53,6 +51,10 @@ namespace BeforeOurTime.Business.Modules
         /// </summary>
         private List<HandleItemCommand> ItemCommandHandlers { set; get; } = new List<HandleItemCommand>();
         /// <summary>
+        /// Allow handlers to take action every tick
+        /// </summary>
+        public event TickDelegate Ticks;
+        /// <summary>
         /// Constructor
         /// </summary>
         public ModuleManager(
@@ -62,6 +64,15 @@ namespace BeforeOurTime.Business.Modules
             Configuration = configuration;
             Logger = logger;
             RegisterModules();
+            // Setup tick
+            var tickTimer = new System.Timers.Timer(5000);
+            tickTimer.AutoReset = true;
+            tickTimer.Enabled = true;
+            tickTimer.Elapsed += (Object source, ElapsedEventArgs e) =>
+            {
+                Console.Write("+");
+                Ticks?.Invoke();
+            };
         }
         /// <summary>
         /// Register all API modules that implement IApiModule

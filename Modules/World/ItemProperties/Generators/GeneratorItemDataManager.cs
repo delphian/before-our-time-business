@@ -40,6 +40,40 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
             ModuleManager = moduleManager;
             GeneratorItemDataRepo = generatorItemDataRepo;
             ModuleManager.RegisterForItemCommands(HandleUseItemCommand);
+            ModuleManager.Ticks += OnTick;
+        }
+        /// <summary>
+        /// Handle recurring regular tasks
+        /// </summary>
+        public void OnTick()
+        {
+            var tickUnit = 5000;
+            var generatorItemDatas = GeneratorItemDataRepo.ReadReadyToRun();
+            if (generatorItemDatas.Count > 0)
+            {
+                generatorItemDatas.ForEach((generatorItemData) =>
+                {
+                    try
+                    {
+                        var item = JsonConvert.DeserializeObject<Item>(generatorItemData.Json);
+                        var parent = ModuleManager.GetManager<IItemManager>().Read(item.ParentId.Value);
+                        if (parent.Children?.Count(x => x.TypeId == item.TypeId) < generatorItemData.Maximum)
+                        {
+                            ModuleManager.GetManager<IItemManager>().Create(item);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        ModuleManager.GetLogger().LogException("Failed to generate item", e);
+                    }
+                    finally
+                    {
+                        generatorItemData.IntervalTime = DateTime.Now
+                            .AddMilliseconds(generatorItemData.Interval * tickUnit);
+                    }
+                });
+                GeneratorItemDataRepo.Update(generatorItemDatas);
+            }
         }
         /// <summary>
         /// Get all repositories declared by manager
@@ -167,7 +201,14 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
             if (item.HasData<GeneratorItemData>())
             {
                 var data = item.GetData<GeneratorItemData>();
-                GeneratorItemDataRepo.Update(data);
+                if (data.Id == Guid.Empty)
+                {
+                    OnItemCreate(item);
+                }
+                else
+                {
+                    GeneratorItemDataRepo.Update(data);
+                }
             }
         }
         /// <summary>

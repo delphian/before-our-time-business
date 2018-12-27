@@ -28,11 +28,6 @@ using BeforeOurTime.Models.Modules.Core.Models.Data;
 using BeforeOurTime.Models.Modules.Terminal.Models.Data;
 using BeforeOurTime.Models.Modules.Account.Managers;
 using BeforeOurTime.Models.Modules.Account.Dbs;
-using BeforeOurTime.Models.Modules.World.ItemProperties.Exits;
-using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
-using BeforeOurTime.Models.Modules.World.ItemProperties.Games;
-using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
-using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 
 namespace BeforeOurTime.Business
 {
@@ -101,6 +96,7 @@ namespace BeforeOurTime.Business
                 server.Stop();
             });
         }
+
         /// <summary>
         /// Setup services
         /// </summary>
@@ -161,9 +157,9 @@ namespace BeforeOurTime.Business
             var moduleManager = ServiceProvider.GetService<IModuleManager>();
             var terminalManager = moduleManager.GetManager<ITerminalManager>();
             var itemManager = moduleManager.GetManager<IItemManager>();
-            ((TerminalManager)terminalManager).OnTerminalCreated += delegate (ITerminal terminal)
+            ((TerminalManager)terminalManager).OnTerminalCreated += (ITerminal terminal) =>
             {
-                ((Terminal)terminal).OnMessageToServer += delegate (ITerminal xterminal, IRequest request)
+                ((Terminal)terminal).OnMessageToServer += (ITerminal xterminal, IRequest request) =>
                 {
                     lock (thisLock)
                     {
