@@ -4,6 +4,7 @@ using BeforeOurTime.Business.Modules.World.Dbs.EF;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Characters;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Exits;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Games;
+using BeforeOurTime.Business.Modules.World.ItemProperties.Garbages;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Generators;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Locations;
 using BeforeOurTime.Business.Modules.World.ItemProperties.Physicals;
@@ -36,6 +37,10 @@ namespace BeforeOurTime.Business.Modules.World
 {
     public partial class WorldModule : IWorldModule
     {
+        /// <summary>
+        /// Subscribe to be notified when this module and it's managers have been loaded
+        /// </summary>
+        public event ModuleReadyDelegate ModuleReadyEvent;
         /// <summary>
         /// Entity framework database context
         /// </summary>
@@ -81,6 +86,10 @@ namespace BeforeOurTime.Business.Modules.World
             Db = new EFWorldModuleContext(dbOptions.Options);
             Managers = BuildManagers(ModuleManager, Db);
             Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
+            ModuleManager.ModuleManagerReadyEvent += () =>
+            {
+                ModuleReadyEvent?.Invoke();
+            };
         }
         /// <summary>
         /// Build all the item managers for the module
@@ -98,7 +107,8 @@ namespace BeforeOurTime.Business.Modules.World
                 new CharacterItemDataManager(moduleManager, new EFCharacterItemDataRepo(db, itemRepo)),
                 new ExitItemDataManager(moduleManager, new EFExitItemDataRepo(db, itemRepo)),
                 new PhysicalItemDataManager(moduleManager, new EFPhysicalItemDataRepo(db, itemRepo)),
-                new GeneratorItemDataManager(moduleManager, new EFGeneratorItemDataRepo(db, itemRepo))
+                new GeneratorItemDataManager(moduleManager, new EFGeneratorItemDataRepo(db, itemRepo)),
+                new GarbageItemDataManager(moduleManager, this, new EFGarbageItemDataRepo(db, itemRepo))
             };
             return managers;
         }

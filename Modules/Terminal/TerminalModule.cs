@@ -20,6 +20,10 @@ namespace BeforeOurTime.Business.Modules.Terminal
     public partial class TerminalModule : ITerminalModule
     {
         /// <summary>
+        /// Subscribe to be notified when this module and it's managers have been loaded
+        /// </summary>
+        public event ModuleReadyDelegate ModuleReadyEvent;
+        /// <summary>
         /// Entity framework database context
         /// </summary>
         private EFTerminalModuleContext Db { set; get; }

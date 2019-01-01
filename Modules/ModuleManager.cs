@@ -23,6 +23,10 @@ namespace BeforeOurTime.Business.Modules
     public class ModuleManager : IModuleManager
     {
         /// <summary>
+        /// Subscribe to be notified when all modules and managers have been loaded
+        /// </summary>
+        public event ModuleManagerReadyDelegate ModuleManagerReadyEvent;
+        /// <summary>
         /// System configuration
         /// </summary>
         private IConfiguration Configuration { set; get; }
@@ -63,16 +67,18 @@ namespace BeforeOurTime.Business.Modules
         {
             Configuration = configuration;
             Logger = logger;
-            RegisterModules();
             // Setup tick
-            var tickTimer = new System.Timers.Timer(5000);
+            var tickInterval = Configuration.GetSection("Timing").GetValue<int>("Tick");
+            var tickTimer = new System.Timers.Timer(tickInterval);
             tickTimer.AutoReset = true;
             tickTimer.Enabled = true;
             tickTimer.Elapsed += (Object source, ElapsedEventArgs e) =>
             {
-                Console.Write("+");
+                Console.Write(".");
                 Ticks?.Invoke();
             };
+            Logger.LogInformation($"Launched tick clock with a {tickInterval} millisecond interval.");
+            RegisterModules();
         }
         /// <summary>
         /// Register all API modules that implement IApiModule
@@ -114,6 +120,7 @@ namespace BeforeOurTime.Business.Modules
                 module.Initialize(Repositories);
                 Logger.LogInformation($"Module {module.GetType().Name} initialized");
             });
+            ModuleManagerReadyEvent?.Invoke();
         }
         /// <summary>
         /// Get API module that implements interface

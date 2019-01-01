@@ -13,6 +13,7 @@ using BeforeOurTime.Models.Modules.World.ItemProperties.Characters;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Games;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Physicals;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Generators;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Garbages;
 
 namespace BeforeOurTime.Business.Modules.World.Dbs.EF
 {
@@ -93,6 +94,13 @@ namespace BeforeOurTime.Business.Modules.World.Dbs.EF
             modelBuilder.Entity<GeneratorItemData>()
                 .HasKey(x => x.Id);
             modelBuilder.Entity<GeneratorItemData>()
+                .Ignore(x => x.DataType);
+            // Item Garbage Data
+            modelBuilder.Entity<GarbageItemData>()
+                .ToTable("Item_Data_Garbages");
+            modelBuilder.Entity<GarbageItemData>()
+                .HasKey(x => x.Id);
+            modelBuilder.Entity<GarbageItemData>()
                 .Ignore(x => x.DataType);
         }
     }

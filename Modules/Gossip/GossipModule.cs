@@ -24,6 +24,10 @@ namespace BeforeOurTime.Business.Modules.Gossip
     public partial class GossipModule : IGossipModule
     {
         /// <summary>
+        /// Subscribe to be notified when this module and it's managers have been loaded
+        /// </summary>
+        public event ModuleReadyDelegate ModuleReadyEvent;
+        /// <summary>
         /// Manage all modules
         /// </summary>
         private IModuleManager ModuleManager { set; get; }

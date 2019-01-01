@@ -36,6 +36,10 @@ namespace BeforeOurTime.Business.Modules.Account
     public partial class AccountModule : IAccountModule
     {
         /// <summary>
+        /// Subscribe to be notified when this module and it's managers have been loaded
+        /// </summary>
+        public event ModuleReadyDelegate ModuleReadyEvent;
+        /// <summary>
         /// Entity framework database context
         /// </summary>
         private EFAccountModuleContext Db { set; get; }

@@ -33,6 +33,10 @@ namespace BeforeOurTime.Business.Modules.Core
     public partial class CoreModule : ICoreModule
     {
         /// <summary>
+        /// Subscribe to be notified when this module and it's managers have been loaded
+        /// </summary>
+        public event ModuleReadyDelegate ModuleReadyEvent;
+        /// <summary>
         /// Entity framework database context
         /// </summary>
         private EFCoreModuleContext Db { set; get; }

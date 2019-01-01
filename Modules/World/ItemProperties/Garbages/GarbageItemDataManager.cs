@@ -9,33 +9,43 @@ using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Messages.Requests;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
+using BeforeOurTime.Models.Modules.Core.Models.Properties;
+using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.World.ItemProperties.Generators;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Garbages;
 using BeforeOurTime.Models.Logs;
+using BeforeOurTime.Models.Modules.Core.Messages.MoveItem;
+using BeforeOurTime.Models.Modules.World;
+using BeforeOurTime.Models.Messages.Events;
 using BeforeOurTime.Models.Modules.Core.ItemProperties.Visibles;
+using BeforeOurTime.Models.Modules.World.ItemProperties.Locations;
 using Microsoft.Extensions.Configuration;
 
-
-namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
+namespace BeforeOurTime.Business.Modules.World.ItemProperties.Garbages
 {
-    public partial class GeneratorItemDataManager : ItemModelManager<Item>, IGeneratorItemDataManager
+    public partial class GarbageItemDataManager : ItemModelManager<Item>, IGarbageItemDataManager
     {
         /// <summary>
         /// Manage all modules
         /// </summary>
         private IModuleManager ModuleManager { set; get; }
         /// <summary>
+        /// Module manager in charge of this data manager
+        /// </summary>
+        private IWorldModule MyModule { set; get; }
+        /// <summary>
         /// Item manager
         /// </summary>
         private IItemManager ItemManager { set; get; }
         /// <summary>
-        /// Repository for manager
-        /// </summary>
-        private IGeneratorItemDataRepo GeneratorItemDataRepo { set; get; }
-        /// <summary>
-        /// Logger
+        /// Error logger
         /// </summary>
         private IBotLogger Logger { set; get; }
+        /// <summary>
+        /// Repository for manager
+        /// </summary>
+        private IGarbageItemDataRepo GarbageItemDataRepo { set; get; }
         /// <summary>
         /// Tick interval at which garbage collection will execute
         /// </summary>
@@ -51,15 +61,36 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// <summary>
         /// Constructor
         /// </summary>
-        public GeneratorItemDataManager(
+        public GarbageItemDataManager(
             IModuleManager moduleManager,
-            IGeneratorItemDataRepo generatorItemDataRepo)
+            IWorldModule myModule,
+            IGarbageItemDataRepo garbageItemDataRepo)
         {
             ModuleManager = moduleManager;
-            GeneratorItemDataRepo = generatorItemDataRepo;
+            MyModule = myModule;
+            GarbageItemDataRepo = garbageItemDataRepo;
             Logger = ModuleManager.GetLogger();
             TickInterval = moduleManager.GetConfiguration().GetSection("Timing").GetValue<int>("Tick");
             ModuleManager.Ticks += OnTick;
+            MyModule.ModuleReadyEvent += () =>
+            {
+                ModuleManager.GetManager<IItemManager>().ItemMoveEvent += OnMoveItemEvent;
+            };
+        }
+        /// <summary>
+        /// Determine if a moved item requires a garbage timer to be set
+        /// </summary>
+        /// <param name="itemEvent"></param>
+        public void OnMoveItemEvent(IEvent itemEvent)
+        {
+            var moveItemEvent = (CoreMoveItemEvent)itemEvent;
+            if (moveItemEvent.Item.GetData<GarbageItemData>() is GarbageItemData garbage)
+            {
+                if (moveItemEvent.NewParent != null && moveItemEvent.NewParent.HasProperty<LocationItemProperty>())
+                {
+                    garbage.IntervalTime = DateTime.Now.AddMilliseconds(TickInterval * garbage.Interval);
+                }
+            }
         }
         /// <summary>
         /// Handle recurring regular tasks
@@ -68,34 +99,23 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         {
             if (CurrentTickCount++ >= MaximumTickCount)
             {
-                Logger.LogDebug("Running generators");
+                Logger.LogDebug("Running garbage collection");
                 CurrentTickCount = 0;
-                var generatorItemDatas = GeneratorItemDataRepo.ReadReadyToRun();
-                if (generatorItemDatas.Count > 0)
+                var garbageItemDatas = GarbageItemDataRepo.ReadExpired();
+                if (garbageItemDatas.Count > 0)
                 {
-                    generatorItemDatas.ForEach((generatorItemData) =>
+                    garbageItemDatas.ForEach((garbageItemData) =>
                     {
                         try
                         {
-                            var item = JsonConvert.DeserializeObject<Item>(generatorItemData.Json);
-                            var parent = ModuleManager.GetManager<IItemManager>().Read(item.ParentId.Value);
-                            if (parent.Children?.Count(x => x.TypeId == item.TypeId) < generatorItemData.Maximum)
-                            {
-                                ModuleManager.GetManager<IItemManager>().Create(item);
-                                Logger.LogDebug($"Generating {item.GetProperty<VisibleItemProperty>()?.Name}");
-                            }
+                            var item = ItemManager.Read(garbageItemData.DataItemId);
+                            ItemManager.Delete(new List<Item>() { item });
                         }
                         catch (Exception e)
                         {
-                            ModuleManager.GetLogger().LogException("Failed to generate item", e);
-                        }
-                        finally
-                        {
-                            generatorItemData.IntervalTime = DateTime.Now
-                                .AddMilliseconds(generatorItemData.Interval * TickInterval);
+                            ModuleManager.GetLogger().LogException("Failed to garbage collect item", e);
                         }
                     });
-                    GeneratorItemDataRepo.Update(generatorItemDatas);
                 }
             }
         }
@@ -105,7 +125,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// <returns></returns>
         public List<ICrudModelRepository> GetRepositories()
         {
-            return new List<ICrudModelRepository>() { GeneratorItemDataRepo };
+            return new List<ICrudModelRepository>() { GarbageItemDataRepo };
         }
         /// <summary>
         /// Get repository as interface
@@ -122,7 +142,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// <returns></returns>
         public List<Guid> GetItemIds()
         {
-            var itemIds = GeneratorItemDataRepo.GetItemIds();
+            var itemIds = GarbageItemDataRepo.GetItemIds();
             return itemIds;
         }
         /// <summary>
@@ -149,6 +169,16 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         public bool IsManagingData(Type dataType)
         {
             return dataType == typeof(GeneratorItemData);
+        }
+        /// <summary>
+        /// Handle request to invoke an item command
+        /// </summary>
+        /// <param name="itemCommand"></param>
+        /// <param name="origin"></param>
+        public CoreUseItemEvent HandleUseItemCommand(ItemCommand itemCommand, Item origin)
+        {
+            CoreUseItemEvent continueIfNull = null;
+            return continueIfNull;
         }
         /// <summary>
         /// Instantite response object and wrap request handlers in try catch
@@ -184,11 +214,11 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// <param name="item">Base item just created from datastore</param>
         public void OnItemCreate(Item item)
         {
-            if (item.HasData<GeneratorItemData>())
+            if (item.HasData<GarbageItemData>())
             {
-                var data = item.GetData<GeneratorItemData>();
+                var data = item.GetData<GarbageItemData>();
                 data.DataItemId = item.Id;
-                GeneratorItemDataRepo.Create(data);
+                GarbageItemDataRepo.Create(data);
             }
         }
         /// <summary>
@@ -197,11 +227,11 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
-            var data = GeneratorItemDataRepo.Read(item);
+            var data = GarbageItemDataRepo.Read(item);
             if (data != null)
             {
                 item.Data.Add(data);
-                item.AddProperty(typeof(GeneratorItemProperty), new GeneratorItemProperty()
+                item.AddProperty(typeof(GarbageItemProperty), new GarbageItemProperty()
                 {
                 });
             }
@@ -212,16 +242,16 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// <param name="item">Base item about to be persisted to datastore</param>
         public void OnItemUpdate(Item item)
         {
-            if (item.HasData<GeneratorItemData>())
+            if (item.HasData<GarbageItemData>())
             {
-                var data = item.GetData<GeneratorItemData>();
+                var data = item.GetData<GarbageItemData>();
                 if (data.Id == Guid.Empty)
                 {
                     OnItemCreate(item);
                 }
                 else
                 {
-                    GeneratorItemDataRepo.Update(data);
+                    GarbageItemDataRepo.Update(data);
                 }
             }
         }
@@ -231,10 +261,10 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// <param name="item">Base item about to be deleted</param>
         public void OnItemDelete(Item item)
         {
-            if (item.HasData<GeneratorItemData>())
+            if (item.HasData<GarbageItemData>())
             {
-                var data = item.GetData<GeneratorItemData>();
-                GeneratorItemDataRepo.Delete(data);
+                var data = item.GetData<GarbageItemData>();
+                GarbageItemDataRepo.Delete(data);
             }
         }
         #endregion
