@@ -23,6 +23,10 @@ namespace BeforeOurTime.Business.Apis.Items
     public class ItemManager : ModelManager<Item>, IItemManager
     {
         /// <summary>
+        /// Subscribe to receive updates when an item changes locations
+        /// </summary>
+        public event ItemEventDelegate ItemMoveEvent;
+        /// <summary>
         /// Manage all modules
         /// </summary>
         private IModuleManager ModuleManager { set; get; }
@@ -208,6 +212,7 @@ namespace BeforeOurTime.Business.Apis.Items
                     recipients.Add(recipient);
                 }
             });
+            ItemMoveEvent?.Invoke(moveItemEvent);
             messageManager.SendMessage(new List<IMessage>() { moveItemEvent }, recipients);
             return item;
         }

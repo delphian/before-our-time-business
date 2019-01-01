@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\before-our-time-models\BeforeOurTime.Models.csproj" />
+    <ProjectReference Include="..\BeforeOurTime.Gossip\BeforeOurTime.Gossip.csproj" />
   </ItemGroup>
 
 </Project>
