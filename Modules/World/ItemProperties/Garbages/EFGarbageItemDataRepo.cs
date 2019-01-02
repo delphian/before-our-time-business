@@ -42,7 +42,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// <returns></returns>
         public List<GarbageItemData> ReadExpired()
         {
-            var dataIds = Set.Where(x => x.IntervalTime >= DateTime.Now)
+            var dataIds = Set.Where(x => x.IntervalTime != null && DateTime.Now >= x.IntervalTime)
                 .Select(x => x.Id).ToList();
             return Read(dataIds);
         }

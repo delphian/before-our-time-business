@@ -173,6 +173,7 @@ namespace BeforeOurTime.Business.Apis.Items
                 var parentItem = Read(item.ParentId.Value);
                 messageManager.SendMessage(new List<IMessage>() { deleteItemEvent },
                     new List<Item>() { parentItem });
+                messageManager.SendMessageToSiblings(new List<IMessage>() { deleteItemEvent }, item );
             });
             ItemRepo.Delete(items);
         }

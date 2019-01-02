@@ -15,7 +15,7 @@
             }
         },
         "WebSocket": {
-            "LogLevel":  2,
+            "LogLevel": 2,
             "Listen": {
                 "Address": "0.0.0.0",
                 "Port": 2024
@@ -25,5 +25,22 @@
     "Timing": {
         "Tick": 30000,
         "Delivery": 1000
+    },
+    "Gossip": {
+        "ClientId": "",
+        "ClientSecret": "",
+        "Endpoint": "ws://example.com/socket"
+    },
+    "Modules": {
+        "World": {
+            "Managers": {
+                "Garbage": {
+                    "TickInterval": 10
+                },
+                "Generator": {
+                    "TickInterval": 10
+                }
+            }
+        }
     }
 }

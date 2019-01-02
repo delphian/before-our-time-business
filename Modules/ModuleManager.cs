@@ -74,7 +74,7 @@ namespace BeforeOurTime.Business.Modules
             tickTimer.Enabled = true;
             tickTimer.Elapsed += (Object source, ElapsedEventArgs e) =>
             {
-                Console.Write(".");
+                logger.LogDebug("Tick");
                 Ticks?.Invoke();
             };
             Logger.LogInformation($"Launched tick clock with a {tickInterval} millisecond interval.");

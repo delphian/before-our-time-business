@@ -12,7 +12,6 @@ namespace BeforeOurTime.Business.Logs
     {
         private string pathToFile = Directory.GetCurrentDirectory() + "/logs.txt";
         private LogLevel LogLevel { set; get; }
-
         public FileLogger(IConfiguration configuration)
         {
             LogLevel = (LogLevel)Convert.ToInt32(configuration.GetSection("Servers").GetSection("WebSocket")["LogLevel"]);

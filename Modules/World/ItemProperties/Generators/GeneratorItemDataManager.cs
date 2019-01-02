@@ -39,15 +39,15 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// <summary>
         /// Tick interval at which garbage collection will execute
         /// </summary>
-        private int MaximumTickCount { set; get; } = 10;
+        private int TickInterval { set; get; }
         /// <summary>
         /// Current tick interval on it's way to the maximum;
         /// </summary>
-        private int CurrentTickCount { set; get; } = 0;
+        private int TickCount { set; get; } = 0;
         /// <summary>
         /// Number of miliseconds between each tick
         /// </summary>
-        private int TickInterval { set; get; }
+        private int TickTime { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -58,7 +58,15 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
             ModuleManager = moduleManager;
             GeneratorItemDataRepo = generatorItemDataRepo;
             Logger = ModuleManager.GetLogger();
-            TickInterval = moduleManager.GetConfiguration().GetSection("Timing").GetValue<int>("Tick");
+            TickTime = moduleManager.GetConfiguration()
+                .GetSection("Timing")
+                .GetValue<int>("Tick");
+            TickInterval = moduleManager.GetConfiguration()
+                .GetSection("Modules")
+                .GetSection("World")
+                .GetSection("Managers")
+                .GetSection("Generator")
+                .GetValue<int>("TickInterval");
             ModuleManager.Ticks += OnTick;
         }
         /// <summary>
@@ -66,10 +74,10 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
         /// </summary>
         public void OnTick()
         {
-            if (CurrentTickCount++ >= MaximumTickCount)
+            if (TickCount++ >= TickInterval)
             {
-                Logger.LogDebug("Running generators");
-                CurrentTickCount = 0;
+                Logger.LogInformation("Running generators");
+                TickCount = 0;
                 var generatorItemDatas = GeneratorItemDataRepo.ReadReadyToRun();
                 if (generatorItemDatas.Count > 0)
                 {
@@ -81,8 +89,8 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
                             var parent = ModuleManager.GetManager<IItemManager>().Read(item.ParentId.Value);
                             if (parent.Children?.Count(x => x.TypeId == item.TypeId) < generatorItemData.Maximum)
                             {
+                                Logger.LogDebug($"Generating {item.GetProperty<VisibleItemProperty>()?.Name ?? item.Id.ToString()}");
                                 ModuleManager.GetManager<IItemManager>().Create(item);
-                                Logger.LogDebug($"Generating {item.GetProperty<VisibleItemProperty>()?.Name}");
                             }
                         }
                         catch (Exception e)
@@ -92,7 +100,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Generators
                         finally
                         {
                             generatorItemData.IntervalTime = DateTime.Now
-                                .AddMilliseconds(generatorItemData.Interval * TickInterval);
+                                .AddMilliseconds(generatorItemData.Interval * TickTime);
                         }
                     });
                     GeneratorItemDataRepo.Update(generatorItemDatas);

@@ -49,15 +49,15 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Garbages
         /// <summary>
         /// Tick interval at which garbage collection will execute
         /// </summary>
-        private int MaximumTickCount { set; get; } = 10;
+        private int TickInterval { set; get; }
         /// <summary>
         /// Current tick interval on it's way to the maximum;
         /// </summary>
-        private int CurrentTickCount { set; get; } = 0;
+        private int TickCount { set; get; } = 0;
         /// <summary>
         /// Number of miliseconds between each tick
         /// </summary>
-        private int TickInterval { set; get; }
+        private int TickTime { set; get; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -70,11 +70,20 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Garbages
             MyModule = myModule;
             GarbageItemDataRepo = garbageItemDataRepo;
             Logger = ModuleManager.GetLogger();
-            TickInterval = moduleManager.GetConfiguration().GetSection("Timing").GetValue<int>("Tick");
+            TickTime = moduleManager.GetConfiguration()
+                .GetSection("Timing")
+                .GetValue<int>("Tick");
+            TickInterval = moduleManager.GetConfiguration()
+                .GetSection("Modules")
+                .GetSection("World")
+                .GetSection("Managers")
+                .GetSection("Garbage")
+                .GetValue<int>("TickInterval");
             ModuleManager.Ticks += OnTick;
             MyModule.ModuleReadyEvent += () =>
             {
                 ModuleManager.GetManager<IItemManager>().ItemMoveEvent += OnMoveItemEvent;
+                ItemManager = moduleManager.GetManager<IItemManager>();
             };
         }
         /// <summary>
@@ -88,7 +97,8 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Garbages
             {
                 if (moveItemEvent.NewParent != null && moveItemEvent.NewParent.HasProperty<LocationItemProperty>())
                 {
-                    garbage.IntervalTime = DateTime.Now.AddMilliseconds(TickInterval * garbage.Interval);
+                    garbage.IntervalTime = DateTime.Now.AddMilliseconds(TickTime * garbage.Interval);
+                    GarbageItemDataRepo.Update(garbage);
                 }
             }
         }
@@ -97,10 +107,10 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Garbages
         /// </summary>
         public void OnTick()
         {
-            if (CurrentTickCount++ >= MaximumTickCount)
+            if (TickCount++ >= TickInterval)
             {
-                Logger.LogDebug("Running garbage collection");
-                CurrentTickCount = 0;
+                Logger.LogInformation("Running garbage collection");
+                TickCount = 0;
                 var garbageItemDatas = GarbageItemDataRepo.ReadExpired();
                 if (garbageItemDatas.Count > 0)
                 {
@@ -109,6 +119,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Garbages
                         try
                         {
                             var item = ItemManager.Read(garbageItemData.DataItemId);
+                            Logger.LogDebug($"Garbage collecting: {item.GetProperty<VisibleItemProperty>()?.Name ?? item.Id.ToString()}");
                             ItemManager.Delete(new List<Item>() { item });
                         }
                         catch (Exception e)
