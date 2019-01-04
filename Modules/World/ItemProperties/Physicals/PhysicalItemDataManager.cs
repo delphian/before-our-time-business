@@ -217,7 +217,18 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Physicals
             if (item.HasData<PhysicalItemData>())
             {
                 var data = item.GetData<PhysicalItemData>();
-                PhysicalItemDataRepo.Update(data);
+                if (data.Id == Guid.Empty)
+                {
+                    OnItemCreate(item);
+                }
+                else
+                {
+                    PhysicalItemDataRepo.Update(data);
+                }
+            }
+            else if (PhysicalItemDataRepo.Read(item) is PhysicalItemData data)
+            {
+                PhysicalItemDataRepo.Delete(data);
             }
         }
         /// <summary>

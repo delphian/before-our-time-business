@@ -32,6 +32,9 @@
         "Endpoint": "ws://example.com/socket"
     },
     "Modules": {
+        "Gossip": {
+            "Enabled": false
+        },
         "World": {
             "Managers": {
                 "Garbage": {
@@ -39,6 +42,13 @@
                 },
                 "Generator": {
                     "TickInterval": 10
+                }
+            }
+        },
+        "Script": {
+            "Managers": {
+                "Javascript": {
+                    "TickInterval": 5
                 }
             }
         }
