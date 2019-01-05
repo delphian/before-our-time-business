@@ -17,13 +17,16 @@ using BeforeOurTime.Models.Modules.Script;
 using Jint;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
+using BeforeOurTime.Models.Modules.World.Messages.Emotes;
+using BeforeOurTime.Models.Messages.Events;
+using BeforeOurTime.Models.Messages;
 
 namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
 {
     public partial class JavascriptItemDataManager : ItemModelManager<Item>, IJavascriptItemDataManager
     {
         private readonly object _lock = new object();
-        private static Guid CommandJavascript = new Guid("22a73822-6655-4b7b-aa2d-100b5c4a00a7");
+        public static readonly Guid CommandJavascript = new Guid("22a73822-6655-4b7b-aa2d-100b5c4a00a7");
         /// <summary>
         /// Manage all modules
         /// </summary>
@@ -96,11 +99,28 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
         public void SetupJintGlobals(Engine jsEngine)
         {
             Func<Guid, Item> readItem = ModuleManager.GetManager<IItemManager>().Read;
-            jsEngine.SetValue("readItem", readItem);
+            Action<string, int?> log = (message, level) =>
+            {
+                level = level ?? (int?)LogLevel.Information;
+                ModuleManager.GetLogger().Log((LogLevel)level, message);
+            };
+            jsEngine.SetValue("botLog", log);
+            jsEngine.SetValue("botReadItem", readItem);
         }
         public void SetupJintItem(Engine jsEngine, Item item)
         {
-            jsEngine.SetValue("addProperty", (Func<string, object, bool>) delegate(string typeName, object propertyObj)
+            Action<int, string> botEmote = (type, parameter) =>
+            {
+                IMessage emote = new WorldEmoteEvent()
+                {
+                    Origin = item,
+                    EmoteType = (WorldEmoteType)type,
+                    Parameter = parameter
+                };
+                ModuleManager.GetManager<IMessageManager>().SendMessageToSiblings(new List<IMessage>() { emote }, item, item);
+            };
+            jsEngine.SetValue("botEmote", botEmote);
+            jsEngine.SetValue("botAddProperty", (Func<string, object, bool>) delegate(string typeName, object propertyObj)
             {
                 Type propertyType = Type.GetType(typeName + ",BeforeOurTime.Models");
                 var itemProperty = (IItemProperty) JsonConvert.DeserializeObject(JsonConvert.SerializeObject(propertyObj), propertyType);

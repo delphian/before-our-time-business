@@ -20,6 +20,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Exits
 {
     public partial class ExitItemDataManager : ItemModelManager<Item>, IExitItemDataManager
     {
+        public static readonly Guid CommandGo = new Guid("c558c1f9-7d01-45f3-bc35-dcab52b5a37c");
         /// <summary>
         /// Manage all modules
         /// </summary>
@@ -100,7 +101,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Exits
         public CoreUseItemEvent HandleUseItemCommand(ItemCommand itemCommand, Item origin)
         {
             CoreUseItemEvent continueIfNull = null;
-            if (itemCommand.Id == new Guid("c558c1f9-7d01-45f3-bc35-dcab52b5a37c"))
+            if (itemCommand.Id == CommandGo)
             {
                 var itemManager = ModuleManager.GetManager<IItemManager>();
                 var messageManager = ModuleManager.GetManager<IMessageManager>();
@@ -191,7 +192,7 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Exits
                         new ItemCommand()
                         {
                             ItemId = item.Id,
-                            Id = new Guid("c558c1f9-7d01-45f3-bc35-dcab52b5a37c"),
+                            Id = CommandGo,
                             Name = "Go"
                         });
                 }

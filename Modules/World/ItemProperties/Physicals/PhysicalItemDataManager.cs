@@ -19,8 +19,8 @@ namespace BeforeOurTime.Business.Modules.World.ItemProperties.Physicals
 {
     public partial class PhysicalItemDataManager : ItemModelManager<Item>, IPhysicalItemDataManager
     {
-        private static Guid CommandTake = new Guid("7a878b4a-47cd-461c-8acb-942afa745d3c");
-        private static Guid CommandDrop = new Guid("b94b98dd-f089-4c32-b1bf-4d11dfe5e0d9");
+        public static readonly Guid CommandTake = new Guid("7a878b4a-47cd-461c-8acb-942afa745d3c");
+        public static readonly Guid CommandDrop = new Guid("b94b98dd-f089-4c32-b1bf-4d11dfe5e0d9");
         /// <summary>
         /// Manage all modules
         /// </summary>
