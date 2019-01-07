@@ -188,6 +188,10 @@ namespace BeforeOurTime.Business.Modules.Account
         /// <param name="item">Base item about to be persisted to datastore</param>
         public void OnItemUpdate(Item item)
         {
+            //Managers.Where(x => x is IAccountManager).ToList().ForEach(manager =>
+            //{
+            //    ((IAccountManager)manager).OnItemUpdate(item);
+            //});
         }
         /// <summary>
         /// Delete attribute of base item before base item is deleted

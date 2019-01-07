@@ -27,6 +27,10 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
         /// </summary>
         private IAccountDataRepo AccountDataRepo { set; get; }
         /// <summary>
+        /// Character manager
+        /// </summary>
+        private IAccountCharacterManager CharacterManager { set; get; }
+        /// <summary>
         /// Constructor
         /// </summary>
         public AccountManager(
@@ -148,10 +152,24 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             }
             return response;
         }
+        #region On Item Hooks
         /// <summary>
-        /// Attach terminal data to item
+        /// Create attribute, if present, after item is created
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="item">Base item just created from datastore</param>
+        public void OnItemCreate(Item item)
+        {
+            if (item.HasData<AccountData>())
+            {
+                var data = item.GetData<AccountData>();
+                data.DataItemId = item.Id;
+                AccountDataRepo.Create(data);
+            }
+        }
+        /// <summary>
+        /// Append attribute to base item when it is loaded
+        /// </summary>
+        /// <param name="item">Base item just read from datastore</param>
         public void OnItemRead(Item item)
         {
             var characterManager = ModuleManager.GetManager<IAccountCharacterManager>();
@@ -159,8 +177,45 @@ namespace BeforeOurTime.Business.Modules.Account.Managers
             if (characterData != null)
             {
                 var accountData = AccountDataRepo.Read(characterData.AccountId);
+//                accountData.Password = null;
                 item.Data.Add(accountData);
             }
         }
+        /// <summary>
+        /// Append attribute to base item when it is loaded
+        /// </summary>
+        /// <param name="item">Base item about to be persisted to datastore</param>
+        public void OnItemUpdate(Item item)
+        {
+            if (item.HasData<AccountData>())
+            {
+                var data = item.GetData<AccountData>();
+                if (data.Id == Guid.Empty)
+                {
+                    OnItemCreate(item);
+                }
+                else
+                {
+                    AccountDataRepo.Update(data);
+                }
+            }
+            //else if (AccountDataRepo.Read(item) is AccountData data)
+            //{
+            //    AccountDataRepo.Delete(data);
+            //}
+        }
+        /// <summary>
+        /// Delete attribute of base item before base item is deleted
+        /// </summary>
+        /// <param name="item">Base item about to be deleted</param>
+        public void OnItemDelete(Item item)
+        {
+            if (item.HasData<AccountData>())
+            {
+                var data = item.GetData<AccountData>();
+                AccountDataRepo.Delete(data);
+            }
+        }
+        #endregion
     }
 }
