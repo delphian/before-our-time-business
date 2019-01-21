@@ -89,6 +89,7 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
             ModuleManager.RegisterForItemCommands(HandleUseItemCommand);
             ModuleManager.ModuleManagerReadyEvent += () =>
             {
+                ItemManager = ModuleManager.GetManager<IItemManager>();
                 SetupJintGlobals(JSEngine);
                 ModuleManager.Ticks += OnTick;
             };
@@ -144,6 +145,29 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
             if (TickCount++ >= TickInterval)
             {
                 Logger.LogInformation("Running item scripts");
+                var javascriptDatas = JavascriptItemDataRepo.Read();
+                javascriptDatas.ForEach(data =>
+                {
+                    if (data.ScriptFunctions.Contains(":onTick:", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        try
+                        {
+                            var item = ItemManager.Read(data.DataItemId);
+                            lock (_lock)
+                            {
+                                JSEngine.EnterExecutionContext(JSEngine.GlobalEnvironment, JSEngine.GlobalEnvironment, null);
+                                SetupJintItem(JSEngine, item);
+                                JSEngine.Execute(data.Script);
+                                var anonymousObject = JSEngine.Invoke("onTick")?.ToObject();
+                                JSEngine.LeaveExecutionContext();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogException("JS Engine", e);
+                        }
+                    }
+                });
                 TickCount = 0;
             }
         }
