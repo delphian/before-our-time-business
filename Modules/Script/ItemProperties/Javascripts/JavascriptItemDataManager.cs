@@ -20,6 +20,7 @@ using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
 using BeforeOurTime.Models.Modules.World.Messages.Emotes;
 using BeforeOurTime.Models.Messages.Events;
 using BeforeOurTime.Models.Messages;
+using System.Collections;
 
 namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
 {
@@ -99,12 +100,19 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
         public void SetupJintGlobals(Engine jsEngine)
         {
             Func<Guid, Item> readItem = ModuleManager.GetManager<IItemManager>().Read;
-            Action<string, int?> log = (message, level) =>
+            Func<object, string> stringify = JsonConvert.SerializeObject;
+            Func<IList, int> listCount = (IList list) =>
+            {
+                return list.Count;
+            };
+            Action<object, int?> log = (message, level) =>
             {
                 level = level ?? (int?)LogLevel.Information;
-                ModuleManager.GetLogger().Log((LogLevel)level, message);
+                ModuleManager.GetLogger().Log((LogLevel)level, message.ToString());
             };
             jsEngine.SetValue("botLog", log);
+            jsEngine.SetValue("botListCount", listCount);
+            jsEngine.SetValue("botStringify", stringify);
             jsEngine.SetValue("botReadItem", readItem);
         }
         public void SetupJintItem(Engine jsEngine, Item item)
