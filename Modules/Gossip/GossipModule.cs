@@ -98,66 +98,69 @@ namespace BeforeOurTime.Business.Modules.Gossip
         {
             var terminalManager = ModuleManager.GetManager<ITerminalManager>();
             var configuration = ModuleManager.GetConfiguration();
-            ((TerminalManager)terminalManager).OnTerminalCreated += (ITerminal terminal) =>
+            if (configuration.GetSection("Modules").GetSection("Gossip").GetValue<bool>("Enabled"))
             {
-                GossipConfig.Members.Add(new GossipMembers()
+                ((TerminalManager)terminalManager).OnTerminalCreated += (ITerminal terminal) =>
                 {
-                    Terminal = terminal
-                });
-            };
-            ((TerminalManager)terminalManager).OnTerminalDestroyed += (ITerminal terminal) =>
-            {
-                GossipConfig.Members.RemoveAll(x => x.Terminal.GetId() == terminal.GetId());
-            };
-            if (configuration.GetSection("Gossip") != null)
-            {
-                var clientId = configuration.GetSection("Gossip").GetValue<string>("ClientId");
-                var clientSecret = configuration.GetSection("Gossip").GetValue<string>("ClientSecret");
-                var gossipConfig = new GossipConfig()
-                {
-                    GossipActive = true,
-                    ClientId = clientId,
-                    ClientSecret = clientSecret,
-                    ClientName = "Before Our Time",
-                    UserAgent = "bot-0.2.16",
-                    SuspendMultiplier = 2,
-                    SuspendMultiplierMaximum = 4,
-                    SupportedChannels = new HashSet<string>() { "testing" },
-                    SupportedFeatures = new HashSet<string>() { "channels" }
-                };
-                var gossipClient = new GossipClient(
-                    gossipConfig,
-                    (Exception e) => {
-                        Console.WriteLine($"EXCEPTION: {e.Message}");
-                    },
-                    (string message) => {
-                        Console.WriteLine($"LOG: {message}");
-                    },
-                    () =>
+                    GossipConfig.Members.Add(new GossipMembers()
                     {
-                        GossipConfig.Members.ForEach((gossipMember) =>
+                        Terminal = terminal
+                    });
+                };
+                ((TerminalManager)terminalManager).OnTerminalDestroyed += (ITerminal terminal) =>
+                {
+                    GossipConfig.Members.RemoveAll(x => x.Terminal.GetId() == terminal.GetId());
+                };
+                if (configuration.GetSection("Gossip") != null)
+                {
+                    var clientId = configuration.GetSection("Gossip").GetValue<string>("ClientId");
+                    var clientSecret = configuration.GetSection("Gossip").GetValue<string>("ClientSecret");
+                    var gossipConfig = new GossipConfig()
+                    {
+                        GossipActive = true,
+                        ClientId = clientId,
+                        ClientSecret = clientSecret,
+                        ClientName = "Before Our Time",
+                        UserAgent = "bot-0.2.16",
+                        SuspendMultiplier = 2,
+                        SuspendMultiplierMaximum = 4,
+                        SupportedChannels = new HashSet<string>() { "testing" },
+                        SupportedFeatures = new HashSet<string>() { "channels" }
+                    };
+                    var gossipClient = new GossipClient(
+                        gossipConfig,
+                        (Exception e) => {
+                            Console.WriteLine($"EXCEPTION: {e.Message}");
+                        },
+                        (string message) => {
+                            Console.WriteLine($"LOG: {message}");
+                        },
+                        () =>
                         {
-                            if (gossipMember.Terminal.GetPlayerId() != null && gossipMember.Member == null)
+                            GossipConfig.Members.ForEach((gossipMember) =>
                             {
-                                var item = ModuleManager
-                                    .GetManager<IItemManager>()
-                                    .Read(gossipMember.Terminal.GetPlayerId().Value);
-                                gossipMember.Member = new Member()
+                                if (gossipMember.Terminal.GetPlayerId() != null && gossipMember.Member == null)
                                 {
-                                    Name = item.GetProperty<VisibleItemProperty>().Name,
-                                    WriteTo = (message) =>
+                                    var item = ModuleManager
+                                        .GetManager<IItemManager>()
+                                        .Read(gossipMember.Terminal.GetPlayerId().Value);
+                                    gossipMember.Member = new Member()
                                     {
-                                        Console.WriteLine($"GOSSIP: {message}\n");
-                                    }
-                                };
-                            }
-                        });
-                        var members = GossipConfig.Members.Where(x => x.Terminal.GetPlayerId() != null)
-                            .Select(x => x.Member).ToArray<Member>();
-                        return members;
-                    }
-                );
-                gossipClient.Launch();
+                                        Name = item.GetProperty<VisibleItemProperty>().Name,
+                                        WriteTo = (message) =>
+                                        {
+                                            Console.WriteLine($"GOSSIP: {message}\n");
+                                        }
+                                    };
+                                }
+                            });
+                            var members = GossipConfig.Members.Where(x => x.Terminal.GetPlayerId() != null)
+                                .Select(x => x.Member).ToArray<Member>();
+                            return members;
+                        }
+                    );
+                    gossipClient.Launch();
+                }
             }
         }
         /// <summary>

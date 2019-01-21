@@ -100,7 +100,11 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
         /// <param name="jsEngine"></param>
         public void SetupJintGlobals(Engine jsEngine)
         {
-            Func<Guid, Item> readItem = ModuleManager.GetManager<IItemManager>().Read;
+            Func<object, Item> readItem = (object itemId) =>
+            {
+                var guidItemId = Guid.Parse(itemId.ToString());
+                return ModuleManager.GetManager<IItemManager>().Read(guidItemId);
+            };
             Func<object, string> stringify = JsonConvert.SerializeObject;
             Func<IList, int> listCount = (IList list) =>
             {
@@ -111,10 +115,18 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                 level = level ?? (int?)LogLevel.Information;
                 ModuleManager.GetLogger().Log((LogLevel)level, message.ToString());
             };
+            Action<object, object, object> moveItem = (itemId, toId, originId) =>
+            {
+                var item = ItemManager.Read(Guid.Parse(itemId.ToString()));
+                var toItem = ItemManager.Read(Guid.Parse(toId.ToString()));
+                var originItem = (originId != null) ? ItemManager.Read(Guid.Parse(originId.ToString())) : null;
+                ItemManager.Move(item, toItem, originItem);
+            };
             jsEngine.SetValue("botLog", log);
             jsEngine.SetValue("botListCount", listCount);
             jsEngine.SetValue("botStringify", stringify);
             jsEngine.SetValue("botReadItem", readItem);
+            jsEngine.SetValue("botMoveItem", moveItem);
         }
         public void SetupJintItem(Engine jsEngine, Item item)
         {
@@ -128,6 +140,7 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                 };
                 ModuleManager.GetManager<IMessageManager>().SendMessageToSiblings(new List<IMessage>() { emote }, item, item);
             };
+            jsEngine.SetValue("me", item);
             jsEngine.SetValue("botEmote", botEmote);
             jsEngine.SetValue("botAddProperty", (Func<string, object, bool>) delegate(string typeName, object propertyObj)
             {
@@ -155,7 +168,7 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                             var item = ItemManager.Read(data.DataItemId);
                             lock (_lock)
                             {
-                                JSEngine.EnterExecutionContext(JSEngine.GlobalEnvironment, JSEngine.GlobalEnvironment, null);
+                                var engine = JSEngine.EnterExecutionContext(JSEngine.GlobalEnvironment, JSEngine.GlobalEnvironment, null);
                                 SetupJintItem(JSEngine, item);
                                 JSEngine.Execute(data.Script);
                                 var anonymousObject = JSEngine.Invoke("onTick")?.ToObject();
