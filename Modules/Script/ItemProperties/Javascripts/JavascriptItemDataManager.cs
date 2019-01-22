@@ -21,6 +21,7 @@ using BeforeOurTime.Models.Modules.World.Messages.Emotes;
 using BeforeOurTime.Models.Messages.Events;
 using BeforeOurTime.Models.Messages;
 using System.Collections;
+using BeforeOurTime.Models.Exceptions;
 
 namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
 {
@@ -166,6 +167,8 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                         try
                         {
                             var item = ItemManager.Read(data.DataItemId);
+                            if (item == null)
+                                throw new BeforeOurTimeException($"No item ({data.DataItemId}) found for javascript data ({data.Id})");
                             lock (_lock)
                             {
                                 var engine = JSEngine.EnterExecutionContext(JSEngine.GlobalEnvironment, JSEngine.GlobalEnvironment, null);
