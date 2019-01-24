@@ -22,6 +22,7 @@ using BeforeOurTime.Models.Messages.Events;
 using BeforeOurTime.Models.Messages;
 using System.Collections;
 using BeforeOurTime.Models.Exceptions;
+using BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Functions;
 
 namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
 {
@@ -49,6 +50,10 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
         /// Logger
         /// </summary>
         private IBotLogger Logger { set; get; }
+        /// <summary>
+        /// All javascript function definitions
+        /// </summary>
+        private List<IJavascriptFunction> Functions = new List<IJavascriptFunction>();
         /// <summary>
         /// Tick interval at which scripts will execute
         /// </summary>
@@ -88,6 +93,7 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                 .GetValue<int>("TickInterval");
             JSEngine = new Engine((cfg => cfg.AllowClr()));
             ModuleManager.RegisterForItemCommands(HandleUseItemCommand);
+            Functions = BuildFunctions(ModuleManager);
             ModuleManager.ModuleManagerReadyEvent += () =>
             {
                 ItemManager = ModuleManager.GetManager<IItemManager>();
@@ -96,21 +102,39 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
             };
         }
         /// <summary>
+        /// Register any classes that implemented IJavascriptFunction
+        /// </summary>
+        /// <param name="moduleManager"></param>
+        public List<IJavascriptFunction> BuildFunctions(IModuleManager moduleManager)
+        {
+            List<IJavascriptFunction> functions;
+            var interfaceType = typeof(IJavascriptFunction);
+            functions = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => (IJavascriptFunction)Activator.CreateInstance(x, moduleManager))
+                .ToList();
+            return functions;
+        }
+        /// <summary>
         /// Setup the jint engine with global function calls
         /// </summary>
         /// <param name="jsEngine"></param>
         public void SetupJintGlobals(Engine jsEngine)
         {
+            Functions
+                .Where(x => x.GetDefinition().Global == true)
+                .ToList()
+                .ForEach(function =>
+                {
+                    function.CreateFunction(jsEngine);
+                });
             Func<object, Item> readItem = (object itemId) =>
             {
                 var guidItemId = Guid.Parse(itemId.ToString());
                 return ModuleManager.GetManager<IItemManager>().Read(guidItemId);
             };
             Func<object, string> stringify = JsonConvert.SerializeObject;
-            Func<IList, int> listCount = (IList list) =>
-            {
-                return list.Count;
-            };
             Action<object, int?> log = (message, level) =>
             {
                 level = level ?? (int?)LogLevel.Information;
@@ -124,7 +148,6 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                 ItemManager.Move(item, toItem, originItem);
             };
             jsEngine.SetValue("botLog", log);
-            jsEngine.SetValue("botListCount", listCount);
             jsEngine.SetValue("botStringify", stringify);
             jsEngine.SetValue("botReadItem", readItem);
             jsEngine.SetValue("botMoveItem", moveItem);
