@@ -2,14 +2,16 @@
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Script.ItemProperties.Javascripts;
 using Jint;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Functions
 {
-    public class BotListCount : IJavascriptFunction
+    public class BotGetItemProperty : IJavascriptFunction
     {
         /// <summary>
         /// Manage all modules
@@ -23,15 +25,16 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
         /// Constructor
         /// </summary>
         /// <param name="moduleManager"></param>
-        public BotListCount(IModuleManager moduleManager)
+        public BotGetItemProperty(IModuleManager moduleManager)
         {
             ModuleManager = moduleManager;
             Definition = new JavascriptFunctionDefinition()
             {
                 Global = true,
-                Prototype = "int botListCount(IList list)",
-                Description = "Count the number of items in a c# list",
-                Example = @"var count = BotListCount(item.children);"
+                Prototype = "object botGetItemProperty(Item item, string partialPropertyName)",
+                Description = "Get property of an item. Returns null if no property found.",
+                Example = @"var property = botGetItemProperty(me, ""VisibleItemProperty"");
+botLog(""Item is named "" + property.name);"
             };
         }
         public JavascriptFunctionDefinition GetDefinition()
@@ -40,11 +43,14 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
         }
         public void CreateFunction(Engine jsEngine)
         {
-            Func<IList, int> listCount = (IList list) =>
+            Func<Item, string, object> botGetItemProperty = (Item item, string partialPropertyName) =>
             {
-                return list.Count;
+                var key = item.Properties.Keys
+                                         .Where(x => x.Name.Contains(partialPropertyName))
+                                         .FirstOrDefault();
+                return (item.Properties.ContainsKey(key)) ? item.Properties[key] : null;
             };
-            jsEngine.SetValue("botListCount", listCount);
+            jsEngine.SetValue("botGetItemProperty", botGetItemProperty);
         }
     }
 }

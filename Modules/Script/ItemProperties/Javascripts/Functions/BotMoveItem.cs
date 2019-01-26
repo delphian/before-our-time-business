@@ -1,7 +1,9 @@
 ﻿using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Script.ItemProperties.Javascripts;
 using Jint;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Functions
 {
-    public class BotListCount : IJavascriptFunction
+    public class BotMoveItem : IJavascriptFunction
     {
         /// <summary>
         /// Manage all modules
@@ -23,15 +25,15 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
         /// Constructor
         /// </summary>
         /// <param name="moduleManager"></param>
-        public BotListCount(IModuleManager moduleManager)
+        public BotMoveItem(IModuleManager moduleManager)
         {
             ModuleManager = moduleManager;
             Definition = new JavascriptFunctionDefinition()
             {
                 Global = true,
-                Prototype = "int botListCount(IList list)",
-                Description = "Count the number of items in a c# list",
-                Example = @"var count = BotListCount(item.children);"
+                Prototype = "void botMoveItem(object itemId, object toId, object originId)",
+                Description = "Move this item to new location",
+                Example = @"botMoveItem(me.Id, ""07f91a80-a9d3-4d97-b696-40ce0e95df91"", me.Id);"
             };
         }
         public JavascriptFunctionDefinition GetDefinition()
@@ -40,11 +42,15 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
         }
         public void CreateFunction(Engine jsEngine)
         {
-            Func<IList, int> listCount = (IList list) =>
+            Action<object, object, object> botMoveItem = (itemId, toId, originId) =>
             {
-                return list.Count;
+                var itemManager = ModuleManager.GetManager<IItemManager>();
+                var moveItem = itemManager.Read(Guid.Parse(itemId.ToString()));
+                var toItem = itemManager.Read(Guid.Parse(toId.ToString()));
+                var originItem = (originId != null) ? itemManager.Read(Guid.Parse(originId.ToString())) : null;
+                itemManager.Move(moveItem, toItem, originItem);
             };
-            jsEngine.SetValue("botListCount", listCount);
+            jsEngine.SetValue("botMoveItem", botMoveItem);
         }
     }
 }

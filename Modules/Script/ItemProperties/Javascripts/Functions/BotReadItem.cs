@@ -1,7 +1,9 @@
 ﻿using BeforeOurTime.Models.Modules;
+using BeforeOurTime.Models.Modules.Core.Managers;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Script.ItemProperties.Javascripts;
 using Jint;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Functions
 {
-    public class BotListCount : IJavascriptFunction
+    public class BotReadItem : IJavascriptFunction
     {
         /// <summary>
         /// Manage all modules
@@ -23,15 +25,16 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
         /// Constructor
         /// </summary>
         /// <param name="moduleManager"></param>
-        public BotListCount(IModuleManager moduleManager)
+        public BotReadItem(IModuleManager moduleManager)
         {
             ModuleManager = moduleManager;
             Definition = new JavascriptFunctionDefinition()
             {
                 Global = true,
-                Prototype = "int botListCount(IList list)",
-                Description = "Count the number of items in a c# list",
-                Example = @"var count = BotListCount(item.children);"
+                Prototype = "item botReadItem(object itemId)",
+                Description = "Read an item",
+                Example = @"var item = botReadItem(""c558c1f9-7d01-45f3-bc35-dcab52b5a37c"");
+botEmote(300, ""I just read item "" + item.id);"
             };
         }
         public JavascriptFunctionDefinition GetDefinition()
@@ -40,11 +43,12 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
         }
         public void CreateFunction(Engine jsEngine)
         {
-            Func<IList, int> listCount = (IList list) =>
+            Func<object, Item> botReadItem = (object itemId) =>
             {
-                return list.Count;
+                var guidItemId = Guid.Parse(itemId.ToString());
+                return ModuleManager.GetManager<IItemManager>().Read(guidItemId);
             };
-            jsEngine.SetValue("botListCount", listCount);
+            jsEngine.SetValue("botReadItem", botReadItem);
         }
     }
 }

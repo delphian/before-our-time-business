@@ -6,6 +6,7 @@ using BeforeOurTime.Models.Messages.Responses;
 using BeforeOurTime.Models.Modules;
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Script;
+using BeforeOurTime.Models.Modules.Script.ItemProperties.Javascripts;
 using BeforeOutTime.Business.Dbs.EF;
 using Jint;
 using Microsoft.EntityFrameworkCore;
@@ -112,7 +113,10 @@ namespace BeforeOurTime.Business.Modules.Script
         /// <returns></returns>
         public List<Guid> RegisterForMessages()
         {
-            return new List<Guid>() { };
+            return new List<Guid>()
+            {
+                ScriptReadJSDefinitionsRequest._Id
+            };
         }
         /// <summary>
         /// Initialize module
@@ -151,6 +155,8 @@ namespace BeforeOurTime.Business.Modules.Script
             IModuleManager mm,
             IResponse response)
         {
+            if (message.GetMessageId() == ScriptReadJSDefinitionsRequest._Id)
+                response = GetManager<IJavascriptItemDataManager>().HandleReadJSDefinitionsRequest(message, origin, mm, response);
             return response;
         }
         #endregion

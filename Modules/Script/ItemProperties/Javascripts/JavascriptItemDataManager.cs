@@ -129,50 +129,10 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                 {
                     function.CreateFunction(jsEngine);
                 });
-            Func<object, Item> readItem = (object itemId) =>
-            {
-                var guidItemId = Guid.Parse(itemId.ToString());
-                return ModuleManager.GetManager<IItemManager>().Read(guidItemId);
-            };
-            Func<object, string> stringify = JsonConvert.SerializeObject;
-            Action<object, int?> log = (message, level) =>
-            {
-                level = level ?? (int?)LogLevel.Information;
-                ModuleManager.GetLogger().Log((LogLevel)level, message.ToString());
-            };
-            Action<object, object, object> moveItem = (itemId, toId, originId) =>
-            {
-                var item = ItemManager.Read(Guid.Parse(itemId.ToString()));
-                var toItem = ItemManager.Read(Guid.Parse(toId.ToString()));
-                var originItem = (originId != null) ? ItemManager.Read(Guid.Parse(originId.ToString())) : null;
-                ItemManager.Move(item, toItem, originItem);
-            };
-            jsEngine.SetValue("botLog", log);
-            jsEngine.SetValue("botStringify", stringify);
-            jsEngine.SetValue("botReadItem", readItem);
-            jsEngine.SetValue("botMoveItem", moveItem);
         }
         public void SetupJintItem(Engine jsEngine, Item item)
         {
-            Action<int, string> botEmote = (type, parameter) =>
-            {
-                IMessage emote = new WorldEmoteEvent()
-                {
-                    Origin = item,
-                    EmoteType = (WorldEmoteType)type,
-                    Parameter = parameter
-                };
-                ModuleManager.GetManager<IMessageManager>().SendMessageToSiblings(new List<IMessage>() { emote }, item, item);
-            };
             jsEngine.SetValue("me", item);
-            jsEngine.SetValue("botEmote", botEmote);
-            jsEngine.SetValue("botAddProperty", (Func<string, object, bool>) delegate(string typeName, object propertyObj)
-            {
-                Type propertyType = Type.GetType(typeName + ",BeforeOurTime.Models");
-                var itemProperty = (IItemProperty) JsonConvert.DeserializeObject(JsonConvert.SerializeObject(propertyObj), propertyType);
-                item.AddProperty(propertyType, itemProperty);
-                return true;
-            });
         }
         /// <summary>
         /// Handle recurring regular tasks
@@ -361,6 +321,30 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                 response._responseSuccess = false;
                 response._responseMessage = e.Message;
             }
+            return response;
+        }
+        /// <summary>
+        /// Read all javascript function definitions
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="origin">Item that initiated request</param>
+        /// <param name="mm">Module manager</param>
+        /// <param name="response"></param>
+        public IResponse HandleReadJSDefinitionsRequest(
+            IMessage message,
+            Item origin,
+            IModuleManager mm,
+            IResponse response)
+        {
+            var request = message.GetMessageAsType<ScriptReadJSDefinitionsRequest>();
+            response = HandleRequestWrapper<ScriptReadJSDefinitionsResponse>(request, res =>
+            {
+                var messageManager = mm.GetManager<IMessageManager>();
+                var itemManager = mm.GetManager<IItemManager>();
+                var location = itemManager.Read(origin.ParentId.Value);
+                ((ScriptReadJSDefinitionsResponse)res).Definitions = Functions.Select(x => x.GetDefinition()).ToList();
+                res.SetSuccess(true);
+            });
             return response;
         }
         #region On Item Hooks

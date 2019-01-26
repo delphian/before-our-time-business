@@ -2,6 +2,7 @@
 using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Script.ItemProperties.Javascripts;
 using Jint;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Functions
 {
-    public class BotListCount : IJavascriptFunction
+    public class BotLog : IJavascriptFunction
     {
         /// <summary>
         /// Manage all modules
@@ -23,15 +24,15 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
         /// Constructor
         /// </summary>
         /// <param name="moduleManager"></param>
-        public BotListCount(IModuleManager moduleManager)
+        public BotLog(IModuleManager moduleManager)
         {
             ModuleManager = moduleManager;
             Definition = new JavascriptFunctionDefinition()
             {
                 Global = true,
-                Prototype = "int botListCount(IList list)",
-                Description = "Count the number of items in a c# list",
-                Example = @"var count = BotListCount(item.children);"
+                Prototype = "void botLog(string message, int? level = null)",
+                Description = "Write a message to the server log file",
+                Example = @"botLog(""Error executing javascript"");"
             };
         }
         public JavascriptFunctionDefinition GetDefinition()
@@ -40,11 +41,12 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
         }
         public void CreateFunction(Engine jsEngine)
         {
-            Func<IList, int> listCount = (IList list) =>
+            Action<object, int?> botLog = (message, level) =>
             {
-                return list.Count;
+                level = level ?? (int?)LogLevel.Information;
+                ModuleManager.GetLogger().Log((LogLevel)level, message.ToString());
             };
-            jsEngine.SetValue("botListCount", listCount);
+            jsEngine.SetValue("botLog", botLog);
         }
     }
 }
