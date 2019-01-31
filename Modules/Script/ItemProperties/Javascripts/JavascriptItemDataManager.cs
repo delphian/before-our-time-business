@@ -147,24 +147,10 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                 {
                     if (data.ScriptFunctions.Contains(":onTick:", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        try
-                        {
-                            var item = ItemManager.Read(data.DataItemId);
-                            if (item == null)
-                                throw new BeforeOurTimeException($"No item ({data.DataItemId}) found for javascript data ({data.Id})");
-                            lock (_lock)
-                            {
-                                var engine = JSEngine.EnterExecutionContext(JSEngine.GlobalEnvironment, JSEngine.GlobalEnvironment, null);
-                                SetupJintItem(JSEngine, item);
-                                JSEngine.Execute(data.Script);
-                                var anonymousObject = JSEngine.Invoke("onTick")?.ToObject();
-                                JSEngine.LeaveExecutionContext();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogException("JS Engine", e);
-                        }
+                        var item = ItemManager.Read(data.DataItemId);
+                        if (item == null)
+                            throw new BeforeOurTimeException($"No item ({data.DataItemId}) found for javascript data ({data.Id})");
+                        ExecuteFunction(item, "onTick");
                     }
                 });
                 TickCount = 0;
@@ -253,6 +239,53 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
             return declarations;
         }
         /// <summary>
+        /// Execute a javascript function of an item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="name"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public object ExecuteFunction(Item item, string name, params object[] parameters)
+        {
+            object report = null;
+            if (item.GetData<JavascriptItemData>() is JavascriptItemData data)
+            {
+                if (data.ScriptFunctions.Contains($":{name}:", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    try
+                    {
+                        lock (_lock)
+                        {
+                            JSEngine.EnterExecutionContext(JSEngine.GlobalEnvironment, JSEngine.GlobalEnvironment, null);
+                            SetupJintItem(JSEngine, item);
+                            JSEngine.Execute(data.Script);
+                            report = JSEngine.Invoke(name, parameters)?.ToObject();
+                            JSEngine.LeaveExecutionContext();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogException($"JS Engine executing {name} in {item.Id}", e);
+                    }
+                }
+            }
+            return report;
+        }
+        /// <summary>
+        /// Execute a javascript function of many items
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="name"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public void ExecuteFunction(List<Item> items, string name, params object[] parameters)
+        {
+            items.ForEach(item =>
+            {
+                ExecuteFunction(item, name, parameters);
+            });
+        }
+        /// <summary>
         /// Handle request to invoke an item command
         /// </summary>
         /// <param name="itemCommand"></param>
@@ -263,36 +296,15 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
             if (itemCommand.Id == CommandJavascript)
             {
                 var itemManager = ModuleManager.GetManager<IItemManager>();
-                var messageManager = ModuleManager.GetManager<IMessageManager>();
                 var item = itemManager.Read(itemCommand.ItemId.Value);
-                if (item.GetData<JavascriptItemData>() is JavascriptItemData data)
+                ExecuteFunction(item, "onUse", itemCommand, origin);
+                continueIfNull = new CoreUseItemEvent()
                 {
-                    if (data.ScriptFunctions.Contains(":onUse:", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        try
-                        {
-                            lock (_lock)
-                            {
-                                JSEngine.EnterExecutionContext(JSEngine.GlobalEnvironment, JSEngine.GlobalEnvironment, null);
-                                SetupJintItem(JSEngine, item);
-                                JSEngine.Execute(data.Script);
-                                var anonymousObject = JSEngine.Invoke("onUse", item, itemCommand, origin)?.ToObject();
-                                JSEngine.LeaveExecutionContext();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogException("JS Engine", e);
-                        }
-                    }
-                    continueIfNull = new CoreUseItemEvent()
-                    {
-                        Success = true,
-                        Used = item,
-                        Using = origin,
-                        Use = itemCommand
-                    };
-                }
+                    Success = true,
+                    Used = item,
+                    Using = origin,
+                    Use = itemCommand
+                };
             }
             return continueIfNull;
         }
@@ -375,25 +387,7 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                 item.AddProperty(typeof(JavascriptItemProperty), new JavascriptItemProperty()
                 {
                 });
-                if (data.ScriptFunctions.Contains(":onItemRead:", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    // Watch out for async/multi-thread issues! consider EnterEnvironment()
-                    try
-                    {
-                        lock (_lock)
-                        {
-                            JSEngine.EnterExecutionContext(JSEngine.GlobalEnvironment, JSEngine.GlobalEnvironment, null);
-                            SetupJintItem(JSEngine, item);
-                            JSEngine.Execute(data.Script);
-                            var anonymousObject = JSEngine.Invoke("onItemRead", item)?.ToObject();
-                            JSEngine.LeaveExecutionContext();
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogException("JS Engine", e);
-                    }
-                }
+                ExecuteFunction(item, "onItemRead", item);
             }
         }
         /// <summary>
