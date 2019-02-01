@@ -250,7 +250,8 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
             object report = null;
             if (item.GetData<JavascriptItemData>() is JavascriptItemData data)
             {
-                if (data.ScriptFunctions.Contains($":{name}:", StringComparison.InvariantCultureIgnoreCase))
+                if (data.ScriptFunctions.Contains($":{name}:", StringComparison.InvariantCultureIgnoreCase) &&
+                    data.Disabled == false)
                 {
                     try
                     {
@@ -265,7 +266,16 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                     }
                     catch (Exception e)
                     {
+                        data.ErrCount += 1;
+                        data.ErrDescriptions += $"Executing {name}: {e.Message}\n";
                         Logger.LogException($"JS Engine executing {name} in {item.Id}", e);
+                        if (data.ErrCount >= 10)
+                        {
+                            data.Disabled = true;
+                            Logger.LogError($"Disabled javascript for item {item.Id}");
+                            Logger.LogException($"JS Engine executing {name} in {item.Id}", e);
+                        }
+                        JavascriptItemDataRepo.Update(data);
                     }
                 }
             }
