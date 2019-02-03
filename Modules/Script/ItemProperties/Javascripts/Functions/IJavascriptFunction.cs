@@ -9,7 +9,5 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
 {
     public interface IJavascriptFunction
     {
-        JavascriptFunctionDefinition GetDefinition();
-        void CreateFunction(Engine jsEngine);
     }
 }

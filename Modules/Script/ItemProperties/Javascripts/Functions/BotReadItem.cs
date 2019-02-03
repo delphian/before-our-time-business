@@ -36,19 +36,17 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
                 Example = @"var item = botReadItem(""c558c1f9-7d01-45f3-bc35-dcab52b5a37c"");
 botEmote(300, ""I just read item "" + item.id);"
             };
-        }
-        public JavascriptFunctionDefinition GetDefinition()
-        {
-            return Definition;
-        }
-        public void CreateFunction(Engine jsEngine)
-        {
-            Func<object, Item> botReadItem = (object itemId) =>
+            ModuleManager.ModuleManagerReadyEvent += () =>
             {
-                var guidItemId = Guid.Parse(itemId.ToString());
-                return ModuleManager.GetManager<IItemManager>().Read(guidItemId);
+                ModuleManager.GetManager<IJavascriptItemDataManager>().AddFunctionDefinition(Definition);
+                var jsEngine = ModuleManager.GetManager<IJavascriptItemDataManager>().GetJSEngine();
+                Func<object, Item> botReadItem = (object itemId) =>
+                {
+                    var guidItemId = Guid.Parse(itemId.ToString());
+                    return ModuleManager.GetManager<IItemManager>().Read(guidItemId);
+                };
+                jsEngine.SetValue("botReadItem", botReadItem);
             };
-            jsEngine.SetValue("botReadItem", botReadItem);
         }
     }
 }

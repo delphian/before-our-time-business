@@ -1,5 +1,4 @@
 ﻿using BeforeOurTime.Models.Modules;
-using BeforeOurTime.Models.Modules.Core.Models.Items;
 using BeforeOurTime.Models.Modules.Script.ItemProperties.Javascripts;
 using Jint;
 using Microsoft.Extensions.Logging;
@@ -10,6 +9,9 @@ using System.Text;
 
 namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Functions
 {
+    /// <summary>
+    /// Define botLog javascript function that writes to the server log system
+    /// </summary>
     public class BotLog : IJavascriptFunction
     {
         /// <summary>
@@ -34,19 +36,17 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
                 Description = "Write a message to the server log file",
                 Example = @"botLog(""Error executing javascript"");"
             };
-        }
-        public JavascriptFunctionDefinition GetDefinition()
-        {
-            return Definition;
-        }
-        public void CreateFunction(Engine jsEngine)
-        {
-            Action<object, int?> botLog = (message, level) =>
+            ModuleManager.ModuleManagerReadyEvent += () =>
             {
-                level = level ?? (int?)LogLevel.Information;
-                ModuleManager.GetLogger().Log((LogLevel)level, message.ToString());
+                ModuleManager.GetManager<IJavascriptItemDataManager>().AddFunctionDefinition(Definition);
+                var jsEngine = ModuleManager.GetManager<IJavascriptItemDataManager>().GetJSEngine();
+                Action<object, int?> botLog = (message, level) =>
+                {
+                    level = level ?? (int?)LogLevel.Information;
+                    ModuleManager.GetLogger().Log((LogLevel)level, message.ToString());
+                };
+                jsEngine.SetValue("botLog", botLog);
             };
-            jsEngine.SetValue("botLog", botLog);
         }
     }
 }

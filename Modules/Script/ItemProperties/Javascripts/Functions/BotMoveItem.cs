@@ -35,22 +35,20 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
                 Description = "Move this item to new location",
                 Example = @"botMoveItem(me.Id, ""07f91a80-a9d3-4d97-b696-40ce0e95df91"", me.Id);"
             };
-        }
-        public JavascriptFunctionDefinition GetDefinition()
-        {
-            return Definition;
-        }
-        public void CreateFunction(Engine jsEngine)
-        {
-            Action<object, object, object> botMoveItem = (itemId, toId, originId) =>
+            ModuleManager.ModuleManagerReadyEvent += () =>
             {
-                var itemManager = ModuleManager.GetManager<IItemManager>();
-                var moveItem = itemManager.Read(Guid.Parse(itemId.ToString()));
-                var toItem = itemManager.Read(Guid.Parse(toId.ToString()));
-                var originItem = (originId != null) ? itemManager.Read(Guid.Parse(originId.ToString())) : null;
-                itemManager.Move(moveItem, toItem, originItem);
+                ModuleManager.GetManager<IJavascriptItemDataManager>().AddFunctionDefinition(Definition);
+                var jsEngine = ModuleManager.GetManager<IJavascriptItemDataManager>().GetJSEngine();
+                Action<object, object, object> botMoveItem = (itemId, toId, originId) =>
+                {
+                    var itemManager = ModuleManager.GetManager<IItemManager>();
+                    var moveItem = itemManager.Read(Guid.Parse(itemId.ToString()));
+                    var toItem = itemManager.Read(Guid.Parse(toId.ToString()));
+                    var originItem = (originId != null) ? itemManager.Read(Guid.Parse(originId.ToString())) : null;
+                    itemManager.Move(moveItem, toItem, originItem);
+                };
+                jsEngine.SetValue("botMoveItem", botMoveItem);
             };
-            jsEngine.SetValue("botMoveItem", botMoveItem);
         }
     }
 }

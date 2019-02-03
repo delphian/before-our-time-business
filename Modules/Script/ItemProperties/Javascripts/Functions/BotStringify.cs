@@ -35,15 +35,13 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
                 Description = "Stringify a javascript or c# object. Regular JSON.stringify will not work on a c# object.",
                 Example = @"var json = botStringify(object obj);"
             };
-        }
-        public JavascriptFunctionDefinition GetDefinition()
-        {
-            return Definition;
-        }
-        public void CreateFunction(Engine jsEngine)
-        {
-            Func<object, string> botStringify = JsonConvert.SerializeObject;
-            jsEngine.SetValue("botStringify", botStringify);
+            ModuleManager.ModuleManagerReadyEvent += () =>
+            {
+                ModuleManager.GetManager<IJavascriptItemDataManager>().AddFunctionDefinition(Definition);
+                var jsEngine = ModuleManager.GetManager<IJavascriptItemDataManager>().GetJSEngine();
+                Func<object, string> botStringify = JsonConvert.SerializeObject;
+                jsEngine.SetValue("botStringify", botStringify);
+            };
         }
     }
 }

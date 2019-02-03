@@ -36,21 +36,19 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
                 Example = @"var property = botGetItemProperty(me, ""VisibleItemProperty"");
 botLog(""Item is named "" + property.name);"
             };
-        }
-        public JavascriptFunctionDefinition GetDefinition()
-        {
-            return Definition;
-        }
-        public void CreateFunction(Engine jsEngine)
-        {
-            Func<Item, string, object> botGetItemProperty = (Item item, string partialPropertyName) =>
+            ModuleManager.ModuleManagerReadyEvent += () =>
             {
-                var key = item.Properties.Keys
-                                         .Where(x => x.Name.Contains(partialPropertyName))
-                                         .FirstOrDefault();
-                return (item.Properties.ContainsKey(key)) ? item.Properties[key] : null;
+                ModuleManager.GetManager<IJavascriptItemDataManager>().AddFunctionDefinition(Definition);
+                var jsEngine = ModuleManager.GetManager<IJavascriptItemDataManager>().GetJSEngine();
+                Func<Item, string, object> botGetItemProperty = (Item item, string partialPropertyName) =>
+                {
+                    var key = item.Properties.Keys
+                                             .Where(x => x.Name.Contains(partialPropertyName))
+                                             .FirstOrDefault();
+                    return (item.Properties.ContainsKey(key)) ? item.Properties[key] : null;
+                };
+                jsEngine.SetValue("botGetItemProperty", botGetItemProperty);
             };
-            jsEngine.SetValue("botGetItemProperty", botGetItemProperty);
         }
     }
 }

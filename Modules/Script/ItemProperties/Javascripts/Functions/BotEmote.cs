@@ -37,25 +37,23 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
                 Description = "Send out emote from current item. 100 = Smile, 200 = Frown, 300 = Speak, 400 = Raw.",
                 Example = @"botEmote(300, ""Hello World"");"
             };
-        }
-        public JavascriptFunctionDefinition GetDefinition()
-        {
-            return Definition;
-        }
-        public void CreateFunction(Engine jsEngine)
-        {
-            Action<int, string> botEmote = (type, parameter) =>
+            ModuleManager.ModuleManagerReadyEvent += () =>
             {
-                Item item = (Item)jsEngine.GetValue("me").ToObject();
-                IMessage emote = new WorldEmoteEvent()
+                ModuleManager.GetManager<IJavascriptItemDataManager>().AddFunctionDefinition(Definition);
+                var jsEngine = ModuleManager.GetManager<IJavascriptItemDataManager>().GetJSEngine();
+                Action<int, string> botEmote = (type, parameter) =>
                 {
-                    Origin = item,
-                    EmoteType = (WorldEmoteType)type,
-                    Parameter = parameter
+                    Item item = (Item)jsEngine.GetValue("me").ToObject();
+                    IMessage emote = new WorldEmoteEvent()
+                    {
+                        Origin = item,
+                        EmoteType = (WorldEmoteType)type,
+                        Parameter = parameter
+                    };
+                    ModuleManager.GetManager<IMessageManager>().SendMessageToSiblings(new List<IMessage>() { emote }, item, item);
                 };
-                ModuleManager.GetManager<IMessageManager>().SendMessageToSiblings(new List<IMessage>() { emote }, item, item);
+                jsEngine.SetValue("botEmote", botEmote);
             };
-            jsEngine.SetValue("botEmote", botEmote);
         }
     }
 }

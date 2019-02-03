@@ -17,8 +17,6 @@ using BeforeOurTime.Models.Modules.Script;
 using Jint;
 using BeforeOurTime.Models.Modules.Core.Models.Properties;
 using BeforeOurTime.Models.Modules.Core.Messages.UseItem;
-using BeforeOurTime.Models.Modules.World.Messages.Emotes;
-using BeforeOurTime.Models.Messages.Events;
 using BeforeOurTime.Models.Messages;
 using System.Collections;
 using BeforeOurTime.Models.Exceptions;
@@ -51,21 +49,13 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
         /// </summary>
         private IBotLogger Logger { set; get; }
         /// <summary>
+        /// All javascript function classes
+        /// </summary>
+        private List<IJavascriptFunction> FunctionClasses = new List<IJavascriptFunction>();
+        /// <summary>
         /// All javascript function definitions
         /// </summary>
-        private List<IJavascriptFunction> Functions = new List<IJavascriptFunction>();
-        /// <summary>
-        /// Tick interval at which scripts will execute
-        /// </summary>
-        private int TickInterval { set; get; }
-        /// <summary>
-        /// Current tick interval on it's way to the maximum;
-        /// </summary>
-        private int TickCount { set; get; } = 0;
-        /// <summary>
-        /// Number of miliseconds between each tick
-        /// </summary>
-        private int TickTime { set; get; }
+        private List<JavascriptFunctionDefinition> FunctionDefinitions = new List<JavascriptFunctionDefinition>();
         /// <summary>
         /// Javascript engine
         /// </summary>
@@ -82,23 +72,12 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
             ScriptModule = scriptModule;
             JavascriptItemDataRepo = javascriptItemDataRepo;
             Logger = ModuleManager.GetLogger();
-            TickTime = moduleManager.GetConfiguration()
-                .GetSection("Timing")
-                .GetValue<int>("Tick");
-            TickInterval = moduleManager.GetConfiguration()
-                .GetSection("Modules")
-                .GetSection("Script")
-                .GetSection("Managers")
-                .GetSection("Javascript")
-                .GetValue<int>("TickInterval");
             JSEngine = new Engine((cfg => cfg.AllowClr()));
             ModuleManager.RegisterForItemCommands(HandleUseItemCommand);
-            Functions = BuildFunctions(ModuleManager);
+            FunctionClasses = BuildFunctions(ModuleManager);
             ModuleManager.ModuleManagerReadyEvent += () =>
             {
                 ItemManager = ModuleManager.GetManager<IItemManager>();
-                SetupJintGlobals(JSEngine);
-                ModuleManager.Ticks += OnTick;
             };
         }
         /// <summary>
@@ -107,54 +86,40 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
         /// <param name="moduleManager"></param>
         public List<IJavascriptFunction> BuildFunctions(IModuleManager moduleManager)
         {
-            List<IJavascriptFunction> functions;
+            List<IJavascriptFunction> classes = new List<IJavascriptFunction>();
             var interfaceType = typeof(IJavascriptFunction);
-            functions = AppDomain.CurrentDomain.GetAssemblies()
+            var types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => interfaceType.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                .Select(x => (IJavascriptFunction)Activator.CreateInstance(x, moduleManager))
                 .ToList();
-            return functions;
+            types.ForEach(type =>
+            {
+                try
+                {
+                    classes.Add((IJavascriptFunction)Activator.CreateInstance(type, moduleManager));
+                }
+                catch (Exception e)
+                {
+                    Logger.LogException($"Failed to load javascript definition \"{type.ToString()}\"", e);
+                }
+            });
+            return classes;
         }
         /// <summary>
-        /// Setup the jint engine with global function calls
+        /// Add a javascript function definition
         /// </summary>
-        /// <param name="jsEngine"></param>
-        public void SetupJintGlobals(Engine jsEngine)
+        /// <param name="function"></param>
+        public void AddFunctionDefinition(JavascriptFunctionDefinition function)
         {
-            Functions
-                .Where(x => x.GetDefinition().Global == true)
-                .ToList()
-                .ForEach(function =>
-                {
-                    function.CreateFunction(jsEngine);
-                });
+            FunctionDefinitions.Add(function);
+        }
+        public Engine GetJSEngine()
+        {
+            return JSEngine;
         }
         public void SetupJintItem(Engine jsEngine, Item item)
         {
             jsEngine.SetValue("me", item);
-        }
-        /// <summary>
-        /// Handle recurring regular tasks
-        /// </summary>
-        public void OnTick()
-        {
-            if (TickCount++ >= TickInterval)
-            {
-                Logger.LogInformation("Running item scripts");
-                var javascriptDatas = JavascriptItemDataRepo.Read();
-                javascriptDatas.ForEach(data =>
-                {
-                    if (data.ScriptFunctions.Contains(":onTick:", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        var item = ItemManager.Read(data.DataItemId);
-                        if (item == null)
-                            throw new BeforeOurTimeException($"No item ({data.DataItemId}) found for javascript data ({data.Id})");
-                        ExecuteFunction(item, "onTick");
-                    }
-                });
-                TickCount = 0;
-            }
         }
         /// <summary>
         /// Get all repositories declared by manager
@@ -364,7 +329,7 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts
                 var messageManager = mm.GetManager<IMessageManager>();
                 var itemManager = mm.GetManager<IItemManager>();
                 var location = itemManager.Read(origin.ParentId.Value);
-                ((ScriptReadJSDefinitionsResponse)res).Definitions = Functions.Select(x => x.GetDefinition()).ToList();
+                ((ScriptReadJSDefinitionsResponse)res).Definitions = FunctionDefinitions;
                 res.SetSuccess(true);
             });
             return response;

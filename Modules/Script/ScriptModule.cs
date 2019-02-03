@@ -53,6 +53,7 @@ namespace BeforeOurTime.Business.Modules.Script
             dbOptions.UseSqlServer(connectionString);
             Db = new EFScriptModuleContext(dbOptions.Options);
             Managers = BuildManagers(ModuleManager, Db);
+            Repositories = Managers.SelectMany(x => x.GetRepositories()).ToList();
             ModuleManager.ModuleManagerReadyEvent += () =>
             {
                 ModuleReadyEvent?.Invoke();

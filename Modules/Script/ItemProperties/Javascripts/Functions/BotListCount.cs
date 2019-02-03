@@ -33,18 +33,16 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
                 Description = "Count the number of items in a c# list",
                 Example = @"var count = BotListCount(item.children);"
             };
-        }
-        public JavascriptFunctionDefinition GetDefinition()
-        {
-            return Definition;
-        }
-        public void CreateFunction(Engine jsEngine)
-        {
-            Func<IList, int> listCount = (IList list) =>
+            ModuleManager.ModuleManagerReadyEvent += () =>
             {
-                return list.Count;
+                ModuleManager.GetManager<IJavascriptItemDataManager>().AddFunctionDefinition(Definition);
+                var jsEngine = ModuleManager.GetManager<IJavascriptItemDataManager>().GetJSEngine();
+                Func<IList, int> listCount = (IList list) =>
+                {
+                    return list.Count;
+                };
+                jsEngine.SetValue("botListCount", listCount);
             };
-            jsEngine.SetValue("botListCount", listCount);
         }
     }
 }

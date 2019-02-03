@@ -32,10 +32,10 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
             Definition = new JavascriptFunctionDefinition()
             {
                 Global = true,
-                Prototype = "void botAddProperty(string propertyClass, object propertyObj)",
+                Prototype = "void botAddItemProperty(string propertyClass, object propertyObj)",
                 Description = "Dynamically add a property to an item",
                 Example = @"var onItemRead = function(item) {
-    botAddProperty(""BeforeOurTime.Models.Modules.Core.Models.Properties.CommandItemProperty"", {
+    botAddItemProperty(""BeforeOurTime.Models.Modules.Core.Models.Properties.CommandItemProperty"", {
         ""commands"": [{
             ""itemId"": item.Id,
             ""id"": ""22a73822-6655-4b7b-aa2d-100b5c4a00a7"",
@@ -47,21 +47,20 @@ namespace BeforeOurTime.Business.Modules.Script.ItemProperties.Javascripts.Funct
     });
 };"
             };
-        }
-        public JavascriptFunctionDefinition GetDefinition()
-        {
-            return Definition;
-        }
-        public void CreateFunction(Engine jsEngine)
-        {
-            Item item = (Item)jsEngine.GetValue("me").ToObject();
-            jsEngine.SetValue("botAddItemProperty", (Func<string, object, bool>)delegate (string typeName, object propertyObj)
+            ModuleManager.ModuleManagerReadyEvent += () =>
             {
-                Type propertyType = Type.GetType(typeName + ",BeforeOurTime.Models");
-                var itemProperty = (IItemProperty)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(propertyObj), propertyType);
-                item.AddProperty(propertyType, itemProperty);
-                return true;
-            });
+                ModuleManager.GetManager<IJavascriptItemDataManager>().AddFunctionDefinition(Definition);
+                var jsEngine = ModuleManager.GetManager<IJavascriptItemDataManager>().GetJSEngine();
+                Func<string, object, bool> botAddItemProperty = (string typeName, object propertyObj) => 
+                {
+                    Item item = (Item)jsEngine.GetValue("me").ToObject();
+                    Type propertyType = Type.GetType(typeName + ",BeforeOurTime.Models");
+                    var itemProperty = (IItemProperty)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(propertyObj), propertyType);
+                    item.AddProperty(propertyType, itemProperty);
+                    return true;
+                };
+                jsEngine.SetValue("botAddItemProperty", botAddItemProperty);
+            };
         }
     }
 }
